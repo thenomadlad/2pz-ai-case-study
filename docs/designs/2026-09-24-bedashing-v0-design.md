@@ -103,7 +103,7 @@ token if avoidable (Leaflet + OpenStreetMap tiles need none).
         app.js
         style.css
   docs/
-    superpowers/specs/        # design specs (this file)
+    designs/                  # design docs (this file)
 ```
 
 `pyproject.toml` + `uv.lock` replace the source doc's
