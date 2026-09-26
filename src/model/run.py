@@ -32,6 +32,8 @@ def main(settings: Settings | None = None) -> None:
 
     (settings.processed_dir / "decisions.json").write_text(
         json.dumps([d.model_dump() for d in decisions], indent=2))
+    (settings.processed_dir / "run_meta.json").write_text(
+        json.dumps({"model_backend": model.name}, indent=2))
 
     print(f"model: backend={model.name}, wrote {len(decisions)} decisions")
 

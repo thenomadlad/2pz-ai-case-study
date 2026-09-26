@@ -53,9 +53,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def network():
         payload = _load("branch_features.json")
         mtime = (settings.processed_dir / "branch_features.json").stat().st_mtime
+        run_meta_path = settings.processed_dir / "run_meta.json"
+        if run_meta_path.exists():
+            model_backend = json.loads(run_meta_path.read_text())["model_backend"]
+        else:
+            model_backend = settings.model_backend
         return {
             "stats": payload["network"],
-            "model_backend": settings.model_backend,
+            "model_backend": model_backend,
             "data_sources": {
                 "branches": "seed" if not settings.enable_scrape else "seed (scrape unimplemented)",
                 "communities": "seed" if not settings.dubai_pulse_enabled

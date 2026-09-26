@@ -82,6 +82,46 @@ async def test_network(client):
     assert body["model_backend"] == "rubric"
 
 
+async def test_network_reports_actual_backend_from_run_meta_not_configured_setting(tmp_path):
+    # Fix 1: MODEL_BACKEND=llm is configured, but no API key was set at pipeline-run time,
+    # so resolve_backend actually ran RubricModel and wrote run_meta.json={"model_backend":
+    # "rubric"}. /api/network must report "rubric" (what actually ran), not "llm" (the
+    # configured setting) -- otherwise the map header lies about data provenance.
+    processed_dir = tmp_path / "processed"
+    processed_dir.mkdir()
+    _seed_processed(processed_dir)
+    (processed_dir / "run_meta.json").write_text(json.dumps({"model_backend": "rubric"}))
+
+    settings = Settings(_env_file=None, processed_dir=processed_dir, model_backend="llm",
+                         anthropic_api_key=None)
+    app = create_app(settings)
+    transport = ASGITransport(app=app)
+    client = AsyncClient(transport=transport, base_url="http://test")
+
+    async with client as c:
+        resp = await c.get("/api/network")
+    body = resp.json()
+    assert body["model_backend"] == "rubric"
+
+
+async def test_network_falls_back_to_configured_backend_when_run_meta_absent(tmp_path):
+    # If the pipeline hasn't run yet (no run_meta.json), fall back to the configured setting.
+    processed_dir = tmp_path / "processed"
+    processed_dir.mkdir()
+    _seed_processed(processed_dir)
+    assert not (processed_dir / "run_meta.json").exists()
+
+    settings = Settings(_env_file=None, processed_dir=processed_dir, model_backend="rubric")
+    app = create_app(settings)
+    transport = ASGITransport(app=app)
+    client = AsyncClient(transport=transport, base_url="http://test")
+
+    async with client as c:
+        resp = await c.get("/api/network")
+    body = resp.json()
+    assert body["model_backend"] == "rubric"
+
+
 async def test_index_serves_html(client):
     async with client as c:
         resp = await c.get("/")
