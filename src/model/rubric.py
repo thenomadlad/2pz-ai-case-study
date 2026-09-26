@@ -13,6 +13,9 @@ class RubricModel:
     name = "rubric"
 
     def decide(self, branches: list[BranchFeatures], network: NetworkStats) -> list[Decision]:
+        if not branches:
+            return []
+
         pops = [b.female_pop_served for b in branches]
         contested = [b.contested_share for b in branches]
         ratings = [b.rating for b in branches if b.rating is not None]
@@ -46,12 +49,23 @@ class RubricModel:
             else:
                 action = "HOLD"
 
+            # Normalize each feature's deviation by its network IQR (p75-p25) before comparing,
+            # so features on very different scales (e.g. female_pop_served in the thousands vs.
+            # contested_share/rating in [0,1]-ish ranges) can be fairly ranked against each
+            # other. Without this, female_pop_served would dominate "key drivers" essentially
+            # every time regardless of whether it's actually the standout feature.
+            eps = 1e-9
+            pop_iqr = network.female_pop_served_p75 - network.female_pop_served_p25
+            contest_iqr = network.contested_share_p75 - network.contested_share_p25
             deviations = {
-                "female_pop_served": abs(b.female_pop_served - network.female_pop_served_median),
-                "contested_share": abs(b.contested_share - network.contested_share_median),
+                "female_pop_served": abs(b.female_pop_served - network.female_pop_served_median)
+                                      / (pop_iqr + eps),
+                "contested_share": abs(b.contested_share - network.contested_share_median)
+                                    / (contest_iqr + eps),
             }
             if network.rating_median is not None and b.rating is not None:
-                deviations["rating"] = abs(b.rating - network.rating_median)
+                rating_iqr = (network.rating_p75 or 0) - (network.rating_p25 or 0)
+                deviations["rating"] = abs(b.rating - network.rating_median) / (rating_iqr + eps)
             key_drivers = sorted(deviations, key=deviations.get, reverse=True)[:2]
 
             decisions.append(Decision(

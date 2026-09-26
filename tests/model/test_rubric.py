@@ -39,6 +39,12 @@ def test_rubric_ranks_top_and_bottom_thirds():
     assert all(len(d.key_drivers) == 2 for d in decisions)
 
 
+def test_rubric_decide_empty_branch_list_returns_empty_without_crashing():
+    # min()/max() on the empty `pops`/`contested`/`ratings` lists would otherwise raise
+    # ValueError. RubricModel.decide([]) is explicitly supported and returns [] early.
+    assert RubricModel().decide([], NETWORK) == []
+
+
 def test_rubric_handles_missing_rating():
     branches = [
         _features("a", pop=3000, contested_share=0.1, rating=None),
@@ -122,3 +128,31 @@ def test_rubric_uses_hardcoded_fallback_when_no_network_rating():
     assert by_id["high"].action == "PROTECT"
     assert by_id["none"].action == "HOLD"
     assert by_id["low"].action == "SHRINK"
+
+
+def test_key_drivers_normalizes_deviation_by_iqr_not_raw_magnitude():
+    # NETWORK IQRs: female_pop_served=1000 (2500-1500), contested_share=0.2 (0.3-0.1),
+    # rating=0.6 (4.6-4.0).
+    #
+    # Branch deviations from network medians:
+    #   female_pop_served: |2200 - 2000| = 200   -> raw deviation is huge in absolute terms
+    #   contested_share:   |0.05 - 0.2|  = 0.15
+    #   rating:             |4.8 - 4.3|  = 0.5
+    #
+    # Raw (unnormalized) ranking by absolute deviation: population (200) >> rating (0.5) >
+    # contested_share (0.15). The old, buggy code would pick {female_pop_served, rating} as
+    # key drivers every time, because population deviates by ~10^2-10^3 in absolute terms
+    # while the other two features live in [0, 1]-ish ranges -- population wins purely on
+    # scale, not because it's actually the most unusual feature for this branch.
+    #
+    # Normalized-by-IQR ranking: population 200/1000=0.20, contested_share 0.15/0.2=0.75,
+    # rating 0.5/0.6=0.833. So rating and contested_share are actually the two most unusual
+    # features (in IQR-relative terms) for this branch, and population -- despite its huge
+    # raw deviation -- is actually the *least* unusual once you account for scale.
+    branch = _features("scale-test", pop=2200, contested_share=0.05, rating=4.8)
+
+    decisions = RubricModel().decide([branch], NETWORK)
+    key_drivers = set(decisions[0].key_drivers)
+
+    assert key_drivers == {"rating", "contested_share"}
+    assert "female_pop_served" not in key_drivers
