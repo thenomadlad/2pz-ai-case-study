@@ -1,3 +1,5 @@
+import pytest
+
 from src.model.rubric import RubricModel
 from src.models import BranchFeatures, NetworkStats
 
@@ -46,8 +48,47 @@ def test_rubric_handles_missing_rating():
     assert len(decisions) == 2
 
 
+def _composite_from_rationale(decision) -> float:
+    # Rationale text is "Composite rubric score {composite:.2f} on population, ..."
+    marker = "Composite rubric score "
+    start = decision.rationale.index(marker) + len(marker)
+    return float(decision.rationale[start:start + 4])
+
+
 def test_rubric_uses_hardcoded_fallback_when_no_network_rating():
     # NetworkStats with all rating fields None to exercise the 4.0 hardcoded fallback
+    # in src/model/rubric.py: `rating_fallback = network.rating_median if ... else 4.0`.
+    #
+    # Batch is a MIXED batch (not all-None like the previous version of this test):
+    #   "low"  has a real rating=3.0
+    #   "high" has a real rating=4.0
+    #   "none" has rating=None, so its rating is filled in with rating_fallback
+    #
+    # Because "low" and "high" both carry real ratings, `ratings` is non-empty, so
+    # rating_lo, rating_hi = (3.0, 4.0) -- a genuine, non-degenerate range (unlike the
+    # old test, where every branch had rating=None, ratings=[] forced
+    # rating_lo == rating_hi == rating_fallback, and _normalize's `if hi == lo: return
+    # 0.5` guard swallowed the fallback's value entirely before it could affect anything).
+    #
+    # population and contested_share are identical across all three branches, so
+    # pop_score and contest_score are 0.5 for every branch (their own hi==lo guard
+    # fires) -- this isolates the rating dimension as the *only* source of composite
+    # score differences.
+    #
+    # Hand computation:
+    #   pop_score = contest_score = 0.5 for all three branches (identical inputs)
+    #   "low":  rating_score = _normalize(3.0, 3.0, 4.0) = 0.0
+    #           composite   = (0.5 + 0.5 + 0.0) / 3 = 0.333... -> "0.33"
+    #   "high": rating_score = _normalize(4.0, 3.0, 4.0) = 1.0
+    #           composite   = (0.5 + 0.5 + 1.0) / 3 = 0.666... -> "0.67"
+    #   "none": rating_value = rating_fallback = 4.0 (network.rating_median is None)
+    #           rating_score = _normalize(4.0, 3.0, 4.0) = 1.0   <- same as "high"
+    #           composite   = (0.5 + 0.5 + 1.0) / 3 = 0.666... -> "0.67"
+    #
+    # If the hardcoded fallback were changed from 4.0 to, say, 3.0, "none" would
+    # instead compute rating_score = _normalize(3.0, 3.0, 4.0) = 0.0, matching "low"
+    # (composite "0.33") instead of "high" -- a change this test would catch by
+    # comparing composites and actions.
     network_no_rating = NetworkStats(
         branch_count=3, total_female_population=6000,
         female_pop_served_median=2000, female_pop_served_p25=1500, female_pop_served_p75=2500,
@@ -56,9 +97,28 @@ def test_rubric_uses_hardcoded_fallback_when_no_network_rating():
         rating_median=None, rating_p25=None, rating_p75=None,
     )
     branches = [
-        _features("x", pop=2000, contested_share=0.1, rating=None),
-        _features("y", pop=3000, contested_share=0.2, rating=None),
-        _features("z", pop=1500, contested_share=0.3, rating=None),
+        _features("low", pop=2000, contested_share=0.2, rating=3.0),
+        _features("high", pop=2000, contested_share=0.2, rating=4.0),
+        _features("none", pop=2000, contested_share=0.2, rating=None),
     ]
     decisions = RubricModel().decide(branches, network_no_rating)
+    by_id = {d.branch_id: d for d in decisions}
     assert len(decisions) == 3
+
+    low_composite = _composite_from_rationale(by_id["low"])
+    high_composite = _composite_from_rationale(by_id["high"])
+    none_composite = _composite_from_rationale(by_id["none"])
+
+    # The None-rating branch scores identically to the branch with a *real* 4.0
+    # rating, and strictly higher than the branch with a real 3.0 rating -- this
+    # is only true because the fallback resolves to 4.0.
+    assert none_composite == pytest.approx(0.67, abs=0.005)
+    assert none_composite == pytest.approx(high_composite, abs=1e-9)
+    assert none_composite > low_composite
+    assert low_composite == pytest.approx(0.33, abs=0.005)
+
+    # Ranking-level confirmation: "none" lands in the same non-bottom tier as "high",
+    # not lumped in with "low" at the bottom.
+    assert by_id["high"].action == "PROTECT"
+    assert by_id["none"].action == "HOLD"
+    assert by_id["low"].action == "SHRINK"
