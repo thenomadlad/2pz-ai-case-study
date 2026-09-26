@@ -17,6 +17,14 @@ function popRadius(pop) {
   return Math.max(6, Math.min(30, Math.sqrt(pop) / 8));
 }
 
+function shortBranchName(name) {
+  // Real seed branch names all start with "Bedashing Beauty Lounge ", which at default
+  // zoom makes permanent map labels overlap and clutter central Dubai. Strip that prefix
+  // for the map label only (side panel keeps the full name). Falls back to the full name
+  // if the prefix isn't present.
+  return name.replace(/^bedashing beauty lounge /i, "");
+}
+
 function escapeHtml(value) {
   const div = document.createElement("div");
   div.textContent = value === null || value === undefined ? "" : String(value);
@@ -37,6 +45,13 @@ function renderSidePanel(branch) {
     ["Contested share", branch.contested_share.toFixed(2), est.has("contested_share"), network.contested_share_median?.toFixed(2)],
     ["Avg price (AED)", branch.avg_price_aed, est.has("avg_price_aed"), network.avg_price_aed_median],
     ["Rating", branch.rating, est.has("rating"), network.rating_median],
+    ["Communities served", branch.communities_served, est.has("communities_served"), null],
+    ["Mean distance (km)", branch.mean_distance_km?.toFixed?.(2) ?? branch.mean_distance_km, est.has("mean_distance_km"), null],
+    ["Contested pop", branch.contested_pop, est.has("contested_pop"), null],
+    ["Nearest sibling (km)", branch.nearest_sibling_km?.toFixed?.(2) ?? branch.nearest_sibling_km, est.has("nearest_sibling_km"), null],
+    ["Siblings within 5km", branch.siblings_within_5km, est.has("siblings_within_5km"), null],
+    ["Price index", branch.price_index?.toFixed?.(2) ?? branch.price_index, est.has("price_index"), null],
+    ["Pop-per-1k rank", branch.pop_per_1k_rank, est.has("pop_per_1k_rank"), null],
   ];
   panel.innerHTML = `
     <button class="close-panel" aria-label="Close">&times;</button>
@@ -82,7 +97,7 @@ function renderBranches() {
       fillColor: ACTION_COLORS[branch.action] || "#999",
       fillOpacity: 0.7,
     }).addTo(map);
-    marker.bindTooltip(`${escapeHtml(branch.name)} (${escapeHtml(branch.action)})`,
+    marker.bindTooltip(`${escapeHtml(shortBranchName(branch.name))} (${escapeHtml(branch.action)})`,
       { permanent: true, direction: "top" });
     marker.on("click", () => {
       renderSidePanel(branch);
@@ -114,33 +129,51 @@ function renderCommunities() {
   }
 }
 
+function showLoadError(message) {
+  const banner = document.getElementById("error-banner");
+  banner.textContent = message;
+  banner.classList.remove("hidden");
+}
+
+async function fetchJson(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    throw new Error(`${url} returned ${resp.status}`);
+  }
+  return resp.json();
+}
+
 async function main() {
-  const [branchResp, communityResp, networkResp] = await Promise.all([
-    fetch("/api/branches"), fetch("/api/communities"), fetch("/api/network"),
-  ]);
-  branches = await branchResp.json();
-  communities = await communityResp.json();
-  const networkPayload = await networkResp.json();
-  network = networkPayload.stats;
+  try {
+    const [branchResp, communityResp, networkPayload] = await Promise.all([
+      fetchJson("/api/branches"), fetchJson("/api/communities"), fetchJson("/api/network"),
+    ]);
+    branches = branchResp;
+    communities = communityResp;
+    network = networkPayload.stats;
 
-  document.getElementById("backend-label").textContent = `backend: ${networkPayload.model_backend}`;
-  document.getElementById("sources-label").textContent =
-    `sources: branches=${networkPayload.data_sources.branches}, communities=${networkPayload.data_sources.communities}`;
-  document.getElementById("run-at-label").textContent = `run at: ${networkPayload.pipeline_run_at}`;
+    document.getElementById("backend-label").textContent = `backend: ${networkPayload.model_backend}`;
+    document.getElementById("sources-label").textContent =
+      `sources: branches=${networkPayload.data_sources.branches}, communities=${networkPayload.data_sources.communities}`;
+    document.getElementById("run-at-label").textContent = `run at: ${networkPayload.pipeline_run_at}`;
 
-  renderBranches();
-  renderCommunities();
-  communityLayer.addTo(map);
+    renderBranches();
+    renderCommunities();
+    communityLayer.addTo(map);
 
-  document.getElementById("toggle-communities").addEventListener("change", (e) => {
-    if (e.target.checked) communityLayer.addTo(map); else map.removeLayer(communityLayer);
-  });
-  document.getElementById("toggle-assignment-lines").addEventListener("change", (e) => {
-    if (e.target.checked) assignmentLineLayer.addTo(map); else map.removeLayer(assignmentLineLayer);
-  });
-  document.getElementById("assumptions-toggle").addEventListener("click", () => {
-    document.getElementById("assumptions-panel").classList.toggle("hidden");
-  });
+    document.getElementById("toggle-communities").addEventListener("change", (e) => {
+      if (e.target.checked) communityLayer.addTo(map); else map.removeLayer(communityLayer);
+    });
+    document.getElementById("toggle-assignment-lines").addEventListener("change", (e) => {
+      if (e.target.checked) assignmentLineLayer.addTo(map); else map.removeLayer(assignmentLineLayer);
+    });
+    document.getElementById("assumptions-toggle").addEventListener("click", () => {
+      document.getElementById("assumptions-panel").classList.toggle("hidden");
+    });
+  } catch (err) {
+    console.error("Failed to load pipeline data", err);
+    showLoadError("Failed to load pipeline data — run `make all` first.");
+  }
 }
 
 main();

@@ -5,6 +5,11 @@ html, body { margin: 0; height: 100%; font-family: sans-serif; }
   background: #222; color: #fff; font-size: 0.85rem;
 }
 #header button { margin-left: auto; }
+#error-banner {
+  position: absolute; top: 40px; left: 0; right: 0; z-index: 1100; background: #c62828;
+  color: #fff; padding: 0.5rem 1rem; font-size: 0.9rem; text-align: center;
+}
+#error-banner.hidden { display: none; }
 #assumptions-panel {
   position: absolute; top: 40px; left: 0; right: 0; z-index: 1000; background: #fff;
   border-bottom: 2px solid #222; padding: 1rem; max-height: 40%; overflow-y: auto;
