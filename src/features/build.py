@@ -28,6 +28,7 @@ def build_features(
 ) -> tuple[list[BranchFeatures], NetworkStats, list]:
     assignments = assign_communities(branches, communities, contest_ratio)
     price_flag_set = set(price_flags)
+    community_by_id = {c.id: c for c in communities}
 
     median_price = statistics.median([b.avg_price_aed for b in branches if b.avg_price_aed])
 
@@ -52,6 +53,9 @@ def build_features(
         siblings_within_5km = sum(1 for d in sibling_distances if d <= 5.0)
 
         estimated_fields = ["avg_price_aed"] if branch.id in price_flag_set else []
+        if any(community_by_id[a.community_id].is_estimated for a in served
+               if a.community_id in community_by_id):
+            estimated_fields.append("female_pop_served")
 
         features.append(BranchFeatures(
             branch_id=branch.id,

@@ -10,9 +10,9 @@ def _branch(id, lat, lng, price=100.0, rating=4.5, reviews=50):
                   review_count=reviews, avg_price_aed=price, source="seed")
 
 
-def _community(id, lat, lng, female):
+def _community(id, lat, lng, female, is_estimated=False):
     return Community(id=id, name_en=id, lat=lat, lng=lng, population_total=female * 2,
-                      population_female=female, is_estimated=False)
+                      population_female=female, is_estimated=is_estimated)
 
 
 def test_build_features_basic():
@@ -29,6 +29,47 @@ def test_build_features_basic():
     assert network.branch_count == 2
     assert network.total_female_population == 1500
     assert len(assignments) == 2
+
+
+def test_build_features_flags_female_pop_served_when_any_served_community_estimated():
+    # Branch "a" is served by one estimated and one reported community -> flagged.
+    # Branch "b" is served only by reported communities -> not flagged.
+    branches = [_branch("a", 25.10, 55.20), _branch("b", 25.50, 55.50)]
+    communities = [
+        _community("c1", 25.101, 55.201, 1000, is_estimated=True),
+        _community("c2", 25.099, 55.199, 500, is_estimated=False),
+        _community("c3", 25.501, 55.501, 700, is_estimated=False),
+    ]
+
+    features, _, _ = build_features(branches, communities, price_flags=[], contest_ratio=1.25)
+    by_id = {f.branch_id: f for f in features}
+
+    assert "female_pop_served" in by_id["a"].estimated_fields
+    assert "female_pop_served" not in by_id["b"].estimated_fields
+
+
+def test_build_features_branch_serving_zero_communities_does_not_crash():
+    # A branch with no communities assigned to it (all communities are closer to another
+    # branch) should get zero-valued distance/pop fields rather than crashing, per the
+    # `if served: ... else: mean_distance, max_distance = 0.0, 0.0` branch in build_features.
+    branches = [_branch("a", 25.10, 55.20), _branch("b", 25.50, 55.50)]
+    # Both communities are far closer to "b" than "a", so "a" serves zero communities.
+    communities = [
+        _community("c1", 25.501, 55.501, 1000),
+        _community("c2", 25.499, 55.499, 500),
+    ]
+
+    features, network, assignments = build_features(branches, communities, price_flags=[],
+                                                      contest_ratio=1.25)
+    by_id = {f.branch_id: f for f in features}
+
+    assert by_id["a"].communities_served == 0
+    assert by_id["a"].female_pop_served == 0
+    assert by_id["a"].mean_distance_km == 0.0
+    assert by_id["a"].max_distance_km == 0.0
+    assert by_id["a"].contested_share == 0.0
+    assert by_id["a"].estimated_fields == []
+    assert network.branch_count == 2
 
 
 def test_main_writes_processed_files(tmp_path):
