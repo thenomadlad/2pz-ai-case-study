@@ -65,6 +65,59 @@ def test_decide_uses_cache_on_second_call(tmp_path):
     assert client.messages.create.call_count == 1
 
 
+def test_decide_overrides_hallucinated_branch_id_with_actual_branch_id(tmp_path):
+    # If the LLM echoes back a typo'd/hallucinated branch_id, we must not trust it -- it's
+    # the join key used downstream by /api/branches. The Decision's branch_id must always
+    # match the branch we actually passed in.
+    branch = _features()
+    decision_payload = {
+        "branch_id": "totally-wrong-id", "action": "PROTECT", "confidence": "high",
+        "rationale": "Strong population, low contest.",
+        "key_drivers": ["female_pop_served", "contested_share"], "caveats": ["No revenue data."],
+    }
+    client = MagicMock()
+    client.messages.create.return_value = _tool_use_response(decision_payload)
+
+    model = LLMModel(client=client, model_name="test-model", cache_dir=tmp_path)
+    decisions = model.decide([branch], NETWORK)
+
+    assert decisions[0].branch_id == "a"
+
+
+def test_decide_falls_back_to_rubric_when_api_call_raises(tmp_path):
+    # If the Anthropic API call fails (rate limit, network error, expired key), the pipeline
+    # must not crash with a raw traceback -- it should fall back to a rubric decision for
+    # that branch, matching the "log loudly, fall back gracefully" philosophy used elsewhere.
+    branch = _features()
+    client = MagicMock()
+    client.messages.create.side_effect = RuntimeError("simulated API failure")
+
+    model = LLMModel(client=client, model_name="test-model", cache_dir=tmp_path)
+    decisions = model.decide([branch], NETWORK)
+
+    assert len(decisions) == 1
+    assert decisions[0].branch_id == "a"
+    assert decisions[0].action in ("PROTECT", "HOLD", "SHRINK")
+
+
+def test_decide_falls_back_to_rubric_when_no_tool_use_block_returned(tmp_path):
+    # If the model responds without a tool-use block (e.g. hits max_tokens mid-call or
+    # refuses), the bare `next(...)` StopIteration must not propagate -- fall back to rubric.
+    branch = _features()
+    text_block = MagicMock()
+    text_block.type = "text"
+    response = MagicMock()
+    response.content = [text_block]
+    client = MagicMock()
+    client.messages.create.return_value = response
+
+    model = LLMModel(client=client, model_name="test-model", cache_dir=tmp_path)
+    decisions = model.decide([branch], NETWORK)
+
+    assert len(decisions) == 1
+    assert decisions[0].branch_id == "a"
+
+
 def test_cache_key_changes_with_feature_vector():
     branch = _features()
     other = branch.model_copy(update={"female_pop_served": 9999})

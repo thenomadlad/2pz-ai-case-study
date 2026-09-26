@@ -76,17 +76,32 @@ class LLMModel:
         if cache_path.exists():
             return Decision(**json.loads(cache_path.read_text()))
 
-        response = self._client.messages.create(
-            model=self._model_name,
-            max_tokens=1024,
-            temperature=0,
-            system=SYSTEM_PROMPT,
-            tools=[DECISION_TOOL],
-            tool_choice={"type": "tool", "name": "submit_decision"},
-            messages=[{"role": "user", "content": _build_user_message(branch, network)}],
-        )
-        tool_block = next(b for b in response.content if b.type == "tool_use")
-        decision = Decision(**tool_block.input)
+        try:
+            response = self._client.messages.create(
+                model=self._model_name,
+                max_tokens=1024,
+                temperature=0,
+                system=SYSTEM_PROMPT,
+                tools=[DECISION_TOOL],
+                tool_choice={"type": "tool", "name": "submit_decision"},
+                messages=[{"role": "user", "content": _build_user_message(branch, network)}],
+            )
+            tool_block = next(b for b in response.content if b.type == "tool_use")
+            # Never trust the LLM's echoed branch_id -- it's the join key used downstream by
+            # /api/branches, and a typo'd/hallucinated id would silently break that join with
+            # no error anywhere. Always use the branch_id we actually passed in.
+            decision = Decision(**{**tool_block.input, "branch_id": branch.branch_id})
+        except Exception as exc:
+            # Mirrors the "log loudly, fall back gracefully" philosophy used elsewhere in the
+            # pipeline (branches.py, population.py, prices.py). A single branch's API call
+            # failing (rate limit, network error, expired key, no tool-use block returned)
+            # should not crash the whole run -- fall back to a rubric decision for just this
+            # branch instead.
+            logger.warning("model: LLM call failed for branch %s (%s), falling back to rubric",
+                            branch.branch_id, exc)
+            from src.model.rubric import RubricModel
+            decision = RubricModel().decide([branch], network)[0]
+
         cache_path.write_text(json.dumps(decision.model_dump(), indent=2))
         return decision
 
