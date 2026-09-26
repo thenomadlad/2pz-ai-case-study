@@ -25,7 +25,7 @@ def _percentile(ordered: list[float], pct: float) -> float:
 def build_features(
     branches: list[Branch], communities: list[Community],
     price_flags: list[str], contest_ratio: float,
-) -> tuple[list[BranchFeatures], NetworkStats]:
+) -> tuple[list[BranchFeatures], NetworkStats, list]:
     assignments = assign_communities(branches, communities, contest_ratio)
     price_flag_set = set(price_flags)
 
@@ -103,7 +103,7 @@ def build_features(
         rating_p25=rating_p25,
         rating_p75=rating_p75,
     )
-    return features, network
+    return features, network, assignments
 
 
 def main(settings: Settings | None = None) -> None:
@@ -115,8 +115,7 @@ def main(settings: Settings | None = None) -> None:
     communities = [Community(**c) for c in
                    json.loads((settings.raw_dir / "communities.json").read_text())]
 
-    features, network = build_features(branches, communities, price_flags, settings.contest_ratio)
-    assignments = assign_communities(branches, communities, settings.contest_ratio)
+    features, network, assignments = build_features(branches, communities, price_flags, settings.contest_ratio)
 
     (settings.processed_dir / "branch_features.json").write_text(json.dumps({
         "network": network.model_dump(),

@@ -19,7 +19,7 @@ def test_build_features_basic():
     branches = [_branch("a", 25.10, 55.20), _branch("b", 25.50, 55.50)]
     communities = [_community("c1", 25.11, 55.21, 1000), _community("c2", 25.51, 55.51, 500)]
 
-    features, network = build_features(branches, communities, price_flags=["b"],
+    features, network, assignments = build_features(branches, communities, price_flags=["b"],
                                         contest_ratio=1.25)
 
     by_id = {f.branch_id: f for f in features}
@@ -28,6 +28,7 @@ def test_build_features_basic():
     assert by_id["b"].estimated_fields == ["avg_price_aed"]
     assert network.branch_count == 2
     assert network.total_female_population == 1500
+    assert len(assignments) == 2
 
 
 def test_main_writes_processed_files(tmp_path):
