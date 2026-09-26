@@ -70,7 +70,7 @@ class LLMModel:
         self._cache_dir = cache_dir or (default_settings.processed_dir / ".llm_cache")
         self._cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def _decide_one(self, branch: BranchFeatures, network: NetworkStats) -> Decision:
+    def _decide_one(self, branch: BranchFeatures, network: NetworkStats, get_fallback) -> Decision:
         key = _cache_key(branch, self._model_name)
         cache_path = self._cache_dir / f"{key}.json"
         if cache_path.exists():
@@ -96,14 +96,39 @@ class LLMModel:
             # pipeline (branches.py, population.py, prices.py). A single branch's API call
             # failing (rate limit, network error, expired key, no tool-use block returned)
             # should not crash the whole run -- fall back to a rubric decision for just this
-            # branch instead.
+            # branch instead. The fallback decision is deliberately never cached: caching it
+            # would permanently freeze a transient API failure as this branch's answer and the
+            # API would never be retried on subsequent runs.
             logger.warning("model: LLM call failed for branch %s (%s), falling back to rubric",
                             branch.branch_id, exc)
-            from src.model.rubric import RubricModel
-            decision = RubricModel().decide([branch], network)[0]
+            return get_fallback(branch)
 
         cache_path.write_text(json.dumps(decision.model_dump(), indent=2))
         return decision
 
     def decide(self, branches: list[BranchFeatures], network: NetworkStats) -> list[Decision]:
-        return [self._decide_one(b, network) for b in branches]
+        # Lazily computed on first failure and memoized for the rest of this `decide()` call.
+        # Must be keyed against the FULL batch of branches (not a single branch in isolation) --
+        # RubricModel's top/bottom-third bucketing depends on how a branch ranks against its
+        # peers, and a batch of one always lands that one branch in the PROTECT tier regardless
+        # of its actual features.
+        fallback_by_branch_id: dict[str, Decision] | None = None
+
+        def get_fallback(branch: BranchFeatures) -> Decision:
+            nonlocal fallback_by_branch_id
+            if fallback_by_branch_id is None:
+                from src.model.rubric import RubricModel
+                fallback_by_branch_id = {
+                    d.branch_id: d for d in RubricModel().decide(branches, network)
+                }
+            base = fallback_by_branch_id[branch.branch_id]
+            # The fallback decision must be visibly distinguishable from a genuine LLM decision
+            # -- a caller (or a human reading decisions.json) has no other way to know this
+            # branch's decision didn't actually come from the LLM.
+            return base.model_copy(update={
+                "confidence": "low",
+                "caveats": [*base.caveats,
+                            "LLM call failed; rubric fallback used for this branch."],
+            })
+
+        return [self._decide_one(b, network, get_fallback) for b in branches]
