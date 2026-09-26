@@ -44,3 +44,21 @@ def test_rubric_handles_missing_rating():
     ]
     decisions = RubricModel().decide(branches, NETWORK)
     assert len(decisions) == 2
+
+
+def test_rubric_uses_hardcoded_fallback_when_no_network_rating():
+    # NetworkStats with all rating fields None to exercise the 4.0 hardcoded fallback
+    network_no_rating = NetworkStats(
+        branch_count=3, total_female_population=6000,
+        female_pop_served_median=2000, female_pop_served_p25=1500, female_pop_served_p75=2500,
+        contested_share_median=0.2, contested_share_p25=0.1, contested_share_p75=0.3,
+        avg_price_aed_median=100, avg_price_aed_p25=90, avg_price_aed_p75=110,
+        rating_median=None, rating_p25=None, rating_p75=None,
+    )
+    branches = [
+        _features("x", pop=2000, contested_share=0.1, rating=None),
+        _features("y", pop=3000, contested_share=0.2, rating=None),
+        _features("z", pop=1500, contested_share=0.3, rating=None),
+    ]
+    decisions = RubricModel().decide(branches, network_no_rating)
+    assert len(decisions) == 3

@@ -1,4 +1,4 @@
-from typing import Literal, Protocol
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -80,9 +80,3 @@ class Decision(BaseModel):
     rationale: str
     key_drivers: list[str]
     caveats: list[str]
-
-
-class DecisionModel(Protocol):
-    name: str
-
-    def decide(self, branch: BranchFeatures, network: NetworkStats) -> Decision: ...
