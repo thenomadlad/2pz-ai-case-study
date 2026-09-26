@@ -23,9 +23,13 @@ html, body { margin: 0; height: 100%; font-family: sans-serif; }
 .dot.hold { background: #f9a825; }
 .dot.shrink { background: #c62828; }
 #side-panel {
-  position: absolute; top: 50px; right: 10px; z-index: 950; background: #fff; width: 280px;
+  position: absolute; top: 100px; right: 10px; z-index: 950; background: #fff; width: 280px;
   max-height: 70%; overflow-y: auto; padding: 1rem; border-radius: 4px;
   box-shadow: 0 1px 6px rgba(0,0,0,0.4); font-size: 0.85rem;
 }
 #side-panel.hidden { display: none; }
+.close-panel {
+  float: right; border: none; background: none; font-size: 1.1rem; line-height: 1;
+  cursor: pointer; padding: 0 0.25rem;
+}
 .estimated { font-style: italic; }

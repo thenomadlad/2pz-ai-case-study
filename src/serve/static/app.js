@@ -39,6 +39,7 @@ function renderSidePanel(branch) {
     ["Rating", branch.rating, est.has("rating"), network.rating_median],
   ];
   panel.innerHTML = `
+    <button class="close-panel" aria-label="Close">&times;</button>
     <h3>${escapeHtml(branch.name)}</h3>
     <p><strong>${escapeHtml(branch.action)}</strong> (${escapeHtml(branch.confidence)} confidence)</p>
     <p>${escapeHtml(branch.rationale)}</p>
@@ -51,6 +52,9 @@ function renderSidePanel(branch) {
     </table>
     <p><strong>Caveats:</strong> ${escapeHtml((branch.caveats || []).join("; ") || "none")}</p>
   `;
+  panel.querySelector(".close-panel").addEventListener("click", () => {
+    panel.classList.add("hidden");
+  });
   panel.classList.remove("hidden");
 }
 
