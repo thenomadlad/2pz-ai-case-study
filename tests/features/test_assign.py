@@ -38,7 +38,7 @@ def test_assign_picks_nearest():
 
 def test_assign_marks_contested_when_close():
     branches = [_branch("b1", 25.10, 55.20), _branch("b2", 25.101, 55.201)]
-    communities = [_community("c1", 25.10, 55.20, 500)]
+    communities = [_community("c1", 25.1005, 55.2005, 500)]
 
     result = assign_communities(branches, communities, contest_ratio=1.25)
 
@@ -63,3 +63,14 @@ def test_assign_single_branch_has_no_second():
     assert result[0].second_branch_id is None
     assert result[0].second_km is None
     assert result[0].contested is False
+
+
+def test_assign_contested_when_tied_at_same_location():
+    branches = [_branch("b1", 25.10, 55.20), _branch("b2", 25.10, 55.20)]
+    communities = [_community("c1", 25.10, 55.20, 500)]
+
+    result = assign_communities(branches, communities, contest_ratio=1.25)
+
+    assert result[0].nearest_km == 0.0
+    assert result[0].second_km == 0.0
+    assert result[0].contested is True

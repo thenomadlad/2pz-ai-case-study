@@ -28,7 +28,7 @@ def assign_communities(
             if nearest_km > 0:
                 contested = (second_km / nearest_km) < contest_ratio
             else:
-                contested = second_km < contest_ratio
+                contested = (second_km == 0)
         else:
             second_km, second_id, contested = None, None, False
 
