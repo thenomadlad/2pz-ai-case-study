@@ -172,7 +172,7 @@ async function main() {
     });
   } catch (err) {
     console.error("Failed to load pipeline data", err);
-    showLoadError("Failed to load pipeline data — run `make all` first.");
+    showLoadError("Failed to load pipeline data — run `just all` first.");
   }
 }
 

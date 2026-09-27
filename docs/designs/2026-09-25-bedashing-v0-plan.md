@@ -4,7 +4,7 @@
 
 **Goal:** Build the Bedashing V0 prototype end to end — a file-based pipeline that assigns Dubai communities to their nearest Bedashing branch, computes per-branch features, labels each branch PROTECT/HOLD/SHRINK (rubric and LLM backends), and serves it all on a Leaflet map.
 
-**Architecture:** Four independently re-runnable file-based stages (`acquire` → `features` → `model` → `serve`), each reading/writing plain JSON under `data/`, wired together by a `Makefile`. No database. FastAPI serves both a JSON API and a static Leaflet frontend.
+**Architecture:** Four independently re-runnable file-based stages (`acquire` → `features` → `model` → `serve`), each reading/writing plain JSON under `data/`, wired together by a `justfile`. No database. FastAPI serves both a JSON API and a static Leaflet frontend.
 
 **Tech Stack:** Python 3.11+, `uv`, `fastapi`, `uvicorn`, `httpx`, `pydantic` v2 + `pydantic-settings`, `python-dotenv`, `anthropic` SDK, `pytest`, `ruff`. Frontend: plain HTML/CSS/JS + Leaflet from CDN.
 
@@ -20,7 +20,7 @@
 - `MODEL_BACKEND` default `llm`; if `ANTHROPIC_API_KEY` is unset, log a warning and fall back to `rubric` automatically.
 - `ENABLE_SCRAPE` and `DUBAI_PULSE_ENABLED` default off (`0`).
 - Map centered at `25.2048, 55.2708`, zoom `11`.
-- `make all` runs stages 1-3; `make serve` runs the API; `make clean` wipes `data/raw` and `data/processed`, never `data/seed`.
+- `just all` runs stages 1-3; `just serve` runs the API; `just clean` wipes `data/raw` and `data/processed`, never `data/seed`.
 - Frontend must not use `innerHTML`/`insertAdjacentHTML` with unescaped dynamic content — LLM-generated fields (`rationale`, `caveats`, `key_drivers`) are untrusted text and must be HTML-escaped before insertion.
 - Full design reference: `docs/designs/2026-09-24-bedashing-v0-design.md`.
 
@@ -45,7 +45,7 @@ The design doc is a build prompt written for a human running real scrapers again
   uv.lock
   .env.example
   .gitignore
-  Makefile
+  justfile
   README.md
   data/
     seed/branches.csv
@@ -108,7 +108,7 @@ The design doc is a build prompt written for a human running real scrapers again
 ### Task 1: Project scaffolding & tooling
 
 **Files:**
-- Create: `pyproject.toml`, `.env.example`, `.gitignore`, `Makefile`, `README.md`
+- Create: `pyproject.toml`, `.env.example`, `.gitignore`, `justfile`, `README.md`
 - Create: `src/__init__.py`, `src/acquire/__init__.py`, `src/features/__init__.py`, `src/model/__init__.py`, `src/serve/__init__.py`
 - Create: `tests/__init__.py`, `tests/acquire/__init__.py`, `tests/features/__init__.py`, `tests/model/__init__.py`, `tests/serve/__init__.py`
 - Test: `tests/test_smoke.py`
@@ -183,7 +183,7 @@ touch tests/__init__.py tests/acquire/__init__.py tests/features/__init__.py tes
 touch data/raw/.gitkeep data/processed/.gitkeep
 ```
 
-- [ ] **Step 5: Write a Makefile skeleton (targets wired up fully in Task 13)**
+- [ ] **Step 5: Write a justfile skeleton (targets wired up fully in Task 13)**
 
 ```makefile
 .PHONY: all serve clean test
@@ -237,8 +237,8 @@ Setup and usage instructions land here in a later task.
 - [ ] **Step 9: Commit**
 
 ```bash
-git add pyproject.toml .env.example .gitignore Makefile README.md src tests data/raw/.gitkeep data/processed/.gitkeep
-git commit -m "Scaffold project: uv toolchain, package layout, Makefile skeleton"
+git add pyproject.toml .env.example .gitignore justfile README.md src tests data/raw/.gitkeep data/processed/.gitkeep
+git commit -m "Scaffold project: uv toolchain, package layout, justfile skeleton"
 ```
 
 ---
@@ -1945,21 +1945,21 @@ git commit -m "Add stage 3 entrypoint with automatic rubric fallback and llm-vs-
 
 ---
 
-### Task 13: Wire up the Makefile
+### Task 13: Wire up the justfile
 
 **Files:**
-- Modify: `Makefile`
+- Modify: `justfile`
 
 **Interfaces:**
 - Consumes: entrypoints from Tasks 7, 9, 12, and the FastAPI app from Task 14.
 
-- [ ] **Step 1: Confirm the Makefile from Task 1 already matches the required targets**
+- [ ] **Step 1: Confirm the justfile from Task 1 already matches the required targets**
 
 The `all`, `serve`, `clean`, `test` targets written in Task 1 already call the exact entrypoints built since (`src.acquire.run`, `src.features.build`, `src.model.run`, `src.serve.app:app`). No code change needed — this step is a verification, not an edit.
 
 - [ ] **Step 2: Run the full pipeline for real with zero env vars set**
 
-Run: `unset ANTHROPIC_API_KEY MODEL_BACKEND && make clean && make all`
+Run: `unset ANTHROPIC_API_KEY MODEL_BACKEND && just clean && just all`
 Expected: acquire summary prints, features summary prints, `model: MODEL_BACKEND=llm but ANTHROPIC_API_KEY is unset, falling back to rubric` warning prints, then `model: backend=rubric, wrote N decisions`. Exit code 0.
 
 - [ ] **Step 3: Commit only if Step 1 required a fix; otherwise no commit needed for this task**
@@ -2421,8 +2421,8 @@ main();
 - [ ] **Step 4: Run the real pipeline and the server, verify manually**
 
 ```bash
-make clean && make all
-make serve
+just clean && just all
+just serve
 ```
 
 Then open `http://localhost:8000` in a browser (or use the `run` skill / browser agent) and confirm: branch markers appear colored by action, clicking a marker opens the side panel with features vs. network medians, the community layer toggles on/off, the assumptions panel toggles, and the header shows backend/sources/run timestamp.
@@ -2463,8 +2463,8 @@ uv sync --extra dev
 ## Run everything
 
 ```bash
-make all     # stages 1-3: acquire -> features -> model
-make serve   # http://localhost:8000
+just all     # stages 1-3: acquire -> features -> model
+just serve   # http://localhost:8000
 ```
 
 No API key or network access is required — `MODEL_BACKEND` defaults to `llm` but
@@ -2486,7 +2486,7 @@ to stdout showing where the LLM and rubric disagree.
 ## Tests
 
 ```bash
-make test
+just test
 ```
 
 ## Known limitations
@@ -2512,7 +2512,7 @@ Expected: all tests pass, 0 failures.
 
 ```bash
 unset ANTHROPIC_API_KEY
-make clean && make all && make serve
+just clean && just all && just serve
 ```
 
 Expected: Dubai map loads at `http://localhost:8000`, every branch is colored by a rubric-derived action, clicking one shows its features against network medians, and the assumptions list is visible via the toggle.
@@ -2528,7 +2528,7 @@ git commit -m "Add setup, usage, and known-limitations documentation"
 
 ## Self-Review Notes
 
-- **Spec coverage:** §1 (file-based, idempotent, no-network, DecisionModel interface) → Tasks 1-14. §2 stack → Task 1. §3 layout → File Structure section. §4 acquisition → Tasks 4-7. §5 features → Tasks 8-9. §6 decision model → Tasks 10-12. §7 service → Task 14. §8 frontend → Task 15. §9 assumptions → Task 15 (rendered) + Task 16 (README). §10 build order/Makefile → Tasks 1, 13, 16. §11 (poke-at prompts) is explicitly post-build usage, not implementation — left to the user once the app is running, not a task.
+- **Spec coverage:** §1 (file-based, idempotent, no-network, DecisionModel interface) → Tasks 1-14. §2 stack → Task 1. §3 layout → File Structure section. §4 acquisition → Tasks 4-7. §5 features → Tasks 8-9. §6 decision model → Tasks 10-12. §7 service → Task 14. §8 frontend → Task 15. §9 assumptions → Task 15 (rendered) + Task 16 (README). §10 build order/justfile → Tasks 1, 13, 16. §11 (poke-at prompts) is explicitly post-build usage, not implementation — left to the user once the app is running, not a task.
 - **Placeholder scan:** no TBD/TODO; the two `NotImplementedError` stubs (live scrape, Dubai Pulse) are real, tested, intentional scope decisions documented up front, not deferred-detail placeholders.
 - **Type consistency:** `DecisionModel.decide` takes `list[BranchFeatures]` and returns `list[Decision]` consistently across `base.py` (Task 10), `rubric.py` (Task 10), `llm.py` (Task 11), and `run.py` (Task 12) — this is a deliberate widening from the source doc's per-branch protocol sketch, called out in Task 10.
 - **Security fix applied:** original draft of Task 15's `app.js` interpolated `branch.name`/`rationale`/`caveats`/`key_drivers` (LLM-controlled text) directly into `innerHTML`. Fixed by adding `escapeHtml()` and routing every dynamic value through it before template interpolation, and calling this out explicitly in the Global Constraints and Task 15's interface notes so it isn't silently reintroduced during implementation.

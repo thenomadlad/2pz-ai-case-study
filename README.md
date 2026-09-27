@@ -14,8 +14,8 @@ uv sync --extra dev
 ## Run everything
 
 ```bash
-make all     # stages 1-3: acquire -> features -> model
-make serve   # http://localhost:8000
+just all     # stages 1-3: acquire -> features -> model
+just serve   # http://localhost:8000
 ```
 
 No API key or network access is required — `MODEL_BACKEND` defaults to `llm` but
@@ -37,7 +37,7 @@ to stdout showing where the LLM and rubric disagree.
 ## Tests
 
 ```bash
-make test
+just test
 ```
 
 ## Known limitations

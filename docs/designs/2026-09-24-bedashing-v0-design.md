@@ -40,7 +40,7 @@ layout, Abu Dhabi/Sharjah (Dubai only).
 3. It must run with zero network access and zero API keys. Committed seed
    data in `data/seed/` is the primary path; scrapers and APIs are
    enrichment, always optional, always falling back to seed. A first-time
-   user runs `make all` and gets a working map.
+   user runs `just all` and gets a working map.
 4. The decision model sits behind an interface with two implementations
    (LLM and a deterministic rubric) so they can be compared. See §6.
 5. Scrappy means small, not sloppy. Type hints, dataclasses or pydantic
@@ -65,7 +65,7 @@ token if avoidable (Leaflet + OpenStreetMap tiles need none).
 
 ```
 2pz-ai-case-study/
-  Makefile
+  justfile
   pyproject.toml
   uv.lock
   .env.example
@@ -403,11 +403,11 @@ Build and verify in this order; each step must work before the next:
 5. LLM backend + caching
 6. Community layer, sibling links, side panel, provenance header
 
-`make all` runs stages 1-3. `make serve` runs the API. `make clean` wipes
+`just all` runs stages 1-3. `just serve` runs the API. `just clean` wipes
 `data/raw` and `data/processed` but never `data/seed`.
 
 Done when: a fresh clone with no API key and no network runs
-`make all && make serve` and shows a Dubai map with every branch coloured
+`just all && just serve` and shows a Dubai map with every branch coloured
 by a rubric-derived action, clicking one shows its features against
 network medians, and the assumptions list is visible.
 
