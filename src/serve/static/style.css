@@ -5,6 +5,8 @@ html, body { margin: 0; height: 100%; font-family: sans-serif; }
   background: #222; color: #fff; font-size: 0.85rem;
 }
 #header button { margin-left: auto; }
+#backend-mismatch-label { color: #ffca28; font-weight: bold; }
+#backend-mismatch-label.hidden { display: none; }
 #error-banner {
   position: absolute; top: 40px; left: 0; right: 0; z-index: 1100; background: #c62828;
   color: #fff; padding: 0.5rem 1rem; font-size: 0.9rem; text-align: center;

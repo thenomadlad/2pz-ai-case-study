@@ -46,13 +46,32 @@ function formatChangedFieldRow(field, delta) {
   return `<tr><td>${label}</td><td><span class="diff-old">${oldValue}</span> &rarr; <span class="diff-new">${newValue}</span></td></tr>`;
 }
 
+function formatActionChangeRow(diffEntry) {
+  // The single most important thing this panel needs to surface: what the decision
+  // actually flipped TO. changed_fields only covers BranchFeatures fields, never the
+  // Decision fields (action/confidence), so without this the side panel shows no
+  // indication anywhere of an action flip. Routed through escapeHtml like
+  // formatChangedFieldRow -- no unescaped interpolation.
+  const oldAction = escapeHtml(diffEntry.old.action);
+  const newAction = escapeHtml(diffEntry.new.action);
+  const oldConfidence = escapeHtml(diffEntry.old.confidence);
+  const newConfidence = escapeHtml(diffEntry.new.confidence);
+  return `<tr><td>Decision</td><td><span class="diff-old">${oldAction} (${oldConfidence})</span> &rarr; <span class="diff-new">${newAction} (${newConfidence})</span></td></tr>`;
+}
+
 function renderDiffSection(diffEntry) {
   if (!diffEntry) return "";
   const hasChanges = diffEntry.action_changed || Object.keys(diffEntry.changed_fields).length > 0;
   if (!hasChanges) return "";
-  const rowsHtml = diffEntry.old === null
-    ? '<tr><td colspan="2">New in this scenario</td></tr>'
-    : Object.entries(diffEntry.changed_fields).map(([field, delta]) => formatChangedFieldRow(field, delta)).join("");
+  let rowsHtml;
+  if (diffEntry.old === null) {
+    rowsHtml = '<tr><td colspan="2">New in this scenario</td></tr>';
+  } else {
+    const actionRow = diffEntry.action_changed && diffEntry.old && diffEntry.new
+      ? formatActionChangeRow(diffEntry) : "";
+    rowsHtml = actionRow + Object.entries(diffEntry.changed_fields)
+      .map(([field, delta]) => formatChangedFieldRow(field, delta)).join("");
+  }
   return `
     <div class="diff-section">
       <h4>Changed since baseline</h4>
@@ -182,11 +201,40 @@ function renderDiffHighlights() {
     } else if (entry.action_changed || Object.keys(entry.changed_fields).length > 0) {
       const branch = branchById[entry.branch_id];
       if (!branch) continue;
-      const ring = L.circleMarker([branch.lat, branch.lng], {
-        radius: popRadius(branch.female_pop_served) + 5,
-        color: "#000", weight: 2, dashArray: "2 4", fill: false,
-      });
+      // A real decision flip gets a thicker ring colored by the NEW action -- visually
+      // distinct from a branch whose feature values merely nudged without flipping the
+      // decision (subtler plain dashed black ring, as before).
+      const ring = entry.action_changed
+        ? L.circleMarker([branch.lat, branch.lng], {
+            radius: popRadius(branch.female_pop_served) + 6,
+            color: ACTION_COLORS[entry.new.action] || "#000",
+            weight: 4, dashArray: "3 3", fill: false,
+          })
+        : L.circleMarker([branch.lat, branch.lng], {
+            radius: popRadius(branch.female_pop_served) + 5,
+            color: "#000", weight: 2, dashArray: "2 4", fill: false,
+          });
       diffHighlightLayer.addLayer(ring);
+
+      // Relocation: show the new position too, not just a ring sitting at the old spot.
+      const latChange = entry.changed_fields.lat;
+      const lngChange = entry.changed_fields.lng;
+      if (latChange || lngChange) {
+        const oldLat = latChange ? latChange.old : branch.lat;
+        const oldLng = lngChange ? lngChange.old : branch.lng;
+        const newLat = entry.new.lat;
+        const newLng = entry.new.lng;
+        const moveLine = L.polyline([[oldLat, oldLng], [newLat, newLng]], {
+          color: "#1565c0", weight: 3, dashArray: "1 6", lineCap: "round",
+        });
+        diffHighlightLayer.addLayer(moveLine);
+        const newMarker = L.circleMarker([newLat, newLng], {
+          radius: 6, color: "#1565c0", fillColor: "#1565c0", fillOpacity: 0.9, weight: 2,
+        });
+        newMarker.bindTooltip(`${escapeHtml(shortBranchName(entry.new.name))} (relocated here)`,
+          { direction: "top" });
+        diffHighlightLayer.addLayer(newMarker);
+      }
     }
   }
 
@@ -253,6 +301,17 @@ async function main() {
       document.getElementById("toggle-diff").addEventListener("change", (e) => {
         if (e.target.checked) diffHighlightLayer.addTo(map); else map.removeLayer(diffHighlightLayer);
       });
+
+      // Fix 7: if baseline and the scenario were decided by different backends, every
+      // action flip in the diff conflates "inputs changed" with "decision method changed".
+      // Keep this simple -- a single visible warning line, not a modal.
+      if (diffData.baseline_backend && diffData.current_backend
+          && diffData.baseline_backend !== diffData.current_backend) {
+        const mismatchLabel = document.getElementById("backend-mismatch-label");
+        mismatchLabel.textContent =
+          `warning: comparing baseline (${diffData.baseline_backend}) vs scenario (${diffData.current_backend}) -- mixed backends`;
+        mismatchLabel.classList.remove("hidden");
+      }
     }
   } catch (err) {
     console.error("Failed to load pipeline data", err);
