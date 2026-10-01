@@ -38,3 +38,7 @@ html, body { margin: 0; height: 100%; font-family: sans-serif; }
   cursor: pointer; padding: 0 0.25rem;
 }
 .estimated { font-style: italic; }
+.diff-section { margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid #ccc; }
+.diff-section table { width: 100%; }
+.diff-old { color: #c62828; text-decoration: line-through; }
+.diff-new { color: #2e7d32; font-weight: bold; }

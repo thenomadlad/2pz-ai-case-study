@@ -12,6 +12,8 @@ const branchMarkers = {};
 let communityLayer = L.layerGroup();
 let assignmentLineLayer = L.layerGroup();
 let siblingLineLayer = L.layerGroup();
+let diffData = null;
+let diffHighlightLayer = L.layerGroup();
 
 function popRadius(pop) {
   return Math.max(6, Math.min(30, Math.sqrt(pop) / 8));
@@ -37,7 +39,30 @@ function fmt(value, isEstimated) {
   return isEstimated ? `<span class="estimated">~${text}</span>` : text;
 }
 
-function renderSidePanel(branch) {
+function formatChangedFieldRow(field, delta) {
+  const label = escapeHtml(field);
+  const oldValue = escapeHtml(delta.old);
+  const newValue = escapeHtml(delta.new);
+  return `<tr><td>${label}</td><td><span class="diff-old">${oldValue}</span> &rarr; <span class="diff-new">${newValue}</span></td></tr>`;
+}
+
+function renderDiffSection(diffEntry) {
+  if (!diffEntry) return "";
+  const hasChanges = diffEntry.action_changed || Object.keys(diffEntry.changed_fields).length > 0;
+  if (!hasChanges) return "";
+  const rowsHtml = diffEntry.old === null
+    ? '<tr><td colspan="2">New in this scenario</td></tr>'
+    : Object.entries(diffEntry.changed_fields).map(([field, delta]) => formatChangedFieldRow(field, delta)).join("");
+  return `
+    <div class="diff-section">
+      <h4>Changed since baseline</h4>
+      <table>${rowsHtml}</table>
+    </div>
+  `;
+}
+
+function renderSidePanel(branch, diffEntry) {
+  diffEntry = diffEntry || diffEntryFor(branch.branch_id);
   const panel = document.getElementById("side-panel");
   const est = new Set(branch.estimated_fields || []);
   const rows = [
@@ -66,6 +91,7 @@ function renderSidePanel(branch) {
       ).join("")}
     </table>
     <p><strong>Caveats:</strong> ${escapeHtml((branch.caveats || []).join("; ") || "none")}</p>
+    ${renderDiffSection(diffEntry)}
   `;
   panel.querySelector(".close-panel").addEventListener("click", () => {
     panel.classList.add("hidden");
@@ -100,7 +126,7 @@ function renderBranches() {
     marker.bindTooltip(`${escapeHtml(shortBranchName(branch.name))} (${escapeHtml(branch.action)})`,
       { permanent: true, direction: "top" });
     marker.on("click", () => {
-      renderSidePanel(branch);
+      renderSidePanel(branch, diffEntryFor(branch.branch_id));
       drawSiblingLinks(branch);
       siblingLineLayer.addTo(map);
     });
@@ -129,6 +155,52 @@ function renderCommunities() {
   }
 }
 
+function diffEntryFor(branchId) {
+  if (!diffData) return null;
+  return diffData.branches.find(d => d.branch_id === branchId) || null;
+}
+
+function renderDiffHighlights() {
+  const branchById = Object.fromEntries(branches.map(b => [b.branch_id, b]));
+  const communityById = Object.fromEntries(communities.map(c => [c.community_id, c]));
+
+  for (const entry of diffData.branches) {
+    if (entry.old === null && entry.new !== null) {
+      // New branch introduced by the scenario -- not in /api/branches at all.
+      const marker = L.circleMarker([entry.new.lat, entry.new.lng], {
+        radius: popRadius(entry.new.female_pop_served || 0),
+        color: ACTION_COLORS[entry.new.action] || "#999",
+        fillColor: ACTION_COLORS[entry.new.action] || "#999",
+        fillOpacity: 0.5,
+        dashArray: "4 4",
+        weight: 2,
+      });
+      marker.bindTooltip(`${escapeHtml(shortBranchName(entry.new.name))} (new, ${escapeHtml(entry.new.action)})`,
+        { permanent: true, direction: "top" });
+      marker.on("click", () => renderSidePanel(entry.new, entry));
+      diffHighlightLayer.addLayer(marker);
+    } else if (entry.action_changed || Object.keys(entry.changed_fields).length > 0) {
+      const branch = branchById[entry.branch_id];
+      if (!branch) continue;
+      const ring = L.circleMarker([branch.lat, branch.lng], {
+        radius: popRadius(branch.female_pop_served) + 5,
+        color: "#000", weight: 2, dashArray: "2 4", fill: false,
+      });
+      diffHighlightLayer.addLayer(ring);
+    }
+  }
+
+  for (const entry of diffData.communities) {
+    if (!entry.reassigned) continue;
+    const community = communityById[entry.community_id];
+    if (!community) continue;
+    const ring = L.circleMarker([community.lat ?? 0, community.lng ?? 0], {
+      radius: 7, color: "#000", weight: 2, dashArray: "2 4", fill: false,
+    });
+    diffHighlightLayer.addLayer(ring);
+  }
+}
+
 function showLoadError(message) {
   const banner = document.getElementById("error-banner");
   banner.textContent = message;
@@ -145,12 +217,16 @@ async function fetchJson(url) {
 
 async function main() {
   try {
-    const [branchResp, communityResp, networkPayload] = await Promise.all([
+    const [branchResp, communityResp, networkPayload, diffPayload] = await Promise.all([
       fetchJson("/api/branches"), fetchJson("/api/communities"), fetchJson("/api/network"),
+      fetchJson("/api/diff"),
     ]);
     branches = branchResp;
     communities = communityResp;
     network = networkPayload.stats;
+    if (diffPayload.available) {
+      diffData = diffPayload;
+    }
 
     document.getElementById("backend-label").textContent = `backend: ${networkPayload.model_backend}`;
     document.getElementById("sources-label").textContent =
@@ -170,6 +246,14 @@ async function main() {
     document.getElementById("assumptions-toggle").addEventListener("click", () => {
       document.getElementById("assumptions-panel").classList.toggle("hidden");
     });
+
+    if (diffData) {
+      renderDiffHighlights();
+      document.getElementById("toggle-diff").disabled = false;
+      document.getElementById("toggle-diff").addEventListener("change", (e) => {
+        if (e.target.checked) diffHighlightLayer.addTo(map); else map.removeLayer(diffHighlightLayer);
+      });
+    }
   } catch (err) {
     console.error("Failed to load pipeline data", err);
     showLoadError("Failed to load pipeline data — run `just all` first.");
