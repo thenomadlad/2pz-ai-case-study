@@ -69,6 +69,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "pipeline_run_at": datetime.datetime.fromtimestamp(mtime).isoformat(),
         }
 
+    @app.get("/api/diff")
+    def diff():
+        current_dir = settings.processed_dir.parent / "current"
+        diff_path = current_dir / "diff.json"
+        if not diff_path.exists():
+            return {"available": False}
+        payload = json.loads(diff_path.read_text())
+        return {"available": True, **payload}
+
     return app
 
 

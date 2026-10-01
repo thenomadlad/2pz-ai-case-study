@@ -41,8 +41,8 @@ def _seed_processed(processed_dir):
 
 @pytest.fixture
 def client(tmp_path):
-    processed_dir = tmp_path / "processed"
-    processed_dir.mkdir()
+    processed_dir = tmp_path / "processed" / "baseline"
+    processed_dir.mkdir(parents=True)
     _seed_processed(processed_dir)
     settings = Settings(_env_file=None, processed_dir=processed_dir, model_backend="rubric")
     app = create_app(settings)
@@ -87,8 +87,8 @@ async def test_network_reports_actual_backend_from_run_meta_not_configured_setti
     # so resolve_backend actually ran RubricModel and wrote run_meta.json={"model_backend":
     # "rubric"}. /api/network must report "rubric" (what actually ran), not "llm" (the
     # configured setting) -- otherwise the map header lies about data provenance.
-    processed_dir = tmp_path / "processed"
-    processed_dir.mkdir()
+    processed_dir = tmp_path / "processed" / "baseline"
+    processed_dir.mkdir(parents=True)
     _seed_processed(processed_dir)
     (processed_dir / "run_meta.json").write_text(json.dumps({"model_backend": "rubric"}))
 
@@ -106,8 +106,8 @@ async def test_network_reports_actual_backend_from_run_meta_not_configured_setti
 
 async def test_network_falls_back_to_configured_backend_when_run_meta_absent(tmp_path):
     # If the pipeline hasn't run yet (no run_meta.json), fall back to the configured setting.
-    processed_dir = tmp_path / "processed"
-    processed_dir.mkdir()
+    processed_dir = tmp_path / "processed" / "baseline"
+    processed_dir.mkdir(parents=True)
     _seed_processed(processed_dir)
     assert not (processed_dir / "run_meta.json").exists()
 
@@ -120,6 +120,46 @@ async def test_network_falls_back_to_configured_backend_when_run_meta_absent(tmp
         resp = await c.get("/api/network")
     body = resp.json()
     assert body["model_backend"] == "rubric"
+
+
+async def test_diff_unavailable_when_no_scenario_has_run(client):
+    async with client as c:
+        resp = await c.get("/api/diff")
+    assert resp.json() == {"available": False}
+
+
+async def test_diff_returns_scenario_diff_when_present(tmp_path):
+    processed_dir = tmp_path / "processed" / "baseline"
+    processed_dir.mkdir(parents=True)
+    _seed_processed(processed_dir)
+
+    current_dir = tmp_path / "processed" / "current"
+    current_dir.mkdir(parents=True)
+    (current_dir / "diff.json").write_text(json.dumps({
+        "scenario_name": "example-perturbations",
+        "branches": [{
+            "branch_id": "a", "old": {"action": "PROTECT"}, "new": {"action": "HOLD"},
+            "changed_fields": {"rating": {"old": 4.5, "new": 3.9}}, "action_changed": True,
+        }],
+        "communities": [{
+            "community_id": "c1", "reassigned": False,
+            "old_branch_id": "a", "new_branch_id": "a",
+        }],
+    }))
+
+    settings = Settings(_env_file=None, processed_dir=processed_dir, model_backend="rubric")
+    app = create_app(settings)
+    transport = ASGITransport(app=app)
+    client = AsyncClient(transport=transport, base_url="http://test")
+
+    async with client as c:
+        resp = await c.get("/api/diff")
+    body = resp.json()
+
+    assert body["available"] is True
+    assert body["scenario_name"] == "example-perturbations"
+    assert body["branches"][0]["action_changed"] is True
+    assert body["communities"][0]["reassigned"] is False
 
 
 async def test_index_serves_html(client):
