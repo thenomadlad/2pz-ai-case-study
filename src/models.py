@@ -1,9 +1,13 @@
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class Branch(BaseModel):
+    # extra="forbid" so a typo'd override field (e.g. scenario patch) raises loudly at
+    # validation instead of silently no-opping -- see src/scenario/apply.py.
+    model_config = ConfigDict(extra="forbid")
+
     id: str
     name: str
     lat: float
@@ -16,6 +20,8 @@ class Branch(BaseModel):
 
 
 class Community(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     id: str
     name_en: str
     lat: float

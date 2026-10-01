@@ -71,3 +71,39 @@ def test_new_community_inserted_with_defaults():
     new_community = next(c for c in result if c.id == "new-c")
     assert new_community.population_female is None
     assert new_community.is_estimated is False
+
+
+def test_new_community_missing_required_field_raises():
+    # Mirrors test_new_branch_missing_required_field_raises -- closes the asymmetry the
+    # final review flagged (branches had this test, communities didn't).
+    communities = [_community("c1")]
+    with pytest.raises(ValidationError):
+        apply_community_overrides(communities, {
+            "new-c": {"population_female": 9000},  # no name_en/lat/lng/population_total
+        })
+
+
+def test_patch_branch_unknown_field_raises():
+    # Fix 1: model_copy(update=patch) used to silently accept a typo'd field name with no
+    # error and no effect. Re-validation via model_validate must now raise instead.
+    branches = [_branch("a")]
+    with pytest.raises(ValidationError):
+        apply_branch_overrides(branches, {"a": {"ratng": 3.9}})  # typo'd "rating"
+
+
+def test_patch_branch_type_invalid_value_raises():
+    branches = [_branch("a")]
+    with pytest.raises(ValidationError):
+        apply_branch_overrides(branches, {"a": {"lat": "not-a-number"}})
+
+
+def test_patch_community_unknown_field_raises():
+    communities = [_community("c1")]
+    with pytest.raises(ValidationError):
+        apply_community_overrides(communities, {"c1": {"popuation_female": 9000}})  # typo
+
+
+def test_patch_community_type_invalid_value_raises():
+    communities = [_community("c1")]
+    with pytest.raises(ValidationError):
+        apply_community_overrides(communities, {"c1": {"lat": "not-a-number"}})
