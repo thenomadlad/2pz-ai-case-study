@@ -33,6 +33,27 @@ MODEL_BACKEND=llm uv run python -m src.model.run
 Re-running `src.model.run` with both backends populates a comparison printed
 to stdout showing where the LLM and rubric disagree.
 
+## Perturb an assumption or a signal (v1)
+
+Baseline ("reality") lives in `data/scenarios/baseline.yaml` and is computed once by
+`just all`, written to `data/processed/baseline/`. A scenario is a YAML file under
+`data/scenarios/` declaring assumption overrides (`contest_ratio`, `model_backend`) and/or
+signal overrides on specific branches/communities (including relocating a branch, changing
+its rating, or introducing a hypothetical new branch). Baseline never changes as a result of
+running a scenario -- there is no "promote" step.
+
+```bash
+just scenario data/scenarios/example-perturbations.yaml
+```
+
+Writes `data/processed/current/` plus a `diff.json` comparing it against baseline. With
+`just serve` running, the map's "Diff vs baseline" toggle (enabled once a scenario has run)
+highlights branches whose PROTECT/HOLD/SHRINK action or feature values changed, and
+communities that got reassigned to a different nearest branch.
+
+See `docs/designs/v1.md` for the full design, including what's explicitly out of scope for
+this version (capacity, re-running `acquire` per scenario, an interactive override UI).
+
 ## Tests
 
 ```bash
