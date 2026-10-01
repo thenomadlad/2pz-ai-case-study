@@ -15,7 +15,7 @@ def main(settings: Settings | None = None) -> None:
     settings.raw_dir.mkdir(parents=True, exist_ok=True)
 
     raw_branches = branches_mod.load(settings)
-    filled_branches, price_flags = backfill_missing_prices(raw_branches)
+    filled_branches, price_flags = backfill_missing_prices(raw_branches, settings.fallback_price_aed)
     communities = population_mod.load(settings)
 
     (settings.raw_dir / "branches.json").write_text(

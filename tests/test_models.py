@@ -13,6 +13,12 @@ def test_branch_minimal():
     assert b.rating is None
 
 
+def test_branch_accepts_scenario_source():
+    b = Branch(id="new-branch", name="New Branch", lat=25.0, lng=55.0, area="Somewhere",
+               rating=None, review_count=None, avg_price_aed=None, source="scenario")
+    assert b.source == "scenario"
+
+
 def test_community_estimated_flag_required():
     c = Community(id="c1", name_en="Deira", lat=25.27, lng=55.31,
                    population_total=1000, population_female=None, is_estimated=True)

@@ -42,7 +42,7 @@ def _fetch_dubai_pulse() -> list[Community]:
     raise NotImplementedError
 
 
-def load(settings: Settings | None = None, global_female_share: float = 0.49) -> list[Community]:
+def load(settings: Settings | None = None) -> list[Community]:
     settings = settings or default_settings
     if settings.dubai_pulse_enabled:
         try:
@@ -50,4 +50,4 @@ def load(settings: Settings | None = None, global_female_share: float = 0.49) ->
         except NotImplementedError:
             logger.warning("population: DUBAI_PULSE_ENABLED=1 but live enrichment isn't "
                             "implemented in V0, falling back to seed")
-    return _load_seed(settings.seed_dir, global_female_share)
+    return _load_seed(settings.seed_dir, settings.global_female_share)

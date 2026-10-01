@@ -14,6 +14,10 @@ def test_defaults(monkeypatch):
     assert s.contest_ratio == 1.25
     assert s.anthropic_api_key is None
     assert s.anthropic_model == "claude-haiku-4-5-20251001"
+    assert s.global_female_share == 0.49
+    assert s.fallback_price_aed == 99.0
+    from src.config import REPO_ROOT
+    assert s.processed_dir == REPO_ROOT / "data" / "processed" / "baseline"
 
 
 def test_env_override(monkeypatch):

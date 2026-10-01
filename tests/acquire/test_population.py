@@ -18,7 +18,7 @@ def test_load_estimates_missing_female_population(tmp_path):
                           "population_total": "1000", "population_female": ""})
 
     test_settings = Settings(_env_file=None, seed_dir=seed_dir, dubai_pulse_enabled=False)
-    result = population.load(test_settings, global_female_share=0.49)
+    result = population.load(test_settings)
 
     by_id = {c.id: c for c in result}
     assert by_id["c1"].population_female == 480

@@ -12,7 +12,7 @@ class Branch(BaseModel):
     rating: float | None
     review_count: int | None
     avg_price_aed: float | None
-    source: Literal["seed", "fresha", "places"]
+    source: Literal["seed", "fresha", "places", "scenario"]
 
 
 class Community(BaseModel):
