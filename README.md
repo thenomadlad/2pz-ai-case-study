@@ -2,8 +2,7 @@
 
 A deliberately crude, end-to-end prototype for exploring retail branch decisions
 for Bedashing Beauty Lounge (Dubai only). See
-`docs/designs/2026-09-24-bedashing-v0-design.md` for the full design and
-`docs/designs/2026-09-25-bedashing-v0-plan.md` for how it was built.
+`docs/designs/v0.md` for the full design, architecture, and build history.
 
 ## Setup
 

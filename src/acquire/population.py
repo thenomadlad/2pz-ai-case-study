@@ -38,7 +38,7 @@ def _load_seed(seed_dir, global_female_share: float) -> list[Community]:
 
 def _fetch_dubai_pulse() -> list[Community]:
     # Dubai Pulse open API integration is intentionally not implemented in
-    # V0 — see docs/designs/2026-09-25-bedashing-v0-plan.md "Scope decisions".
+    # V0 — see docs/designs/v0.md "Scope decisions made during the build".
     raise NotImplementedError
 
 

@@ -29,8 +29,8 @@ def _load_seed(seed_dir) -> list[Branch]:
 
 def _scrape_live() -> list[Branch]:
     # Live scraping of bedashingbeauty.com / Fresha is intentionally not
-    # implemented in V0 — see docs/designs/2026-09-25-bedashing-v0-plan.md
-    # "Scope decisions" section. Callers must catch NotImplementedError.
+    # implemented in V0 — see docs/designs/v0.md "Scope decisions made
+    # during the build". Callers must catch NotImplementedError.
     raise NotImplementedError
 
 
