@@ -72,7 +72,12 @@ def test_main_calls_all_three_stages_with_baseline_settings(tmp_path, monkeypatc
         "assumptions": {"contest_ratio": 1.4, "model_backend": "rubric"},
     }))
 
-    test_settings = Settings(_env_file=None, seed_dir=tmp_path / "seed")
+    # processed_dir/raw_dir must be pinned under tmp_path -- main() now also rmtree's
+    # processed_dir.parent/"current" (Fix 6), and without this override that defaults to
+    # the real REPO_ROOT/data/processed/baseline, so this test would delete the real
+    # repo's data/processed/current/ as a side effect.
+    test_settings = Settings(_env_file=None, seed_dir=tmp_path / "seed",
+                              raw_dir=tmp_path / "raw", processed_dir=tmp_path / "processed" / "baseline")
 
     mock_acquire = MagicMock()
     mock_features = MagicMock()
