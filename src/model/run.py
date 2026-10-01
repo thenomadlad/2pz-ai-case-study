@@ -17,7 +17,11 @@ def resolve_backend(settings: Settings) -> DecisionModel:
                             "falling back to rubric")
             return RubricModel()
         from src.model.llm import LLMModel
-        return LLMModel()
+        # Pass cache_dir explicitly, derived from the settings actually given to this
+        # function -- LLMModel's own default falls back to the global default_settings
+        # singleton, which would write a scenario run's cache into baseline/.llm_cache
+        # (see Fix 2 in the final review).
+        return LLMModel(cache_dir=settings.processed_dir / ".llm_cache")
     return RubricModel()
 
 

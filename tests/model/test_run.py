@@ -29,6 +29,21 @@ def test_resolve_backend_returns_llm_model_when_backend_llm_and_key_set():
     assert model.name == "llm"
 
 
+def test_resolve_backend_llm_cache_dir_derived_from_given_settings(tmp_path):
+    # Fix 2: LLMModel() used to be constructed with no cache_dir, which defaults to
+    # src.config's global `settings` singleton's processed_dir -- NOT the settings passed
+    # into resolve_backend. For a scenario run (processed_dir=.../current), that meant the
+    # LLM cache silently landed under baseline/.llm_cache instead. Confirm the cache_dir is
+    # now derived from the settings object actually given to resolve_backend.
+    processed_dir = tmp_path / "current"
+    settings = Settings(_env_file=None, model_backend="llm", anthropic_api_key="fake-test-key",
+                         processed_dir=processed_dir)
+    model = resolve_backend(settings)
+    assert isinstance(model, LLMModel)
+    assert model._cache_dir == processed_dir / ".llm_cache"
+    assert (processed_dir / ".llm_cache").exists()
+
+
 def test_main_writes_decisions(tmp_path):
     processed_dir = tmp_path / "processed"
     processed_dir.mkdir()
