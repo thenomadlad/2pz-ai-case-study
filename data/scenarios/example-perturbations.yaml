@@ -21,7 +21,8 @@ overrides:
       lat: 25.2697
       lng: 55.3095
 
-    # Rating change on an existing real branch (jumeirah-park), currently the
-    # network's highest-rated branch at 4.8 -- "what if reviews got worse."
+    # Rating change on an existing real branch (jumeirah-park), currently
+    # rated 4.8 (second only to palm-jumeirah's 4.9) -- "what if reviews got
+    # worse."
     jumeirah-park:
       rating: 3.9
