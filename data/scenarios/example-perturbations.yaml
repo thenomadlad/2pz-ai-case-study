@@ -1,0 +1,27 @@
+name: example-perturbations
+assumptions:
+  contest_ratio: 1.1
+overrides:
+  branches:
+    # New hypothetical branch -- an id not in the seed data, so apply.py treats
+    # it as a brand new entity rather than a patch. rating/review_count/
+    # avg_price_aed are left out and default to null; source defaults to
+    # "scenario" rather than "seed".
+    dubai-marina-new:
+      name: "Hypothetical Dubai Marina Branch"
+      lat: 25.0805
+      lng: 55.1403
+      area: "Dubai Marina"
+
+    # Relocate an existing real branch (al-safa-2) from its real coordinates
+    # near Al Safa 2 to Deira's coordinates -- "what if this branch were in
+    # Deira instead." Only lat/lng are patched; everything else about the
+    # branch (name, rating, etc.) stays whatever baseline has.
+    al-safa-2:
+      lat: 25.2697
+      lng: 55.3095
+
+    # Rating change on an existing real branch (jumeirah-park), currently the
+    # network's highest-rated branch at 4.8 -- "what if reviews got worse."
+    jumeirah-park:
+      rating: 3.9
