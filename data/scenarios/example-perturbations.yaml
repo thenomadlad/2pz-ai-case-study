@@ -1,6 +1,19 @@
 name: example-perturbations
+# Demonstrates the three example perturbation kinds in isolation: a new hypothetical
+# branch, relocating an existing branch, and re-rating an existing branch. contest_ratio
+# is intentionally left at baseline's value (not overridden here) so these three branch/
+# community overrides are the only things that differ from baseline -- that's what makes
+# this an honest demonstration of "here's what these specific changes do," rather than a
+# combination whose effects can't be individually attributed.
+#
+# Even with only these three overrides, OTHER branches may also shift action (not just
+# the three touched here). This is because the rubric ranks every branch relative to the
+# whole network -- changing one branch's standing (new branch added, al-safa-2 relocated)
+# can shift where the top/bottom-third tier boundaries fall for everyone else. That's an
+# honest property of the model, not a bug -- don't be surprised if branches you didn't
+# touch show up in the diff too.
 assumptions:
-  contest_ratio: 1.1
+  model_backend: rubric  # free, instant, deterministic -- see docs/designs/v1.md
 overrides:
   branches:
     # New hypothetical branch -- an id not in the seed data, so apply.py treats
