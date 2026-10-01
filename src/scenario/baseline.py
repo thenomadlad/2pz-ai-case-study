@@ -1,3 +1,5 @@
+import shutil
+
 import yaml
 
 from src.acquire import run as acquire_run
@@ -28,6 +30,12 @@ def main(settings: Settings | None = None) -> None:
     acquire_run.main(baseline_settings)
     features_build.main(baseline_settings)
     model_run.main(baseline_settings)
+
+    # A stale data/processed/current/ (and its diff.json) must never survive a baseline
+    # regeneration -- otherwise /api/diff keeps serving a comparison against a baseline
+    # that no longer exists on disk, with no indication to the user that it's stale.
+    current_dir = settings.processed_dir.parent / "current"
+    shutil.rmtree(current_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":
