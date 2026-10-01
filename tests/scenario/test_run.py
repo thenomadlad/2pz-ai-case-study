@@ -72,6 +72,93 @@ def test_scenario_run_writes_current_and_diff(tmp_path):
     assert by_id["new-branch"]["action_changed"] is True
 
 
+def test_scenario_diff_records_baseline_and_current_backend(tmp_path):
+    # Fix 7: ScenarioDiff must record which backend produced each side of the diff, so a
+    # mismatch (baseline decided with one backend, scenario run with another) is
+    # attributable rather than silently conflated with "the inputs changed".
+    seed_dir, raw_dir, baseline_dir, scenarios_dir = _write_seed_and_baseline(tmp_path)
+
+    scenario_path = scenarios_dir / "test-scenario.yaml"
+    scenario_path.write_text(yaml.dump({
+        "name": "test-scenario",
+        "assumptions": {"model_backend": "rubric"},
+        "overrides": {"branches": {"a": {"rating": 3.0}}},
+    }))
+
+    settings = Settings(_env_file=None, seed_dir=seed_dir, raw_dir=raw_dir,
+                         processed_dir=baseline_dir)
+    main(scenario_path, settings)
+
+    current_dir = baseline_dir.parent / "current"
+    diff = json.loads((current_dir / "diff.json").read_text())
+    # _write_seed_and_baseline pins baseline.yaml's model_backend to "rubric", and this
+    # scenario also pins "rubric" -- both sides should match here.
+    assert diff["baseline_backend"] == "rubric"
+    assert diff["current_backend"] == "rubric"
+
+
+def test_new_branch_with_no_price_flagged_as_estimated(tmp_path):
+    # Fix 8: a scenario-introduced branch with no avg_price_aed gets the network median
+    # imputed by build_features, but its id was never in price_flags (that only comes from
+    # ACQUIRE, which doesn't run for scenario entities). estimated_fields must still flag it.
+    seed_dir, raw_dir, baseline_dir, scenarios_dir = _write_seed_and_baseline(tmp_path)
+
+    scenario_path = scenarios_dir / "test-scenario.yaml"
+    scenario_path.write_text(yaml.dump({
+        "name": "test-scenario",
+        "assumptions": {"model_backend": "rubric"},
+        "overrides": {
+            "branches": {
+                "new-branch": {"name": "New Branch", "lat": 25.3, "lng": 55.3, "area": "New Area"},
+            },
+        },
+    }))
+
+    settings = Settings(_env_file=None, seed_dir=seed_dir, raw_dir=raw_dir,
+                         processed_dir=baseline_dir)
+    main(scenario_path, settings)
+
+    current_dir = baseline_dir.parent / "current"
+    features = json.loads((current_dir / "branch_features.json").read_text())
+    by_id = {b["branch_id"]: b for b in features["branches"]}
+    assert "avg_price_aed" in by_id["new-branch"]["estimated_fields"]
+
+
+def test_scenario_run_never_modifies_baseline_dir(tmp_path):
+    # Fix 10: direct regression test for the core "baseline is reality, never modified by
+    # a scenario run" invariant, rather than relying only on manual verification.
+    seed_dir, raw_dir, baseline_dir, scenarios_dir = _write_seed_and_baseline(tmp_path)
+
+    before = {
+        p: (p.read_bytes(), p.stat().st_mtime_ns)
+        for p in baseline_dir.rglob("*") if p.is_file()
+    }
+    assert before  # sanity: baseline actually produced files
+
+    scenario_path = scenarios_dir / "test-scenario.yaml"
+    scenario_path.write_text(yaml.dump({
+        "name": "test-scenario",
+        "assumptions": {"model_backend": "rubric"},
+        "overrides": {
+            "branches": {
+                "a": {"rating": 1.0},
+                "new-branch": {"name": "New Branch", "lat": 25.3, "lng": 55.3, "area": "New"},
+            },
+            "communities": {"c1": {"population_female": 1}},
+        },
+    }))
+
+    settings = Settings(_env_file=None, seed_dir=seed_dir, raw_dir=raw_dir,
+                         processed_dir=baseline_dir)
+    main(scenario_path, settings)
+
+    after = {
+        p: (p.read_bytes(), p.stat().st_mtime_ns)
+        for p in baseline_dir.rglob("*") if p.is_file()
+    }
+    assert after == before
+
+
 def test_scenario_run_raises_when_baseline_missing(tmp_path):
     seed_dir = tmp_path / "seed"
     seed_dir.mkdir()

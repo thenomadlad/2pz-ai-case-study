@@ -53,3 +53,8 @@ class ScenarioDiff(BaseModel):
     scenario_name: str
     branches: list[BranchDiffEntry]
     communities: list[CommunityDiffEntry]
+    # Records which backend produced each side of the diff, so an action flip can be
+    # attributed to "the inputs changed" vs. "the decision-making method changed" instead
+    # of conflating the two when baseline/scenario backends differ.
+    baseline_backend: str
+    current_backend: str

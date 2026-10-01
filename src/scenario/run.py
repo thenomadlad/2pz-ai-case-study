@@ -37,12 +37,22 @@ def main(scenario_path, settings: Settings | None = None) -> None:
     baseline_assumptions = load_baseline_assumptions(scenarios_dir / "baseline.yaml")
     scenario = load_scenario(scenario_path)
 
-    branches = [Branch(**b) for b in json.loads((raw_dir / "branches.json").read_text())]
+    raw_branches = [Branch(**b) for b in json.loads((raw_dir / "branches.json").read_text())]
     communities = [Community(**c) for c in json.loads((raw_dir / "communities.json").read_text())]
     price_flags = json.loads((raw_dir / "price_flags.json").read_text())
 
-    branches = apply_branch_overrides(branches, scenario.overrides.branches)
+    original_branch_ids = {b.id for b in raw_branches}
+    branches = apply_branch_overrides(raw_branches, scenario.overrides.branches)
     communities = apply_community_overrides(communities, scenario.overrides.communities)
+
+    # A scenario-introduced new branch with no avg_price_aed given gets the network median
+    # imputed by build_features just like any branch with a missing price -- but its id was
+    # never in price_flags (that only comes from the ACQUIRE stage, which never runs for a
+    # new scenario entity), so estimated_fields wouldn't flag it. Add those ids explicitly
+    # so the imputed price is honestly flagged, not shown as if it were reported (Fix 8).
+    new_unpriced_ids = [b.id for b in branches
+                         if b.id not in original_branch_ids and b.avg_price_aed is None]
+    price_flags = [*price_flags, *new_unpriced_ids]
 
     contest_ratio = (scenario.assumptions.contest_ratio
                       if scenario.assumptions.contest_ratio is not None
@@ -83,10 +93,20 @@ def main(scenario_path, settings: Settings | None = None) -> None:
     baseline_assignments = [CommunityAssignment(**a) for a in
                              json.loads((baseline_dir / "community_assignment.json").read_text())]
 
+    # Record which backend produced each side of the diff, the same way /api/network
+    # reads it, for consistency -- so a flip can be attributed to "inputs changed" vs.
+    # "decision method changed" (Fix 7).
+    baseline_run_meta_path = baseline_dir / "run_meta.json"
+    if baseline_run_meta_path.exists():
+        baseline_backend = json.loads(baseline_run_meta_path.read_text())["model_backend"]
+    else:
+        baseline_backend = settings.model_backend
+
     branch_diff = compute_branch_diff(baseline_features, baseline_decisions, features, decisions)
     community_diff = compute_community_diff(baseline_assignments, assignments)
     diff = ScenarioDiff(scenario_name=scenario.name, branches=branch_diff,
-                         communities=community_diff)
+                         communities=community_diff,
+                         baseline_backend=baseline_backend, current_backend=model.name)
     (current_dir / "diff.json").write_text(diff.model_dump_json(indent=2))
 
     changed_count = sum(1 for b in branch_diff if b.changed_fields or b.old is None)

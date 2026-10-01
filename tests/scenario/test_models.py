@@ -57,6 +57,14 @@ def test_community_diff_entry_reassigned():
 
 
 def test_scenario_diff_shape():
-    diff = ScenarioDiff(scenario_name="x", branches=[], communities=[])
+    diff = ScenarioDiff(scenario_name="x", branches=[], communities=[],
+                         baseline_backend="rubric", current_backend="rubric")
     assert diff.scenario_name == "x"
     assert diff.branches == []
+
+
+def test_scenario_diff_carries_backend_names():
+    diff = ScenarioDiff(scenario_name="x", branches=[], communities=[],
+                         baseline_backend="llm", current_backend="rubric")
+    assert diff.baseline_backend == "llm"
+    assert diff.current_backend == "rubric"
