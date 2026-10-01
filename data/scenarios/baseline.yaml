@@ -1,0 +1,8 @@
+# Baseline assumptions -- "reality". Edit this file and re-run `just all` to
+# regenerate the one true baseline raw data and report. Never edited by a
+# scenario run.
+assumptions:
+  contest_ratio: 1.25
+  global_female_share: 0.49
+  fallback_price_aed: 99.0
+  model_backend: llm
