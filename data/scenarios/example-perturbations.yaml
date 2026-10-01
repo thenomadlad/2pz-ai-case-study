@@ -1,10 +1,11 @@
 name: example-perturbations
-# Demonstrates the three example perturbation kinds in isolation: a new hypothetical
-# branch, relocating an existing branch, and re-rating an existing branch. contest_ratio
-# is intentionally left at baseline's value (not overridden here) so these three branch/
-# community overrides are the only things that differ from baseline -- that's what makes
-# this an honest demonstration of "here's what these specific changes do," rather than a
-# combination whose effects can't be individually attributed.
+# Demonstrates three example perturbation kinds together: a new hypothetical branch,
+# relocating an existing branch, and re-rating an existing branch. contest_ratio is
+# intentionally left at baseline's value (not overridden here) so these three branch
+# overrides are the ONLY things that differ from baseline -- that's what makes this an
+# honest demonstration of "here's what these specific changes do," rather than a
+# combination confounded with an unrelated assumption change whose own effect can't be
+# told apart from the branch-level overrides.
 #
 # Even with only these three overrides, OTHER branches may also shift action (not just
 # the three touched here). This is because the rubric ranks every branch relative to the
