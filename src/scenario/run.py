@@ -64,9 +64,12 @@ def run_scenario(scenario: Scenario, settings: Settings | None = None) -> Scenar
                       else baseline_assumptions.model_backend)
 
     # Redirect processed_dir (not an on-disk write by itself) so that IF the llm backend is
-    # used, its disk cache lands under data/processed/current/.llm_cache -- never inside
-    # baseline/, which must never be touched by a scenario run (LLMModel creates this
-    # directory itself on construction; run_scenario never creates it).
+    # used, its own response cache lands under data/processed/current/.llm_cache rather than
+    # inside baseline/, which must never be touched by a scenario run. This is a pre-existing
+    # side effect of LLMModel itself (src/model/llm.py, untouched by this refactor) -- it is
+    # NOT one of run_scenario()'s own output artifacts (those are only ever written by main(),
+    # never here). The widget-based Streamlit editor defaults to the rubric backend
+    # specifically so the live perturbation loop never depends on this cache existing.
     current_dir = baseline_dir.parent / "current"
     current_settings = settings.model_copy(update={
         "processed_dir": current_dir,
