@@ -50,7 +50,7 @@ def _render_headline(data) -> None:
         st.markdown(f"SHRINK calls are driven primarily by **{drivers}**.")
     st.caption(
         f"Backend: {data.model_backend} · pipeline run at "
-        f"{data.pipeline_run_at:%Y-%m-%d %H:%M} · "
+        f"{data.pipeline_run_at:%Y-%m-%d %H:%M} UTC · "
         "every price and population figure in this dataset is an estimate, not a reported "
         "figure — see the Model page for exactly which fields and why."
     )
