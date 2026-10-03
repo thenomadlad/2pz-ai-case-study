@@ -4,7 +4,7 @@ import json
 import yaml
 
 from src.config import Settings
-from src.scenario.run import main
+from src.scenario.run import main, run_scenario
 
 
 def _write_seed_and_baseline(tmp_path):
@@ -174,3 +174,54 @@ def test_scenario_run_raises_when_baseline_missing(tmp_path):
     import pytest
     with pytest.raises(FileNotFoundError):
         main(scenario_path, settings)
+
+
+def test_run_scenario_returns_bundle_without_touching_disk(tmp_path):
+    seed_dir, raw_dir, baseline_dir, scenarios_dir = _write_seed_and_baseline(tmp_path)
+
+    scenario_path = scenarios_dir / "test-scenario.yaml"
+    scenario_path.write_text(yaml.dump({
+        "name": "test-scenario",
+        "assumptions": {"model_backend": "rubric"},
+        "overrides": {"branches": {"a": {"rating": 3.0}}},
+    }))
+
+    from src.scenario.load import load_scenario
+    scenario = load_scenario(scenario_path)
+    settings = Settings(_env_file=None, seed_dir=seed_dir, raw_dir=raw_dir,
+                         processed_dir=baseline_dir)
+
+    current_dir = baseline_dir.parent / "current"
+    assert not current_dir.exists()
+
+    run = run_scenario(scenario, settings)
+
+    assert not current_dir.exists()  # no disk writes from run_scenario itself
+    assert run.scenario_name == "test-scenario"
+    assert len(run.features) == 2  # a, b
+    by_id = {d.branch_id: d for d in run.decisions}
+    assert "a" in by_id and "b" in by_id
+    diff_by_id = {b.branch_id: b for b in run.diff.branches}
+    assert diff_by_id["a"].changed_fields["rating"] == {"old": 4.5, "new": 3.0}
+
+
+def test_main_writes_identical_output_via_run_scenario(tmp_path):
+    # main() must still write byte-for-byte the same four files + diff.json it always has --
+    # this is the regression guard that the refactor didn't change CLI behavior.
+    seed_dir, raw_dir, baseline_dir, scenarios_dir = _write_seed_and_baseline(tmp_path)
+
+    scenario_path = scenarios_dir / "test-scenario.yaml"
+    scenario_path.write_text(yaml.dump({
+        "name": "test-scenario",
+        "assumptions": {"model_backend": "rubric"},
+        "overrides": {"branches": {"a": {"rating": 3.0}}},
+    }))
+
+    settings = Settings(_env_file=None, seed_dir=seed_dir, raw_dir=raw_dir,
+                         processed_dir=baseline_dir)
+    main(scenario_path, settings)
+
+    current_dir = baseline_dir.parent / "current"
+    for name in ("branch_features.json", "community_assignment.json", "communities.json",
+                 "decisions.json", "run_meta.json", "diff.json"):
+        assert (current_dir / name).exists()

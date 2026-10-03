@@ -1,6 +1,5 @@
 import json
 import logging
-import sys
 
 from src.config import Settings, settings as default_settings
 from src.features.build import build_features
@@ -10,16 +9,20 @@ from src.scenario.apply import apply_branch_overrides, apply_community_overrides
 from src.scenario.baseline import load_baseline_assumptions
 from src.scenario.diff import compute_branch_diff, compute_community_diff
 from src.scenario.load import load_scenario
-from src.scenario.models import ScenarioDiff
+from src.scenario.models import Scenario, ScenarioDiff, ScenarioRun
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 
-def main(scenario_path, settings: Settings | None = None) -> None:
+def run_scenario(scenario: Scenario, settings: Settings | None = None) -> ScenarioRun:
+    """Apply a scenario's overrides on top of the fixed baseline raw data, recompute
+    features+model, and diff against the baseline report -- entirely in memory. Never
+    writes to disk; callers that need the on-disk artifacts (the CLI) do that themselves
+    with the returned bundle.
+    """
     settings = settings or default_settings
     baseline_dir = settings.processed_dir
-    current_dir = baseline_dir.parent / "current"
     raw_dir = settings.raw_dir
     scenarios_dir = settings.seed_dir.parent / "scenarios"
 
@@ -35,7 +38,6 @@ def main(scenario_path, settings: Settings | None = None) -> None:
         )
 
     baseline_assumptions = load_baseline_assumptions(scenarios_dir / "baseline.yaml")
-    scenario = load_scenario(scenario_path)
 
     raw_branches = [Branch(**b) for b in json.loads((raw_dir / "branches.json").read_text())]
     communities = [Community(**c) for c in json.loads((raw_dir / "communities.json").read_text())]
@@ -49,7 +51,7 @@ def main(scenario_path, settings: Settings | None = None) -> None:
     # imputed by build_features just like any branch with a missing price -- but its id was
     # never in price_flags (that only comes from the ACQUIRE stage, which never runs for a
     # new scenario entity), so estimated_fields wouldn't flag it. Add those ids explicitly
-    # so the imputed price is honestly flagged, not shown as if it were reported (Fix 8).
+    # so the imputed price is honestly flagged, not shown as if it were reported.
     new_unpriced_ids = [b.id for b in branches
                          if b.id not in original_branch_ids and b.avg_price_aed is None]
     price_flags = [*price_flags, *new_unpriced_ids]
@@ -61,7 +63,11 @@ def main(scenario_path, settings: Settings | None = None) -> None:
                       if scenario.assumptions.model_backend is not None
                       else baseline_assumptions.model_backend)
 
-    current_dir.mkdir(parents=True, exist_ok=True)
+    # Redirect processed_dir (not an on-disk write by itself) so that IF the llm backend is
+    # used, its disk cache lands under data/processed/current/.llm_cache -- never inside
+    # baseline/, which must never be touched by a scenario run (LLMModel creates this
+    # directory itself on construction; run_scenario never creates it).
+    current_dir = baseline_dir.parent / "current"
     current_settings = settings.model_copy(update={
         "processed_dir": current_dir,
         "contest_ratio": contest_ratio,
@@ -73,19 +79,6 @@ def main(scenario_path, settings: Settings | None = None) -> None:
     model = resolve_backend(current_settings)
     decisions = model.decide(features, network)
 
-    (current_dir / "branch_features.json").write_text(json.dumps({
-        "network": network.model_dump(),
-        "branches": [f.model_dump() for f in features],
-    }, indent=2))
-    (current_dir / "community_assignment.json").write_text(
-        json.dumps([a.model_dump() for a in assignments], indent=2))
-    (current_dir / "communities.json").write_text(
-        json.dumps([c.model_dump() for c in communities], indent=2))
-    (current_dir / "decisions.json").write_text(
-        json.dumps([d.model_dump() for d in decisions], indent=2))
-    (current_dir / "run_meta.json").write_text(
-        json.dumps({"model_backend": model.name, "scenario_name": scenario.name}, indent=2))
-
     baseline_payload = json.loads((baseline_dir / "branch_features.json").read_text())
     baseline_features = [BranchFeatures(**b) for b in baseline_payload["branches"]]
     baseline_decisions = [Decision(**d) for d in
@@ -93,9 +86,8 @@ def main(scenario_path, settings: Settings | None = None) -> None:
     baseline_assignments = [CommunityAssignment(**a) for a in
                              json.loads((baseline_dir / "community_assignment.json").read_text())]
 
-    # Record which backend produced each side of the diff, the same way /api/network
-    # reads it, for consistency -- so a flip can be attributed to "inputs changed" vs.
-    # "decision method changed" (Fix 7).
+    # Records which backend produced each side of the diff, the same way the old /api/network
+    # read it, so a flip can be attributed to "inputs changed" vs. "decision method changed".
     baseline_run_meta_path = baseline_dir / "run_meta.json"
     if baseline_run_meta_path.exists():
         baseline_backend = json.loads(baseline_run_meta_path.read_text())["model_backend"]
@@ -107,13 +99,41 @@ def main(scenario_path, settings: Settings | None = None) -> None:
     diff = ScenarioDiff(scenario_name=scenario.name, branches=branch_diff,
                          communities=community_diff,
                          baseline_backend=baseline_backend, current_backend=model.name)
-    (current_dir / "diff.json").write_text(diff.model_dump_json(indent=2))
 
-    changed_count = sum(1 for b in branch_diff if b.changed_fields or b.old is None)
-    reassigned_count = sum(1 for c in community_diff if c.reassigned)
-    print(f"scenario: '{scenario.name}' -> {len(features)} branches, {changed_count} changed, "
-          f"{reassigned_count} communities reassigned. Wrote {current_dir}/diff.json")
+    return ScenarioRun(scenario_name=scenario.name, features=features, network=network,
+                        assignments=assignments, communities=communities, decisions=decisions,
+                        diff=diff)
+
+
+def main(scenario_path, settings: Settings | None = None) -> None:
+    settings = settings or default_settings
+    scenario = load_scenario(scenario_path)
+    run = run_scenario(scenario, settings)
+
+    current_dir = settings.processed_dir.parent / "current"
+    current_dir.mkdir(parents=True, exist_ok=True)
+
+    (current_dir / "branch_features.json").write_text(json.dumps({
+        "network": run.network.model_dump(),
+        "branches": [f.model_dump() for f in run.features],
+    }, indent=2))
+    (current_dir / "community_assignment.json").write_text(
+        json.dumps([a.model_dump() for a in run.assignments], indent=2))
+    (current_dir / "communities.json").write_text(
+        json.dumps([c.model_dump() for c in run.communities], indent=2))
+    (current_dir / "decisions.json").write_text(
+        json.dumps([d.model_dump() for d in run.decisions], indent=2))
+    (current_dir / "run_meta.json").write_text(
+        json.dumps({"model_backend": run.diff.current_backend,
+                     "scenario_name": run.scenario_name}, indent=2))
+    (current_dir / "diff.json").write_text(run.diff.model_dump_json(indent=2))
+
+    changed_count = sum(1 for b in run.diff.branches if b.changed_fields or b.old is None)
+    reassigned_count = sum(1 for c in run.diff.communities if c.reassigned)
+    print(f"scenario: '{run.scenario_name}' -> {len(run.features)} branches, {changed_count} "
+          f"changed, {reassigned_count} communities reassigned. Wrote {current_dir}/diff.json")
 
 
 if __name__ == "__main__":
+    import sys
     main(sys.argv[1])

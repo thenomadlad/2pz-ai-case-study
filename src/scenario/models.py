@@ -2,6 +2,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict
 
+from src.models import BranchFeatures, Community, CommunityAssignment, Decision, NetworkStats
+
 
 class BaselineAssumptions(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -58,3 +60,13 @@ class ScenarioDiff(BaseModel):
     # of conflating the two when baseline/scenario backends differ.
     baseline_backend: str
     current_backend: str
+
+
+class ScenarioRun(BaseModel):
+    scenario_name: str
+    features: list[BranchFeatures]
+    network: NetworkStats
+    assignments: list[CommunityAssignment]
+    communities: list[Community]
+    decisions: list[Decision]
+    diff: ScenarioDiff
