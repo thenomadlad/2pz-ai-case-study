@@ -3,9 +3,9 @@
 all:
     uv run python -m src.scenario.baseline
 
-# Serve the JSON API + Leaflet frontend on http://localhost:8000
-serve:
-    uv run uvicorn src.serve.app:app --reload --port 8000
+# Launch the Streamlit app on http://localhost:8501
+app:
+    uv run streamlit run streamlit_app.py
 
 # Run a scenario: apply its overrides on top of the fixed baseline raw data,
 # recompute features+model, diff against data/processed/baseline/, write
