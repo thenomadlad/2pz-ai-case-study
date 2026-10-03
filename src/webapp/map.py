@@ -1,8 +1,18 @@
 """pydeck layer builders for the Dubai branch map. st.pydeck_chart (wired in
 src/webapp/pages/product.py) renders whatever Deck build_deck() assembles.
 
-Radii are in pixels (radius_units="pixels"), not meters, mirroring the previous Leaflet
+Radii are in pixels (radius_units=_PIXELS), not meters, mirroring the previous Leaflet
 circleMarker sizing -- zoom-invariant marker size, same visual language as before.
+
+pydeck treats any bare string kwarg as a per-row data accessor (serialized as a
+"@@=<value>" JS expression) UNLESS the string is itself wrapped in quote characters, in
+which case it strips them and passes the literal through -- see
+pydeck.bindings.layer.Layer.__init__. radius_units is a fixed enum value, not a per-row
+field, so it must be passed as a literal via _PIXELS ("'pixels'"), not a bare "pixels":
+passing the bare string silently produced "@@=pixels" on the wire, which deck.gl
+couldn't evaluate as a unit, so it fell back to its default (CommonUnits) -- at this
+map's zoom level that's roughly 2000x too large per radius unit, so every marker
+rendered large enough to fill (and alpha-composite across) the entire viewport.
 """
 import math
 
@@ -18,6 +28,10 @@ ACTION_COLORS: dict[str, list[int]] = {
 }
 DEFAULT_COLOR = [153, 153, 153]
 DUBAI_VIEW = pdk.ViewState(latitude=25.2048, longitude=55.2708, zoom=11)
+
+# Quote-wrapped so pydeck passes the literal string "pixels" through to deck.gl instead of
+# treating it as a per-row accessor expression -- see the module docstring above.
+_PIXELS = "'pixels'"
 
 
 def _pop_radius(pop: float) -> float:
@@ -37,7 +51,7 @@ def branch_layer(features: list[BranchFeatures], decisions: list[Decision]) -> p
         })
     return pdk.Layer(
         "ScatterplotLayer", data=rows, get_position=["lng", "lat"], get_radius="radius",
-        radius_units="pixels", get_fill_color="color", pickable=True, id="branches",
+        radius_units=_PIXELS, get_fill_color="color", pickable=True, id="branches",
     )
 
 
@@ -54,7 +68,7 @@ def community_layer(communities: list[Community], assignments: list[CommunityAss
         rows.append({"lat": c.lat, "lng": c.lng, "color": [*color, int(opacity * 255)]})
     return pdk.Layer(
         "ScatterplotLayer", data=rows, get_position=["lng", "lat"], get_radius=4,
-        radius_units="pixels", get_fill_color="color", id="communities",
+        radius_units=_PIXELS, get_fill_color="color", id="communities",
     )
 
 
@@ -123,10 +137,10 @@ def diff_highlight_layers(diff: ScenarioDiff, features: list[BranchFeatures]) ->
 
     return [
         pdk.Layer("ScatterplotLayer", data=ring_rows, get_position=["lng", "lat"],
-                  get_radius="radius", radius_units="pixels", filled=False, stroked=True,
+                  get_radius="radius", radius_units=_PIXELS, filled=False, stroked=True,
                   get_line_color="color", line_width_min_pixels=3, id="diff-rings"),
         pdk.Layer("ScatterplotLayer", data=new_rows, get_position=["lng", "lat"], get_radius=10,
-                  radius_units="pixels", get_fill_color="color", id="diff-new-branches"),
+                  radius_units=_PIXELS, get_fill_color="color", id="diff-new-branches"),
         pdk.Layer("LineLayer", data=move_rows, get_source_position="source",
                   get_target_position="target", get_color=[21, 101, 192], get_width=2,
                   id="diff-relocations"),

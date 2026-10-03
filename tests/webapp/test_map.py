@@ -91,3 +91,47 @@ def test_diff_highlight_layers_separates_new_ring_and_relocation():
 def test_build_deck_assembles_layers():
     deck = build_deck([branch_layer([_feature("a", 25.0, 55.0)], [])])
     assert len(deck.layers) == 1
+
+
+def _serialized_radius_units(layer) -> str:
+    # pydeck treats a bare string kwarg as a per-row data accessor, serializing it as
+    # "@@=<value>" -- which silently breaks deck.gl's unit lookup for a fixed enum value
+    # like radius_units (deployed-and-reproduced bug: markers rendered ~2000x too large,
+    # alpha-compositing into a single solid-color fill covering the whole map). Only a
+    # quote-wrapped string ("'pixels'") survives as the literal "pixels". Checking the row
+    # DATA a layer produces (what the other tests in this file check) can't catch this --
+    # it's only visible in the actual serialized layer spec, which is what this asserts.
+    import json
+    spec = json.loads(build_deck([layer]).to_json())
+    return spec["layers"][0]["radiusUnits"]
+
+
+def test_branch_layer_radius_units_is_literal_pixels_not_an_accessor_expression():
+    layer = branch_layer([_feature("a", 25.0, 55.0)], [])
+    assert _serialized_radius_units(layer) == "pixels"
+
+
+def test_community_layer_radius_units_is_literal_pixels_not_an_accessor_expression():
+    community = Community(id="c1", name_en="C1", lat=25.01, lng=55.01,
+                           population_total=1000, population_female=500, is_estimated=False)
+    layer = community_layer([community], [], {})
+    assert _serialized_radius_units(layer) == "pixels"
+
+
+def test_diff_highlight_ring_and_new_branch_layers_radius_units_is_literal_pixels():
+    diff = ScenarioDiff(
+        scenario_name="s",
+        branches=[
+            BranchDiffEntry(branch_id="a", old={"action": "PROTECT", "lat": 25.0, "lng": 55.0},
+                             new={"action": "SHRINK", "lat": 25.0, "lng": 55.0},
+                             changed_fields={}, action_changed=True),
+            BranchDiffEntry(branch_id="new-branch", old=None,
+                             new={"action": "HOLD", "lat": 25.2, "lng": 55.2,
+                                  "female_pop_served": 0},
+                             changed_fields={}, action_changed=True),
+        ],
+        communities=[], baseline_backend="rubric", current_backend="rubric",
+    )
+    ring_layer, new_layer, _move_layer = diff_highlight_layers(diff, [_feature("a", 25.0, 55.0)])
+    assert _serialized_radius_units(ring_layer) == "pixels"
+    assert _serialized_radius_units(new_layer) == "pixels"
