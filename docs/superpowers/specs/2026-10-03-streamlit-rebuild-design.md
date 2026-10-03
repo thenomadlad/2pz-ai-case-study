@@ -55,6 +55,11 @@ no disk writes, which is what makes "perturb and rerun" actually live.
 
 ```
 streamlit_app.py            # entrypoint: st.navigation() over the 3 pages
+.streamlit/
+  config.toml                # theme, disable the default "Deploy" menu chrome
+  secrets.toml                # gitignored; ANTHROPIC_API_KEY. Mirrors exactly what's
+                               # set in Community Cloud's Secrets panel -- same format,
+                               # same mechanism, local and deployed.
 src/webapp/
   data.py                   # load_baseline(settings) -> typed bundle (replaces
                              # src/serve/app.py's per-route _load/join logic)
@@ -173,9 +178,26 @@ pyramid-principle read, most load-bearing for personality/fit signal.
 Add `requirements.txt` (generated via `uv export`, since Streamlit
 Community Cloud's resolver expects it) alongside the existing
 `pyproject.toml`/`uv.lock`. Deploy `streamlit_app.py` from the GitHub repo
-to Streamlit Community Cloud. Set `ANTHROPIC_API_KEY` as an app secret
-only if the optional page-2 LLM-agreement feature is wanted. README gets
-updated run/deploy instructions in place of the Netlify ones.
+to Streamlit Community Cloud.
+
+### Secrets: native `st.secrets`, not `.env`
+
+`ANTHROPIC_API_KEY` (needed only for the optional page-2 LLM-agreement
+feature) is supplied the native Streamlit way: `.streamlit/secrets.toml`
+locally (gitignored, `.streamlit/secrets.toml.example` committed as the
+documented template, same role `.env.example` plays today), and
+Community Cloud's "Secrets" panel in production — same TOML format both
+places, nothing to translate between environments.
+
+Streamlit also copies top-level secrets into `os.environ` on startup, so
+`src/config.py`'s existing `Settings` (pydantic-settings, which already
+reads env vars) picks up `ANTHROPIC_API_KEY` with **zero code changes** —
+no `st.secrets` fallback branch, no reading secrets twice. `.env` keeps
+serving the non-Streamlit CLI paths (`just all`, `just scenario`)
+exactly as it does today; the two mechanisms don't need to be unified,
+since each is native to the context that uses it.
+
+README gets updated run/deploy instructions in place of the Netlify ones.
 
 ## Out of scope (deferred, not forgotten)
 
