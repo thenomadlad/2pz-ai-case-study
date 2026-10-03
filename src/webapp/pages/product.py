@@ -83,8 +83,9 @@ def render() -> None:
     show_communities = st.checkbox("Show communities", value=True)
     show_assignment_lines = st.checkbox("Show assignment lines", value=False)
 
-    branch_actions = {f.branch_id: (data.decision_for(f.branch_id).action
-                                      if data.decision_for(f.branch_id) else "HOLD")
+    decisions_by_id = {d.branch_id: d for d in data.decisions}
+    branch_actions = {f.branch_id: (decisions_by_id[f.branch_id].action
+                                      if f.branch_id in decisions_by_id else "HOLD")
                        for f in data.features}
 
     layers = [branch_layer(data.features, data.decisions)]
@@ -128,8 +129,14 @@ def render() -> None:
     col1, col2 = st.columns(2)
     if col1.button("Run scenario", type="primary"):
         scenario = build_scenario()
-        st.session_state["scenario_run"] = run_scenario(scenario, settings)
-        st.rerun()
+        try:
+            st.session_state["scenario_run"] = run_scenario(scenario, settings)
+        except Exception as exc:  # noqa: BLE001 - surface any override/run failure as a
+            # friendly message instead of a raw traceback; this is a Streamlit page
+            # boundary, not library code, so a deliberately broad catch is appropriate here.
+            st.error(f"Couldn't run that scenario: {exc}")
+        else:
+            st.rerun()
     if col2.button("Reset to baseline"):
         clear_overrides()
         st.session_state.pop("scenario_run", None)
@@ -137,9 +144,23 @@ def render() -> None:
 
     if scenario_run:
         st.subheader("What changed")
-        changed = [b for b in scenario_run.diff.branches if b.changed_fields or b.old is None]
+        changed = [b for b in scenario_run.diff.branches
+                   if b.action_changed or b.changed_fields or b.old is None]
         st.write(f"{len(changed)} branch(es) changed, "
                  f"{sum(1 for c in scenario_run.diff.communities if c.reassigned)} "
                  "community(ies) reassigned.")
+        if scenario_run.diff.baseline_backend != scenario_run.diff.current_backend:
+            st.warning(
+                f"Backend changed: baseline ran on **{scenario_run.diff.baseline_backend}**, "
+                f"this scenario ran on **{scenario_run.diff.current_backend}** -- some of "
+                "the flips below may reflect the decision method changing, not just your "
+                "overrides."
+            )
         for entry in changed:
-            st.write(f"**{entry.branch_id}**", entry.changed_fields)
+            if entry.old is None:
+                action_line = f"new → {entry.new['action']}"
+            elif entry.action_changed:
+                action_line = f"{entry.old['action']} → {entry.new['action']}"
+            else:
+                action_line = entry.new["action"]
+            st.write(f"**{entry.branch_id}** ({action_line})", entry.changed_fields)

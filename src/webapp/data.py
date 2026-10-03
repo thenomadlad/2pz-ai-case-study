@@ -25,9 +25,24 @@ class BaselineData:
         return {c.id: c for c in self.communities}
 
 
+def _ensure_baseline(settings: Settings) -> None:
+    # A fresh clone (including a fresh Streamlit Community Cloud deploy) has no
+    # data/processed/baseline/ -- it's gitignored, generated output. Generate it from the
+    # committed seed data the first time it's missing, so the app is self-contained rather
+    # than depending on someone having run `just all` first. Idempotent: once the file
+    # exists, every later load_baseline() call skips straight past this. Falls back to the
+    # rubric backend automatically when no ANTHROPIC_API_KEY is configured (existing
+    # resolve_backend behavior), so a fresh public deploy never silently spends API budget.
+    if (settings.processed_dir / "branch_features.json").exists():
+        return
+    from src.scenario.baseline import main as generate_baseline
+    generate_baseline(settings)
+
+
 def load_baseline(settings: Settings | None = None) -> BaselineData:
     settings = settings or default_settings
     processed_dir = settings.processed_dir
+    _ensure_baseline(settings)
 
     payload = json.loads((processed_dir / "branch_features.json").read_text())
     network = NetworkStats(**payload["network"])

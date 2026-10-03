@@ -6,16 +6,29 @@ Scenario object src.scenario.run.run_scenario() actually consumes.
 """
 import streamlit as st
 
+from src.config import settings as default_settings
 from src.models import Branch
+from src.scenario.baseline import load_baseline_assumptions
 from src.scenario.models import Scenario, ScenarioAssumptions, ScenarioOverrides
 
 NEW_BRANCH_LABEL = "(new hypothetical branch)"
+
+# Prefixes of the per-branch widget keys render_branch_override() creates dynamically (one
+# set per branch id, plus the "new branch" form) -- clear_overrides() deletes any
+# session_state key starting with one of these so a reset doesn't leave a stale slider
+# value behind even though branch_overrides itself is empty again.
+_WIDGET_KEY_PREFIXES = ("rating-", "price-", "lat-", "lng-", "new-branch-")
+
+
+def _baseline_contest_ratio() -> float:
+    scenarios_dir = default_settings.seed_dir.parent / "scenarios"
+    return load_baseline_assumptions(scenarios_dir / "baseline.yaml").contest_ratio
 
 
 def _init_session_state() -> None:
     st.session_state.setdefault("branch_overrides", {})
     st.session_state.setdefault("community_overrides", {})
-    st.session_state.setdefault("contest_ratio", 1.25)
+    st.session_state.setdefault("contest_ratio", _baseline_contest_ratio())
     st.session_state.setdefault("model_backend", "rubric")
 
 
@@ -25,9 +38,16 @@ def render_assumptions() -> None:
         "Contest ratio", min_value=1.0, max_value=2.0,
         value=st.session_state["contest_ratio"], step=0.05,
         help="A community counts as 'contested' when its second-nearest branch is within "
-             "this ratio of its nearest.",
+             "this ratio of its nearest. Starts at baseline's own value -- an untouched "
+             "slider means this axis isn't part of your scenario.",
     )
-    backend_options = ["rubric", "llm"]
+    # llm costs real, paid API calls per branch -- only offer it when a key is actually
+    # configured, so a public deploy with no key can't be driven into a confusing silent
+    # rubric fallback, and a public deploy WITH a key can't have its budget spent by every
+    # visitor's every scenario without that being the key-holder's deliberate choice.
+    backend_options = ["rubric", "llm"] if default_settings.anthropic_api_key else ["rubric"]
+    if st.session_state["model_backend"] not in backend_options:
+        st.session_state["model_backend"] = "rubric"
     st.session_state["model_backend"] = st.radio(
         "Decision backend", options=backend_options,
         index=backend_options.index(st.session_state["model_backend"]),
@@ -78,9 +98,12 @@ def pending_overrides_summary() -> list[str]:
 
 
 def clear_overrides() -> None:
+    for key in list(st.session_state.keys()):
+        if key.startswith(_WIDGET_KEY_PREFIXES):
+            del st.session_state[key]
     st.session_state["branch_overrides"] = {}
     st.session_state["community_overrides"] = {}
-    st.session_state["contest_ratio"] = 1.25
+    st.session_state["contest_ratio"] = _baseline_contest_ratio()
     st.session_state["model_backend"] = "rubric"
 
 
