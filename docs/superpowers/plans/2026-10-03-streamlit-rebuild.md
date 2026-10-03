@@ -1533,13 +1533,23 @@ def render() -> None:
 
 - [ ] **Step 2: Add a page-3-specific smoke test**
 
-Add to `tests/webapp/test_pages.py`:
+Add to `tests/webapp/test_pages.py`. **Do not use `AppTest.switch_page()` here** — it
+only matches pages registered with a file-path `script_path`; every page in this app is
+registered via `st.Page(callable, ...)` (see `streamlit_app.py`), whose `script_path` is
+always `""`, so `switch_page` can never find them (confirmed against the installed
+streamlit's `navigation.py`/`app_test.py` source during Task 8's review). Use
+`AppTest.from_function` with a small wrapper that imports `streamlit` and the page's
+`render` itself, which actually executes `render()` through real Streamlit script-running
+machinery instead of only re-checking the default page:
 
 ```python
 def test_app_story_page_explains_evolution():
-    at = AppTest.from_file("streamlit_app.py")
-    at.run()
-    at.switch_page("src/webapp/pages/story.py")
+    def run_story_page():
+        import streamlit as st
+        from src.webapp.pages.story import render
+        render()
+
+    at = AppTest.from_function(run_story_page)
     at.run()
     assert not at.exception
     headers = [h.value for h in at.header]
