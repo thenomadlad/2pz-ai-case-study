@@ -17,9 +17,11 @@ logger = logging.getLogger(__name__)
 
 def run_scenario(scenario: Scenario, settings: Settings | None = None) -> ScenarioRun:
     """Apply a scenario's overrides on top of the fixed baseline raw data, recompute
-    features+model, and diff against the baseline report -- entirely in memory. Never
-    writes to disk; callers that need the on-disk artifacts (the CLI) do that themselves
-    with the returned bundle.
+    features+model, and diff against the baseline report -- entirely in memory. Never writes
+    its own output artifacts to disk; callers that need those on disk (the CLI) do that
+    themselves with the returned bundle. (If the llm backend is selected, LLMModel's own
+    response cache is a separate, pre-existing side effect of src/model/llm.py -- see the
+    comment below, not a disk write performed by run_scenario() itself.)
     """
     settings = settings or default_settings
     baseline_dir = settings.processed_dir
