@@ -30,6 +30,7 @@ def _init_session_state() -> None:
     st.session_state.setdefault("community_overrides", {})
     st.session_state.setdefault("contest_ratio", _baseline_contest_ratio())
     st.session_state.setdefault("model_backend", "rubric")
+    st.session_state.setdefault("widget_reset_nonce", 0)
 
 
 def render_assumptions() -> None:
@@ -59,21 +60,31 @@ def render_assumptions() -> None:
 
 def render_branch_override(existing_branches: dict[str, Branch]) -> None:
     _init_session_state()
+    # Suffixed onto every value-holding widget's key below. Streamlit sliders/number_inputs
+    # don't visually reset to a new `value=` just because their session_state entry was
+    # deleted -- the mounted frontend component keeps its last displayed value until the
+    # widget's key itself changes, which forces a real remount. clear_overrides() bumps
+    # this nonce, so the widgets rendered on the NEXT run are genuinely new components
+    # (observed directly: without this, "Reset to baseline" left an overridden rating
+    # slider visually stuck at the overridden value even though session_state was clear).
+    nonce = st.session_state["widget_reset_nonce"]
     branch_ids = sorted(existing_branches)
     # Existing branches first so the selectbox defaults to overriding one (the common
     # case) rather than to the "add new branch" form.
     choice = st.selectbox("Branch to add or override", options=[*branch_ids, NEW_BRANCH_LABEL])
 
     if choice == NEW_BRANCH_LABEL:
-        branch_id = st.text_input("New branch id", key="new-branch-id",
+        branch_id = st.text_input("New branch id", key=f"new-branch-id-{nonce}",
                                    placeholder="e.g. dubai-marina-new")
-        name = st.text_input("Name", value="Hypothetical Branch", key="new-branch-name")
-        lat = st.number_input("Latitude", value=25.2048, format="%.4f", key="new-branch-lat")
-        lng = st.number_input("Longitude", value=55.2708, format="%.4f", key="new-branch-lng")
-        area = st.text_input("Area", value="", key="new-branch-area")
-        rating = st.slider("Rating", 0.0, 5.0, 4.0, 0.1, key="new-branch-rating")
+        name = st.text_input("Name", value="Hypothetical Branch", key=f"new-branch-name-{nonce}")
+        lat = st.number_input("Latitude", value=25.2048, format="%.4f",
+                               key=f"new-branch-lat-{nonce}")
+        lng = st.number_input("Longitude", value=55.2708, format="%.4f",
+                               key=f"new-branch-lng-{nonce}")
+        area = st.text_input("Area", value="", key=f"new-branch-area-{nonce}")
+        rating = st.slider("Rating", 0.0, 5.0, 4.0, 0.1, key=f"new-branch-rating-{nonce}")
         price = st.number_input("Avg price (AED)", value=99.0, min_value=0.0,
-                                 key="new-branch-price")
+                                 key=f"new-branch-price-{nonce}")
         if st.button("Add branch", key="add-new-branch") and branch_id:
             st.session_state["branch_overrides"][branch_id] = {
                 "name": name, "lat": lat, "lng": lng, "area": area,
@@ -81,11 +92,14 @@ def render_branch_override(existing_branches: dict[str, Branch]) -> None:
             }
     else:
         current = existing_branches[choice]
-        rating = st.slider("Rating", 0.0, 5.0, current.rating or 4.0, 0.1, key=f"rating-{choice}")
+        rating = st.slider("Rating", 0.0, 5.0, current.rating or 4.0, 0.1,
+                            key=f"rating-{choice}-{nonce}")
         price = st.number_input("Avg price (AED)", value=current.avg_price_aed or 99.0,
-                                 min_value=0.0, key=f"price-{choice}")
-        lat = st.number_input("Latitude", value=current.lat, format="%.4f", key=f"lat-{choice}")
-        lng = st.number_input("Longitude", value=current.lng, format="%.4f", key=f"lng-{choice}")
+                                 min_value=0.0, key=f"price-{choice}-{nonce}")
+        lat = st.number_input("Latitude", value=current.lat, format="%.4f",
+                               key=f"lat-{choice}-{nonce}")
+        lng = st.number_input("Longitude", value=current.lng, format="%.4f",
+                               key=f"lng-{choice}-{nonce}")
         if st.button("Apply override", key=f"apply-{choice}"):
             st.session_state["branch_overrides"][choice] = {
                 "rating": rating, "avg_price_aed": price, "lat": lat, "lng": lng,
@@ -105,6 +119,9 @@ def clear_overrides() -> None:
     st.session_state["community_overrides"] = {}
     st.session_state["contest_ratio"] = _baseline_contest_ratio()
     st.session_state["model_backend"] = "rubric"
+    # Forces every value-holding widget in render_branch_override() to remount on the next
+    # run (new key = new component) instead of visually keeping its last displayed value.
+    st.session_state["widget_reset_nonce"] = st.session_state.get("widget_reset_nonce", 0) + 1
 
 
 def build_scenario(name: str = "live-scenario") -> Scenario:

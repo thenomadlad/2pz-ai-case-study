@@ -51,7 +51,10 @@ def test_product_page_override_run_reset_flow():
     rating_sliders = [s for s in at.slider if s.key and s.key.startswith("rating-")]
     assert rating_sliders, "expected at least one per-branch rating override slider"
     slider = rating_sliders[0]
-    branch_id = slider.key.removeprefix("rating-")
+    # Key format is rating-{branch_id}-{nonce} (the nonce suffix exists so a reset can force
+    # a real widget remount -- see render_branch_override()'s docstring comment). This is the
+    # first render, so the nonce is always "0".
+    branch_id = slider.key.removeprefix("rating-").removesuffix("-0")
     baseline_value = slider.value
 
     # Pick a new rating distinct from baseline so the override actually does something.
@@ -85,6 +88,11 @@ def test_product_page_override_run_reset_flow():
     assert not at.exception
     assert at.session_state["branch_overrides"] == {}
 
-    fresh_sliders = [s for s in at.slider if s.key == f"rating-{branch_id}"]
+    # The reset must have bumped the widget-reset nonce, so the slider now rendered for this
+    # branch has a different key (a fresh component) showing the real baseline value again --
+    # not just session_state's branch_overrides dict being empty, which alone was proven
+    # insufficient during browser verification (the old slider visually stayed stuck).
+    fresh_sliders = [s for s in at.slider if s.key and s.key.startswith(f"rating-{branch_id}-")]
     assert fresh_sliders, "rating slider should still be rendered after reset"
+    assert fresh_sliders[0].key != slider.key, "reset must assign the widget a new key"
     assert fresh_sliders[0].value == baseline_value
