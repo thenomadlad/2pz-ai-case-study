@@ -1,7 +1,7 @@
 import json
 
-from src.features.build import build_features, main
 from src.config import Settings
+from src.features.build import build_features, main
 from src.models import Branch, Community
 
 
@@ -59,8 +59,8 @@ def test_build_features_branch_serving_zero_communities_does_not_crash():
         _community("c2", 25.499, 55.499, 500),
     ]
 
-    features, network, assignments = build_features(branches, communities, price_flags=[],
-                                                      contest_ratio=1.25)
+    features, network, _assignments = build_features(branches, communities, price_flags=[],
+                                                       contest_ratio=1.25)
     by_id = {f.branch_id: f for f in features}
 
     assert by_id["a"].communities_served == 0

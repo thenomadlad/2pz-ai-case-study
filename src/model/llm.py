@@ -91,7 +91,7 @@ class LLMModel:
             # /api/branches, and a typo'd/hallucinated id would silently break that join with
             # no error anywhere. Always use the branch_id we actually passed in.
             decision = Decision(**{**tool_block.input, "branch_id": branch.branch_id})
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - deliberately broad, see comment below
             # Mirrors the "log loudly, fall back gracefully" philosophy used elsewhere in the
             # pipeline (branches.py, population.py, prices.py). A single branch's API call
             # failing (rate limit, network error, expired key, no tool-use block returned)

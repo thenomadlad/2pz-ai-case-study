@@ -4,22 +4,22 @@ from src.config import settings
 from src.webapp.data import load_baseline
 
 KNOWN_LIMITATIONS = [
-    "Nearest-branch assignment is false. Real choice depends on travel time, malls, "
-    "parking, habit, price and brand. Straight-line distance from a community centroid "
-    "ignores all of it.",
-    "Community centroids are not where people live. Large communities get collapsed to "
-    "a point.",
-    "No competitors. A branch with five rival salons next door looks identical to one "
-    "with none. The single biggest omission.",
-    "Female population is a poor demand proxy on its own — and every value in this "
-    "dataset is an estimate (see Data provenance below), not just a proxy that could be "
-    "refined.",
-    "No revenue, footfall, staffing or lease data, so 'SHRINK' here cannot distinguish a "
-    "badly-located branch from a well-located, badly-run one.",
-    "The LLM classifies without ground truth and will produce confident-sounding labels "
-    "regardless. Agreement with the rubric is a sanity check, not validation.",
-    "Prices are not 'a thin basket that may not be current' — there are zero real "
-    "per-branch prices anywhere, confirmed, not merely unsourced.",
+    ("Nearest-branch assignment is false. Real choice depends on travel time, malls, "
+     "parking, habit, price and brand. Straight-line distance from a community centroid "
+     "ignores all of it."),
+    ("Community centroids are not where people live. Large communities get collapsed to "
+     "a point."),
+    ("No competitors. A branch with five rival salons next door looks identical to one "
+     "with none. The single biggest omission."),
+    ("Female population is a poor demand proxy on its own — and every value in this "
+     "dataset is an estimate (see Data provenance below), not just a proxy that could be "
+     "refined."),
+    ("No revenue, footfall, staffing or lease data, so 'SHRINK' here cannot distinguish a "
+     "badly-located branch from a well-located, badly-run one."),
+    ("The LLM classifies without ground truth and will produce confident-sounding labels "
+     "regardless. Agreement with the rubric is a sanity check, not validation."),
+    ("Prices are not 'a thin basket that may not be current' — there are zero real "
+     "per-branch prices anywhere, confirmed, not merely unsourced."),
     "Dubai only.",
 ]
 

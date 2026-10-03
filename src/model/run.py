@@ -1,7 +1,8 @@
 import json
 import logging
 
-from src.config import Settings, settings as default_settings
+from src.config import Settings
+from src.config import settings as default_settings
 from src.model.base import DecisionModel
 from src.model.rubric import RubricModel
 from src.models import BranchFeatures, NetworkStats

@@ -76,7 +76,7 @@ class RubricModel:
                            f"share, and rating places this branch in the {action.lower()} "
                            f"tier of the network."),
                 key_drivers=key_drivers,
-                caveats=["Linear rubric over 3 features only; no revenue, footfall, or "
-                         "competitor context."],
+                caveats=[("Linear rubric over 3 features only; no revenue, footfall, or "
+                          "competitor context.")],
             ))
         return decisions

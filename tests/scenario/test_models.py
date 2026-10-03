@@ -2,8 +2,13 @@ import pytest
 from pydantic import ValidationError
 
 from src.scenario.models import (
-    BaselineAssumptions, ScenarioAssumptions, ScenarioOverrides, Scenario,
-    BranchDiffEntry, CommunityDiffEntry, ScenarioDiff,
+    BaselineAssumptions,
+    BranchDiffEntry,
+    CommunityDiffEntry,
+    Scenario,
+    ScenarioAssumptions,
+    ScenarioDiff,
+    ScenarioOverrides,
 )
 
 

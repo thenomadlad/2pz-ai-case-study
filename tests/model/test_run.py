@@ -1,9 +1,9 @@
 import json
 
 from src.config import Settings
-from src.model.run import main, resolve_backend
 from src.model.llm import LLMModel
 from src.model.rubric import RubricModel
+from src.model.run import main, resolve_backend
 
 
 def test_resolve_backend_falls_back_without_api_key():

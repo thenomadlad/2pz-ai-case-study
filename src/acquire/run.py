@@ -4,7 +4,8 @@ import logging
 from src.acquire import branches as branches_mod
 from src.acquire import population as population_mod
 from src.acquire.prices import backfill_missing_prices
-from src.config import Settings, settings as default_settings
+from src.config import Settings
+from src.config import settings as default_settings
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)

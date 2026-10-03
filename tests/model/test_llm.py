@@ -1,7 +1,7 @@
 import json
 from unittest.mock import MagicMock
 
-from src.model.llm import LLMModel, PROMPT_VERSION, _cache_key
+from src.model.llm import LLMModel, _cache_key
 from src.models import BranchFeatures, NetworkStats
 
 

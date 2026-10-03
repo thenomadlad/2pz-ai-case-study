@@ -1,7 +1,8 @@
 import json
 import logging
 
-from src.config import Settings, settings as default_settings
+from src.config import Settings
+from src.config import settings as default_settings
 from src.features.build import build_features
 from src.model.run import resolve_backend
 from src.models import Branch, BranchFeatures, Community, CommunityAssignment, Decision

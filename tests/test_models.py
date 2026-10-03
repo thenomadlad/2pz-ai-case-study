@@ -2,7 +2,12 @@ import pytest
 from pydantic import ValidationError
 
 from src.models import (
-    Branch, Community, CommunityAssignment, BranchFeatures, NetworkStats, Decision,
+    Branch,
+    BranchFeatures,
+    Community,
+    CommunityAssignment,
+    Decision,
+    NetworkStats,
 )
 
 

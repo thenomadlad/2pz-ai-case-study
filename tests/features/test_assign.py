@@ -1,5 +1,3 @@
-import math
-
 from src.features.assign import assign_communities, haversine_km
 from src.models import Branch, Community
 

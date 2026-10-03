@@ -2,8 +2,8 @@ from unittest.mock import MagicMock
 
 import yaml
 
-from src.scenario.baseline import load_baseline_assumptions, main
 from src.config import Settings
+from src.scenario.baseline import load_baseline_assumptions, main
 
 
 def test_load_baseline_assumptions_from_yaml(tmp_path):

@@ -2,7 +2,8 @@ import dataclasses
 import datetime
 import json
 
-from src.config import Settings, settings as default_settings
+from src.config import Settings
+from src.config import settings as default_settings
 from src.models import BranchFeatures, Community, CommunityAssignment, Decision, NetworkStats
 
 
@@ -54,5 +55,6 @@ def load_baseline(settings: Settings | None = None) -> BaselineData:
     return BaselineData(
         features=features, decisions=decisions, assignments=assignments,
         communities=communities, network=network, model_backend=model_backend,
-        data_sources=data_sources, pipeline_run_at=datetime.datetime.fromtimestamp(mtime),
+        data_sources=data_sources,
+        pipeline_run_at=datetime.datetime.fromtimestamp(mtime, tz=datetime.UTC),
     )

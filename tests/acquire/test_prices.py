@@ -1,5 +1,5 @@
-from src.models import Branch
 from src.acquire.prices import backfill_missing_prices
+from src.models import Branch
 
 
 def _branch(id_: str, price: float | None) -> Branch:

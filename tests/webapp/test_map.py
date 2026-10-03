@@ -1,8 +1,13 @@
 from src.models import BranchFeatures, Community, CommunityAssignment, Decision
 from src.scenario.models import BranchDiffEntry, CommunityDiffEntry, ScenarioDiff
 from src.webapp.map import (
-    ACTION_COLORS, assignment_lines_layer, branch_layer, build_deck,
-    community_layer, diff_highlight_layers, sibling_lines_layer,
+    ACTION_COLORS,
+    assignment_lines_layer,
+    branch_layer,
+    build_deck,
+    community_layer,
+    diff_highlight_layers,
+    sibling_lines_layer,
 )
 
 

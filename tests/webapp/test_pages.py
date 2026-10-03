@@ -17,7 +17,6 @@ def test_app_product_page_shows_headline():
 
 def test_app_model_page_lists_limitations():
     def run_model_page():
-        import streamlit as st
         from src.webapp.pages.model import render
         render()
 
@@ -30,7 +29,6 @@ def test_app_model_page_lists_limitations():
 
 def test_app_story_page_explains_evolution():
     def run_story_page():
-        import streamlit as st
         from src.webapp.pages.story import render
         render()
 

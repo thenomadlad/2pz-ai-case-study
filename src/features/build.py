@@ -1,7 +1,8 @@
 import json
 import statistics
 
-from src.config import Settings, settings as default_settings
+from src.config import Settings
+from src.config import settings as default_settings
 from src.features.assign import assign_communities, haversine_km
 from src.models import Branch, BranchFeatures, Community, NetworkStats
 

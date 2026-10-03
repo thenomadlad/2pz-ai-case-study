@@ -1,7 +1,8 @@
 import csv
 import logging
 
-from src.config import Settings, settings as default_settings
+from src.config import Settings
+from src.config import settings as default_settings
 from src.models import Community
 
 logger = logging.getLogger(__name__)

@@ -7,11 +7,18 @@ from src.models import Branch
 from src.scenario.run import run_scenario
 from src.webapp.data import load_baseline
 from src.webapp.map import (
-    assignment_lines_layer, branch_layer, build_deck, community_layer,
-    diff_highlight_layers, sibling_lines_layer,
+    assignment_lines_layer,
+    branch_layer,
+    build_deck,
+    community_layer,
+    diff_highlight_layers,
+    sibling_lines_layer,
 )
 from src.webapp.scenario_editor import (
-    build_scenario, clear_overrides, pending_overrides_summary, render_assumptions,
+    build_scenario,
+    clear_overrides,
+    pending_overrides_summary,
+    render_assumptions,
     render_branch_override,
 )
 

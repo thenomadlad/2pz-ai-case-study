@@ -3,7 +3,8 @@ import shutil
 import yaml
 
 from src.acquire import run as acquire_run
-from src.config import Settings, settings as default_settings
+from src.config import Settings
+from src.config import settings as default_settings
 from src.features import build as features_build
 from src.model import run as model_run
 from src.scenario.models import BaselineAssumptions
