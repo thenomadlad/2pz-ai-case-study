@@ -71,6 +71,11 @@ def test_product_page_override_run_reset_flow():
     scenario_run = at.session_state["scenario_run"]
     expected_changed = [b for b in scenario_run.diff.branches
                          if b.action_changed or b.changed_fields or b.old is None]
+    # Without at least one action-only flip (action_changed but no changed_fields), this
+    # test can't actually distinguish the fixed formula from the old buggy one -- pin that
+    # the scenario produces one, so a future data/rubric change can't silently make this
+    # test stop discriminating.
+    assert any(b.action_changed and not b.changed_fields for b in scenario_run.diff.branches)
     markdown_texts = [m.value for m in at.markdown]
     count_line = next(t for t in markdown_texts if "branch(es) changed" in t)
     assert count_line.startswith(f"{len(expected_changed)} branch(es) changed")

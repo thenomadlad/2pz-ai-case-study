@@ -33,7 +33,12 @@ def _ensure_baseline(settings: Settings) -> None:
     # exists, every later load_baseline() call skips straight past this. Falls back to the
     # rubric backend automatically when no ANTHROPIC_API_KEY is configured (existing
     # resolve_backend behavior), so a fresh public deploy never silently spends API budget.
-    if (settings.processed_dir / "branch_features.json").exists():
+    # run_meta.json is the LAST file model/run.py writes -- checking for it (not
+    # branch_features.json, written earlier by the features stage) means a baseline that
+    # failed partway through generation (e.g. a transient LLM API error) is recognized as
+    # incomplete and retried on the next load, rather than permanently wedged with a
+    # present branch_features.json but a missing decisions.json.
+    if (settings.processed_dir / "run_meta.json").exists():
         return
     from src.scenario.baseline import main as generate_baseline
     generate_baseline(settings)
