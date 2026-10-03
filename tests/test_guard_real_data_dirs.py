@@ -59,3 +59,15 @@ def test_guard_leaves_tmp_path_rmtree_unaffected(tmp_path):
     shutil.rmtree(victim)
 
     assert not victim.exists()
+
+
+def test_guard_allows_rmtree_on_a_protected_path_that_does_not_exist():
+    # src/scenario/baseline.py's main() unconditionally calls
+    # shutil.rmtree(current_dir, ignore_errors=True), including on a fresh checkout where
+    # current_dir never existed -- src/webapp/data.py's load_baseline() triggers exactly
+    # this path when it self-heals a missing baseline. There's no real data to lose here,
+    # so the guard must let it through rather than raising on a path that was never there.
+    nonexistent = REPO_ROOT / "data" / "processed" / "test-guard-scratch-nonexistent"
+    assert not nonexistent.exists()
+
+    shutil.rmtree(nonexistent, ignore_errors=True)  # must not raise
