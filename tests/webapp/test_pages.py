@@ -18,8 +18,6 @@ def test_app_product_page_shows_headline():
 def test_app_model_page_lists_limitations():
     def run_model_page():
         import streamlit as st
-        from src.config import settings
-        from src.webapp.data import load_baseline
         from src.webapp.pages.model import render
         render()
 
