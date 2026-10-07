@@ -68,7 +68,7 @@ Status: ✅ addressed · 🟡 partial · ❌ missing.
 - [x] **Stale baseline protection:** `run_meta.json` carries `pipeline_version`, and the app regenerates an older baseline instead of crashing.
 
 ### Still to do
-- [ ] **⚠️ Generate the AI explanations (placeholder in place).** No API key was available during the build, so `data/explanations/cache.json` is `{}` and the app shows *template* explanations everywhere. To fix: `ANTHROPIC_API_KEY=... just explain`, check how many passed grounding (it prints the count), commit the cache. Until then the brief's "AI layer" requirement is only met in code, not on the live link.
+- [x] **AI explanations generated.** 59/59 pass grounding on Opus 5.5 (`data/explanations/cache.json`). First run: 56/59. Two of the three failures were the checker rejecting correctly rounded numbers ("3.1" for 3.06), so it now compares at the precision the text uses. The third was a malformed answer that passed on a re-run, which only fills gaps. Known limit: the check verifies numbers, not adjectives (one explanation calls a 4.6★ rating "strong").
 - [x] **Committed and pushed to `main`.** Check that Streamlit Community Cloud redeployed and that the live app shows "7 are GROW" in the headline.
 - [ ] **Click through the live app in a browser.** Panels were verified headlessly (AppTest), not visually: the browser extension wasn't connected.
 - [ ] **Demo:** a 5–10 min recording, or a written walkthrough. Suggested arc: headline → al-safa-2 SHRINK and why → a Deira GROW area → the scenario that moves al-safa-2 into Deira → the "where not to trust it" section.
@@ -99,5 +99,5 @@ Settled in a grilling session on 2026-10-07.
 | D12 | Competitive set | OSM `shop=beauty` and `shop=hairdresser`, excluding barbers |
 | D13 | Does competitive overlap move the action? | Yes: a 4th equal-weight signal |
 | D14 | Opportunity action rule | 2×2 of underserved (nearest branch > 5 km) × unsaturated (< 5 competitors per 10k), with a 20k-women floor and worker-housing areas capped at WATCH |
-| D15 | How explanations are generated | Haiku with forced tool output and a grounding check. Baseline explanations are committed. Without a key, a labelled template is used |
+| D15 | How explanations are generated | Opus 5.5 (low effort, strict tool schema, refusal fallback) with a grounding check. Baseline explanations are committed. Without a key, a labelled template is used |
 | D16 | LLM classifier | Deleted |

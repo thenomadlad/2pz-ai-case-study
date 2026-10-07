@@ -1,1 +1,3867 @@
-{}
+{
+  "005045aa35be8f20": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Warsan First has enough demand to support a branch on its own, well above the 20,000-woman minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 53006
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light, below the Dubai median of 5 salons per 10,000 women, so the market still has room.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 11
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 2.0752
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The area is already partly covered by our Al Warqa branch, which sits inside the 5 km underserved line, so a new site could take customers from it; that is why this is WATCH rather than GO.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "al-warqa"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 3.7492
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "warsan-first",
+    "table_caption": "The table tests Warsan First on three things: how many women live there, how crowded the salon market is, and how close our nearest branch is. Demand is strong and competition is low. But Al Warqa is under 5 km away, so the area already has some coverage. We will keep watching it rather than open now.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "03360c74485a7e41": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Jebel Ali First has enough women to support a branch, well above the minimum size.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 37908
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light, so the market is unsaturated with only 5 rival salons, far below the 5 per 10k threshold.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 5
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 1.319
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "It is a watch, not a go, because Jumeirah Park is about 4.0056 km away, inside the 5 km line, so the area is not underserved and a new branch could take customers from it.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "jumeirah-park"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 4.0056
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "jebel-ali-first",
+    "table_caption": "The table shows how many women live in the area, how crowded the local salon market is, and how close our nearest branch is. Jebel Ali First is large and has little competition, at 1.319 salons per 10k women against a 5 threshold. But it sits within 5 km of Jumeirah Park, so it is not underserved, which is why it is a watch and not an open.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "0ae5e3bf01919ad5": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Dubai Investment Park First is underserved: no Bedashing branch is in the community, and the nearest one is more than the 5 km threshold away.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 6.3297
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light, well below the 5-salons-per-10k unsaturated threshold.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 2
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 0.6469
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The female population is above the 20,000 floor needed to support a branch, but the closest existing branch is Jumeirah Park, so we hold at WATCH rather than committing now.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 30916
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "jumeirah-park"
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "dubai-investment-park-first",
+    "table_caption": "The table shows how many women live in Dubai Investment Park First, how many rival salons serve them, and how far away our nearest branch is. Here, about 30,916 women are served by only 2 competitor salons, and our closest branch, Jumeirah Park, is about 6.3 km away. That makes this a less-covered, low-competition area worth tracking.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "0d074342ee23ceb9": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al Barsha First is not underserved: an existing Bedashing branch is already within walking distance, so a new site would mostly draw from our own customers.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "al-barsha-2"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.493
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Competition is still below the Dubai median, so the market has room to grow, which is why this is a watch and not a rejection.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 9
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 4.4224
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The female population only just passes the 20,000 size bar, so a second nearby branch would have very little room for error.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 20351
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-barsha-first",
+    "table_caption": "The table shows how many women live in Al Barsha First, how crowded the local salon market is, and how close our nearest branch is. Read it this way: competition is light at 4.4224 salons per 10k women, under the median of 5, but Al Barsha 2 is only 0.493 km away, far below the 5 km underserved bar. The area has room for growth, but most of it is already within reach of our existing branch.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "0edf6c4e7f51f19f": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al-Karama is a coverage gap: no Bedashing branch sits in the community and the nearest one is beyond the 5 km underserved line.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 6.5938
+          }
+        ]
+      },
+      {
+        "claim": "The community has enough women to support a branch on its own, well above the 20,000 minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 37530
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The market is crowded: competitor density is more than twice the 5-per-10k unsaturated threshold, which is why this is WATCH rather than a go.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 45
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 11.9904
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-karama",
+    "table_caption": "The table shows three things for Al-Karama: how many women live there, how far away our nearest branch is, and how many competing salons already operate. Al-Karama has plenty of women (37,530) and our closest branch, City Walk, is 6.5938 km away. But it has about 12 competitor salons per 10,000 women, against a city median of about 5. That level of competition is why it stays on watch for now.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "14615b3c4561a01b": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Bedashing already has a branch in this community, so a new site would mostly split existing demand.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "jumeirah-park"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 2.8651
+          }
+        ]
+      },
+      {
+        "claim": "The area is already well covered: the nearest branch is inside the 5 km underserved threshold.",
+        "evidence": [
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 2.8651
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The market is crowded, with competitor density well above the 5-per-10k saturation line.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 15
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 7.4742
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-thanyah-fifth",
+    "table_caption": "The table shows how many women live in Al Thanyah Fifth, how many competing salons serve them, and how close our nearest branch is. The female population of 20,069 is only just above the 20,000 minimum, but the area already has a Bedashing branch less than 5 km away and 7.4742 competitor salons per 10k women, above the median of 5. It fails both the coverage-gap test and the open-market test.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "1b7ba4bfdebdbc56": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is already crowded: competitor density is about four times the Dubai median threshold of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 12
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 19.6431
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The area is already covered by an existing branch within the 5 km underserved threshold.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "al-safa-2"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 4.3099
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The catchment is too small to carry a branch alone, falling well below the 20,000 female-resident minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 6109
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "umm-suqeim-first",
+    "table_caption": "The table tests Umm Suqeim First on three things: how many women live there, how many competing salons serve them, and how close our nearest branch is. Here it fails all three. It has about 6,109 women against a 20,000 minimum, about 19.6 competitor salons per 10k women against a 5 median, and Al Safa 2 is only 4.3 km away, inside the 5 km coverage line.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "1c2936dd3a08f212": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Downtown Dubai is already covered by an existing branch, so it does not meet the underserved test of more than 5 km to the nearest branch.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 1.6872
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The local market is saturated, with competitor density well above the threshold of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 9
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 8.4018
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The community is too small to support a branch on its own, falling below the 20,000 female-resident threshold.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 10712
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "downtown-dubai",
+    "table_caption": "The table shows how big Downtown Dubai's market of women is, how many competing salons are there, and how close our nearest branch is. An area qualifies when the nearest branch is more than 5 km away, there are fewer than 5 competitor salons per 10k women, and there are at least 20,000 female residents. Downtown Dubai fails all three tests: City Walk is 1.6872 km away, there are 8.4018 competitor salons per 10k women, and it has only 10712 female residents.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "202b2548e1dc33db": {
+    "action": "GROW",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Hor Al Anz is a gap in our coverage: no branch sits in the community, and the nearest one is about twice the 5 km underserved line away.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 10.5084
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light for the size of the market, well below the 5 salons per 10k women saturation threshold.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 13
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 3.1183
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The community is large enough to carry a branch on its own, at roughly twice the 20,000 female-resident minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 41689
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "hor-al-anz",
+    "table_caption": "The factors show how many women live in Hor Al Anz, how many rival salons already serve them, and how far they are from our nearest branch. Hor Al Anz has a large pool of women, competition below the Dubai median, and no branch of ours within 5 km. That combination is why the model marks it as a place to grow.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "291599942ab67845": {
+    "action": "GROW",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Muhaisnah Second has a large enough market to support a branch by itself, well above the minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 72928
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Our current network does not reach this area: the closest branch is more than 5 km away.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "mirdif-35"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 8.0194
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "There are fewer competing salons for each woman living here than the cutoff of 5 per 10k women, so there is room for a new entrant.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 17
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 2.3311
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "muhaisnah-second",
+    "table_caption": "The table shows three things for Muhaisnah Second: how many women live there, how far it is from our nearest branch, and how many competing salons there are for every 10,000 women. An area is a good prospect when it has at least 20,000 women, our nearest branch is more than 5 km away, and there are fewer than 5 competing salons per 10,000 women. Muhaisnah Second meets all three.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "2a3160492cdb5ade": {
+    "action": "GROW",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al Qusais is underserved by Bedashing: there is no branch in the community and the nearest one is well beyond the 5 km threshold.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "mirdif-35"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 7.6957
+          }
+        ]
+      },
+      {
+        "claim": "Competition is below the Dubai median, so a new branch would enter an unsaturated market.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 10
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 4.2185
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The community clears the 20,000 female-resident minimum, so it is large enough to support a branch on its own.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 23705
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-qusais",
+    "table_caption": "The table shows how many women live in Al Qusais, how crowded its salon market is, and how far it is from our nearest branch. Al Qusais has about 23,705 women, which is above the 20,000 minimum. It has 4.2 competitor salons per 10,000 women, which is under the median of 5. Our nearest branch, Mirdif, is about 7.7 km away, which is more than the 5 km cut-off. A community that is big enough, not crowded and far from our branches is a growth target.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "2d5b9c7fa6097d97": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "There are enough women here to support a branch: 39258 estimated female residents, well above the 20,000 minimum for a standalone branch.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 39258
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The area is only just underserved: the nearest branch, Jumeirah Park, is 5.6362 km away, barely past the 5 km cut-off, so a new branch could take customers from it.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "jumeirah-park"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 5.6362
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "No competitor salons are recorded here, which leaves the market open but also gives no proof of local demand and may mean the map data is incomplete, so the area should be checked before committing.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 0
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 0.0
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "dubai-investment-park-second",
+    "table_caption": "The table shows how many women live in Dubai Investment Park Second, how close our nearest branch is and how many competing salons are nearby. The area passes every test: it is large enough, it is underserved because our nearest branch is more than 5 km away, and it has fewer than 5 competitor salons per 10k women. It stays on WATCH because it only just clears the distance test and has no competitors to prove there is demand.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "2ebb1f1c61d2165b": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Business Bay is already covered by our existing City Walk branch, so it fails the underserved test.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 1.9068
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The market is already saturated with competitors, just above the Dubai median of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 6
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 5.1142
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The female population is too small to carry a branch on its own, falling below the 20,000 threshold.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 11732
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "business-bay",
+    "table_caption": "The table checks Business Bay on two things: how close our nearest branch is (more than 5 km counts as underserved) and how crowded the local salon market is (fewer than 5 competitor salons per 10,000 women counts as unsaturated). Business Bay fails both. City Walk is 1.9 km away, and with 5.1 competitors per 10,000 women the market is slightly above the city median. It also has fewer than 20,000 women, which is too small to support a branch on its own.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "33b59b4e3b325323": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Mirdif already has a Bedashing branch, so a new site would compete with our own branch rather than reach new customers.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "The area does not pass the underserved test, which requires the nearest branch to be more than 5 km away.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "The demand and competition numbers look good, but they describe a market our current branch already serves, so they do not justify a second one.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 32701
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 0.6116
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "mirdif",
+    "table_caption": "The table shows how many women live in Mirdif, how many rival salons operate there, and how far away our nearest branch is. Mirdif is large enough to support a branch and has few competitors. But our existing branch sits inside the community, at 0.0 km. That fails the coverage test, so the decision is to skip.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "34af57943dfc02ae": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Bedashing already operates a branch inside Palm Jumeirah, so a new opening would add no new coverage.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "palm-jumeirah"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "The community is not underserved: the nearest branch is well inside the 5 km threshold.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "The market is unsaturated, but it is too small for a second branch, and our existing branch already serves that demand.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 12274
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 2.4442
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "palm-jumeirah",
+    "table_caption": "The table shows how many women live in Palm Jumeirah, how crowded the local salon market is, and how close our nearest branch is. Here, our nearest branch is in the community itself (0.0 km), and about 12,274 women live there. That is below the roughly 20,000 needed to support a branch on its own. Competition is light at 2.4442 salons per 10,000 women, but our existing branch already serves this area.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "40c21c8476447fa7": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Bedashing already operates in this community, so a new branch would compete with our own.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "al-warqa"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "The area is not underserved: our nearest branch sits inside it, well within the 5 km coverage threshold.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "The female population is below the 20,000 needed to support a branch alone, and low competition does not make up for that.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 12938
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 2.3188
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-warqaa-first",
+    "table_caption": "The factors show how many women live in Al Warqa'a First, how many competing salons serve them, and how close the nearest Bedashing branch is. Competition is light, with 2.3188 salons per 10k women against a limit of 5. But our al-warqa branch is already in the community (0.0 km away), and 12,938 women is under the 20,000 needed to support a branch alone. That is why the decision is to skip.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "46aed1f6b5aa88e2": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is already crowded with competitors, well above the Dubai median of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 22
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 13.7063
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The female catchment is below the roughly 20,000-resident size needed to carry a branch on its own.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 16051
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The area is underserved by Bedashing, but on its own that gap does not outweigh the saturation and size problems.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 10.4467
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "mirdif-35"
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-nahda-first",
+    "table_caption": "The table shows how many women live in Al Nahda First, how many rival salons already serve them, and how far the nearest Bedashing branch is. Al Nahda First is far from our network (more than 10 km from Mirdif), but it has about 13.7 competitor salons per 10,000 women, nearly three times the Dubai median. Its roughly 16,000 female residents are also below the size needed to support a branch alone. That is why the model says SKIP.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "46c278ced22e4012": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Nad Al Sheba already hosts a Bedashing branch, so a new site would split demand with our own branch instead of adding coverage.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "nad-al-sheba"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "The community is not underserved, which is the main test for a new opening.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light, but the female population is too small to support a second branch: it is far below the 20,000 minimum for carrying even one branch.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 3229
+          },
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 1
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 3.0969
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "nad-al-sheba-first",
+    "table_caption": "The table shows how many women live in Nad Al Sheba, how many rival salons they have to choose from, and how close our nearest branch is. The market is unsaturated, with 3.0969 salons per 10k women against a threshold of 5. But our own branch is already in the community (0.0 km away) and only 3,229 women live there. The opportunity is skipped because the area is already covered and the market is small.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "49dadf89b387076d": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is already crowded with competitors, at well over three times the Dubai median of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 11
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 16.9596
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "An existing Bedashing branch already covers this area, so a new site would mostly take customers from our own branch.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "sheikh-zayed-road"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 3.1218
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The community is too small to support a branch on its own, falling far below the 20,000 female-resident threshold.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 6486
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "umm-suqeim-second",
+    "table_caption": "The table shows how many women live in Umm Suqeim Second, how many competing salons serve them, and how far away our nearest branch is. Two things count in an area's favour: an overlap figure under 5 salons per 10k women and a nearest branch more than 5 km away. This area fails both tests and is also below the 20,000-resident size threshold, so the model scored it a SKIP.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "582ccef54644711d": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is heavily saturated: competitive overlap is more than three times the 5-per-10k threshold.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 17.1518
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          },
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 34
+          }
+        ]
+      },
+      {
+        "claim": "The female catchment falls just short of the 20,000 residents needed to carry a branch on its own.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 19823
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Being underserved is the one point in its favour, but it does not outweigh saturation and a small catchment.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 9.4573
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-murar",
+    "table_caption": "The table shows how many women live in Al-Murar, how crowded the local salon market is, and how far the nearest Bedashing branch is. Al-Murar has 34 competitor salons, about 17 for every 10,000 women, against a Dubai median of about 5. It also has slightly fewer than the 20,000 women a branch needs. The nearest branch, City Walk, is 9.5 km away, so the area is underserved, but the crowded market and small catchment outweigh that.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "59facc4bfcc59b90": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is already crowded: competitor density is more than double the 5-per-10k saturation threshold.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 11
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 11.1313
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The catchment is too small to support a branch, at under half the 20,000-women minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 9882
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The gap in Bedashing coverage is real but does not outweigh crowding and small size; Al Warqa is the nearest branch.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 6.8632
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "al-warqa"
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-garhoud",
+    "table_caption": "The table shows how many women live in Al Garhoud, how many competing salons serve them, and how far away our nearest branch is. Al Garhoud is more than 5 km from our nearest branch, which counts as underserved. But it has about 11 salons per 10,000 women against a 5 benchmark, and only 9,882 women against a 20,000 minimum. Too much competition and too few customers drive the SKIP.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "5a5ed396934298bb": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Dubai Marina is a saturated market, with nearly double the competitor density of the unsaturated cut-off of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 30
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 9.7851
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The area is already covered by our Palm Jumeirah branch, which sits inside the 5 km underserved threshold.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "palm-jumeirah"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 3.675
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The female population clears the 20,000 minimum, but that alone does not justify a branch when the area fails both the coverage and saturation tests.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 30659
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "dubai-marina",
+    "table_caption": "These factors show how many women live in Dubai Marina, how crowded the local salon market is, and how close our nearest branch already is. An area makes a strong opportunity when the nearest branch is over 5 km away and there are fewer than 5 competitor salons per 10,000 women. Dubai Marina fails both tests: there are about 9.8 salons per 10,000 women, and Palm Jumeirah is only 3.675 km away.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "626df3a12060044a": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al Nahda Second is a coverage gap: no Bedashing branch is present and the nearest one is about twice the 5 km underserved threshold.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 10.5111
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The catchment is big enough to support a branch, well above the 20,000-women minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 31584
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "mirdif-35"
+          }
+        ]
+      },
+      {
+        "claim": "Competition is the blocker: salon density is about seven times the 5-per-10k unsaturated threshold, so this is a WATCH and not a GO.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 114
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 36.0942
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-nahda-second",
+    "table_caption": "The table looks at three things: how far the nearest Bedashing branch is, how many women live in the area, and how many competing salons there are for every 10,000 women. Al Nahda Second does well on the first two. The nearest branch is more than 10 km away and about 31,600 women live there. But it has roughly 36 salons per 10,000 women, against a Dubai median of 5, which is why it stays on the watch list.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "675cba32259b5dc0": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al Barsha is already covered: a Bedashing branch sits inside the community, a few hundred metres from this site.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "al-barsha-2"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.2954
+          }
+        ]
+      },
+      {
+        "claim": "The market is heavily saturated, with competitive overlap roughly nine times the 5-per-10k Dubai median.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 36
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 44.7539
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The community is too small to support a second branch, with female residents well below the 20,000 minimum and no coverage gap to fill.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 8044
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-barsha-second",
+    "table_caption": "The table shows how many women live in Al Barsha, how many competitor salons serve them, and how close our nearest branch is. Here our existing branch is only 0.2954 km away, and there are 44.7539 competitor salons per 10,000 women against a Dubai median of about 5. Both numbers point to a market that is already served and crowded, not an open opportunity.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "6befbdbaf66f34c4": {
+    "action": "HOLD",
+    "kind": "branch",
+    "reasons": [
+      {
+        "claim": "The composite sits in the middle band, between the SHRINK and PROTECT thresholds, so the rule returns HOLD.",
+        "evidence": [
+          {
+            "field": "composite",
+            "label": "Composite score",
+            "value": 0.4623
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.4642
+          },
+          {
+            "field": "score_quality",
+            "label": "Quality score",
+            "value": 0.5
+          }
+        ]
+      },
+      {
+        "claim": "Cannibalisation is the main weakness: a sibling branch competes for the entire catchment.",
+        "evidence": [
+          {
+            "field": "contested_share",
+            "label": "Cannibalisation",
+            "value": 1.0
+          },
+          {
+            "field": "nearest_sibling_km",
+            "label": "Nearest other Bedashing branch",
+            "value": 0.6877
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "Low outside competition and a mid-sized catchment hold the score up and keep the branch out of SHRINK.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 1.7234
+          },
+          {
+            "field": "score_competition",
+            "label": "Competition score",
+            "value": 0.8851
+          },
+          {
+            "field": "female_pop_served",
+            "label": "Female residents in catchment",
+            "value": 69631
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "sheikh-zayed-road",
+    "table_caption": "Each factor is scored from 0 (weak) to 1 (strong), and the composite is the plain average of the four. Sheikh Zayed Road scores well on competition, is middling on demand, and scores zero on cannibalisation because another Bedashing branch is 0.6877 km away. It has no customer rating, so quality is set to a neutral 0.5.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the branch clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD. The middle band is deliberately wide: with no revenue or rent data, the model should only make strong calls when the signals agree."
+  },
+  "701c215632d92aff": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is large enough to support a branch on its own.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 63145
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Competition is very light, well under the 5-per-10k saturation threshold.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 1
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 0.1584
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "It is not underserved: the Sheikh Zayed Road branch already sits within the 5 km coverage line, so a new branch could pull customers from it. That is why this is WATCH rather than OPEN.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "sheikh-zayed-road"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 3.1643
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-quoz-industrial-second",
+    "table_caption": "The table shows three things for Al Quoz Industrial Second: how many women live there, how many competing salons serve them, and how far away our nearest branch is. Two of the three look good: 63145 women (the 20,000 minimum is cleared) and only 1 competitor salon. The weak point is that our Sheikh Zayed Road branch is 3.1643 km away, inside the 5 km line we use to call an area underserved, so we watch this area rather than open now.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "709a513407f35030": {
+    "action": "HOLD",
+    "kind": "branch",
+    "reasons": [
+      {
+        "claim": "Demand is the weak signal: the catchment is one community with few female residents, so demand scores near zero.",
+        "evidence": [
+          {
+            "field": "female_pop_served",
+            "label": "Female residents in catchment",
+            "value": 3229
+          },
+          {
+            "field": "communities_served",
+            "label": "Communities in catchment",
+            "value": 1
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.0215
+          }
+        ]
+      },
+      {
+        "claim": "The branch's territory is its own: no sibling overlap and the nearest Bedashing branch is almost 6 km away.",
+        "evidence": [
+          {
+            "field": "contested_share",
+            "label": "Cannibalisation",
+            "value": 0.0
+          },
+          {
+            "field": "nearest_sibling_km",
+            "label": "Nearest other Bedashing branch",
+            "value": 5.7803
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 1.0
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light and customers rate the branch well on a solid review base, but the composite of 0.6038 still falls short of the 0.65 PROTECT bar, so the call is HOLD.",
+        "evidence": [
+          {
+            "field": "competitors_in_catchment",
+            "label": "Competitor salons in catchment",
+            "value": 1
+          },
+          {
+            "field": "rating",
+            "label": "Customer rating",
+            "value": 4.6
+          },
+          {
+            "field": "composite",
+            "label": "Composite score",
+            "value": 0.6038
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "nad-al-sheba",
+    "table_caption": "Each factor is scored from 0 to 1, where higher is better. The composite is the plain average of the four. Nad Al Sheba scores high on having no sibling overlap, light competition and good ratings, but very low on local demand (0.0215). That pulls its composite to 0.6038, between the SHRINK line (0.35) and the PROTECT line (0.65), so the model holds it.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the branch clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD. The middle band is deliberately wide: with no revenue or rent data, the model should only make strong calls when the signals agree."
+  },
+  "7597e647187057fb": {
+    "action": "PROTECT",
+    "kind": "branch",
+    "reasons": [
+      {
+        "claim": "Jumeirah Park serves a large catchment of its own, above the level that earns a full demand score.",
+        "evidence": [
+          {
+            "field": "female_pop_served",
+            "label": "Female residents in catchment",
+            "value": 225283
+          },
+          {
+            "field": "communities_served",
+            "label": "Communities in catchment",
+            "value": 5
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 1.0
+          }
+        ]
+      },
+      {
+        "claim": "No other Bedashing branch competes for these customers, so cutting back here would give up demand that no sibling picks up.",
+        "evidence": [
+          {
+            "field": "contested_share",
+            "label": "Cannibalisation",
+            "value": 0.0
+          },
+          {
+            "field": "nearest_sibling_km",
+            "label": "Nearest other Bedashing branch",
+            "value": 7.68
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 1.0
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light for a catchment this size, and customers rate the branch highly across a solid number of reviews.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 1.0209
+          },
+          {
+            "field": "rating",
+            "label": "Customer rating",
+            "value": 4.8
+          },
+          {
+            "field": "review_count",
+            "label": "Reviews",
+            "value": 158
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "jumeirah-park",
+    "table_caption": "Each factor is scored from 0 to 1, where 1 is best. Demand counts the women living nearby, cannibalisation shows how much the branch overlaps with our other branches, competition counts rival salons for every 10,000 women, and quality is the customer star rating. Jumeirah Park scores 0.8 or higher on all four and has a composite of 0.933, well above the 0.65 PROTECT bar, so every signal points the same way.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the branch clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD. The middle band is deliberately wide: with no revenue or rent data, the model should only make strong calls when the signals agree."
+  },
+  "760a839ce101ee23": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al-Muteena has enough women living there to support a branch, so it is worth tracking.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 24145
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Bedashing does not cover the area well today: the nearest branch is well beyond the 5 km underserved line.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 9.4591
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The local market is already crowded with competitors, which is why this is a WATCH and not an outright opportunity.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 15
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 6.2125
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-muteena",
+    "table_caption": "The table looks at three things: how many women live in Al-Muteena, how far away the nearest Bedashing branch is, and how many competitor salons there are for every 10,000 women. Al-Muteena is above the 20,000-resident size floor and is underserved, because City Walk is more than 5 km away. However, competition is above the Dubai median of 5 salons per 10k women, which keeps it on watch.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "7fc22769abc1bc1f": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al Mizhar First is already covered by an existing branch, so a new site would mostly draw from the same customers.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "mirdif-35"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 1.0999
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The community is too small to support a branch on its own, falling well below the 20,000 female-resident threshold.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 8574
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Low competition is a plus, but it does not outweigh the small population and existing nearby coverage.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 2
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 2.3326
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-mizhar-first",
+    "table_caption": "These factors show whether Al Mizhar First has enough women nearby, how crowded the salon market is, and how close our nearest branch already is. Here competition is light, under the median of 5 salons per 10k women. But the Mirdif branch is close, well inside the 5 km underserved line, and the population is below the 20,000 minimum, so we skip this site.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "87b1171e77ee716d": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The catchment is too small to carry a branch on its own: estimated female residents fall below the 20,000 minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 17572
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The area is underserved, since the nearest Bedashing branch is more than 5 km away. That gap is real, but it does not make up for the small population.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 8.8418
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "mirdif-35"
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light, well under the saturation line of 5 salons per 10k women, but light competition in a small market still leaves a small market.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 3
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 1.7073
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "muhaisnah-fourth",
+    "table_caption": "The table shows how many women live in Muhaisnah Fourth, how many competing salons are there per 10,000 women, and how far away our closest branch is. Distance and competition both look good: our nearest branch is 8.8 km away, and there are only 1.7 rival salons per 10,000 women. The SKIP comes from the size test: at about 17,572 women, the area falls short of the 20,000 needed to support a branch on its own.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "885493a7c089733e": {
+    "action": "HOLD",
+    "kind": "branch",
+    "reasons": [
+      {
+        "claim": "The composite score sits in the middle band: well below the PROTECT bar of 0.65 and above the SHRINK bar of 0.35, so the model makes no strong call.",
+        "evidence": [
+          {
+            "field": "composite",
+            "label": "Composite score",
+            "value": 0.4899
+          },
+          {
+            "field": "score_quality",
+            "label": "Quality score",
+            "value": 0.9
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.2862
+          }
+        ]
+      },
+      {
+        "claim": "Customer quality is excellent, but it rests on a small number of reviews, so it cannot carry the case for PROTECT by itself.",
+        "evidence": [
+          {
+            "field": "rating",
+            "label": "Customer rating",
+            "value": 4.9
+          },
+          {
+            "field": "review_count",
+            "label": "Reviews",
+            "value": 38
+          },
+          {
+            "field": "score_quality",
+            "label": "Quality score",
+            "value": 0.9
+          }
+        ]
+      },
+      {
+        "claim": "Demand is modest and much of the catchment is shared with a sibling branch, which keeps the branch out of PROTECT.",
+        "evidence": [
+          {
+            "field": "female_pop_served",
+            "label": "Female residents in catchment",
+            "value": 42933
+          },
+          {
+            "field": "contested_share",
+            "label": "Cannibalisation",
+            "value": 0.7141
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 0.2859
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "palm-jumeirah",
+    "table_caption": "Each factor is scored from 0 to 1, where higher is better. The composite is a simple average of the four. Palm Jumeirah scores very well on customer rating but low on the number of women in its catchment and on overlap with sibling branches. Its competition score is in the middle, with 33 rival salons nearby. The signals point different ways, so the branch stays at HOLD.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the branch clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD. The middle band is deliberately wide: with no revenue or rent data, the model should only make strong calls when the signals agree."
+  },
+  "8a693e8dbac16e0c": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al-Murqabat is a coverage gap: no branch sits in the community and the nearest one is well beyond the 5 km underserved line.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 9.5923
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The female population is big enough to support a branch on its own, well above the 20,000 floor.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 36201
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          }
+        ]
+      },
+      {
+        "claim": "Competition is heavy, above the 5-per-10k saturation line, so this is WATCH and not a go.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 25
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 6.9059
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-murqabat",
+    "table_caption": "The table looks at three things: how many women live in Al-Murqabat, how far it is from the nearest Bedashing branch, and how many competitor salons there are for every 10,000 women. Al-Murqabat passes on size (36,201 women, against a 20,000 minimum) and on coverage (9.6 km to City Walk, against a 5 km line). It fails on competition: it has 6.9 salons per 10,000 women, above the Dubai median of 5. That crowded market is why the decision is WATCH and not open.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "8e288350342220a4": {
+    "action": "PROTECT",
+    "kind": "branch",
+    "reasons": [
+      {
+        "claim": "Al-Warqa barely shares its customers with other Bedashing branches, so protecting it keeps a catchment no sibling can serve.",
+        "evidence": [
+          {
+            "field": "contested_share",
+            "label": "Cannibalisation",
+            "value": 0.1303
+          },
+          {
+            "field": "nearest_sibling_km",
+            "label": "Nearest other Bedashing branch",
+            "value": 4.5561
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 0.8697
+          }
+        ]
+      },
+      {
+        "claim": "Customers rate the branch highly, and the rating rests on a large number of reviews.",
+        "evidence": [
+          {
+            "field": "rating",
+            "label": "Customer rating",
+            "value": 4.7
+          },
+          {
+            "field": "review_count",
+            "label": "Reviews",
+            "value": 280
+          },
+          {
+            "field": "score_quality",
+            "label": "Quality score",
+            "value": 0.7
+          }
+        ]
+      },
+      {
+        "claim": "Competition is moderate for the size of the catchment, and demand is middling rather than strong, so this call rests on several signals and not on population alone.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 3.297
+          },
+          {
+            "field": "score_competition",
+            "label": "Competition score",
+            "value": 0.7802
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.5055
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-warqa",
+    "table_caption": "Each factor is scored from 0 to 1, where higher is better for the branch. The composite is the plain average of the four scores. Al-Warqa's composite of 0.7138 clears the 0.65 bar for PROTECT. It scores highest on low overlap with sibling branches (0.8697) and light competition (0.7802). Demand (0.5055) is its weakest signal and the one to watch.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the branch clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD. The middle band is deliberately wide: with no revenue or rent data, the model should only make strong calls when the signals agree."
+  },
+  "9f5c12c0c1ba40da": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is already crowded: competitor density is more than three times the 5-per-10k saturation line.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 24
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 16.8386
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The area is already covered by an existing branch just under the 5 km underserved threshold.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "al-barsha-2"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 4.9695
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The community is below the 20,000 female-resident level needed to carry a branch on its own.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 14253
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-barsha-south-fourth",
+    "table_caption": "The table shows how many women live in Al Barsha South Fourth, how many competing salons serve them, and how close our nearest branch is. Here density is 16.8386 salons per 10k women against a 5 benchmark, and Al Barsha 2 sits 4.9695 km away, under the 5 km line. The area fails all three tests: it has too much competition, it is already covered, and it is too small.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "a0febd3b6c4a609d": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The catchment is too small to carry a branch alone: estimated female residents fall below the 20,000 minimum, which is about the median for a Dubai community.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 18725
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The open coverage gap and lack of competitors do not make up for the small population. The rule treats size as a hard minimum.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 8.2689
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          }
+        ]
+      },
+      {
+        "claim": "Having no competitor salons is a good sign, but that alone cannot justify a branch in an area this small.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 0
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 0.0
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-hamriya",
+    "table_caption": "The table checks three things for Al-Hamriya: how many women live there, how far away the nearest Bedashing branch is, and how crowded the local salon market is. Al-Hamriya passes on reach (8.2689 km from City Walk) and on competition (0 salons). It fails on size, with 18725 women against a 20,000 minimum, so the area is skipped.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "a2a80ab0901a3ec0": {
+    "action": "GROW",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al Souk Al Kabir sits in the less-covered half of Dubai, with no Bedashing branch nearby.",
+        "evidence": [
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 7.6475
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light, well under the 5-per-10k saturation line.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 2
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 0.7784
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The community is large enough to support a branch of its own, and the model classes it as underserved.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 25695
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-souk-al-kabir",
+    "table_caption": "The table shows how many women live in Al Souk Al Kabir, how many competing salons serve them, and how far away our closest branch is. Here there are about 25,695 women, only 2 competitor salons (0.78 per 10,000 women, against a Dubai median of about 5), and the nearest branch, City Walk, is 7.6 km away, past the 5 km mark. That combination of a big market, little competition and no nearby branch is why the model says GROW.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "a5baa0d2857cc87f": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al-Satwa is already covered by our network: the City Walk branch sits well inside the 5 km underserved threshold.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 2.7348
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The market is crowded, with competitor density above the 5-per-10k Dubai median.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 14
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 6.969
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The female population is only just above the 20,000 minimum, so it is too small to support a new branch competing with our own nearby site.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 20089
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-satwa",
+    "table_caption": "The table shows how close our nearest branch is and how crowded the local salon market is. Al-Satwa fails both tests. City Walk is within 5 km, and the area has 6.969 competitor salons per 10,000 women, above the median of 5. A new branch here would mostly compete with City Walk and with rival salons.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "a82b436c26fd2e3e": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al Quoz Third is big enough to carry a branch on its own, clearing the 20,000 female-resident floor.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 24593
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Competition is below the Dubai median, so there is room for a new entrant.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 9
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 3.6596
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "It is not underserved: an existing branch is under the 5 km line, so a new site could take customers from Al Safa 2. That keeps it at WATCH, not GO.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "al-safa-2"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 4.5379
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-quoz-third",
+    "table_caption": "The factors cover three things: how many women live in the area, how crowded the local salon market is, and how close our nearest branch already is. Al Quoz Third has about 24,600 women and only 3.66 competitor salons per 10,000 women, below the median of 5, so the market is open. But Al Safa 2 is just 4.54 km away, inside the 5 km line, so we watch this area rather than open now.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "a99693022a947184": {
+    "action": "PROTECT",
+    "kind": "branch",
+    "reasons": [
+      {
+        "claim": "City Walk serves the largest catchment possible on the model's scale, and demand is what puts it in PROTECT.",
+        "evidence": [
+          {
+            "field": "female_pop_served",
+            "label": "Female residents in catchment",
+            "value": 393658
+          },
+          {
+            "field": "communities_served",
+            "label": "Communities in catchment",
+            "value": 19
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 1.0
+          }
+        ]
+      },
+      {
+        "claim": "Its customer quality is solid and well supported by reviews, but it scores in the middle of the scale, not at the top.",
+        "evidence": [
+          {
+            "field": "rating",
+            "label": "Customer rating",
+            "value": 4.6
+          },
+          {
+            "field": "review_count",
+            "label": "Reviews",
+            "value": 454
+          },
+          {
+            "field": "score_quality",
+            "label": "Quality score",
+            "value": 0.6
+          }
+        ]
+      },
+      {
+        "claim": "Cannibalisation and competition are moderate, so the composite only just clears the PROTECT bar of 0.65.",
+        "evidence": [
+          {
+            "field": "contested_share",
+            "label": "Cannibalisation",
+            "value": 0.4371
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 6.2237
+          },
+          {
+            "field": "composite",
+            "label": "Composite score",
+            "value": 0.687
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "city-walk",
+    "table_caption": "Each factor is scored from 0 to 1, where 1 is best, and the composite is a simple average of the four. City Walk gets the maximum demand score because its catchment is far above the 150,000-woman cap. Its other three scores sit between 0.56 and 0.6, so the 0.687 composite clears the 0.65 PROTECT bar mainly because of demand, not because every signal is strong.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the branch clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD. The middle band is deliberately wide: with no revenue or rent data, the model should only make strong calls when the signals agree."
+  },
+  "adc29198d3918668": {
+    "action": "GROW",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Naif is a gap in our network: it has no branch of its own, and the closest one is well past the 5 km underserved line.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 8.4722
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "Enough women live in Naif to support a branch on their own, clearing the 20,000 minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 26167
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          }
+        ]
+      },
+      {
+        "claim": "The market counts as unsaturated, but only just: competitive overlap sits barely below the 5-per-10k cut-off, so this is the weakest part of the case.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 4.9681
+          },
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 13
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "naif",
+    "table_caption": "The table shows how many women live in Naif, how many rival salons already serve them, and how far away our nearest branch is. Naif clears both tests: it is underserved (nearest branch, City Walk, is over 5 km away) and unsaturated (under 5 rival salons per 10,000 women). Competition, at 4.9681, only just passes, so we should expect a contested local market.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "b3cd81a2cb118842": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is heavily saturated, with competitive overlap roughly four times the unsaturated threshold of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 19.5663
+          },
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 24
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The female catchment is too small to carry a branch on its own, sitting well under the 20,000 female-resident threshold.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 12266
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Being underserved is not enough to outweigh these weaknesses, because the nearest branch is only just beyond the 5 km threshold.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 5.4619
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-jafiliya",
+    "table_caption": "The table shows how many women live in Al Jafiliya, how many competing salons already serve them, and how far the nearest Bedashing branch is. The community counts as underserved because City Walk is just over 5 km away. However, competitive overlap is far above the 5-per-10k unsaturated threshold and the female population is below 20,000, so the area fails on market size and competition.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "b77076050867d6c2": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al-Bada is already a saturated salon market, above the Dubai median competitive overlap of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 19
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 6.6355
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The area is already covered by our City Walk branch, well inside the 5 km underserved threshold.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 3.3139
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The female population is large enough to support a branch, but size alone does not outweigh failing both the coverage and saturation tests.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 28634
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-bada",
+    "table_caption": "The table checks whether a community has enough women to support a branch (at least 20,000), how many competing salons it already has per 10,000 women (under 5 counts as unsaturated), and how far it is from our nearest branch (over 5 km counts as underserved). Al-Bada has enough women, but it is crowded with competitors and close to City Walk, so it fails both tests for a new site.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "bd63f532236fe372": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is heavily saturated, with competitive overlap far above the 5-per-10k unsaturated threshold.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 34.0088
+          },
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 24
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The catchment is too small to carry a branch alone, well below the 20,000 female-resident benchmark.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 7057
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The coverage gap is real but doesn't outweigh saturation and the small catchment; Mirdif remains the closest branch for residents.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 9.6432
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "mirdif-35"
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-twar-first",
+    "table_caption": "The table shows market size (female residents), competition (salons per 10,000 women; under 5 counts as unsaturated) and distance to our nearest branch (over 5 km counts as underserved). Al Twar First is underserved, but it has about 34 competitor salons per 10,000 women and only 7,057 female residents. That is a small, crowded market, so we skip it.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "be172d91312412ad": {
+    "action": "HOLD",
+    "kind": "branch",
+    "reasons": [
+      {
+        "claim": "Demand is the branch's strongest signal: its catchment is well above the level that earns a full demand score.",
+        "evidence": [
+          {
+            "field": "female_pop_served",
+            "label": "Female residents in catchment",
+            "value": 254804
+          },
+          {
+            "field": "communities_served",
+            "label": "Communities in catchment",
+            "value": 12
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 1.0
+          }
+        ]
+      },
+      {
+        "claim": "Nearly half the catchment is shared with a nearby sibling branch, and the area has many competing salons, so the branch faces pressure from both sides.",
+        "evidence": [
+          {
+            "field": "contested_share",
+            "label": "Cannibalisation",
+            "value": 0.4566
+          },
+          {
+            "field": "nearest_sibling_km",
+            "label": "Nearest other Bedashing branch",
+            "value": 4.5561
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 8.7126
+          }
+        ]
+      },
+      {
+        "claim": "Customer quality is solid, but strong demand and good ratings are not enough to offset the overlap. The composite lands just below the PROTECT bar of 0.65, so the decision is HOLD.",
+        "evidence": [
+          {
+            "field": "rating",
+            "label": "Customer rating",
+            "value": 4.6
+          },
+          {
+            "field": "review_count",
+            "label": "Reviews",
+            "value": 568
+          },
+          {
+            "field": "composite",
+            "label": "Composite score",
+            "value": 0.6406
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "mirdif-35",
+    "table_caption": "Each factor is scored from 0 to 1, where higher is better for the branch. The four scores cover demand (local women), cannibalisation (overlap with other Bedashing branches), competition (rival salons) and quality (customer rating). For this Mirdif branch, demand scores the full 1.0, but scores for cannibalisation and competition are only middling. This pulls the average to 0.6406, which is just short of the 0.65 needed to PROTECT.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the branch clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD. The middle band is deliberately wide: with no revenue or rent data, the model should only make strong calls when the signals agree."
+  },
+  "c954490b4acaa3e2": {
+    "action": "WATCH",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The area is big enough to support a branch: its estimated female population is far above the 20,000 minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 97132
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Competition is very light, well below the saturation line of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 1
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 0.103
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "Our current coverage here is thin: the nearest branch is more than the 5 km underserved cutoff away.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "jumeirah-park"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 7.5307
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "jebel-ali-industrial-first",
+    "table_caption": "These factors show whether Jebel Ali Industrial First has enough women, few enough competing salons and weak enough coverage from our own branches to justify a new site. It passes all three tests: about 97,000 women, 1 competing salon, and a nearest branch (Jumeirah Park) 7.5 km away. The rule-based model rates it WATCH, so it stays on the list to monitor, not to open now. Note that the competitor count comes from OpenStreetMap and may be incomplete.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "ca13b4ca519d1bc2": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al Khawaneej One has about 6,681 women, well under the 20,000 needed to support a branch by itself.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 6681
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The local market is already crowded, with 4 competitor salons, or 5.9871 per 10k women. That is above the Dubai median of 5.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 4
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 5.9871
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Our existing Mirdif branch is 4.0893 km away, within the 5 km underserved line, so customers here can already reach us.",
+        "evidence": [
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 4.0893
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-khawaneej-one",
+    "table_caption": "This table checks three things for Al Khawaneej One: how many women live there, how crowded the salon market is, and how close our nearest branch is. The community fails all three tests. It is too small, it has more salons per 10k women than the Dubai median, and our Mirdif branch is less than 5 km away.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "cf0861b511ef6e36": {
+    "action": "GROW",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al-Rifa is large enough to carry a branch on its own, clearing the 20,000 female-resident floor.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 23788
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Competition is very thin: one salon serves the whole community, far below the 5-per-10k saturation line.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 1
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 0.4204
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "Our network does not reach Al-Rifa today; the closest branch is well beyond the 5 km coverage threshold, so a new site would add customers rather than take them from City Walk.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 7.258
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-rifa",
+    "table_caption": "The table shows three things: how many women live in the area, how many competing salons serve them, and how far away our nearest branch is. Al-Rifa has about 23,788 women, only 1 competitor salon (0.4204 per 10,000 women, against a city median of about 5), and our nearest branch, City Walk, is 7.258 km away. All three point the same way: a large area with little competition that we do not yet serve.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "cfd549fb444d103c": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is already saturated: competitor density sits well above the 5-per-10k Dubai median.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 9
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 7.0334
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The catchment is too small to carry a branch on its own, falling below the 20,000 female-resident floor.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 12796
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Being far from our network is a real gap, but it does not outweigh a small, crowded market.",
+        "evidence": [
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 10.2134
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-baraha",
+    "table_caption": "The table shows how many women live in Al-Baraha, how many rival salons already serve them, and how far away our nearest branch is. Al-Baraha is underserved by Bedashing (City Walk is about 10.2 km away), but it has 12,796 women, below the 20,000 we need, and 7.0 competitor salons per 10,000 women, above the median of 5. That combination is why we are skipping it.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "d7ef706da4dc8e79": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al-Mamzar is too small to support a branch by itself: it has about 8,281 women, well under the 20,000 minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 8281
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The area is underserved and has little competition, but neither point makes up for the small number of residents.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 2.4152
+          }
+        ]
+      },
+      {
+        "claim": "Low competition here mostly reflects how small the market is: just 2 salons, not a large group of customers left unserved.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 2
+          },
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 8281
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 12.2571
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-mamzar",
+    "table_caption": "The table shows how many women live in Al-Mamzar, how many competitor salons they have per 10,000 women, and how far away the nearest Bedashing branch is (Mirdif, about 12.3 km). Al-Mamzar scores well on distance and competition, since both are better than the Dubai median. But with about 8,281 women it falls short of the 20,000 residents needed to carry a branch, and that is why the decision is SKIP.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "dcaf81d8231e464f": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Jumeirah First is already covered by the network: the City Walk branch sits well inside the 5 km underserved threshold.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 2.7645
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The community is too small to support a branch of its own, falling well short of the 20,000 female-resident floor.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 10533
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Competition is light, but that alone doesn't justify a new site in an area that is already served and too small.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 5
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 4.747
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "jumeirah-first",
+    "table_caption": "The table shows how many women live in Jumeirah First, how many competing salons serve them, and how far the closest Bedashing branch is. Coverage counts as a gap only when the nearest branch is more than 5 km away. The market counts as open when there are fewer than 5 competitor salons per 10,000 women. Here the market is open, at 4.747 salons per 10,000 women, but City Walk is only 2.7645 km away and the area has 10,533 women, below the 20,000 minimum, so the result is SKIP.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "dcf308873ad53ff3": {
+    "action": "GROW",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al-Mankhool is out of easy reach of our current network, so a branch here would add new coverage instead of drawing customers from an existing one.",
+        "evidence": [
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 6.8254
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "Competition is below the Dubai median, which leaves room for a new entrant.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 3.4636
+          },
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 7
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      },
+      {
+        "claim": "The community has enough women to support a branch of its own, and we have no presence there today.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 20210
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-mankhool",
+    "table_caption": "The table looks at three things: how far residents are from our nearest branch, how many competitor salons there are for every 10,000 women, and how many women live in the community. Al-Mankhool is 6.8254 km from City Walk, which is past the 5 km mark for being underserved. It has 3.4636 competitor salons per 10,000 women, below the saturation mark of 5. With 20,210 women it is just over the 20,000 minimum, so it is large enough, but only barely.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "e46bdf30e3cfdb41": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Jumeirah Third is already covered by our network: City Walk is under 2 km away, well inside the 5 km underserved threshold.",
+        "evidence": [
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 1.9463
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The community is too small to carry a branch on its own, with female residents well below the 20,000 minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 6952
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "Low competition is real but does not offset the coverage and size issues; a new branch would mostly pull customers from City Walk rather than win them from rivals.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 1
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 1.4384
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "jumeirah-third",
+    "table_caption": "The table shows how many women live in Jumeirah Third, how many competing salons serve them, and how far our nearest branch is. Competition is light (1.4384 salons per 10k women, below the threshold of 5). But City Walk is only 1.9463 km away and the community has 6,952 women, under the 20,000 needed to support a branch, so the right decision is to skip it.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "e4b15b5d0006907f": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al-Rashidiya is too small to carry a branch on its own: about 18820 female residents, below the 20,000 minimum.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 18820
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The area is already covered: our nearest branch, in Mirdif, is 4.3675 km away, inside the 5 km underserved line.",
+        "evidence": [
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 4.3675
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "There is little competition, at 2.6567 salons per 10k women against a limit of 5, but on its own that does not make up for the small population and existing coverage.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 5
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 2.6567
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": true
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-rashidiya",
+    "table_caption": "The table shows three things for Al-Rashidiya: how many women live there, how close our nearest branch is, and how many competitor salons there are for every 10,000 women. Al-Rashidiya has little competition, but it falls just short of the 20,000-resident minimum, and the Mirdif branch is already within 5 km. That is why the model chose SKIP.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "e67da94fa0e2d107": {
+    "action": "SHRINK",
+    "kind": "branch",
+    "reasons": [
+      {
+        "claim": "Most of al-safa-2's catchment is shared with a nearby sister branch, so a smaller footprint would lose few customers that the network keeps anyway.",
+        "evidence": [
+          {
+            "field": "contested_share",
+            "label": "Cannibalisation",
+            "value": 0.8739
+          },
+          {
+            "field": "nearest_sibling_km",
+            "label": "Nearest other Bedashing branch",
+            "value": 2.7196
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 0.1261
+          }
+        ]
+      },
+      {
+        "claim": "The branch has a small catchment of female residents to draw on.",
+        "evidence": [
+          {
+            "field": "female_pop_served",
+            "label": "Female residents in catchment",
+            "value": 35133
+          },
+          {
+            "field": "communities_served",
+            "label": "Communities in catchment",
+            "value": 3
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.2342
+          }
+        ]
+      },
+      {
+        "claim": "The local market is already crowded with competitor salons, and the branch's strong rating is not enough to lift its composite score above the SHRINK line.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 10.5314
+          },
+          {
+            "field": "competitors_in_catchment",
+            "label": "Competitor salons in catchment",
+            "value": 37
+          },
+          {
+            "field": "composite",
+            "label": "Composite score",
+            "value": 0.3146
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-safa-2",
+    "table_caption": "Each factor is scored from 0 to 1, and a higher score is better for the branch. A branch is marked SHRINK when its average score is 0.35 or less. Al-safa-2 averages 0.3146: its quality score of 0.6 is its strength, while demand (0.2342), cannibalisation (0.1261) and competition (0.2979) are all weak.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the branch clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD. The middle band is deliberately wide: with no revenue or rent data, the model should only make strong calls when the signals agree."
+  },
+  "eaf48d2577a93252": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "Al Wasl is already covered: a Bedashing branch sits inside the community, so a new site would mainly pull clients from it.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "city-walk"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.4284
+          }
+        ]
+      },
+      {
+        "claim": "The market is just past the saturation line, with about 5.02 competitor salons per 10k women against a threshold of 5.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 5.0243
+          },
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 3
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "With about 5,971 women, the community is well under the 20,000 needed to support a branch on its own.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 5971
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-wasl",
+    "table_caption": "The table checks Al Wasl against three tests: how close the nearest Bedashing branch is (it counts as underserved only if that branch is over 5 km away), how many competitor salons there are per 10,000 women (below 5 counts as unsaturated), and how many women live there (about 20,000 are needed to support a branch). Al Wasl fails all three. City Walk is 0.43 km away, there are 5.02 competitors per 10,000 women, and about 5,971 women live there. That is why the recommendation is to skip it.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "ee196a1a41582664": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The community already hosts a Bedashing branch, and the nearest one sits well inside the 5 km coverage threshold, so a new site would mainly cannibalise our own clients.",
+        "evidence": [
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "al-safa-2"
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 0.6165
+          }
+        ]
+      },
+      {
+        "claim": "The market is heavily saturated, with competitive overlap far above the 5 salons per 10k women median.",
+        "evidence": [
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 16
+          },
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 36.1092
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The female population is far below the 20,000 residents needed to carry a branch, and the area is not underserved.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 4431
+          },
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": false
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-safa-first",
+    "table_caption": "The table shows how many women live in Al Safa First, how many competing salons serve them, and how close our existing network already is. Here every signal points the same way. The area is small, already crowded with competitors, and already covered by our al-safa-2 branch inside the community, so we skip it.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  },
+  "f53f589bf8fdb6e3": {
+    "action": "HOLD",
+    "kind": "branch",
+    "reasons": [
+      {
+        "claim": "The composite score lands in the middle band, between the SHRINK line of 0.35 and the PROTECT line of 0.65, so the rules return HOLD.",
+        "evidence": [
+          {
+            "field": "composite",
+            "label": "Composite score",
+            "value": 0.4125
+          },
+          {
+            "field": "score_quality",
+            "label": "Quality score",
+            "value": 0.7
+          },
+          {
+            "field": "score_competition",
+            "label": "Competition score",
+            "value": 0.0
+          }
+        ]
+      },
+      {
+        "claim": "Customers rate the branch highly, and enough reviews sit behind the rating to make it credible. This is the branch's strongest signal.",
+        "evidence": [
+          {
+            "field": "rating",
+            "label": "Customer rating",
+            "value": 4.7
+          },
+          {
+            "field": "review_count",
+            "label": "Reviews",
+            "value": 396
+          },
+          {
+            "field": "score_quality",
+            "label": "Quality score",
+            "value": 0.7
+          }
+        ]
+      },
+      {
+        "claim": "Two things hold the score down: the local market is crowded with competitor salons, and the catchment is modest, with a third of it shared with a sibling branch less than 1 km away.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 16.179
+          },
+          {
+            "field": "female_pop_served",
+            "label": "Female residents in catchment",
+            "value": 42648
+          },
+          {
+            "field": "contested_share",
+            "label": "Cannibalisation",
+            "value": 0.3342
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "al-barsha-2",
+    "table_caption": "Each factor is scored from 0 (weak) to 1 (strong), and the composite is a simple average of the four. Al Barsha 2 does well on customer quality (0.7) and reasonably on low overlap with siblings (0.6658). It scores 0.0 on competition because there are 16.179 competitor salons per 10,000 women, past the 15 that counts as fully saturated, and it scores only 0.2843 on demand.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the branch clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD. The middle band is deliberately wide: with no revenue or rent data, the model should only make strong calls when the signals agree."
+  },
+  "fc47c0e5f4e1231c": {
+    "action": "SKIP",
+    "kind": "opportunity",
+    "reasons": [
+      {
+        "claim": "The market is heavily saturated, with competitive overlap roughly three times the unsaturated threshold of 5 salons per 10k women.",
+        "evidence": [
+          {
+            "field": "competitors_per_10k",
+            "label": "Competitive overlap",
+            "value": 15.6682
+          },
+          {
+            "field": "competitors",
+            "label": "Competitor salons",
+            "value": 17
+          },
+          {
+            "field": "unsaturated",
+            "label": "Unsaturated",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The catchment is too small to carry a branch on its own, falling well short of the 20,000 female-resident threshold.",
+        "evidence": [
+          {
+            "field": "female_pop",
+            "label": "Female residents",
+            "value": 10850
+          },
+          {
+            "field": "hosts_branch",
+            "label": "Already has a branch",
+            "value": false
+          }
+        ]
+      },
+      {
+        "claim": "The coverage gap is real but does not outweigh the saturation and size problems.",
+        "evidence": [
+          {
+            "field": "underserved",
+            "label": "Underserved",
+            "value": true
+          },
+          {
+            "field": "nearest_branch_km",
+            "label": "Distance to nearest branch",
+            "value": 11.42
+          },
+          {
+            "field": "nearest_branch_id",
+            "label": "Nearest Bedashing branch",
+            "value": "mirdif-35"
+          }
+        ]
+      }
+    ],
+    "source": "ai",
+    "subject_id": "hor-al-anz-east",
+    "table_caption": "The table looks at three things for Hor Al Anz East: how many women live there, how crowded the area is with rival salons, and how far it is from our nearest branch. The area passes on distance, since our nearest branch (Mirdif) is 11.42 km away. It fails on the other two: it has 15.6682 rival salons per 10k women, against a ceiling of 5, and 10,850 women, against a minimum of 20,000.",
+    "thresholds_note": "Underserved means the nearest Bedashing branch is over 5 km away, about the median for a Dubai community today, so these are the less-covered half of the city. Unsaturated means fewer than 5 competitor salons per 10k female residents, about the Dubai median. Areas under 20,000 estimated female residents (roughly the median community) are too small to carry a branch on their own."
+  }
+}

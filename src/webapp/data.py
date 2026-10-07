@@ -82,9 +82,8 @@ def load_baseline(settings: Settings | None = None) -> BaselineData:
                      json.loads((processed_dir / "opportunities.json").read_text())]
 
     data_sources = {
-        "branches": "seed" if not settings.enable_scrape else "seed (scrape unimplemented)",
-        "communities": "seed" if not settings.dubai_pulse_enabled
-                        else "seed (pulse unimplemented)",
+        "branches": "seed (2GIS)",
+        "communities": "seed (Dubai Statistics Center)",
         "competitors": "OpenStreetMap seed",
     }
     mtime = (processed_dir / "branch_features.json").stat().st_mtime

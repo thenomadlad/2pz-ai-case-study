@@ -1,12 +1,12 @@
 [project]
-name = "bedashing-v0"
+name = "bedashing-right-sizing"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
     "python-dotenv>=1.0",
-    "anthropic>=0.34",
+    "anthropic>=1.8",
     "pyyaml>=6.0",
     "streamlit>=1.65.0",
 ]
@@ -14,13 +14,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
-    "pytest-asyncio>=0.23",
     "ruff>=0.6",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-asyncio_mode = "auto"
 
 [tool.ruff]
 line-length = 100

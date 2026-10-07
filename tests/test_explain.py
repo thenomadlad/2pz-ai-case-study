@@ -43,12 +43,14 @@ def test_template_is_always_grounded():
     assert explain.verify(exp, FACTS, "branch") == []
 
 
-def _client(payloads):
+def _client(payloads, stop_reason="tool_use"):
     calls = iter(payloads)
 
-    def create(**_):
-        return SimpleNamespace(content=[SimpleNamespace(type="tool_use", input=next(calls))])
-    return SimpleNamespace(messages=SimpleNamespace(create=create))
+    def create(**kwargs):
+        assert "temperature" not in kwargs and "tool_choice" not in kwargs  # 400 on Opus 5.5
+        return SimpleNamespace(stop_reason=stop_reason, stop_details=None,
+                               content=[SimpleNamespace(type="tool_use", input=next(calls))])
+    return SimpleNamespace(beta=SimpleNamespace(messages=SimpleNamespace(create=create)))
 
 
 def _payload(claim):
@@ -96,3 +98,34 @@ def test_branch_facts_cover_branch_table():
                  scores={"demand": 0.5, "cannibalisation": 0.5, "competition": 0.5,
                          "quality": 0.5})
     assert set(explain.BRANCH_TABLE) <= set(explain.branch_facts(f, d))
+
+
+def test_explain_falls_back_to_template_on_refusal():
+    exp = explain.explain("branch", "b", "HOLD", FACTS, cache={},
+                          client=_client([_payload("Rated 4.7.")], stop_reason="refusal"))
+    assert exp.source == "template"
+
+
+def test_tool_schema_is_strict_compatible():
+    def walk(node):
+        if isinstance(node, dict):
+            if node.get("type") == "object":
+                assert node.get("additionalProperties") is False
+            assert "minItems" not in node and "maxItems" not in node
+            for v in node.values():
+                walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+    assert explain.EXPLAIN_TOOL["strict"] is True
+    walk(explain.EXPLAIN_TOOL["input_schema"])
+
+
+def test_verify_accepts_numbers_rounded_to_the_precision_written():
+    facts = {**FACTS, "competitors_per_10k": 3.06, "nearest_sibling_km": 7.64}
+    ok = _exp(["3.1 rival salons per 10k women.", "Nearest sibling 7.6 km away.",
+               "Cannibalisation is 33%."], GOOD_EVIDENCE[:1] + [("rating", 4.7)])
+    assert not [e for e in explain.verify(ok, facts, "branch") if "number" in e]
+    wrong = _exp(["3.2 rival salons per 10k women.", "b", "c"], [("rating", 4.7),
+                                                                ("review_count", 396)])
+    assert any("3.2" in e for e in explain.verify(wrong, facts, "branch"))

@@ -37,18 +37,8 @@ def _load_seed(seed_dir, global_female_share: float) -> list[Community]:
     return communities
 
 
-def _fetch_dubai_pulse() -> list[Community]:
-    # Dubai Pulse open API integration is intentionally not implemented in
-    # V0 — see docs/designs/v0.md "Scope decisions made during the build".
-    raise NotImplementedError
-
-
 def load(settings: Settings | None = None) -> list[Community]:
+    # Seed only: Dubai Pulse blocks automated access and publishes no per-community gender
+    # split anyway (see docs/history.md, Data sources).
     settings = settings or default_settings
-    if settings.dubai_pulse_enabled:
-        try:
-            return _fetch_dubai_pulse()
-        except NotImplementedError:
-            logger.warning("population: DUBAI_PULSE_ENABLED=1 but live enrichment isn't "
-                            "implemented in V0, falling back to seed")
     return _load_seed(settings.seed_dir, settings.global_female_share)

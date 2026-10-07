@@ -28,19 +28,7 @@ def _load_seed(seed_dir) -> list[Branch]:
     return branches
 
 
-def _scrape_live() -> list[Branch]:
-    # Live scraping of bedashingbeauty.com / Fresha is intentionally not
-    # implemented in V0 — see docs/designs/v0.md "Scope decisions made
-    # during the build". Callers must catch NotImplementedError.
-    raise NotImplementedError
-
-
 def load(settings: Settings | None = None) -> list[Branch]:
+    # Seed only: branches were hand-collected from 2GIS (see docs/history.md, Data sources).
     settings = settings or default_settings
-    if settings.enable_scrape:
-        try:
-            return _scrape_live()
-        except NotImplementedError:
-            logger.warning("branches: ENABLE_SCRAPE=1 but live enrichment isn't implemented "
-                            "in V0, falling back to seed")
     return _load_seed(settings.seed_dir)

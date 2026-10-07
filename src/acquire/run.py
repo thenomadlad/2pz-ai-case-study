@@ -31,11 +31,10 @@ def main(settings: Settings | None = None) -> None:
 
     estimated_pop = sum(1 for c in communities if c.is_estimated)
     print("=== acquire summary ===")
-    print(f"branches:    {len(filled_branches)} rows (source: "
-          f"{'seed' if not settings.enable_scrape else 'seed, scrape unimplemented'})"
+    print(f"branches:    {len(filled_branches)} rows (source: seed)"
           f", {len(price_flags)} price(s) backfilled")
     print(f"communities: {len(communities)} rows "
-          f"(source: {'seed' if not settings.dubai_pulse_enabled else 'seed, pulse unimplemented'})"
+          "(source: seed)"
           f", {estimated_pop} with estimated female population")
     print(f"competitors: {len(competitors)} rows (source: OSM seed)")
 

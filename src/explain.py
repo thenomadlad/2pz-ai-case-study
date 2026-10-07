@@ -31,7 +31,7 @@ from src.models import (
 logger = logging.getLogger(__name__)
 
 CACHE_PATH = REPO_ROOT / "data" / "explanations" / "cache.json"
-PROMPT_VERSION = "v1"
+PROMPT_VERSION = "v2"
 
 
 @dataclass(frozen=True)
@@ -245,8 +245,11 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
                 errors.append(f"{e.field}: cited {e.value!r}, actual {facts[e.field]!r}")
     for text in [r.claim for r in exp.reasons] + [exp.table_caption]:
         for raw in _NUMBER.findall(text):
-            n = float(raw.replace(",", "").rstrip("."))
-            if not any(_close(n, a) for a in allowed):
+            raw = raw.replace(",", "").rstrip(".")
+            n = float(raw)
+            # Compare at the precision the text uses: "3.1" matches 3.06, "33%" matches 33.4.
+            places = len(raw.split(".")[1]) if "." in raw else 0
+            if not any(_close(n, a) or round(a, places) == n for a in allowed):
                 errors.append(f"number {raw} in text not in fact sheet")
     return errors
 
@@ -258,36 +261,49 @@ SYSTEM_PROMPT = (
     "will defend them to the COO and a private-equity board. The decision is already made by "
     "a rule-based model; you explain it, you never change it. Use only the fact sheet. Every "
     "number you write must appear in the fact sheet or the thresholds. Write like a board "
-    "memo: short, concrete claims. Never mention revenue, rent or profit figures (none exist)."
+    "memo: short, concrete claims. Never mention revenue, rent or profit figures (none exist). "
+    "Always answer by calling the submit_explanation tool."
 )
+# Server-side refusal fallback: a declined request is re-run on Anthropic's recommended
+# substitute model inside the same call.
+FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
+# strict: the API guarantees inputs match this schema. Strict mode doesn't support array
+# length limits, so "exactly 3 reasons, 2-3 data points" is enforced by verify() instead.
 EXPLAIN_TOOL = {
     "name": "submit_explanation",
+    "strict": True,
     "description": "Explain the decision: exactly 3 reasons, each backed by 2-3 data points "
                    "copied from the fact sheet, plus a caption for the factor table.",
     "input_schema": {
         "type": "object",
         "properties": {
             "reasons": {
-                "type": "array", "minItems": 3, "maxItems": 3,
+                "type": "array",
                 "items": {
                     "type": "object",
                     "properties": {
                         "claim": {"type": "string", "description": "One sentence."},
                         "evidence": {
-                            "type": "array", "minItems": 2, "maxItems": 3,
+                            "type": "array",
                             "items": {
                                 "type": "object",
                                 "properties": {
                                     "field": {"type": "string",
                                               "description": "A key from the fact sheet."},
-                                    "value": {"description": "That key's exact value."},
+                                    "value": {
+                                        "anyOf": [{"type": "number"}, {"type": "string"},
+                                                  {"type": "boolean"}, {"type": "null"}],
+                                        "description": "That key's exact value.",
+                                    },
                                 },
                                 "required": ["field", "value"],
+                                "additionalProperties": False,
                             },
                         },
                     },
                     "required": ["claim", "evidence"],
+                    "additionalProperties": False,
                 },
             },
             "table_caption": {
@@ -298,6 +314,7 @@ EXPLAIN_TOOL = {
             },
         },
         "required": ["reasons", "table_caption"],
+        "additionalProperties": False,
     },
 }
 
@@ -322,14 +339,26 @@ def llm_explanation(client, kind: str, subject_id: str, action: str,
     errors: list[str] = []
     for _attempt in range(2):
         try:
-            response = client.messages.create(
-                model=settings.anthropic_model, max_tokens=1500, temperature=0,
+            # Opus 5.5 rejects forced tool_choice and temperature, and thinking is always
+            # on: steer to the tool from the prompt, keep effort low (explaining a decision
+            # already made), and leave max_tokens room for thinking.
+            response = client.beta.messages.create(
+                model=settings.anthropic_model, max_tokens=8000,
+                output_config={"effort": "low"},
+                betas=[FALLBACK_BETA], fallbacks="default",
                 system=SYSTEM_PROMPT, tools=[EXPLAIN_TOOL],
-                tool_choice={"type": "tool", "name": "submit_explanation"},
                 messages=[{"role": "user",
                            "content": _user_message(kind, subject_id, action, facts, errors)}],
             )
-            raw = next(b for b in response.content if b.type == "tool_use").input
+            if response.stop_reason == "refusal":
+                logger.warning("explain: %s %s refused (%s)", kind, subject_id,
+                               getattr(response.stop_details, "category", None))
+                return None
+            tool_use = next((b for b in response.content if b.type == "tool_use"), None)
+            if tool_use is None:
+                errors = ["You answered in text. Call the submit_explanation tool instead."]
+                continue
+            raw = tool_use.input
             exp = Explanation(
                 subject_id=subject_id, kind=kind, action=action,
                 reasons=[Reason(claim=r["claim"],
@@ -380,6 +409,7 @@ def explain(kind: str, subject_id: str, action: str, facts: dict,
 
 
 def make_client():
+    """Client from ANTHROPIC_API_KEY, or None when it isn't set."""
     if not settings.anthropic_api_key:
         return None
     import anthropic
@@ -388,13 +418,31 @@ def make_client():
 
 def main() -> None:
     """Regenerate AI explanations for the current baseline and write the committed cache."""
+    import anthropic
+
     from src.webapp.data import load_baseline
 
     client = make_client()
     if client is None:
-        raise SystemExit("ANTHROPIC_API_KEY is not set; nothing to generate.")
+        raise SystemExit("Set ANTHROPIC_API_KEY in .env first.")
+    # Batch job: let the SDK's exponential backoff (honours retry-after) ride out per-minute
+    # rate limits. Calls are sequential, so no concurrency limit is needed.
+    client = client.with_options(max_retries=8)
+    # Fail loudly before the batch. explain() swallows API errors so the app degrades to
+    # templates, which here would silently write an empty cache.
+    try:
+        client.with_options(max_retries=2).messages.create(
+            model=settings.anthropic_model, max_tokens=16,
+            messages=[{"role": "user", "content": "Reply OK."}])
+    except anthropic.RateLimitError as exc:
+        raise SystemExit("Preflight still rate-limited (429) after retries; try again "
+                         "shortly or check the key's rate limits in the console.") from exc
+    except anthropic.APIStatusError as exc:
+        raise SystemExit(f"Preflight failed ({exc.status_code}): {exc.message}") from exc
     data = load_baseline(settings)
-    cache: dict[str, dict] = {}
+    # Reuse entries whose exact facts are unchanged, so a re-run only fills gaps (failed
+    # or changed subjects). Entries for subjects that no longer match are dropped below.
+    cache = load_cache()
     subjects = [("branch", f.branch_id, data.decision_for(f.branch_id).action,
                  branch_facts(f, data.decision_for(f.branch_id))) for f in data.features]
     opp = {o.community_id: o for o in data.opportunities}
@@ -403,8 +451,10 @@ def main() -> None:
     ai = 0
     for kind, sid, action, facts in subjects:
         ai += explain(kind, sid, action, facts, cache=cache, client=client).source == "ai"
+    current = {cache_key(*subject) for subject in subjects}
+    cache = {k: v for k, v in cache.items() if k in current}
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    CACHE_PATH.write_text(json.dumps(cache, indent=2, ensure_ascii=False))
+    CACHE_PATH.write_text(json.dumps(cache, indent=2, ensure_ascii=False, sort_keys=True))
     print(f"explain: {ai}/{len(subjects)} AI explanations passed grounding; "
           f"{len(subjects) - ai} fall back to template. Wrote {CACHE_PATH}")
 

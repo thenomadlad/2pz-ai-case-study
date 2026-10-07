@@ -3,7 +3,8 @@
 all:
     uv run python -m src.scenario.baseline
 
-# Generate grounded AI explanations for the baseline (needs ANTHROPIC_API_KEY) and write
+# Generate grounded AI explanations for the baseline (needs ANTHROPIC_API_KEY in .env)
+# and write
 # the committed cache data/explanations/cache.json. Commit the result.
 explain:
     uv run python -m src.explain

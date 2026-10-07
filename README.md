@@ -54,7 +54,7 @@ Both → GROW, one → WATCH, neither → SKIP. Areas with fewer than 20k women,
 
 ## The AI layer
 
-The rules make every decision; Claude (Haiku 4.5) **explains** them:
+The rules make every decision; Claude (Opus 5.5, low effort) **explains** them:
 - **3 reasons**, each backed by **2–3 data points** copied from the decision's fact sheet;
 - a plain-language **caption for the factor table**. Every table also shows each factor's unit and meaning.
 
@@ -62,7 +62,7 @@ The rules make every decision; Claude (Haiku 4.5) **explains** them:
 
 **No key needed to see it.** Explanations are generated once with `just explain` and committed in `data/explanations/cache.json`, keyed by a hash of the exact numbers, so a stale explanation can never be served. In a scenario, a branch whose numbers changed gets a live explanation if a key is set, and the template otherwise.
 
-> ⚠️ The committed cache is currently **empty**: no API key was available when this was built, so the app shows template explanations. Run `ANTHROPIC_API_KEY=... just explain` and commit the cache. See `docs/remaining.md`.
+All 59 baseline explanations (9 branches, 50 areas) are generated and pass the grounding check. Regenerate after changing the model or data with `just explain` (needs `ANTHROPIC_API_KEY` in `.env`; re-runs only fill gaps).
 
 ## Where to trust it, and where not
 
