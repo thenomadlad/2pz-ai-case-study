@@ -28,7 +28,7 @@ def _write_seed_and_baseline(tmp_path):
     scenarios_dir = tmp_path / "scenarios"
     scenarios_dir.mkdir()
     (scenarios_dir / "baseline.yaml").write_text(yaml.dump({
-        "assumptions": {"contest_ratio": 1.25, "model_backend": "rubric"},
+        "assumptions": {"contest_ratio": 1.25},
     }))
 
     raw_dir = tmp_path / "raw"
@@ -47,7 +47,6 @@ def test_scenario_run_writes_current_and_diff(tmp_path):
     scenario_path = scenarios_dir / "test-scenario.yaml"
     scenario_path.write_text(yaml.dump({
         "name": "test-scenario",
-        "assumptions": {"model_backend": "rubric"},
         "overrides": {
             "branches": {
                 "a": {"rating": 3.0},
@@ -72,31 +71,6 @@ def test_scenario_run_writes_current_and_diff(tmp_path):
     assert by_id["new-branch"]["action_changed"] is True
 
 
-def test_scenario_diff_records_baseline_and_current_backend(tmp_path):
-    # Fix 7: ScenarioDiff must record which backend produced each side of the diff, so a
-    # mismatch (baseline decided with one backend, scenario run with another) is
-    # attributable rather than silently conflated with "the inputs changed".
-    seed_dir, raw_dir, baseline_dir, scenarios_dir = _write_seed_and_baseline(tmp_path)
-
-    scenario_path = scenarios_dir / "test-scenario.yaml"
-    scenario_path.write_text(yaml.dump({
-        "name": "test-scenario",
-        "assumptions": {"model_backend": "rubric"},
-        "overrides": {"branches": {"a": {"rating": 3.0}}},
-    }))
-
-    settings = Settings(_env_file=None, seed_dir=seed_dir, raw_dir=raw_dir,
-                         processed_dir=baseline_dir)
-    main(scenario_path, settings)
-
-    current_dir = baseline_dir.parent / "current"
-    diff = json.loads((current_dir / "diff.json").read_text())
-    # _write_seed_and_baseline pins baseline.yaml's model_backend to "rubric", and this
-    # scenario also pins "rubric" -- both sides should match here.
-    assert diff["baseline_backend"] == "rubric"
-    assert diff["current_backend"] == "rubric"
-
-
 def test_new_branch_with_no_price_flagged_as_estimated(tmp_path):
     # Fix 8: a scenario-introduced branch with no avg_price_aed gets the network median
     # imputed by build_features, but its id was never in price_flags (that only comes from
@@ -106,7 +80,6 @@ def test_new_branch_with_no_price_flagged_as_estimated(tmp_path):
     scenario_path = scenarios_dir / "test-scenario.yaml"
     scenario_path.write_text(yaml.dump({
         "name": "test-scenario",
-        "assumptions": {"model_backend": "rubric"},
         "overrides": {
             "branches": {
                 "new-branch": {"name": "New Branch", "lat": 25.3, "lng": 55.3, "area": "New Area"},
@@ -138,7 +111,6 @@ def test_scenario_run_never_modifies_baseline_dir(tmp_path):
     scenario_path = scenarios_dir / "test-scenario.yaml"
     scenario_path.write_text(yaml.dump({
         "name": "test-scenario",
-        "assumptions": {"model_backend": "rubric"},
         "overrides": {
             "branches": {
                 "a": {"rating": 1.0},
@@ -182,7 +154,6 @@ def test_run_scenario_returns_bundle_without_touching_disk(tmp_path):
     scenario_path = scenarios_dir / "test-scenario.yaml"
     scenario_path.write_text(yaml.dump({
         "name": "test-scenario",
-        "assumptions": {"model_backend": "rubric"},
         "overrides": {"branches": {"a": {"rating": 3.0}}},
     }))
 
@@ -205,50 +176,6 @@ def test_run_scenario_returns_bundle_without_touching_disk(tmp_path):
     assert diff_by_id["a"].changed_fields["rating"] == {"old": 4.5, "new": 3.0}
 
 
-def test_run_scenario_writes_no_scenario_output_regardless_of_backend(tmp_path, monkeypatch):
-    # The "no disk I/O" guarantee is about run_scenario()'s OWN output artifacts (the four
-    # scenario-result files main() writes) -- not about a resolved backend's unrelated side
-    # effects (e.g. LLMModel's own response cache, which is pre-existing and untouched by
-    # this refactor). Fake the resolved backend here so this test exercises that contract
-    # without a real Anthropic client or network call.
-    seed_dir, raw_dir, baseline_dir, scenarios_dir = _write_seed_and_baseline(tmp_path)
-
-    scenario_path = scenarios_dir / "test-scenario.yaml"
-    scenario_path.write_text(yaml.dump({
-        "name": "test-scenario",
-        "assumptions": {"model_backend": "llm"},
-        "overrides": {"branches": {"a": {"rating": 3.0}}},
-    }))
-
-    class FakeLLMBackend:
-        name = "llm"
-
-        def decide(self, branches, network):
-            # Simulate a real disk-touching backend (like LLMModel's cache) to prove
-            # run_scenario() itself still writes none of ITS OWN output files.
-            cache_dir = tmp_path / "fake-llm-cache"
-            cache_dir.mkdir(exist_ok=True)
-            (cache_dir / "touched.json").write_text("{}")
-            from src.model.rubric import RubricModel
-            return RubricModel().decide(branches, network)
-
-    import src.scenario.run as scenario_run_module
-    monkeypatch.setattr(scenario_run_module, "resolve_backend", lambda settings: FakeLLMBackend())
-
-    from src.scenario.load import load_scenario
-    scenario = load_scenario(scenario_path)
-    settings = Settings(_env_file=None, seed_dir=seed_dir, raw_dir=raw_dir,
-                         processed_dir=baseline_dir)
-
-    current_dir = baseline_dir.parent / "current"
-    run = run_scenario(scenario, settings)
-
-    assert run.diff.current_backend == "llm"
-    for name in ("branch_features.json", "community_assignment.json", "communities.json",
-                 "decisions.json", "run_meta.json", "diff.json"):
-        assert not (current_dir / name).exists()
-
-
 def test_main_writes_identical_output_via_run_scenario(tmp_path):
     # main() must still write byte-for-byte the same four files + diff.json it always has --
     # this is the regression guard that the refactor didn't change CLI behavior.
@@ -257,7 +184,6 @@ def test_main_writes_identical_output_via_run_scenario(tmp_path):
     scenario_path = scenarios_dir / "test-scenario.yaml"
     scenario_path.write_text(yaml.dump({
         "name": "test-scenario",
-        "assumptions": {"model_backend": "rubric"},
         "overrides": {"branches": {"a": {"rating": 3.0}}},
     }))
 

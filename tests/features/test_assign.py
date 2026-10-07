@@ -72,3 +72,20 @@ def test_assign_contested_when_tied_at_same_location():
     assert result[0].nearest_km == 0.0
     assert result[0].second_km == 0.0
     assert result[0].contested is True
+
+
+def test_count_competitors_assigns_to_nearest_community_within_cutoff():
+    from src.features.assign import count_competitors
+    from src.models import Community, Competitor
+
+    def comm(cid, lat):
+        return Community(id=cid, name_en=cid, lat=lat, lng=55.0, population_total=1000,
+                         population_female=None, is_estimated=True)
+
+    def comp(cid, lat):
+        return Competitor(id=cid, name=cid, category="beauty", lat=lat, lng=55.0)
+
+    communities = [comm("north", 25.10), comm("south", 25.00)]
+    # 0.01 deg lat ~ 1.1 km; 0.2 deg ~ 22 km, beyond the 3 km cutoff.
+    competitors = [comp("k1", 25.09), comp("k2", 25.01), comp("k3", 25.011), comp("far", 25.30)]
+    assert count_competitors(competitors, communities) == {"north": 1, "south": 2}

@@ -7,14 +7,9 @@ name: example-perturbations
 # combination confounded with an unrelated assumption change whose own effect can't be
 # told apart from the branch-level overrides.
 #
-# Even with only these three overrides, OTHER branches may also shift action (not just
-# the three touched here). This is because the rubric ranks every branch relative to the
-# whole network -- changing one branch's standing (new branch added, al-safa-2 relocated)
-# can shift where the top/bottom-third tier boundaries fall for everyone else. That's an
-# honest property of the model, not a bug -- don't be surprised if branches you didn't
-# touch show up in the diff too.
-assumptions:
-  model_backend: rubric  # free, instant, deterministic -- see docs/designs/v1.md
+# Even with only these three overrides, OTHER branches may also shift action: a new or
+# moved branch takes communities (and their competitors) out of its neighbours'
+# catchments, which changes their demand, cannibalisation and competition signals.
 overrides:
   branches:
     # New hypothetical branch -- an id not in the seed data, so apply.py treats

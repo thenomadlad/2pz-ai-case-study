@@ -3,6 +3,11 @@
 all:
     uv run python -m src.scenario.baseline
 
+# Generate grounded AI explanations for the baseline (needs ANTHROPIC_API_KEY) and write
+# the committed cache data/explanations/cache.json. Commit the result.
+explain:
+    uv run python -m src.explain
+
 # Launch the Streamlit app on http://localhost:8501
 app:
     uv run streamlit run streamlit_app.py
@@ -20,4 +25,4 @@ clean:
     touch data/raw/.gitkeep data/processed/.gitkeep
 
 test:
-    uv run pytest
+    uv run --extra dev pytest

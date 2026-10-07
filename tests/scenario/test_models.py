@@ -17,7 +17,6 @@ def test_baseline_assumptions_defaults():
     assert a.contest_ratio == 1.25
     assert a.global_female_share == 0.49
     assert a.fallback_price_aed == 99.0
-    assert a.model_backend == "llm"
 
 
 def test_baseline_assumptions_rejects_unknown_field():
@@ -28,7 +27,6 @@ def test_baseline_assumptions_rejects_unknown_field():
 def test_scenario_assumptions_default_to_none():
     a = ScenarioAssumptions()
     assert a.contest_ratio is None
-    assert a.model_backend is None
 
 
 def test_scenario_minimal():
@@ -62,14 +60,7 @@ def test_community_diff_entry_reassigned():
 
 
 def test_scenario_diff_shape():
-    diff = ScenarioDiff(scenario_name="x", branches=[], communities=[],
-                         baseline_backend="rubric", current_backend="rubric")
+    diff = ScenarioDiff(scenario_name="x", branches=[], communities=[])
     assert diff.scenario_name == "x"
     assert diff.branches == []
 
-
-def test_scenario_diff_carries_backend_names():
-    diff = ScenarioDiff(scenario_name="x", branches=[], communities=[],
-                         baseline_backend="llm", current_backend="rubric")
-    assert diff.baseline_backend == "llm"
-    assert diff.current_backend == "rubric"

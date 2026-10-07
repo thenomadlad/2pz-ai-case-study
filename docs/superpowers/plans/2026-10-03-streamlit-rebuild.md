@@ -1,5 +1,7 @@
 # Streamlit Rebuild Implementation Plan
 
+> **Executed** (checkboxes never ticked). Superseded in parts by v2 (`docs/designs/v2.md`).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the FastAPI/Leaflet/Netlify demo with a native Streamlit app that supports live perturbation (no frozen JSON snapshot) and is structured pyramid-principle-first for a consulting audience: Product → Model/Assumptions/Data → Story.

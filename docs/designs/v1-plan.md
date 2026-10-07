@@ -1,5 +1,7 @@
 # Bedashing V1 Implementation Plan: The Perturbation Loop
 
+> **Executed.** Checkboxes were never ticked. Tasks 10–11 (FastAPI/Leaflet diff mode) were later removed by the Streamlit rebuild, and the LLM backend by v2.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the v1 perturbation loop on top of the existing v0 pipeline — a baseline computed once from an explicit assumptions file, scenarios declared as YAML overrides (including the three example perturbations: a new branch, a relocated branch, a rating change), a diff between baseline and a scenario's result, and a diff-mode overlay on the existing map.

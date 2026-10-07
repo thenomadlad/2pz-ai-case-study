@@ -1,6 +1,8 @@
 import streamlit as st
 
+from src import explain
 from src.config import settings
+from src.model import opportunity, rubric
 from src.webapp.data import load_baseline
 
 KNOWN_LIMITATIONS = [
@@ -9,18 +11,20 @@ KNOWN_LIMITATIONS = [
      "ignores all of it."),
     ("Community centroids are not where people live. Large communities get collapsed to "
      "a point."),
-    ("No competitors. A branch with five rival salons next door looks identical to one "
-     "with none. The single biggest omission."),
+    ("Competitors come from OpenStreetMap, which misses salons, so competitor counts are "
+     "a lower bound. Gents' salons are filtered out by tag and by name, imperfectly."),
     ("Female population is a poor demand proxy on its own — and every value in this "
      "dataset is an estimate (see Data provenance below), not just a proxy that could be "
      "refined."),
     ("No revenue, footfall, staffing or lease data, so 'SHRINK' here cannot distinguish a "
      "badly-located branch from a well-located, badly-run one."),
-    ("The LLM classifies without ground truth and will produce confident-sounding labels "
-     "regardless. Agreement with the rubric is a sanity check, not validation."),
+    ("The AI only explains decisions; it never makes them. Its numbers are checked against "
+     "the data, but its wording can still over- or under-state how strong a signal is."),
+    ("Thresholds and scale anchors are judgement calls picked from the Dubai data "
+     "distribution, not fitted to outcomes. There are no outcomes to fit to."),
     ("Prices are not 'a thin basket that may not be current' — there are zero real "
      "per-branch prices anywhere, confirmed, not merely unsourced."),
-    "Dubai only.",
+    "Dubai only, by design: 9 of Bedashing's 23 UAE branches.",
 ]
 
 
@@ -34,14 +38,33 @@ def _render_pipeline() -> None:
         "whenever live enrichment isn't available (it never is in this build — see Data "
         "provenance below).\n"
         "- **Features**: assigns every community to its nearest branch (haversine "
-        "distance), rolls that up into per-branch features (population served, contested "
-        "share, price index, sibling proximity) plus network-wide medians to compare "
-        "against.\n"
-        "- **Model**: a deterministic rubric (normalize population/contested-share/rating, "
-        "equal-weight sum, top third PROTECT / bottom third SHRINK / rest HOLD) or an LLM "
-        "backend (one Anthropic tool-use call per branch, disk-cached, rubric fallback on "
-        "failure) label each branch.\n"
+        "distance) and every competitor salon to its nearest community, then rolls that up "
+        "into per-branch features (female residents served, cannibalisation, competitors "
+        "per 10k women, sibling proximity) and per-community features.\n"
+        "- **Model**: a deterministic rubric scores each branch on four fixed scales and "
+        "applies absolute thresholds (PROTECT / HOLD / SHRINK); a two-question 2x2 labels "
+        "each community GROW / WATCH / SKIP.\n"
+        "- **Explain**: Claude writes 3 reasons with 2-3 data points each, plus a caption "
+        "for the factor table, and every number is checked against the data.\n"
     )
+
+
+def _render_scales() -> None:
+    st.header("Scales and thresholds")
+    st.markdown("Each branch signal is scored 0-1 on a **fixed** scale, so a branch's score "
+                "doesn't move just because a sibling changed.")
+    st.table({
+        "Signal": [s.label for s in rubric.SIGNALS],
+        "Scores 0 at": [f"{s.worst:g}" for s in rubric.SIGNALS],
+        "Scores 1 at": [f"{s.best:g}" for s in rubric.SIGNALS],
+        "Why this scale": [s.why for s in rubric.SIGNALS],
+    })
+    st.markdown(f"**Branch thresholds.** {rubric.THRESHOLDS_WHY}")
+    st.markdown(f"**Opportunity thresholds.** {opportunity.THRESHOLDS_WHY}")
+    with st.expander("Glossary: every factor shown in the app"):
+        st.dataframe([{"Factor": f.label, "Unit": f.unit, "What it means": f.meaning}
+                      for f in explain.GLOSSARY.values()], hide_index=True,
+                     width="stretch")
 
 
 def _render_data_provenance(data) -> None:
@@ -58,25 +81,34 @@ def _render_data_provenance(data) -> None:
         "**Every `population_female` is estimated.** `dubaipulse.gov.ae` and `dsc.gov.ae` "
         "both block automated access, and the source Population Bulletin PDF doesn't publish "
         "a per-community gender split at all — only emirate-wide. All 50 communities' female "
-        "population is estimated via a global 49% share and flagged as such."
+        "population is estimated via a global 49% share and flagged as such.\n\n"
+        f"**{len(data.competitors)} competitor salons** from OpenStreetMap (`shop=beauty` and "
+        "`shop=hairdresser` around Dubai, gents' salons and Bedashing itself removed), pulled "
+        "once by `scripts/fetch_competitors.py` and committed. Each counts toward the nearest "
+        "community within 3 km."
     )
     st.caption(f"Configured data sources: branches={data.data_sources['branches']}, "
-               f"communities={data.data_sources['communities']}")
+               f"communities={data.data_sources['communities']}, "
+               f"competitors={data.data_sources['competitors']}")
 
 
-def _render_backend_comparison() -> None:
-    st.header("Rubric vs. LLM")
-    if settings.anthropic_api_key:
-        st.info("ANTHROPIC_API_KEY is configured — live rubric-vs-LLM agreement would run "
-                "here in a future iteration.")
-    else:
-        st.markdown(
-            "This public demo runs the **rubric backend only** — free, instant, "
-            "deterministic, and exactly reproducible. The LLM backend is a real, working "
-            "alternative (one Anthropic call per branch, structured output, disk-cached) "
-            "but isn't exposed publicly here since it costs real API calls and its cache "
-            "never helps across different scenarios."
-        )
+def _render_ai_layer() -> None:
+    st.header("How the AI layer works")
+    cache = explain.load_cache()
+    st.markdown(
+        "The rules make every decision. Claude explains them for the portfolio team: 3 "
+        "reasons, each backed by 2-3 data points copied from the decision's fact sheet, plus "
+        "a plain-language caption for the factor table.\n\n"
+        "**Grounding check.** Every cited field must exist in the fact sheet with the same "
+        "value, and every number in the prose must match a fact or a published threshold. "
+        "A failed check is retried once with the errors fed back, then replaced by a "
+        "template explanation.\n\n"
+        "**No key needed to see it.** Explanations for the baseline are generated once "
+        "(`just explain`) and committed, keyed by a hash of the exact numbers. A scenario "
+        "that changes a branch's numbers gets a live explanation if a key is configured, "
+        "otherwise the template, clearly labelled."
+    )
+    st.caption(f"{len(cache)} AI explanations committed in data/explanations/cache.json.")
 
 
 def _render_limitations() -> None:
@@ -89,6 +121,7 @@ def render() -> None:
     st.title("Model, Assumptions & Data")
     data = load_baseline(settings)
     _render_pipeline()
+    _render_scales()
     _render_data_provenance(data)
-    _render_backend_comparison()
+    _render_ai_layer()
     _render_limitations()

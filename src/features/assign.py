@@ -1,8 +1,12 @@
 import math
 
-from src.models import Branch, Community, CommunityAssignment
+from src.models import Branch, Community, CommunityAssignment, Competitor
 
 EARTH_RADIUS_KM = 6371.0
+# A competitor further than this from every seeded community centroid is dropped rather
+# than lumped into an edge community: the 50 seeded communities don't tile all of Dubai.
+# ponytail: centroid distance, not community polygons; use polygons if counts look off.
+COMPETITOR_MAX_KM = 3.0
 
 
 def haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
@@ -42,3 +46,19 @@ def assign_communities(
             female_pop=community.population_female or 0,
         ))
     return assignments
+
+
+def count_competitors(
+    competitors: list[Competitor], communities: list[Community],
+    max_km: float = COMPETITOR_MAX_KM,
+) -> dict[str, int]:
+    """Competitors per community: each competitor counts toward its nearest community."""
+    counts = {c.id: 0 for c in communities}
+    if not communities:
+        return counts
+    for k in competitors:
+        km, community_id = min((haversine_km(k.lat, k.lng, c.lat, c.lng), c.id)
+                               for c in communities)
+        if km <= max_km:
+            counts[community_id] += 1
+    return counts

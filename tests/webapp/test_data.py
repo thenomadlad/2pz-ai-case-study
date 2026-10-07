@@ -1,6 +1,7 @@
 import json
 
 from src.config import Settings
+from src.model.run import PIPELINE_VERSION
 from src.webapp.data import load_baseline
 
 
@@ -34,32 +35,44 @@ def _seed_processed(processed_dir):
         "branch_id": "a", "action": "PROTECT", "confidence": "high",
         "rationale": "Strong branch.", "key_drivers": ["female_pop_served"], "caveats": [],
     }]))
+    (processed_dir / "community_features.json").write_text(json.dumps([{
+        "community_id": "c1", "name": "C1", "lat": 25.05, "lng": 55.15, "female_pop": 500,
+        "competitors": 0, "competitors_per_10k": 0.0, "nearest_branch_id": "a",
+        "nearest_branch_km": 1.0, "nearest_branch_pop_served": 1000, "hosts_branch": True,
+    }]))
+    (processed_dir / "opportunities.json").write_text(json.dumps([{
+        "community_id": "c1", "action": "SKIP", "underserved": False, "unsaturated": True,
+        "rationale": "Already hosts a Bedashing branch.", "caveats": [],
+    }]))
+    (processed_dir / "run_meta.json").write_text(json.dumps(
+        {"model": "rubric", "pipeline_version": PIPELINE_VERSION}))
 
 
-def test_load_baseline_joins_and_reports_actual_backend(tmp_path):
+def test_load_baseline_joins_decisions_and_opportunities(tmp_path):
     processed_dir = tmp_path / "processed" / "baseline"
     processed_dir.mkdir(parents=True)
     _seed_processed(processed_dir)
-    (processed_dir / "run_meta.json").write_text(json.dumps({"model_backend": "rubric"}))
 
-    settings = Settings(_env_file=None, processed_dir=processed_dir, model_backend="llm",
-                         anthropic_api_key=None)
-    data = load_baseline(settings)
+    data = load_baseline(Settings(_env_file=None, processed_dir=processed_dir,
+                                  raw_dir=tmp_path / "raw"))
 
     assert data.network.branch_count == 1
-    assert data.model_backend == "rubric"  # from run_meta.json, not the configured "llm"
     assert data.decision_for("a").action == "PROTECT"
     assert data.decision_for("missing") is None
+    assert data.opportunity_for("c1").action == "SKIP"
     assert data.communities_by_id()["c1"].name_en == "C1"
+    assert data.competitors == []  # no raw competitors.json under tmp_path
 
 
-def test_load_baseline_falls_back_to_configured_backend_when_run_meta_absent(tmp_path):
+def test_load_baseline_regenerates_an_older_pipeline_version(tmp_path, monkeypatch):
     processed_dir = tmp_path / "processed" / "baseline"
     processed_dir.mkdir(parents=True)
     _seed_processed(processed_dir)
-    assert not (processed_dir / "run_meta.json").exists()
+    (processed_dir / "run_meta.json").write_text(json.dumps({"model_backend": "llm"}))
+    calls = []
+    monkeypatch.setattr("src.scenario.baseline.main", lambda s: calls.append(s))
 
-    settings = Settings(_env_file=None, processed_dir=processed_dir, model_backend="rubric")
-    data = load_baseline(settings)
+    load_baseline(Settings(_env_file=None, processed_dir=processed_dir,
+                           raw_dir=tmp_path / "raw"))
 
-    assert data.model_backend == "rubric"
+    assert len(calls) == 1

@@ -5,4 +5,3 @@ assumptions:
   contest_ratio: 1.25
   global_female_share: 0.49
   fallback_price_aed: 99.0
-  model_backend: llm

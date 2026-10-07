@@ -3,8 +3,9 @@ import logging
 
 from src.config import Settings
 from src.config import settings as default_settings
-from src.features.build import build_features
-from src.model.run import resolve_backend
+from src.features.build import build_community_features, build_features, load_competitors
+from src.model.opportunity import classify_all
+from src.model.rubric import RubricModel
 from src.models import Branch, BranchFeatures, Community, CommunityAssignment, Decision
 from src.scenario.apply import apply_branch_overrides, apply_community_overrides
 from src.scenario.baseline import load_baseline_assumptions
@@ -20,9 +21,7 @@ def run_scenario(scenario: Scenario, settings: Settings | None = None) -> Scenar
     """Apply a scenario's overrides on top of the fixed baseline raw data, recompute
     features+model, and diff against the baseline report -- entirely in memory. Never writes
     its own output artifacts to disk; callers that need those on disk (the CLI) do that
-    themselves with the returned bundle. (If the llm backend is selected, LLMModel's own
-    response cache is a separate, pre-existing side effect of src/model/llm.py -- see the
-    comment below, not a disk write performed by run_scenario() itself.)
+    themselves with the returned bundle.
     """
     settings = settings or default_settings
     baseline_dir = settings.processed_dir
@@ -45,6 +44,7 @@ def run_scenario(scenario: Scenario, settings: Settings | None = None) -> Scenar
     raw_branches = [Branch(**b) for b in json.loads((raw_dir / "branches.json").read_text())]
     communities = [Community(**c) for c in json.loads((raw_dir / "communities.json").read_text())]
     price_flags = json.loads((raw_dir / "price_flags.json").read_text())
+    competitors = load_competitors(raw_dir)
 
     original_branch_ids = {b.id for b in raw_branches}
     branches = apply_branch_overrides(raw_branches, scenario.overrides.branches)
@@ -62,28 +62,13 @@ def run_scenario(scenario: Scenario, settings: Settings | None = None) -> Scenar
     contest_ratio = (scenario.assumptions.contest_ratio
                       if scenario.assumptions.contest_ratio is not None
                       else baseline_assumptions.contest_ratio)
-    model_backend = (scenario.assumptions.model_backend
-                      if scenario.assumptions.model_backend is not None
-                      else baseline_assumptions.model_backend)
-
-    # Redirect processed_dir (not an on-disk write by itself) so that IF the llm backend is
-    # used, its own response cache lands under data/processed/current/.llm_cache rather than
-    # inside baseline/, which must never be touched by a scenario run. This is a pre-existing
-    # side effect of LLMModel itself (src/model/llm.py, untouched by this refactor) -- it is
-    # NOT one of run_scenario()'s own output artifacts (those are only ever written by main(),
-    # never here). The widget-based Streamlit editor defaults to the rubric backend
-    # specifically so the live perturbation loop never depends on this cache existing.
-    current_dir = baseline_dir.parent / "current"
-    current_settings = settings.model_copy(update={
-        "processed_dir": current_dir,
-        "contest_ratio": contest_ratio,
-        "model_backend": model_backend,
-    })
 
     features, network, assignments = build_features(branches, communities, price_flags,
-                                                      contest_ratio)
-    model = resolve_backend(current_settings)
-    decisions = model.decide(features, network)
+                                                      contest_ratio, competitors)
+    community_features = build_community_features(branches, communities, assignments,
+                                                  features, competitors)
+    decisions = RubricModel().decide(features, network)
+    opportunities = classify_all(community_features)
 
     baseline_payload = json.loads((baseline_dir / "branch_features.json").read_text())
     baseline_features = [BranchFeatures(**b) for b in baseline_payload["branches"]]
@@ -92,22 +77,14 @@ def run_scenario(scenario: Scenario, settings: Settings | None = None) -> Scenar
     baseline_assignments = [CommunityAssignment(**a) for a in
                              json.loads((baseline_dir / "community_assignment.json").read_text())]
 
-    # Records which backend produced each side of the diff, the same way the old /api/network
-    # read it, so a flip can be attributed to "inputs changed" vs. "decision method changed".
-    baseline_run_meta_path = baseline_dir / "run_meta.json"
-    if baseline_run_meta_path.exists():
-        baseline_backend = json.loads(baseline_run_meta_path.read_text())["model_backend"]
-    else:
-        baseline_backend = settings.model_backend
-
     branch_diff = compute_branch_diff(baseline_features, baseline_decisions, features, decisions)
     community_diff = compute_community_diff(baseline_assignments, assignments)
     diff = ScenarioDiff(scenario_name=scenario.name, branches=branch_diff,
-                         communities=community_diff,
-                         baseline_backend=baseline_backend, current_backend=model.name)
+                         communities=community_diff)
 
     return ScenarioRun(scenario_name=scenario.name, features=features, network=network,
                         assignments=assignments, communities=communities, decisions=decisions,
+                        community_features=community_features, opportunities=opportunities,
                         diff=diff)
 
 
@@ -129,9 +106,12 @@ def main(scenario_path, settings: Settings | None = None) -> None:
         json.dumps([c.model_dump() for c in run.communities], indent=2))
     (current_dir / "decisions.json").write_text(
         json.dumps([d.model_dump() for d in run.decisions], indent=2))
+    (current_dir / "community_features.json").write_text(
+        json.dumps([c.model_dump() for c in run.community_features], indent=2))
+    (current_dir / "opportunities.json").write_text(
+        json.dumps([o.model_dump() for o in run.opportunities], indent=2))
     (current_dir / "run_meta.json").write_text(
-        json.dumps({"model_backend": run.diff.current_backend,
-                     "scenario_name": run.scenario_name}, indent=2))
+        json.dumps({"model": "rubric", "scenario_name": run.scenario_name}, indent=2))
     (current_dir / "diff.json").write_text(run.diff.model_dump_json(indent=2))
 
     changed_count = sum(1 for b in run.diff.branches if b.changed_fields or b.old is None)

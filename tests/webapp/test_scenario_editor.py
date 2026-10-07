@@ -22,11 +22,16 @@ st.session_state["_scenario"] = build_scenario()
 """
 
 
-def test_assumptions_default_to_rubric_and_baseline_contest_ratio():
+def test_assumptions_default_to_baseline_contest_ratio():
+    from src.config import settings
+    from src.scenario.baseline import load_baseline_assumptions
+
     at = AppTest.from_string(SCRIPT)
     at.run()
     scenario = at.session_state["_scenario"]
-    assert scenario.assumptions.model_backend == "rubric"
+    baseline_yaml = settings.seed_dir.parent / "scenarios" / "baseline.yaml"
+    assert scenario.assumptions.contest_ratio == load_baseline_assumptions(
+        baseline_yaml).contest_ratio
 
 
 def test_applying_an_override_updates_the_scenario():

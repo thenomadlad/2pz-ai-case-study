@@ -2,6 +2,7 @@ import json
 import logging
 
 from src.acquire import branches as branches_mod
+from src.acquire import competitors as competitors_mod
 from src.acquire import population as population_mod
 from src.acquire.prices import backfill_missing_prices
 from src.config import Settings
@@ -18,12 +19,15 @@ def main(settings: Settings | None = None) -> None:
     raw_branches = branches_mod.load(settings)
     filled_branches, price_flags = backfill_missing_prices(raw_branches, settings.fallback_price_aed)
     communities = population_mod.load(settings)
+    competitors = competitors_mod.load(settings)
 
     (settings.raw_dir / "branches.json").write_text(
         json.dumps([b.model_dump() for b in filled_branches], indent=2))
     (settings.raw_dir / "price_flags.json").write_text(json.dumps(price_flags, indent=2))
     (settings.raw_dir / "communities.json").write_text(
         json.dumps([c.model_dump() for c in communities], indent=2))
+    (settings.raw_dir / "competitors.json").write_text(
+        json.dumps([c.model_dump() for c in competitors], indent=2))
 
     estimated_pop = sum(1 for c in communities if c.is_estimated)
     print("=== acquire summary ===")
@@ -33,6 +37,7 @@ def main(settings: Settings | None = None) -> None:
     print(f"communities: {len(communities)} rows "
           f"(source: {'seed' if not settings.dubai_pulse_enabled else 'seed, pulse unimplemented'})"
           f", {estimated_pop} with estimated female population")
+    print(f"competitors: {len(competitors)} rows (source: OSM seed)")
 
 
 if __name__ == "__main__":

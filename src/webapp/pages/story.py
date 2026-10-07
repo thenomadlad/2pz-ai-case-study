@@ -14,13 +14,13 @@ def render() -> None:
 
     st.header("Who this is for")
     st.markdown(
-        "This is a submission for a technical analyst / implementer role at a private "
-        "equity firm. The audience is consultants: time-constrained, and trained to expect "
-        "the conclusion first, the evidence second, and the methodology available on "
-        "request — which is exactly how this app is ordered. If you've read this far, "
-        "you've already seen the recommendation (Product) and the mechanics behind it "
-        "(Model, Assumptions & Data); this page is the reflective layer behind both: why "
-        "a running tool, and why built this way."
+        "Software a PE firm's AI team would build for a portfolio company. It supports one "
+        "conversation between three roles: Bedashing's **portfolio team** (network, real "
+        "estate and expansion) uses it to form recommendations; the **COO** approves or "
+        "questions them and owns branch operations and return on capital; the **PE board** "
+        "has to find them defensible. So the app leads with the conclusion, every decision "
+        "carries its reasons and data, and the limits (no revenue or rent data) are stated "
+        "up front rather than buried."
     )
 
     st.header("Perturb, re-run, compare")
@@ -45,5 +45,10 @@ def render() -> None:
         "- **This app** — v1's own design doc named an interactive override UI as explicit "
         "future work, deferred for later. This is that UI, built natively in Streamlit "
         "instead of a custom frontend, so perturbing a scenario is a slider, not a YAML "
-        "edit."
+        "edit.\n"
+        "- **v2** — closed the brief's gaps: competitors from OpenStreetMap as a fourth "
+        "signal, fixed scales and absolute thresholds instead of ranking branches into "
+        "thirds, GROW/WATCH/SKIP for every community, and grounded AI explanations with "
+        "units and captions on every table. The LLM decision backend was removed: the "
+        "rules decide, the AI explains."
     )

@@ -25,7 +25,6 @@ def main(settings: Settings | None = None) -> None:
         "contest_ratio": assumptions.contest_ratio,
         "global_female_share": assumptions.global_female_share,
         "fallback_price_aed": assumptions.fallback_price_aed,
-        "model_backend": assumptions.model_backend,
     })
 
     acquire_run.main(baseline_settings)
@@ -33,7 +32,7 @@ def main(settings: Settings | None = None) -> None:
     model_run.main(baseline_settings)
 
     # A stale data/processed/current/ (and its diff.json) must never survive a baseline
-    # regeneration -- otherwise /api/diff keeps serving a comparison against a baseline
+    # regeneration -- otherwise the app keeps serving a comparison against a baseline
     # that no longer exists on disk, with no indication to the user that it's stale.
     current_dir = settings.processed_dir.parent / "current"
     shutil.rmtree(current_dir, ignore_errors=True)

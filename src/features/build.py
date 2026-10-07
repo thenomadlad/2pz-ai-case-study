@@ -3,8 +3,16 @@ import statistics
 
 from src.config import Settings
 from src.config import settings as default_settings
-from src.features.assign import assign_communities, haversine_km
-from src.models import Branch, BranchFeatures, Community, NetworkStats
+from src.features.assign import assign_communities, count_competitors, haversine_km
+from src.models import (
+    Branch,
+    BranchFeatures,
+    Community,
+    CommunityAssignment,
+    CommunityFeatures,
+    Competitor,
+    NetworkStats,
+)
 
 
 def _percentiles(values: list[float]) -> tuple[float, float, float]:
@@ -23,11 +31,17 @@ def _percentile(ordered: list[float], pct: float) -> float:
     return ordered[lo] + (ordered[hi] - ordered[lo]) * frac
 
 
+def per_10k(count: int, population: int) -> float:
+    return count / population * 10_000 if population else 0.0
+
+
 def build_features(
     branches: list[Branch], communities: list[Community],
     price_flags: list[str], contest_ratio: float,
+    competitors: list[Competitor] = (),
 ) -> tuple[list[BranchFeatures], NetworkStats, list]:
     assignments = assign_communities(branches, communities, contest_ratio)
+    competitor_counts = count_competitors(list(competitors), communities)
     price_flag_set = set(price_flags)
     community_by_id = {c.id: c for c in communities}
 
@@ -38,6 +52,7 @@ def build_features(
         served = [a for a in assignments if a.nearest_branch_id == branch.id]
         female_pop_served = sum(a.female_pop for a in served)
         contested_pop = sum(a.female_pop for a in served if a.contested)
+        competitors_in_catchment = sum(competitor_counts.get(a.community_id, 0) for a in served)
 
         if served:
             mean_distance = (
@@ -77,6 +92,8 @@ def build_features(
             review_count=branch.review_count,
             pop_per_1k_rank=0,
             estimated_fields=estimated_fields,
+            competitors_in_catchment=competitors_in_catchment,
+            competitors_per_10k=per_10k(competitors_in_catchment, female_pop_served),
         ))
 
     ranked = sorted(features, key=lambda f: f.female_pop_served, reverse=True)
@@ -111,6 +128,38 @@ def build_features(
     return features, network, assignments
 
 
+def build_community_features(
+    branches: list[Branch], communities: list[Community],
+    assignments: list[CommunityAssignment], features: list[BranchFeatures],
+    competitors: list[Competitor] = (),
+) -> list[CommunityFeatures]:
+    competitor_counts = count_competitors(list(competitors), communities)
+    assignment_by_id = {a.community_id: a for a in assignments}
+    pop_served_by_branch = {f.branch_id: f.female_pop_served for f in features}
+    # A community "hosts" a branch when it's that branch's nearest community centroid.
+    host_ids = {min(communities, key=lambda c: haversine_km(b.lat, b.lng, c.lat, c.lng)).id
+                for b in branches} if communities else set()
+
+    result = []
+    for c in communities:
+        a = assignment_by_id[c.id]
+        count = competitor_counts.get(c.id, 0)
+        result.append(CommunityFeatures(
+            community_id=c.id, name=c.name_en, lat=c.lat, lng=c.lng,
+            female_pop=a.female_pop, competitors=count,
+            competitors_per_10k=per_10k(count, a.female_pop),
+            nearest_branch_id=a.nearest_branch_id, nearest_branch_km=a.nearest_km,
+            nearest_branch_pop_served=pop_served_by_branch.get(a.nearest_branch_id, 0),
+            hosts_branch=c.id in host_ids,
+        ))
+    return result
+
+
+def load_competitors(raw_dir) -> list[Competitor]:
+    path = raw_dir / "competitors.json"
+    return [Competitor(**c) for c in json.loads(path.read_text())] if path.exists() else []
+
+
 def main(settings: Settings | None = None) -> None:
     settings = settings or default_settings
     settings.processed_dir.mkdir(parents=True, exist_ok=True)
@@ -120,7 +169,12 @@ def main(settings: Settings | None = None) -> None:
     communities = [Community(**c) for c in
                    json.loads((settings.raw_dir / "communities.json").read_text())]
 
-    features, network, assignments = build_features(branches, communities, price_flags, settings.contest_ratio)
+    competitors = load_competitors(settings.raw_dir)
+
+    features, network, assignments = build_features(branches, communities, price_flags,
+                                                    settings.contest_ratio, competitors)
+    community_features = build_community_features(branches, communities, assignments,
+                                                  features, competitors)
 
     (settings.processed_dir / "branch_features.json").write_text(json.dumps({
         "network": network.model_dump(),
@@ -130,6 +184,8 @@ def main(settings: Settings | None = None) -> None:
         json.dumps([a.model_dump() for a in assignments], indent=2))
     (settings.processed_dir / "communities.json").write_text(
         json.dumps([c.model_dump() for c in communities], indent=2))
+    (settings.processed_dir / "community_features.json").write_text(
+        json.dumps([c.model_dump() for c in community_features], indent=2))
 
     print(f"features: wrote {len(features)} branch features, {len(assignments)} community "
           f"assignments")

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -15,7 +14,6 @@ class Settings(BaseSettings):
 
     enable_scrape: bool = False
     dubai_pulse_enabled: bool = False
-    model_backend: Literal["llm", "rubric"] = "llm"
     contest_ratio: float = 1.25
     global_female_share: float = 0.49
     fallback_price_aed: float = 99.0

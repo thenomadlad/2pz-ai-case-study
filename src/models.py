@@ -31,6 +31,15 @@ class Community(BaseModel):
     is_estimated: bool
 
 
+class Competitor(BaseModel):
+    """A non-Bedashing beauty/hair salon from OSM -- see scripts/fetch_competitors.py."""
+    id: str
+    name: str
+    category: str
+    lat: float
+    lng: float
+
+
 class CommunityAssignment(BaseModel):
     community_id: str
     nearest_branch_id: str
@@ -60,6 +69,23 @@ class BranchFeatures(BaseModel):
     review_count: int | None
     pop_per_1k_rank: int
     estimated_fields: list[str]
+    # Competitive overlap: competitors in this branch's catchment communities.
+    competitors_in_catchment: int = 0
+    competitors_per_10k: float = 0.0
+
+
+class CommunityFeatures(BaseModel):
+    community_id: str
+    name: str
+    lat: float
+    lng: float
+    female_pop: int
+    competitors: int
+    competitors_per_10k: float
+    nearest_branch_id: str
+    nearest_branch_km: float
+    nearest_branch_pop_served: int
+    hosts_branch: bool
 
 
 class NetworkStats(BaseModel):
@@ -86,3 +112,37 @@ class Decision(BaseModel):
     rationale: str
     key_drivers: list[str]
     caveats: list[str]
+    composite: float = 0.0
+    # Per-signal score on its fixed 0-1 scale (1 = good for the branch).
+    scores: dict[str, float] = {}
+
+
+class OpportunityDecision(BaseModel):
+    community_id: str
+    action: Literal["GROW", "WATCH", "SKIP"]
+    underserved: bool
+    unsaturated: bool
+    rationale: str
+    caveats: list[str]
+
+
+class Evidence(BaseModel):
+    field: str
+    label: str
+    value: float | int | str | bool | None
+
+
+class Reason(BaseModel):
+    claim: str
+    evidence: list[Evidence]
+
+
+class Explanation(BaseModel):
+    subject_id: str
+    kind: Literal["branch", "opportunity"]
+    action: str
+    reasons: list[Reason]
+    # Plain-language caption for the factor table shown next to this decision.
+    table_caption: str
+    thresholds_note: str
+    source: Literal["ai", "template"]

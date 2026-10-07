@@ -1,6 +1,6 @@
 # Streamlit rebuild — design
 
-Date: 2026-10-03. Status: approved, pending implementation plan.
+Date: 2026-10-03. Status: implemented. The model it describes was later replaced in v2 (`docs/designs/v2.md`).
 
 ## Why
 

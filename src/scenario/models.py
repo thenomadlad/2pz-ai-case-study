@@ -1,8 +1,16 @@
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
-from src.models import BranchFeatures, Community, CommunityAssignment, Decision, NetworkStats
+from src.models import (
+    BranchFeatures,
+    Community,
+    CommunityAssignment,
+    CommunityFeatures,
+    Decision,
+    NetworkStats,
+    OpportunityDecision,
+)
 
 
 class BaselineAssumptions(BaseModel):
@@ -11,14 +19,12 @@ class BaselineAssumptions(BaseModel):
     contest_ratio: float = 1.25
     global_female_share: float = 0.49
     fallback_price_aed: float = 99.0
-    model_backend: Literal["llm", "rubric"] = "llm"
 
 
 class ScenarioAssumptions(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     contest_ratio: float | None = None
-    model_backend: Literal["llm", "rubric"] | None = None
 
 
 class ScenarioOverrides(BaseModel):
@@ -55,11 +61,6 @@ class ScenarioDiff(BaseModel):
     scenario_name: str
     branches: list[BranchDiffEntry]
     communities: list[CommunityDiffEntry]
-    # Records which backend produced each side of the diff, so an action flip can be
-    # attributed to "the inputs changed" vs. "the decision-making method changed" instead
-    # of conflating the two when baseline/scenario backends differ.
-    baseline_backend: str
-    current_backend: str
 
 
 class ScenarioRun(BaseModel):
@@ -69,4 +70,6 @@ class ScenarioRun(BaseModel):
     assignments: list[CommunityAssignment]
     communities: list[Community]
     decisions: list[Decision]
+    community_features: list[CommunityFeatures]
+    opportunities: list[OpportunityDecision]
     diff: ScenarioDiff

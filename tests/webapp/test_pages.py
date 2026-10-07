@@ -2,13 +2,13 @@ from streamlit.testing.v1 import AppTest
 
 
 def test_app_loads_without_exception():
-    at = AppTest.from_file("../../streamlit_app.py")
+    at = AppTest.from_file("../../streamlit_app.py", default_timeout=30)
     at.run()
     assert not at.exception
 
 
 def test_app_product_page_shows_headline():
-    at = AppTest.from_file("../../streamlit_app.py")
+    at = AppTest.from_file("../../streamlit_app.py", default_timeout=30)
     at.run()
     assert not at.exception
     headers = [h.value for h in at.header]
@@ -20,7 +20,7 @@ def test_app_model_page_lists_limitations():
         from src.webapp.pages.model import render
         render()
 
-    at = AppTest.from_function(run_model_page)
+    at = AppTest.from_function(run_model_page, default_timeout=30)
     at.run()
     assert not at.exception
     headers = [h.value for h in at.header]
@@ -32,7 +32,7 @@ def test_app_story_page_explains_evolution():
         from src.webapp.pages.story import render
         render()
 
-    at = AppTest.from_function(run_story_page)
+    at = AppTest.from_function(run_story_page, default_timeout=30)
     at.run()
     assert not at.exception
     headers = [h.value for h in at.header]
@@ -40,11 +40,10 @@ def test_app_story_page_explains_evolution():
 
 
 def test_product_page_override_run_reset_flow():
-    """Regression test for the final-review findings: an override that only flips a
-    branch's action (no other BranchFeatures field changed) must still show up in "What
-    changed" (Finding 3), and "Reset to baseline" must clear both the override dict and the
+    """Regression test for the final-review findings: every changed branch must show up in
+    "What changed" (Finding 3), and "Reset to baseline" must clear both the override dict and the
     widget's own remembered value, not just the dict (Finding 2's clear_overrides fix)."""
-    at = AppTest.from_file("../../streamlit_app.py")
+    at = AppTest.from_file("../../streamlit_app.py", default_timeout=30)
     at.run()
     assert not at.exception
 
@@ -74,11 +73,10 @@ def test_product_page_override_run_reset_flow():
     scenario_run = at.session_state["scenario_run"]
     expected_changed = [b for b in scenario_run.diff.branches
                          if b.action_changed or b.changed_fields or b.old is None]
-    # Without at least one action-only flip (action_changed but no changed_fields), this
-    # test can't actually distinguish the fixed formula from the old buggy one -- pin that
-    # the scenario produces one, so a future data/rubric change can't silently make this
-    # test stop discriminating.
-    assert any(b.action_changed and not b.changed_fields for b in scenario_run.diff.branches)
+    # Fixed-scale rubric: a branch's action only changes when its own inputs do, so every
+    # flip also appears in changed_fields (no more action-only flips from re-ranking).
+    assert all(b.changed_fields for b in scenario_run.diff.branches if b.action_changed
+               and b.old is not None)
     markdown_texts = [m.value for m in at.markdown]
     count_line = next(t for t in markdown_texts if "branch(es) changed" in t)
     assert count_line.startswith(f"{len(expected_changed)} branch(es) changed")

@@ -4,7 +4,17 @@ import json
 
 from src.config import Settings
 from src.config import settings as default_settings
-from src.models import BranchFeatures, Community, CommunityAssignment, Decision, NetworkStats
+from src.features.build import load_competitors
+from src.models import (
+    BranchFeatures,
+    Community,
+    CommunityAssignment,
+    CommunityFeatures,
+    Competitor,
+    Decision,
+    NetworkStats,
+    OpportunityDecision,
+)
 
 
 @dataclasses.dataclass
@@ -14,12 +24,17 @@ class BaselineData:
     assignments: list[CommunityAssignment]
     communities: list[Community]
     network: NetworkStats
-    model_backend: str
+    community_features: list[CommunityFeatures]
+    opportunities: list[OpportunityDecision]
+    competitors: list[Competitor]
     data_sources: dict[str, str]
     pipeline_run_at: datetime.datetime
 
     def decision_for(self, branch_id: str) -> Decision | None:
         return next((d for d in self.decisions if d.branch_id == branch_id), None)
+
+    def opportunity_for(self, community_id: str) -> OpportunityDecision | None:
+        return next((o for o in self.opportunities if o.community_id == community_id), None)
 
     def communities_by_id(self) -> dict[str, Community]:
         return {c.id: c for c in self.communities}
@@ -30,15 +45,17 @@ def _ensure_baseline(settings: Settings) -> None:
     # data/processed/baseline/ -- it's gitignored, generated output. Generate it from the
     # committed seed data the first time it's missing, so the app is self-contained rather
     # than depending on someone having run `just all` first. Idempotent: once the file
-    # exists, every later load_baseline() call skips straight past this. Falls back to the
-    # rubric backend automatically when no ANTHROPIC_API_KEY is configured (existing
-    # resolve_backend behavior), so a fresh public deploy never silently spends API budget.
+    # exists, every later load_baseline() call skips straight past this.
     # run_meta.json is the LAST file model/run.py writes -- checking for it (not
     # branch_features.json, written earlier by the features stage) means a baseline that
-    # failed partway through generation (e.g. a transient LLM API error) is recognized as
-    # incomplete and retried on the next load, rather than permanently wedged with a
-    # present branch_features.json but a missing decisions.json.
-    if (settings.processed_dir / "run_meta.json").exists():
+    # failed partway through generation is recognized as incomplete and retried on the
+    # next load, rather than permanently wedged with a missing decisions.json. A baseline
+    # from an older pipeline version is regenerated the same way.
+    from src.model.run import PIPELINE_VERSION
+
+    run_meta = settings.processed_dir / "run_meta.json"
+    if (run_meta.exists()
+            and json.loads(run_meta.read_text()).get("pipeline_version") == PIPELINE_VERSION):
         return
     from src.scenario.baseline import main as generate_baseline
     generate_baseline(settings)
@@ -59,22 +76,24 @@ def load_baseline(settings: Settings | None = None) -> BaselineData:
     communities = [Community(**c) for c in
                    json.loads((processed_dir / "communities.json").read_text())]
 
-    run_meta_path = processed_dir / "run_meta.json"
-    if run_meta_path.exists():
-        model_backend = json.loads(run_meta_path.read_text())["model_backend"]
-    else:
-        model_backend = settings.model_backend
+    community_features = [CommunityFeatures(**c) for c in
+                          json.loads((processed_dir / "community_features.json").read_text())]
+    opportunities = [OpportunityDecision(**o) for o in
+                     json.loads((processed_dir / "opportunities.json").read_text())]
 
     data_sources = {
         "branches": "seed" if not settings.enable_scrape else "seed (scrape unimplemented)",
         "communities": "seed" if not settings.dubai_pulse_enabled
                         else "seed (pulse unimplemented)",
+        "competitors": "OpenStreetMap seed",
     }
     mtime = (processed_dir / "branch_features.json").stat().st_mtime
 
     return BaselineData(
         features=features, decisions=decisions, assignments=assignments,
-        communities=communities, network=network, model_backend=model_backend,
+        communities=communities, network=network,
+        community_features=community_features, opportunities=opportunities,
+        competitors=load_competitors(settings.raw_dir),
         data_sources=data_sources,
         pipeline_run_at=datetime.datetime.fromtimestamp(mtime, tz=datetime.UTC),
     )

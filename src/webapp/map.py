@@ -18,13 +18,26 @@ import math
 
 import pydeck as pdk
 
-from src.models import BranchFeatures, Community, CommunityAssignment, Decision
+from src.models import (
+    BranchFeatures,
+    Community,
+    CommunityAssignment,
+    CommunityFeatures,
+    Competitor,
+    Decision,
+    OpportunityDecision,
+)
 from src.scenario.models import ScenarioDiff
 
 ACTION_COLORS: dict[str, list[int]] = {
     "PROTECT": [46, 125, 50],
     "HOLD": [249, 168, 37],
     "SHRINK": [198, 40, 40],
+}
+OPPORTUNITY_COLORS: dict[str, list[int]] = {
+    "GROW": [21, 101, 192],
+    "WATCH": [142, 36, 170],
+    "SKIP": [189, 189, 189],
 }
 DEFAULT_COLOR = [153, 153, 153]
 DUBAI_VIEW = pdk.ViewState(latitude=25.2048, longitude=55.2708, zoom=11)
@@ -145,6 +158,34 @@ def diff_highlight_layers(diff: ScenarioDiff, features: list[BranchFeatures]) ->
                   get_target_position="target", get_color=[21, 101, 192], get_width=2,
                   id="diff-relocations"),
     ]
+
+
+def opportunity_layer(communities: list[CommunityFeatures],
+                      opportunities: list[OpportunityDecision]) -> pdk.Layer:
+    action_by_id = {o.community_id: o.action for o in opportunities}
+    rows = []
+    for c in communities:
+        action = action_by_id.get(c.community_id, "SKIP")
+        rows.append({
+            "community_id": c.community_id, "name": c.name, "lat": c.lat, "lng": c.lng,
+            "action": action, "radius": 9 if action == "GROW" else 7,
+            "color": [*OPPORTUNITY_COLORS[action], 90 if action == "SKIP" else 200],
+        })
+    return pdk.Layer(
+        "ScatterplotLayer", data=rows, get_position=["lng", "lat"], get_radius="radius",
+        radius_units=_PIXELS, get_fill_color="color", pickable=True, stroked=True,
+        get_line_color=[255, 255, 255], line_width_min_pixels=1, id="opportunities",
+    )
+
+
+def competitor_layer(competitors: list[Competitor]) -> pdk.Layer:
+    rows = [{"name": k.name or "(unnamed salon)", "action": "competitor",
+             "lat": k.lat, "lng": k.lng} for k in competitors]
+    return pdk.Layer(
+        "ScatterplotLayer", data=rows, get_position=["lng", "lat"], get_radius=2,
+        radius_units=_PIXELS, get_fill_color=[66, 66, 66, 140], pickable=True,
+        id="competitors",
+    )
 
 
 def build_deck(layers: list[pdk.Layer]) -> pdk.Deck:

@@ -29,32 +29,18 @@ def _init_session_state() -> None:
     st.session_state.setdefault("branch_overrides", {})
     st.session_state.setdefault("community_overrides", {})
     st.session_state.setdefault("contest_ratio", _baseline_contest_ratio())
-    st.session_state.setdefault("model_backend", "rubric")
     st.session_state.setdefault("widget_reset_nonce", 0)
 
 
 def render_assumptions() -> None:
     _init_session_state()
     st.session_state["contest_ratio"] = st.slider(
-        "Contest ratio", min_value=1.0, max_value=2.0,
+        "Contest ratio (cannibalisation threshold)", min_value=1.0, max_value=2.0,
         value=st.session_state["contest_ratio"], step=0.05,
-        help="A community counts as 'contested' when its second-nearest branch is within "
-             "this ratio of its nearest. Starts at baseline's own value -- an untouched "
-             "slider means this axis isn't part of your scenario.",
-    )
-    # llm costs real, paid API calls per branch -- only offer it when a key is actually
-    # configured, so a public deploy with no key can't be driven into a confusing silent
-    # rubric fallback, and a public deploy WITH a key can't have its budget spent by every
-    # visitor's every scenario without that being the key-holder's deliberate choice.
-    backend_options = ["rubric", "llm"] if default_settings.anthropic_api_key else ["rubric"]
-    if st.session_state["model_backend"] not in backend_options:
-        st.session_state["model_backend"] = "rubric"
-    st.session_state["model_backend"] = st.radio(
-        "Decision backend", options=backend_options,
-        index=backend_options.index(st.session_state["model_backend"]),
-        help="rubric is free, instant, and deterministic. llm costs a real API call per "
-             "branch and needs ANTHROPIC_API_KEY configured -- its cache never helps across "
-             "different scenarios, so rubric is the default for perturbation runs.",
+        help="Cannibalisation threshold: a community counts as contested when its "
+             "second-nearest branch is within this ratio of its nearest. Starts at "
+             "baseline's own value -- an untouched slider means this axis isn't part of "
+             "your scenario.",
     )
 
 
@@ -118,7 +104,6 @@ def clear_overrides() -> None:
     st.session_state["branch_overrides"] = {}
     st.session_state["community_overrides"] = {}
     st.session_state["contest_ratio"] = _baseline_contest_ratio()
-    st.session_state["model_backend"] = "rubric"
     # Forces every value-holding widget in render_branch_override() to remount on the next
     # run (new key = new component) instead of visually keeping its last displayed value.
     st.session_state["widget_reset_nonce"] = st.session_state.get("widget_reset_nonce", 0) + 1
@@ -130,7 +115,6 @@ def build_scenario(name: str = "live-scenario") -> Scenario:
         name=name,
         assumptions=ScenarioAssumptions(
             contest_ratio=st.session_state["contest_ratio"],
-            model_backend=st.session_state["model_backend"],
         ),
         overrides=ScenarioOverrides(
             branches=st.session_state["branch_overrides"],
