@@ -21,6 +21,8 @@ class BaselineAssumptions(BaseModel):
     fallback_price_aed: float = 99.0
     # Drive time a customer will travel to a salon; sources in data/seed/v3/SOURCES.md.
     travel_time_minutes: dict[str, int] = {"low": 10, "medium": 15, "high": 20}
+    # Departure time for traffic-aware isochrones (Mapbox driving-traffic), local time.
+    isochrone_depart_at: str = "2026-10-13T12:00"
     # Price segment: Bedashing's assumed Google price level, and the competitor levels
     # that count as its market. See data/seed/v3/SOURCES.md, "Price segment".
     bedashing_price_level: str = "expensive"

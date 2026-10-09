@@ -170,7 +170,10 @@ residential share rebalanced per emirate. Tests: `tests/scripts/test_cells.py`.
 - [x] **Step 3: Notebook** `notebooks/market_size.ipynb`: the model structure and every assumption, with its reasons (the user asked for this to live next to the data); WorldPop emirate totals; the flat 33.6% finding; the calibration table; **validation**: modelled female share vs measured for the 21 measured communities located by OSM place points (MAE 0.21 → 0.13; unmapped camps such as DIP and Sonapur are missed); the women per cell map; how much the correction moves women near each lounge (low/medium/high).
 - [x] **Step 4:** `SOURCES.md` "Market size" section, README table rows (3, 4, 5, new 13), commit.
 
-### Task 3: Lounge catchments and cell reach (drive-time isochrones)
+### Task 3: Lounge catchments and cell reach (drive-time isochrones) — DONE 2026-10-08
+
+**Changed during execution:** openrouteservice's free key allowed only ~250 isochrones a day (counted per location), so the script moved to the **Mapbox Isochrone API** (`driving-traffic`, typical traffic at `isochrone_depart_at`, weekday 12:00; 2 requests per lounge, 1 per cell). Results: 257 / 542 / 810 catchment cells at 10 / 15 / 20 min; all 120 lounge and 2,430 cell polygons; 30-min search area 8,320 km². Committed polygons are simplified to ~200 m; memberships use the full-detail polygons from the cache. The ORS mentions in the steps below are historical.
+
 
 **Files:** Create `scripts/fetch_isochrones.py`. Outputs: `lounge_isochrones.geojson`, `cell_isochrones.geojson`, `catchment_cells.csv`.
 
@@ -182,8 +185,8 @@ residential share rebalanced per emirate. Tests: `tests/scripts/test_cells.py`.
   - `cell_isochrones.geojson`: per catchment cell (any level), one polygon per catchment level, properties `cell_id, level, minutes`.
   - `reaches(isochrone: Polygon, points: dict[str, tuple[float, float]]) -> list[str]`.
 
-- [ ] **Step 1: Key.** openrouteservice isochrones (free key; ~500 requests a day; 5 locations and up to 10 ranges per request). The user creates the key and adds `ORS_API_KEY` to `.env` and `src/config.py`. Cache every response in `data/raw/isochrone_cache/`. Typical traffic only: say so in `SOURCES.md`.
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 1: Key.** openrouteservice isochrones (free key; ~500 requests a day; 5 locations and up to 10 ranges per request). The user creates the key and adds `ORS_API_KEY` to `.env` and `src/config.py`. Cache every response in `data/raw/isochrone_cache/`. Typical traffic only: say so in `SOURCES.md`.
+- [x] **Step 2: Write the failing test**
 
 ```python
 # tests/scripts/test_isochrones.py
@@ -197,11 +200,11 @@ def test_reaches_returns_points_inside_only():
     pts = {"in": (25.05, 55.05), "out": (25.2, 55.2)}   # (lat, lng)
     assert reaches(square, pts) == ["in"]
 ```
-- [ ] **Step 3:** Run it. Expected: FAIL. Implement `reaches` (shapely points are `(lng, lat)`). Run again. Expected: PASS.
-- [ ] **Step 4: Lounge isochrones** (24 lounges ÷ 5 = 5 requests). Compute `catchment_cells.csv`. **Report the count of catchment cells** (at the high level) before Step 5: cell isochrones cost (cells ÷ 5) requests; if that exceeds ~450, ask the user (options: medium level only, or two days of quota).
-- [ ] **Step 5: Cell isochrones** for every catchment cell, all three levels per request.
-- [ ] **Step 6: Vet** in `notebooks/catchments.ipynb`: each lounge's catchment polygon and cells on a map; women per catchment at each level (with the worker-housing correction at low/medium/high); lounges sharing cells (cannibalisation); the 30-min competitor bounds (the Task 4 sweep area, in km²); populated cells outside every catchment (growth candidates).
-- [ ] **Step 7:** `SOURCES.md` row, commit.
+- [x] **Step 3:** Run it. Expected: FAIL. Implement `reaches` (shapely points are `(lng, lat)`). Run again. Expected: PASS.
+- [x] **Step 4: Lounge isochrones** (24 lounges ÷ 5 = 5 requests). Compute `catchment_cells.csv`. **Report the count of catchment cells** (at the high level) before Step 5: cell isochrones cost (cells ÷ 5) requests; if that exceeds ~450, ask the user (options: medium level only, or two days of quota).
+- [x] **Step 5: Cell isochrones** for every catchment cell, all three levels per request.
+- [x] **Step 6: Vet** in `notebooks/catchments.ipynb`: each lounge's catchment polygon and cells on a map; women per catchment at each level (with the worker-housing correction at low/medium/high); lounges sharing cells (cannibalisation); the 30-min competitor bounds (the Task 4 sweep area, in km²); populated cells outside every catchment (growth candidates).
+- [x] **Step 7:** `SOURCES.md` row, commit.
 
 ### Task 4: Every salon within 2x travel time of a lounge, with ratings, review counts and prices
 
@@ -298,7 +301,7 @@ def test_impute_unknown_when_nothing_priced():
 ```
 - [ ] **Step 2:** Run them. Expected: FAIL. Implement `split`, `dedupe`, `fetch_tile`, `tag_bedashing`, `impute_price_levels` and the tiling loop. For an even count of levels, take the lower median (the conservative choice: it doesn't inflate a neighbourhood's price). Run again. Expected: PASS.
 - [ ] **Step 3: Probe (ask the user first, about 10-20 calls).** One dense tile (Al Barsha) and one sparse one (Al Dhafra). Report calls per km², salons found, tiles hitting the cap, the `primary_type` mix, and **price-level coverage** (share of salons with a Google `priceLevel`, by level). Extrapolate over the sweep area's km² to a cost estimate. **Budget warning:** `review_count` is an Enterprise-tier field, so every call bills at Enterprise (1,000 free a month, then $35 per 1,000), and 30-min zones around 24 lounges cover much of the urban UAE. Expect roughly 1,000-3,000 calls, so possibly $0-70. **Stop and get approval.** Ways to cut it: sweep only the medium (30 min) bound, not the high one (40 min), or split the run across two calendar months.
-- [ ] **Step 4:** Full run with `MAX_CALLS` set to the approved estimate plus 20%. Then compute `salon_reach.csv` with `reaches` for every cell isochrone.
+- [ ] **Step 4:** Full run with `MAX_CALLS` set to the approved estimate plus 20%. Then compute `salon_reach.csv` with `reaches` for every cell isochrone, using the **full-detail** polygons from `data/raw/isochrone_cache/mapbox/` (via `scripts.fetch_isochrones.polygons`, which reads the cache), not the simplified committed file.
 - [ ] **Step 5: Vet** in `notebooks/salons.ipynb`: price-level coverage by emirate and the share imputed per source; how many competitors survive the price filter per lounge, at `[expensive]` and at the wider `[moderate, expensive, very_expensive]` (if the strict filter leaves most lounges with almost no competitors, raise it with the user before integration); Bedashing's lounges' own Google price levels, if any (a check on the `expensive` assumption); salons per lounge catchment and per 10k women; the review-count distribution (competitors vs. Bedashing: how big is Bedashing's review advantage, i.e. the chain-solicitation caveat?); the `excluded_reason` counts; neighbourhoods reached by zero salons or only zero-review salons; Google vs. the old OSM count for Dubai.
 - [ ] **Step 6:** Add `SOURCES.md` rows (competitive-set rules, price fields and imputation, 30-day terms caveat, home-service limitation) and commit.
 

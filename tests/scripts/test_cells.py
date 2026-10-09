@@ -26,3 +26,15 @@ def test_residential_share_clipped_to_valid_range():
 def test_market_women_splits_worker_and_residential():
     assert market_women(adults=1000, worker_adults=400, worker_share=0.05,
                         resid_share=0.45) == 0.05 * 400 + 0.45 * 600
+
+
+def test_women_15plus_keeps_each_emirate_total():
+    import pandas as pd
+    from scripts.build_cells import women_15plus
+    cells = pd.DataFrame({"emirate": ["Dubai", "Dubai"], "adults": [1000, 1000],
+                          "adults_worker": [800, 0], "women_worldpop": [336, 336]})
+    emirates = pd.DataFrame({"adults": [2000], "women_worldpop": [672], "worker_adults": [800]},
+                            index=["Dubai"])
+    w = women_15plus(cells, emirates, worker_share=0.05)
+    assert round(w.sum()) == 672           # same women, moved between cells
+    assert w[0] < 336 < w[1]               # out of worker housing, into the residential cell

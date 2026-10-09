@@ -108,3 +108,22 @@ assumptions, validation).
   Names from OSM admin boundaries (level 10, then 8, 2026-07-28 snapshot) or the nearest OSM place
   within 3 km. Cells, not official neighbourhoods, because OSM neighbourhoods cover 66% of
   Dubai's women, Sharjah's are whole towns and Fujairah has none.
+
+## Catchments (`lounge_isochrones.geojson`, `catchment_cells.csv`, `cell_isochrones.geojson`, fetched 2026-10-08)
+
+Script: `scripts/fetch_isochrones.py`. Notebook: `notebooks/catchments.ipynb`.
+
+- **Source:** Mapbox Isochrone API, profile `driving-traffic`, `depart_at` 2026-10-13T12:00 (a
+  weekday midday: Mapbox's typical traffic at that time). `isochrone_depart_at` in `baseline.yaml`.
+- **Lounges:** 24 x {10, 15, 20, 30, 40} min (catchment levels, plus 2x each as the competitor
+  search bound). 48 requests.
+- **Catchment cells:** cells whose centre is inside a lounge's polygon: 257 / 542 / 810 at
+  10 / 15 / 20 min.
+- **Cells:** each of the 810 catchment cells x {10, 15, 20} min, starting from the cell (customers
+  drive from home). 810 requests.
+- Polygons are simplified to ~200 m in the committed files; memberships are computed on the
+  full-detail polygons (cached in `data/raw/isochrone_cache/mapbox/`).
+- **Tried first: openrouteservice.** Its free key allows ~250 isochrones a day, counted per
+  location (not per request); 810 cells would have taken 3+ days, and it has no traffic model.
+- **Limitations:** typical midday traffic, not rush hour (TomTom 2025: Dubai evening trips take
+  ~40% longer, so after-work catchments are smaller); cell membership by centre point.

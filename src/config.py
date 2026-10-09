@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = None
     anthropic_model: str = "claude-opus-5-5"
     google_maps_api_key: str | None = None
+    mapbox_access_token: str | None = None
 
 
 settings = Settings()

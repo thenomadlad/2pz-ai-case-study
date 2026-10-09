@@ -54,6 +54,15 @@ def market_women(adults, worker_adults, worker_share, resid_share):
     return worker_share * worker_adults + resid_share * (adults - worker_adults)
 
 
+def women_15plus(cells, emirates, worker_share: float):
+    """Women 15+ per cell (pandas): worker housing at worker_share, the rest of each emirate
+    rebalanced so its WorldPop female total is unchanged. `emirates` is emirates.csv indexed
+    by emirate."""
+    resid = {e: residential_share(r.women_worldpop, r.adults, r.worker_adults, worker_share)
+             for e, r in emirates.iterrows()}
+    return market_women(cells.adults, cells.adults_worker, worker_share, cells.emirate.map(resid))
+
+
 def _polygons(elements: list[dict]):
     """OSM ways/relations with geometry -> shapely polygons (outer rings only)."""
     from shapely.geometry import LineString, Polygon

@@ -11,6 +11,9 @@ assumptions:
     low: 10     # core convenience trade area; nail top-ups are proximity-driven
     medium: 15  # BrightLocal 2014: ~14 min average for hair/beauty salons
     high: 20    # women travel ~5 min longer than men; loyal clients go further
+  # Drive times use Mapbox's typical traffic at this local departure time (a weekday midday).
+  # A weekday 18:00 (after-work peak, when salon demand is high) gives smaller catchments.
+  isochrone_depart_at: "2026-10-13T12:00"
   # Price segment. Bedashing's level is assumed (Google has no price data for its lounges;
   # revisit from its own menu). Only competitors at a comparable level share its market;
   # missing competitor levels are imputed (neighbourhood, then emirate median). Levels are
