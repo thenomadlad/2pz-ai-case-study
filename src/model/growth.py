@@ -24,7 +24,7 @@ WHY = {
     "MIN_COVERAGE": "Under half the women in searched cells, the saturation figure describes the minority.",
     "UNSATURATED_PER_1K": (
         "PROPOSAL, pending the user's review. Every lounge catchment with a real premium market "
-        "(10+ premium salons) has 88+ premium reviews per 1k women (al-jada 88, median 216); the two "
+        "(10+ premium salons) has 88+ premium reviews per 1k women (al-jada 88, median 220); the two "
         "thin ones are 10 and 27. Growth areas of 5k+ women have a median of 5 and a 75th percentile "
         "of 54. 50 is under the least crowded working catchment by a wide margin and splits the "
         "growth areas into the empty majority and the ones with an established premium scene."),
