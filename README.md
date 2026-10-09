@@ -139,7 +139,7 @@ The live app above still runs on the old data until the refresh is wired in. Bel
 assumption the new data and market model rest on, with its evidence. Full sources, fetch dates
 and caveats are in [`data/seed/v3/SOURCES.md`](data/seed/v3/SOURCES.md); the tunable values are in
 [`data/scenarios/baseline.yaml`](data/scenarios/baseline.yaml); the work plan is
-[`docs/superpowers/plans/2026-10-08-data-refresh.md`](docs/superpowers/plans/2026-10-08-data-refresh.md).
+[`docs/superpowers/plans/2026-10-08-data-refresh.md`](docs/superpowers/plans/2026-10-08-data-refresh.md). What data we have and what's missing, with the cost of filling each gap: [`docs/data-inventory.md`](docs/data-inventory.md).
 
 Status: **in data** = fetched and committed · **set** = value chosen, used once the data lands · **planned** = method agreed, data not fetched yet · **estimate** = a calibrated guess, to be replaced with better data.
 
