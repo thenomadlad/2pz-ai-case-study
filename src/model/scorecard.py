@@ -61,11 +61,15 @@ def score(signal: Signal, value: float | None) -> float:
     return max(0.0, min(1.0, (value - signal.worst) / (signal.best - signal.worst)))
 
 
+LOW_MARGIN = 0.05   # composite this close to a line: low confidence
+HIGH_MARGIN = 0.10  # this far from both lines: high confidence
+
+
 def _confidence(composite: float, low: bool) -> str:
     margin = min(abs(composite - PROTECT_AT), abs(composite - SHRINK_AT))
-    if low or margin < 0.05:
+    if low or margin < LOW_MARGIN:
         return "low"
-    return "high" if margin >= 0.10 else "medium"
+    return "high" if margin >= HIGH_MARGIN else "medium"
 
 
 def _decide(f: LoungeFeatures, flips: int | None) -> Decision:

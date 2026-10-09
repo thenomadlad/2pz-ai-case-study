@@ -47,6 +47,8 @@ def render() -> None:
     st.markdown("We will iterate on this model: **the limitations matter more than the calls.** "
                 "Below: the limitations, how the model fits together, and every assumption and "
                 "threshold it uses.")
+    if data.active():
+        st.caption("The figures in the limitations below are at the baseline, not your what-if.")
     st.markdown(LIMITATIONS.read_text().split("\n", 1)[1])     # without its own title
 
     st.divider()
@@ -72,7 +74,8 @@ def render() -> None:
          "Why": "A missing rating gap, or capture in a thin market, scores neutral, never the worst."},
         {"Constant": "THIN_MARKET", "Value": f"{THIN_MARKET} premium salons",
          "Why": "Fewer premium salons than this: capture is a share of a tiny pool, so it is noise."},
-        {"Constant": "Confidence", "Value": "low within 0.05 of a line; high from 0.10",
+        {"Constant": "LOW_MARGIN / HIGH_MARGIN",
+         "Value": f"low within {scorecard.LOW_MARGIN} of a line; high from {scorecard.HIGH_MARGIN}",
          "Why": "Low also when the market is thin, the rating gap is missing, or the call flips "
                 f"{scorecard.FLIP_LOW}+ times."},
         {"Constant": "NOT_SCORED", "Value": ", ".join(sorted(NOT_SCORED)),

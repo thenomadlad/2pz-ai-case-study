@@ -65,13 +65,14 @@ def _legend(r, lounge: str | None) -> None:
                 "⚪ **NOT SCORED**: the airport lounge  \n"
                 "◯ **Hollow** = low confidence")
     st.caption("Composite: demand, cannibalisation, capture (weight 1 each) and rating (½), each "
-               f"0-1 on a fixed scale. Low confidence: within 0.05 of a line, thin market, missing "
-               f"rating, or the call changes in {scorecard.FLIP_LOW}+ of 27 assumption combinations.")
+               f"0-1 on a fixed scale. Low confidence: within {scorecard.LOW_MARGIN} of a line, thin market, "
+               "no rating gap (missing rating or no rated substitutes), or the call changes in "
+               f"{scorecard.FLIP_LOW}+ of 27 assumption combinations.")
     st.markdown(f"**Growth areas** (cells beyond a {data.minutes(r.levels)}-min drive of every lounge)")
     st.markdown(f"🔵 **GROW**: ≥ {growth.GROW_MIN_WOMEN:,} women, worker housing under "
                 f"{growth.WORKER_CAP:.0%}, *and* under {growth.UNSATURATED_PER_1K:g} premium reviews per "
                 f"1k women, with ≥ {growth.MIN_COVERAGE:.0%} of women searched  \n"
-                "🟣 **WATCH**: one of the two, or too little searched  \n"
+                "🟣 **WATCH**: one of the two, too little searched, or big but mostly worker housing  \n"
                 f"⚪ **SKIP**: neither, or under {growth.SKIP_UNDER_WOMEN:,} women")
     if lounge:
         st.markdown(f"**{lounge}**: its {data.minutes(r.levels)}-min drive polygon, catchment cells "
@@ -83,7 +84,7 @@ def _legend(r, lounge: str | None) -> None:
 def _lounge_panel(r, b: str) -> None:
     f = next((f for f in r.features if f.branch_id == b), None)
     if f is None:
-        st.caption(f"{b} is closed in this what-if.")
+        st.caption(f"{b} is closed in this what-if." if b in r.closed else f"Unknown lounge id: {b}.")
         return
     d = next(d for d in r.decisions if d.branch_id == b)
     exp, _ = explanation_for(r, "lounge", b)

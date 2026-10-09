@@ -28,6 +28,7 @@ def _sync() -> None:
 
 
 def _reset() -> None:
+    st.session_state.pop("wi-error", None)
     st.session_state["what_if"] = {"levels": Levels(), "closed": frozenset(), "recall": None}
 
 

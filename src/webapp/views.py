@@ -139,7 +139,7 @@ def limitations_box(r: Run) -> None:
             "(noya-plaza, 215 reviews) look weak partly because they are new. Reviews are a proxy for "
             "customers, not a count.\n"
             f"3. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
-            "lounges are low confidence: near a threshold, a thin market, a missing input, or a call "
+            "lounges are low confidence: near a threshold, a thin market, no rating gap (missing rating or no rated substitutes), or a call "
             f"that changes in {scorecard.FLIP_LOW}+ of the 27 assumption combinations. Try the what-if "
             "panel below.\n"
             f"4. **Growth areas are a first cut.** Competitor data is partial and the saturation line "
@@ -150,8 +150,8 @@ def limitations_box(r: Run) -> None:
 
 def near_threshold(d: Decision) -> str | None:
     for name, line in (("PROTECT", scorecard.PROTECT_AT), ("SHRINK", scorecard.SHRINK_AT)):
-        if abs(d.composite - line) < 0.05:
-            return (f"Composite {d.composite:.2f} is within 0.05 of the {name} line ({line}): a small "
+        if abs(d.composite - line) < scorecard.LOW_MARGIN:
+            return (f"Composite {d.composite:.2f} is within {scorecard.LOW_MARGIN} of the {name} line ({line}): a small "
                     "change in any input moves the call.")
     return None
 

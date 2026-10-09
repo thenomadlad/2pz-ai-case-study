@@ -39,3 +39,20 @@ def test_substitutes_are_sized_by_reviews():
                               {"name": "b", "lat": 25, "lng": 55, "review_count": 1600, "rating": None,
                                "premium_because": "y"}]).data
     assert rows[0]["radius"] < rows[1]["radius"]
+
+
+def test_pixel_units_serialise_as_literals_not_accessors():
+    """Regression: a bare "pixels" became the accessor "@@=pixels", deck.gl fell back to meters
+    and every marker filled the viewport."""
+    import json
+
+    from src.webapp.map import build_deck, flag_layer, lounge_layer
+    r = run()
+    sub = {"name": "a", "lat": 25, "lng": 55, "review_count": 16, "rating": 4.5, "premium_because": "x"}
+    deck = json.loads(build_deck([lounge_layer(r.features, r.decisions), substitutes_layer([sub]),
+                                  flag_layer(r.features)]).to_json())
+    layers = {x["id"]: x for x in deck["layers"]}
+    for lid in ("lounges", "substitutes"):
+        assert layers[lid]["radiusUnits"] == "pixels", lid
+    assert layers["lounges"]["lineWidthUnits"] == "pixels"
+    assert layers["lounge-flags"]["sizeUnits"] == "pixels"

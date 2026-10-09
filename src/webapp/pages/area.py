@@ -37,7 +37,8 @@ def _rule(a, d) -> None:
     cols[2].metric("Competitor data coverage", f"{a.data_coverage:.0%}")
     cols[2].caption(f"{_check(a.data_coverage >= growth.MIN_COVERAGE)} GROW needs ≥ "
                     f"{growth.MIN_COVERAGE:.0%} of the women in searched cells")
-    st.info(f"**GROW** needs both tests (and enough searched), **WATCH** one, **SKIP** neither; under "
+    st.info(f"**GROW** needs both tests (and enough searched), **WATCH** one (or big but mostly worker housing, "
+            f"{growth.WORKER_CAP:.0%}+ of adults, even when saturated), **SKIP** neither; under "
             f"{growth.SKIP_UNDER_WOMEN:,} women is always SKIP. {d.rationale}")
 
 
