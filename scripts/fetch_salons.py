@@ -31,6 +31,7 @@ Google's cap, so the recall correction can be computed for any grouping of cells
 
 Run: uv run --extra notebook python scripts/fetch_salons.py [--force]
      uv run --extra notebook python scripts/fetch_salons.py growth
+     uv run --extra notebook python scripts/fetch_salons.py pool    (offline: every cached salon -> salons.csv)
 """
 import csv
 import hashlib
@@ -157,25 +158,21 @@ def _read(name):
         return list(csv.DictReader(f))
 
 
-def main() -> None:
-    if (V3 / "salons.csv").exists() and "--force" not in sys.argv:
-        raise SystemExit(f"{V3 / 'salons.csv'} exists; pass --force to rebuild")
+def _medium_polygons(branches: list[dict]) -> tuple[dict, dict]:
+    """(branch_id -> full-detail medium-level polygon from the isochrone cache, levels)."""
     import yaml
     from shapely import make_valid
-    from shapely.geometry import Point, shape
+    from shapely.geometry import shape
     from scripts.fetch_isochrones import polygons, ranges_minutes
-
-    from shapely.ops import unary_union
-
-    places.MAX_CALLS = MAX_CALLS
     a = yaml.safe_load(open(ROOT / "data" / "scenarios" / "baseline.yaml"))["assumptions"]
     levels, depart_at = a["travel_time_minutes"], a["isochrone_depart_at"]
-    branches = _read("branches.csv")
-    polys = {b["branch_id"]: make_valid(shape(polygons(float(b["lat"]), float(b["lng"]),
-                                                       ranges_minutes(levels), depart_at)[levels["medium"]]))
-             for b in branches}                                         # from the isochrone cache
-    cs = circles(unary_union(list(polys.values())))
-    print(f"{len(cs)} circles of {CIRCLE_M} m cover the {levels['medium']}-min catchments")
+    return {b["branch_id"]: make_valid(shape(polygons(float(b["lat"]), float(b["lng"]),
+                                                      ranges_minutes(levels), depart_at)[levels["medium"]]))
+            for b in branches}, levels
+
+
+def build_pool(cs: list[tuple[float, float]], branches: list[dict], polys: dict) -> list[dict]:
+    """Every salon from the cached circle responses and text searches, plus the lounges."""
     found = []
     for i, (lat, lng) in enumerate(cs, start=1):
         found += fetch_circle(lat, lng, CIRCLE_M, CACHE)
@@ -189,7 +186,21 @@ def main() -> None:
               "review_count": o["review_count"], "status": o["status"], "primary_type": "beauty_salon",
               "price_level": "", "price_low_aed": None, "price_high_aed": None}
              for o in branches if o["place_id"]]
-    pool = tag_bedashing(dedupe(pool), branches)
+    return tag_bedashing(dedupe(pool), branches)
+
+
+def main() -> None:
+    if (V3 / "salons.csv").exists() and "--force" not in sys.argv:
+        raise SystemExit(f"{V3 / 'salons.csv'} exists; pass --force to rebuild")
+    from shapely.geometry import Point
+    from shapely.ops import unary_union
+
+    places.MAX_CALLS = MAX_CALLS
+    branches = _read("branches.csv")
+    polys, levels = _medium_polygons(branches)                          # from the isochrone cache
+    cs = circles(unary_union(list(polys.values())))
+    print(f"{len(cs)} circles of {CIRCLE_M} m cover the {levels['medium']}-min catchments")
+    pool = build_pool(cs, branches, polys)
     today = date.today().isoformat()
     salons, pairs = {}, []
     for b in branches:
@@ -277,5 +288,24 @@ def growth() -> None:
           f"from {len(cs)} circles ({sum(r['full'] for r in circle_rows)} full); {places.calls} billed calls")
 
 
+def pool() -> None:
+    """Offline: rewrite salons.csv with every salon in the cache (all circles, no polygon filter)."""
+    places.MAX_CALLS = 0                                               # a cache miss raises
+    branches = _read("branches.csv")
+    polys, _ = _medium_polygons(branches)
+    cs = [(float(r["lat"]), float(r["lng"])) for r in _read("search_circles.csv")]
+    today = date.today().isoformat()
+    rows = [r | {"excluded_reason": excluded_reason(r), "fetched_at": today}
+            for r in build_pool(cs, branches, polys)]
+    rows = dedupe(rows + _read("growth_salons.csv"))
+    fields = _read("salons.csv")[0].keys()                             # keep the column order
+    with open(V3 / "salons.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(fields))
+        w.writeheader()
+        w.writerows(rows)
+    print(f"wrote {len(rows)} salons ({sum(1 for r in rows if not r['excluded_reason'])} candidates); "
+          f"{places.calls} billed calls")
+
+
 if __name__ == "__main__":
-    growth() if sys.argv[1:2] == ["growth"] else main()
+    {"growth": growth, "pool": pool}.get(sys.argv[1] if len(sys.argv) > 1 else "", main)()
