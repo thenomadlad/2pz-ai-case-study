@@ -21,6 +21,7 @@ notebook = [
     "matplotlib>=3.11.2",
     "nbconvert>=7.17.1",
     "pandas>=3.0.6",
+    "scipy>=1.17.1",
 ]
 
 [tool.pytest.ini_options]

@@ -5,3 +5,15 @@ assumptions:
   contest_ratio: 1.25
   global_female_share: 0.49
   fallback_price_aed: 99.0
+  # Catchment = drive time a customer will travel to a lounge (typical traffic, not rush
+  # hour). Evidence and caveats: data/seed/v3/SOURCES.md, "Catchment travel time".
+  travel_time_minutes:
+    low: 10     # core convenience trade area; nail top-ups are proximity-driven
+    medium: 15  # BrightLocal 2014: ~14 min average for hair/beauty salons
+    high: 20    # women travel ~5 min longer than men; loyal clients go further
+  # Price segment. Bedashing's level is assumed (Google has no price data for its lounges;
+  # revisit from its own menu). Only competitors at a comparable level share its market;
+  # missing competitor levels are imputed (neighbourhood, then emirate median). Levels are
+  # Google's: inexpensive, moderate, expensive, very_expensive.
+  bedashing_price_level: expensive
+  comparable_price_levels: [expensive]   # strict; the salons notebook also tests a wider band

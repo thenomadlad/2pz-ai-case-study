@@ -19,6 +19,12 @@ class BaselineAssumptions(BaseModel):
     contest_ratio: float = 1.25
     global_female_share: float = 0.49
     fallback_price_aed: float = 99.0
+    # Drive time a customer will travel to a salon; sources in data/seed/v3/SOURCES.md.
+    travel_time_minutes: dict[str, int] = {"low": 10, "medium": 15, "high": 20}
+    # Price segment: Bedashing's assumed Google price level, and the competitor levels
+    # that count as its market. See data/seed/v3/SOURCES.md, "Price segment".
+    bedashing_price_level: str = "expensive"
+    comparable_price_levels: list[str] = ["expensive"]
 
 
 class ScenarioAssumptions(BaseModel):

@@ -131,3 +131,36 @@ CONTEXT.md                 glossary of domain terms
 ```
 
 Commands: `just all` (rebuild the baseline) · `just app` · `just explain` · `just scenario data/scenarios/example-perturbations.yaml` · `just test`.
+
+## Assumptions and evidence (data refresh, in progress)
+
+A data refresh is replacing the hand-curated seed: 4 of its 9 "Dubai branches" don't exist.
+The live app above still runs on the old data until the refresh is wired in. Below is every
+assumption the new data and market model rest on, with its evidence. Full sources, fetch dates
+and caveats are in [`data/seed/v3/SOURCES.md`](data/seed/v3/SOURCES.md); the tunable values are in
+[`data/scenarios/baseline.yaml`](data/scenarios/baseline.yaml); the work plan is
+[`docs/superpowers/plans/2026-10-08-data-refresh.md`](docs/superpowers/plans/2026-10-08-data-refresh.md).
+
+Status: **in data** = fetched and committed · **set** = value chosen, used once the data lands · **planned** = method agreed, data not fetched yet.
+
+| # | Assumption | Value | Evidence / reasoning | Status |
+|---|---|---|---|---|
+| 1 | **Which lounges exist** | 24 UAE lounges: Abu Dhabi 15, Dubai 5, Sharjah 2, RAK 1, Fujairah 1 | Bedashing's own store locator (bedashingbeauty.com/lounges). All 24 matched an operational Google Maps listing | in data |
+| 2 | **Where each lounge is** | Google Maps pin, not the store locator's | The locator's pins are off by up to 16 km (Shahama 15.9, Al Ain 8.4, Nad Al Sheba 4.8 km); its street addresses agree with Google | in data |
+| 3 | **Catchment = drive time** a customer will travel | 10 / **15** / 20 min (low / medium / high), typical traffic | BrightLocal 2014 (US, 800+ consumers): ~14 min to a hair/beauty salon, women ~5 min more than men. Retail trade-area practice: the primary trade area (50-80% of customers) is a 5-15 min drive. No UAE-specific survey found. TomTom 2025: a Dubai trip takes ~40% longer at evening rush (27 vs 19 min per 10 km), so real catchments are smaller after work | set |
+| 4 | **Market size** of a neighbourhood | Its female population | Only relative size matters. The sex split must be real: the old flat 49% badly overstated worker-housing areas. Source: WorldPop sex-disaggregated population grids | planned |
+| 5 | **How the market is shared** | Each neighbourhood's market is split among every salon that can reach it, in proportion to lifetime Google review count | Review count stands in for each salon's draw (revealed preference). Splitting per neighbourhood, not per catchment, means overlapping catchments can't double-count, and nearby lounges split the same customers (cannibalisation) | planned |
+| 6 | **Review counts are lifetime totals** | Google `userRatingCount`, not adjusted for age | Older salons have had longer to collect reviews: a stated limitation. Partly a fair signal too: years of trading build a customer base. Per-year rates were considered and dropped: Google can't sort reviews oldest-first, so the first review needs a full scrape (unaffordable for competitors, and against Google's terms) | in data (lounges) |
+| 7 | **Ratings don't separate lounges** | Not used as an absolute quality score | Google ratings for the 24 lounges span 4.4-4.9 (median 4.6, std 0.12); 17 of 24 sit at 4.5 or 4.6. No link to review count (Spearman ρ = −0.22, p = 0.30) | in data |
+| 8 | **Bedashing's price segment** | `expensive` (assumed) | Google has no price level for Bedashing's lounges; to be revisited from its own menu | set |
+| 9 | **Comparable competitors** | Only salons at Google price level `expensive` (strict; a wider band is tested) | Google `priceLevel` is crowd-sourced spend per person. Probe near Al Barsha: 9 of 19 competitors had one (6 moderate, 1 expensive, 2 very expensive) | set |
+| 10 | **Missing competitor prices** | Imputed: neighbourhood median level, then emirate median, else kept as comparable | Missing data must never quietly remove competition. Imputation smooths over mixed neighbourhoods: a stated limitation | planned |
+| 11 | **Competitive set** | Women's beauty, hair and nail salons. Men-only and closed salons excluded (kept with a reason) | Bedashing is a women's beauty lounge. Home-service salons, common in the UAE, are invisible in the data: a stated limitation | planned |
+| 12 | **Airport lounge** | Excluded from market measures | It serves travellers, not a neighbourhood | set |
+
+**Known limitations of the market model.** There's no distance decay inside the drive time:
+every reachable salon competes equally (a Huff gravity model is the natural upgrade, and the
+three travel-time levels are the sensitivity check). Chains likely push for more reviews than
+independents, which inflates Bedashing's share. Income and nationality mix are ignored. Mall
+lounges draw beyond their drive-time zone. There's still no revenue, rent or capex data, so
+nothing here measures return on capital.

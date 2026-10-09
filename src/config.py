@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     fallback_price_aed: float = 99.0
     anthropic_api_key: str | None = None
     anthropic_model: str = "claude-opus-5-5"
+    google_maps_api_key: str | None = None
 
 
 settings = Settings()

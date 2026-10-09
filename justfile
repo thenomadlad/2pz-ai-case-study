@@ -27,7 +27,7 @@ clean:
 
 # Open the data-vetting notebook in JupyterLab
 notebook:
-    uv run --extra notebook jupyter lab notebooks/vet_data.ipynb
+    uv run --extra notebook jupyter lab notebooks/branches.ipynb
 
 test:
     uv run --extra dev pytest
