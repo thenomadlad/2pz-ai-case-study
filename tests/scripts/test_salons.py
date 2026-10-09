@@ -86,3 +86,10 @@ def test_cached_circle_is_not_rebilled(tmp_path, monkeypatch):
     f.fetch_circle(25.0, 55.0, 1500, tmp_path)
     f.fetch_circle(25.0, 55.0, 1500, tmp_path)
     assert len(calls) == 1
+
+
+def test_arabic_mens_salon_names_are_men_only():
+    ok = {"status": "OPERATIONAL", "primary_type": "hair_salon"}
+    assert excluded_reason(ok | {"name": "حلاق تركي hair cut"}) == "men-only"              # barber
+    assert excluded_reason(ok | {"name": "صالون المشاهير للحلاقة الرجالية"}) == "men-only"  # men's
+    assert excluded_reason(ok | {"name": "صالون نونه ستايل للسيدات"}) == ""               # ladies'

@@ -43,7 +43,8 @@ QUERIES = ("beauty salon", "ladies salon")   # the earlier text searches, merged
 CIRCLE_M = 1800        # 576 circles for the 15-min catchments: inside the free tier (1,500 m needed 770)
 MAX_CALLS = 620        # ~330 of the month's 1,000 free calls were already used
 SALON_TYPES = {"beauty_salon", "hair_salon", "nail_salon", "beautician", "hair_care"}
-MALE_NAME = re.compile(r"\b(gents?|men|man|barber|barbershop|barbers)\b", re.IGNORECASE)
+MALE_NAME = re.compile(r"\b(gents?|men|man|barber|barbershop|barbers)\b"
+                       r"|حلاق|رجال", re.IGNORECASE)   # Arabic: barber / barbering, men's
 
 
 def dedupe(rows: list[dict]) -> list[dict]:

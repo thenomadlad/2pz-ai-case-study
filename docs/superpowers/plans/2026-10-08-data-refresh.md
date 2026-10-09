@@ -205,7 +205,10 @@ def test_reaches_returns_points_inside_only():
 - [x] **Step 6: Vet** in `notebooks/catchments.ipynb`: each lounge's catchment polygon and cells on a map; women per catchment at each level (with the worker-housing correction at low/medium/high); lounges sharing cells (cannibalisation); the 30-min competitor bounds (the Task 4 sweep area, in km²); populated cells outside every catchment (growth candidates).
 - [x] **Step 7:** `SOURCES.md` row, commit.
 
-### Task 4: Premium substitutes per lounge, with ratings and review counts (revised 2026-10-08)
+### Task 4: Premium substitutes per lounge, with ratings and review counts (revised 2026-10-08) — DONE 2026-10-09
+
+**Result:** 576 Nearby calls (free tier); 4,237 salons, 2,824 candidates, recall 17/20 on the probe tile. Capture (k = 20) runs from ~2% in dense Dubai to 12-14% where Bedashing leads its set (khalifa-city-a, al-ain); al-dhafra and al-falah have too few premium salons to read. During vetting, the men-only filter gained Arabic terms (حلاق, رجال): 93 more excluded, rebuilt from cache at 0 calls. See `notebooks/competitors.ipynb`.
+
 
 **Why this shape:** see *Market model* (top). A full sweep of every salon in the 30-min zones was
 designed, probed and rejected: ~2,100 calls for a split we don't need.
@@ -248,7 +251,7 @@ type and returned hotels, clinics and a car wash.
 `fetch_circle(lat, lng, radius_m, cache_dir) -> list[dict]` (cached per circle);
 `scripts.places.search(..., url=NEARBY_URL)`.
 
-- [ ] **Step 1: Write the failing tests** (replace `tests/scripts/test_salons.py`)
+- [x] **Step 1: Write the failing tests** (replace `tests/scripts/test_salons.py`)
 
 ```python
 from scripts.fetch_salons import capture, dedupe, excluded_reason, premium_substitutes, tag_bedashing
@@ -316,10 +319,10 @@ def test_cached_lounge_is_not_rebilled(tmp_path, monkeypatch):
     f.fetch_lounge(branch, box(54.9, 24.9, 55.1, 25.1), tmp_path)
     assert len(calls) == 2                          # 2 queries, 1 page each, then cached
 ```
-- [ ] **Step 2:** Run them. Expected: FAIL. Rewrite `scripts/fetch_salons.py` (the median for the premium stand-in is over the candidates passed in, i.e. that lounge's catchment). Run again. Expected: PASS.
-- [ ] **Step 3:** Run it (576 calls, free; `MAX_CALLS = 620`). Report calls used and candidates per lounge. **Commit and push immediately after the fetch** (user request: don't risk losing paid-for data).
-- [ ] **Step 4: Vet** in `notebooks/competitors.ipynb`: the design and its reasons (from *Market model*); the recall validation above, re-measured on the actual 1.8 km circles against the Al Barsha probe; the probe's concentration and price-coverage numbers; candidates and premium substitutes per lounge; how often the premium stand-in vs. Google's price decided; each lounge's capture at k = 10 / 20 / 30 and the share of all candidate reviews the k substitutes cover (the dense-market bias); Bedashing's rank among its substitutes; other Bedashing lounges appearing in each other's sets; estimated customers and headroom (capture x catchment women).
-- [ ] **Step 5:** `SOURCES.md` section (sources, competitive-set rules, premium rule, the bias, 30-day terms caveat, home-service limitation); README rows; commit.
+- [x] **Step 2:** Run them. Expected: FAIL. Rewrite `scripts/fetch_salons.py` (the median for the premium stand-in is over the candidates passed in, i.e. that lounge's catchment). Run again. Expected: PASS.
+- [x] **Step 3:** Run it (576 calls, free; `MAX_CALLS = 620`). Report calls used and candidates per lounge. **Commit and push immediately after the fetch** (user request: don't risk losing paid-for data).
+- [x] **Step 4: Vet** in `notebooks/competitors.ipynb`: the design and its reasons (from *Market model*); the recall validation above, re-measured on the actual 1.8 km circles against the Al Barsha probe; the probe's concentration and price-coverage numbers; candidates and premium substitutes per lounge; how often the premium stand-in vs. Google's price decided; each lounge's capture at k = 10 / 20 / 30 and the share of all candidate reviews the k substitutes cover (the dense-market bias); Bedashing's rank among its substitutes; other Bedashing lounges appearing in each other's sets; estimated customers and headroom (capture x catchment women).
+- [x] **Step 5:** `SOURCES.md` section (sources, competitive-set rules, premium rule, the bias, 30-day terms caveat, home-service limitation); README rows; commit.
 
 ### Task 5: Hand-off
 

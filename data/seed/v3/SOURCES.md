@@ -122,3 +122,30 @@ Script: `scripts/fetch_isochrones.py`. Notebook: `notebooks/catchments.ipynb`.
   location (not per request); 810 cells would have taken 3+ days, and it has no traffic model.
 - **Limitations:** typical midday traffic, not rush hour (TomTom 2025: Dubai evening trips take
   ~40% longer, so after-work catchments are smaller); cell membership by centre point.
+
+## Competitors (`salons.csv`, `lounge_candidates.csv`, fetched 2026-10-09)
+
+Script: `scripts/fetch_salons.py`. Notebook: `notebooks/competitors.ipynb`.
+
+- **Source:** Google Places (New) **Nearby Search**, `includedPrimaryTypes` = beauty_salon,
+  hair_salon, nail_salon, beautician, hair_care; `rankPreference` = POPULARITY; 20 results per
+  call. 576 circles of 1.8 km radius on a gap-free hexagonal grid over the union of the 15-min
+  catchments: 576 calls, inside the monthly free tier. The first design's per-lounge text
+  searches (144 calls) are merged in from cache.
+- **Why this method (validation):** on a fully swept ~8 km tile around Al Barsha (probe, 62 calls),
+  recall of the true top-20 premium salons by reviews was 0-2/20 for one large text search per
+  lounge, 5/20 for one large popularity search, and **17/20 for small popularity circles** (8/10 at
+  k = 10, 25/30 at k = 30, re-measured on the final run). No Google search ranks by review count.
+- **Rows:** 4,237 salons inside some lounge's 15-min catchment; 2,824 candidates after exclusions:
+  men-only 1,337 (barber_shop type; "gents/men/barber" names; Arabic حلاق "barber", رجال "men"),
+  not operational 44, not a women's salon 32. Other Bedashing lounges inside a catchment are
+  candidates (added from `branches.csv`).
+- **Selection is not baked in:** the top-k premium substitutes are picked from
+  `lounge_candidates.csv` with `competitor_k` (10/20/30), `premium_min_rating` (4.3) and
+  `comparable_price_levels` (expensive, very expensive) from `baseline.yaml`.
+- **Limitations:** lifetime review counts favour older salons; chains likely push for more
+  reviews; home-service salons are invisible; ~36% of candidates have a Google price, so the
+  premium test mostly uses the reviews-and-rating stand-in; capture is a share of the premium end,
+  not the whole market (the top 20 hold only 22-30% of reviews in dense centres); al-dhafra and
+  al-falah have only 6-7 premium salons, so their capture is unreliable.
+- Google terms: only `place_id` may be stored indefinitely; refresh the rest within 30 days.
