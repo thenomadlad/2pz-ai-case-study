@@ -44,25 +44,6 @@ def block_sum(a: np.ndarray, k: int) -> np.ndarray:
     return p.reshape(h // k, k, w // k, k).sum(axis=(1, 3))
 
 
-def residential_share(women: float, adults: float, worker_adults: float, worker_share: float) -> float:
-    """Female share outside worker housing that keeps the emirate's total women unchanged."""
-    rest = adults - worker_adults
-    return float(min(1.0, max(0.0, (women - worker_share * worker_adults) / rest))) if rest else 0.0
-
-
-def market_women(adults, worker_adults, worker_share, resid_share):
-    return worker_share * worker_adults + resid_share * (adults - worker_adults)
-
-
-def women_15plus(cells, emirates, worker_share: float):
-    """Women 15+ per cell (pandas): worker housing at worker_share, the rest of each emirate
-    rebalanced so its WorldPop female total is unchanged. `emirates` is emirates.csv indexed
-    by emirate."""
-    resid = {e: residential_share(r.women_worldpop, r.adults, r.worker_adults, worker_share)
-             for e, r in emirates.iterrows()}
-    return market_women(cells.adults, cells.adults_worker, worker_share, cells.emirate.map(resid))
-
-
 def _polygons(elements: list[dict]):
     """OSM ways/relations with geometry -> shapely polygons (outer rings only)."""
     from shapely.geometry import LineString, Polygon
