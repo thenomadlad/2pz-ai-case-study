@@ -1,6 +1,7 @@
 import pytest
 
-from src.model.scorecard import PROTECT_AT, SHRINK_AT, SIGNALS, counts, decide, score
+from src.config import REPO_ROOT
+from src.model.scorecard import FLIP_LOW, PROTECT_AT, SHRINK_AT, SIGNALS, counts, decide, score
 from src.models import LoungeFeatures
 
 SIG = {s.name: s for s in SIGNALS}
@@ -32,7 +33,7 @@ def test_drafted_anchors():
     assert all(s.why for s in SIGNALS)
 
 
-def test_composite_is_the_mean_and_thresholds_split_actions():
+def test_composite_is_the_weighted_mean_and_thresholds_split_actions():
     strong = _f("strong", women=200_000, shared=0, capture=0.15, gap=0.3)
     weak = _f("weak", women=0, shared=1, capture=0, gap=-0.3)
     mid = _f("mid")
@@ -55,8 +56,8 @@ def test_missing_rating_gap_scores_neutral():
 
 def test_confidence_margin_rule():
     far = decide([_f(women=200_000, shared=0, capture=0.15, gap=0.3)])[0]
-    # (0.62 + 1 + 1 + 0) / 4 = 0.655, within 0.05 of PROTECT_AT
-    near = decide([_f(women=124_000, shared=0, capture=0.15, gap=-0.3)])[0]
+    # (0.27 + 1 + 1 + 0.5 x 0) / 3.5 = 0.648, within 0.05 of PROTECT_AT
+    near = decide([_f(women=54_000, shared=0, capture=0.15, gap=-0.3)])[0]
     assert far.confidence == "high" and near.confidence == "low"
 
 
@@ -70,3 +71,26 @@ def test_not_scored_lounge_gets_no_call_and_is_not_counted():
 def test_score_does_not_depend_on_siblings():
     a = _f("a", women=80_000, shared=0.3, capture=0.05, gap=-0.1)
     assert decide([a])[0] == decide([a, _f("b", women=500_000)])[0]
+
+
+def test_rating_has_half_weight():
+    d = decide([_f(women=0, shared=1, capture=0, gap=0.3)])[0]
+    assert d.composite == pytest.approx(0.5 / 3.5, abs=1e-4)
+
+
+def test_lounges_that_flip_often_are_low_confidence():
+    strong = _f(women=200_000, shared=0, capture=0.15, gap=0.3)
+    assert decide([strong], flips={"a": FLIP_LOW - 1})[0].confidence == "high"
+    d = decide([strong], flips={"a": FLIP_LOW})[0]
+    assert d.confidence == "low" and any("27" in c for c in d.caveats)
+
+
+def test_level_flips_on_real_data():
+    from src.config import load_baseline_assumptions
+    from src.data_v3 import load_v3
+    from src.models import Levels
+    from src.model.scorecard import level_flips
+    a = load_baseline_assumptions(REPO_ROOT / "data" / "scenarios" / "baseline.yaml")
+    flips = level_flips(load_v3(), a, Levels())
+    assert len(flips) == 24 and all(0 <= n <= 26 for n in flips.values())
+    assert flips["zayed-international-airport"] == 0
