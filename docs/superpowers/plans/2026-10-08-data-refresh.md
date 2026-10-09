@@ -325,15 +325,15 @@ def test_cached_lounge_is_not_rebilled(tmp_path, monkeypatch):
 - [x] **Step 4: Vet** in `notebooks/competitors.ipynb`: the design and its reasons (from *Market model*); the recall validation above, re-measured on the actual 1.8 km circles against the Al Barsha probe; the probe's concentration and price-coverage numbers; candidates and premium substitutes per lounge; how often the premium stand-in vs. Google's price decided; each lounge's capture at k = 10 / 20 / 30 and the share of all candidate reviews the k substitutes cover (the dense-market bias); Bedashing's rank among its substitutes; other Bedashing lounges appearing in each other's sets; estimated customers and headroom (capture x catchment women).
 - [x] **Step 5:** `SOURCES.md` section (sources, competitive-set rules, premium rule, the bias, 30-day terms caveat, home-service limitation); README rows; commit.
 
-### Task 5: Hand-off
+### Task 5: Hand-off — DONE 2026-10-09 (spec in `docs/remaining.md`, "Data refresh (v3)"; it supersedes the k = 10/20/30 wording in Step 3)
 
-- [ ] **Step 1:** Run `just test`. Expected: all existing tests and the new `tests/scripts` pass. The pipeline is untouched.
-- [ ] **Step 2:** Add a **"Market model"** section to `data/seed/v3/SOURCES.md` (so the app can show it): the formula, the per-neighbourhood rule, the excluded airport lounge, and every limitation listed under *Market model* at the top of this plan.
-- [ ] **Step 3:** Add a "Data refresh (v3)" entry to `docs/remaining.md`: what's now in `data/seed/v3/`, the open findings from each notebook, and the follow-up **integration plan**. That plan must include:
+- [x] **Step 1:** Run `just test`. Expected: all existing tests and the new `tests/scripts` pass. The pipeline is untouched.
+- [x] **Step 2:** Add a **"Market model"** section to `data/seed/v3/SOURCES.md` (so the app can show it): the formula, the per-neighbourhood rule, the excluded airport lounge, and every limitation listed under *Market model* at the top of this plan.
+- [x] **Step 3:** Add a "Data refresh (v3)" entry to `docs/remaining.md`: what's now in `data/seed/v3/`, the open findings from each notebook, and the follow-up **integration plan**. That plan must include:
   - Reuse `premium_substitutes` and `capture` from `scripts/fetch_salons.py` (move them into `src/` with their tests).
   - The rubric changes: models gain `emirate` and `place_id`; catchments from `catchment_cells.csv` replace nearest-centroid assignment; the demand signal becomes catchment market and estimated customers; competition becomes capture among the top-k premium substitutes (Google, not OSM), shown at k = 10/20/30; the quality signal is replaced or made relative to nearby salons (ratings only span 4.4-4.9); GROW/WATCH/SKIP uses populated cells outside every catchment; the app map handles every emirate; the airport lounge is excluded from market measures and labelled.
-- [ ] **Step 4:** Update the **"Assumptions and evidence"** table at the bottom of `README.md`: move each row's status to *in data* once its data is committed, update values and evidence from the notebooks' findings (e.g. price-level coverage, how many competitors survive the price filter), and add rows for any new assumption.
-- [ ] **Step 5:** Commit.
+- [x] **Step 4:** Update the **"Assumptions and evidence"** table at the bottom of `README.md`: move each row's status to *in data* once its data is committed, update values and evidence from the notebooks' findings (e.g. price-level coverage, how many competitors survive the price filter), and add rows for any new assumption.
+- [x] **Step 5:** Commit.
 
 ---
 

@@ -157,3 +157,42 @@ Script: `scripts/fetch_salons.py`. Notebook: `notebooks/competitors.ipynb`.
   not the whole market; al-dhafra and
   al-falah have only 6-7 premium salons, so their capture is unreliable.
 - Google terms: only `place_id` may be stored indefinitely; refresh the rest within 30 days.
+
+## Market model (how the pieces fit; for the app's "how it works")
+
+Notebooks: `market_size.ipynb` (structure, market size), `catchments.ipynb`, `competitors.ipynb`.
+Every tunable value is in `data/scenarios/baseline.yaml`.
+
+1. **Market size:** women aged 15+ per ~2 km cell (WorldPop 2025 adults; female share 5.5% in
+   worker housing, `worker_housing_female_share`, the rest rebalanced per emirate).
+2. **Catchment:** the cells within a 15-min drive of the lounge (`travel_time_minutes`: 10/15/20;
+   Mapbox typical traffic at `isochrone_depart_at`, weekday 12:00). Catchment market = the sum of
+   its cells' women.
+3. **Competitors:** women's beauty, hair and nail salons inside the catchment; other Bedashing
+   lounges count too (so overlapping lounges split demand). **Premium** = Google price expensive or
+   very expensive, or, without a price, reviews ≥ the catchment median and rating ≥ 4.3.
+   **Substitutes** = the most-reviewed premium salons holding `competitor_coverage` (60%; 50/70) of
+   the catchment's premium reviews.
+4. **Capture** = lounge reviews ÷ (lounge reviews + substitutes' reviews x recall multiplier).
+   Multiplier = 1 + (share of the catchment's search circles that hit Google's cap) x
+   (1 / `search_recall` − 1), with `search_recall` = 0.66 (an estimate).
+5. **Estimated customers** = capture x catchment market. **Headroom** = catchment market − estimated
+   customers. **Growth candidates** = populated cells outside every lounge's catchment.
+
+**Excluded from market measures:** `zayed-international-airport` (serves travellers, not its
+catchment); kept in the data and labelled. `al-dhafra` and `al-falah` have under 10 premium salons:
+their capture is a share of a tiny pool and is flagged `thin_premium_market`.
+
+**Limitations (show these with the numbers):**
+- Capture is a share of the **premium** end, not market penetration; budget salons and the long tail
+  are left out on purpose.
+- Review counts are **lifetime** totals, so older salons look bigger; chains likely push for more
+  reviews than independents (inflating Bedashing).
+- The search misses smaller salons where Google's cap bites; the recall correction is calibrated on
+  one tile and is an upper bound.
+- No distance decay inside the 15 minutes; travel times are typical midday, not rush hour.
+- Worker housing not mapped as industrial in OSM is missed (DIP, very likely Sonapur): Mirdif-35's
+  market is overstated.
+- Home-service salons are invisible; income and nationality mix are ignored; mall lounges draw from
+  further than 15 minutes.
+- Nothing here measures revenue, rent or capital: no return-on-capital view.

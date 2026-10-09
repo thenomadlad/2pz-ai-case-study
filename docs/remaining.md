@@ -103,3 +103,72 @@ Settled in a grilling session on 2026-10-07.
 | D14 | Opportunity action rule | 2×2 of underserved (nearest branch > 5 km) × unsaturated (< 5 competitors per 10k), with a 20k-women floor and worker-housing areas capped at WATCH |
 | D15 | How explanations are generated | Opus 5.5 (low effort, strict tool schema, refusal fallback) with a grounding check. Baseline explanations are committed. Without a key, a labelled template is used |
 | D16 | LLM classifier | Deleted |
+
+## Data refresh (v3), 2026-10-08 to 10-09
+
+The hand-curated seed listed 9 Dubai "branches", 4 of which don't exist. `data/seed/v3/` replaces
+it with data fetched once and committed (branch `data-refresh`). **The live app still runs on the
+old seed** until the integration plan below is done. Plan:
+`docs/superpowers/plans/2026-10-08-data-refresh.md`; sources and caveats: `data/seed/v3/SOURCES.md`
+(its "Market model" section is written for the app); assumptions for reviewers: README, bottom.
+
+### What's in `data/seed/v3/`
+
+| File | What | Built by |
+|---|---|---|
+| `../lounges.json`, `branches.csv` | 24 UAE lounges (Bedashing's store locator) with Google pin, rating, reviews | `scripts/fetch_branches.py` |
+| `cells.csv`, `emirates.csv`, `dubai_community_gender.csv` | 2,373 ~2 km cells: adults, worker-housing adults, names; emirate totals; DSC calibration | `scripts/build_cells.py` |
+| `lounge_isochrones.geojson`, `catchment_cells.csv`, `cell_isochrones.geojson` | 10/15/20/30/40-min drive polygons per lounge; catchment cells; 10/15/20-min polygons per catchment cell | `scripts/fetch_isochrones.py` (Mapbox) |
+| `salons.csv`, `lounge_candidates.csv`, `lounge_search_saturation.csv` | 4,237 salons (2,824 candidates); lounge x candidate pairs; search saturation per lounge | `scripts/fetch_salons.py` (Google Places) |
+
+### Open findings, by notebook
+- **`branches.ipynb`:** all 24 lounges matched Google; Bedashing's own store-locator pins are off by
+  up to 16 km (Google's are used). Ratings span only 4.4-4.9★, so they don't separate lounges;
+  lifetime review counts span 215-2,465.
+- **`market_size.ipynb`:** WorldPop's sex split is flat (33.6% female everywhere). The worker-housing
+  correction cuts the error against 21 measured Dubai communities from 0.21 to 0.13, but misses camps
+  not mapped as industrial (DIP; very likely Sonapur, so **Mirdif-35's market is overstated**).
+- **`catchments.ipynb`:** travel time is the most sensitive assumption (15 → 20 min roughly doubles
+  most catchments). Abu Dhabi city lounges share 98-100% of their catchment women with another
+  lounge. 49% of UAE women 15+ live outside every 15-min catchment (largest gaps: Sharjah city and
+  north, Ajman, Hor Al Anz in Deira, Khor Fakkan and Kalba).
+- **`competitors.ipynb`:** capture among premium substitutes is ~1% in dense Dubai (Bedashing ranks
+  24th-42nd among its own substitutes at al-barsha, city-walk, jumeirah-park, nad-al-sheba) and
+  12-14% where it leads (al-ain, khalifa-city-a, ras-al-khaimah, al-taif-mall). Al-dhafra and
+  al-falah are too thin to read. `search_recall` (0.66) is an estimate from one swept tile.
+
+### Follow-ups (not done)
+- **Integration plan** (next): wire `data/seed/v3/` into `src/` and the app (spec below).
+- Replace `search_recall` with a full sweep of the capped circles (~1,600-6,000 calls; free from
+  1 November, or ~$54-210 now; declined 2026-10-09).
+- Bedashing's real price level from its own menu (Phorest booking pages); `expensive` is assumed.
+- Rush-hour isochrones as a sensitivity (`isochrone_depart_at` 18:00); distance decay (Huff) inside
+  the travel time.
+
+### Spec for the integration plan
+- **Move into `src/` with their tests:** `women_15plus`, `premium_substitutes`, `coverage_k`,
+  `capture_by_coverage`, `recall_multiplier` (now in `scripts/`), plus the zero-substitutes and
+  thin-market rules.
+- **Models:** branches gain `emirate`, `place_id`; communities become cells.
+- **Rubric:** catchments from `catchment_cells.csv` replace nearest-centroid assignment; demand =
+  catchment market (women 15+); competition = capture among premium substitutes, shown at 50/60/70%
+  coverage; the absolute rating signal is dropped or made relative to the substitutes; the
+  cannibalisation signal comes from shared catchment cells; thresholds re-anchored on the new
+  distributions.
+- **GROW / WATCH / SKIP:** populated cells outside every catchment, with competitor counts.
+- **App:** all five emirates on the map; the airport lounge excluded from market measures and
+  labelled; the "Market model" section of `SOURCES.md` and the README assumptions shown in the app;
+  `thin_premium_market` lounges flagged.
+
+### Decisions that supersede the table above (2026-10-08 to 10-09)
+
+| # | Replaces | Decision |
+|---|---|---|
+| D17 | D3 | All 24 UAE lounges, every emirate (WorldPop covers them all with one method) |
+| D18 | D5, D11 | ~2 km grid cells from WorldPop, not the 50 seed communities |
+| D19 | D8 | Catchment = 15-min drive (10/20 as sensitivity), Mapbox typical midday traffic |
+| D20 | D4, D12 | Competitors from Google Places (popularity-ranked Nearby circles), women's salons only, Arabic men's names filtered |
+| D21 | D13 | Competition = capture among premium substitutes covering 60% of premium reviews, with a recall correction |
+| D22 | | Lifetime review counts, not per-year rates (per-year needs a full review scrape); age caveat stated |
+| D23 | | Bedashing's price level assumed `expensive`; no price imputation for competitors |
+| D24 | | Worker housing = OSM industrial land at 5.5% female, calibrated on DSC Dubai communities |
