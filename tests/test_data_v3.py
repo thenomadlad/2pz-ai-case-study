@@ -47,3 +47,7 @@ def test_full_share_at_15_min_matches_the_saturation_record():
         assert v.full_share[(b, "medium")] == by.full_share[b]
         if by.circles[b] == rec.circles[b]:     # no growth circle over this polygon
             assert abs(by.full_share[b] - rec.full_share[b]) <= 0.005, b
+
+
+def test_load_v3_accepts_explicit_settings():
+    assert load_v3(Settings()) is load_v3()

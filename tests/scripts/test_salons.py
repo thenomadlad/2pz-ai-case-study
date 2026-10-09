@@ -1,3 +1,5 @@
+import pytest
+
 from scripts.fetch_salons import dedupe, tag_bedashing
 
 
@@ -55,3 +57,19 @@ def test_growth_cells_are_populated_and_outside_every_catchment():
     women = pd.Series({"in": 9000.0, "big": 5000.0, "small": 500.0})
     catchment = pd.DataFrame({"cell_id": ["in"], "level": ["medium"], "branch_id": ["x"]})
     assert growth_cells(women, catchment, level="medium", min_women=2000) == ["big"]
+
+
+def test_pool_never_goes_to_the_network_on_an_isochrone_cache_miss(monkeypatch, tmp_path):
+    import scripts.fetch_isochrones as iso
+    import scripts.fetch_salons as fs
+
+    def no_network(*a, **k):
+        raise AssertionError("urlopen called")
+
+    monkeypatch.setattr(iso, "CACHE", tmp_path)                 # empty cache: every lookup misses
+    monkeypatch.setattr(iso.settings, "mapbox_access_token", "fake")
+    monkeypatch.setattr(iso.urllib.request, "urlopen", no_network)
+    monkeypatch.setattr(iso, "OFFLINE", False)                  # restored after pool() sets it
+    monkeypatch.setattr(fs.places, "MAX_CALLS", fs.places.MAX_CALLS)
+    with pytest.raises(RuntimeError, match="offline"):
+        fs.pool()

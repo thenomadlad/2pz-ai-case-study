@@ -38,6 +38,7 @@ V3 = ROOT / "data" / "seed" / "v3"
 CACHE = ROOT / "data" / "raw" / "isochrone_cache" / "mapbox"
 URL = "https://api.mapbox.com/isochrone/v1/mapbox/driving-traffic/{lng},{lat}"
 MAX_CONTOURS = 4     # Mapbox: at most 4 contours per request
+OFFLINE = False     # set by offline callers (fetch_salons.py pool): a cache miss raises, no request
 PAUSE_S = 0.25       # Mapbox: 300 requests a minute
 
 
@@ -71,6 +72,8 @@ def isochrone(lat: float, lng: float, minutes: list[int], depart_at: str) -> lis
     path = CACHE / f"{key}.json"
     if path.exists():
         return json.loads(path.read_text())["features"]
+    if OFFLINE:
+        raise RuntimeError(f"offline: isochrone cache miss for {lat},{lng} {params}")
     if not settings.mapbox_access_token:
         raise SystemExit("MAPBOX_ACCESS_TOKEN missing from .env")
     url = URL.format(lat=lat, lng=lng) + "?" + urllib.parse.urlencode(

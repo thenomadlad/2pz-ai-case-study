@@ -331,7 +331,9 @@ def growth() -> None:
 
 def pool() -> None:
     """Offline: rewrite salons.csv with every salon in the cache (all circles, no polygon filter)."""
+    import scripts.fetch_isochrones as isochrones
     places.MAX_CALLS = 0                                               # a cache miss raises
+    isochrones.OFFLINE = True                                          # so does an isochrone miss
     branches = _read("branches.csv")
     by_level, _ = _level_polygons(branches)
     polys = {b: p["medium"] for b, p in by_level.items()}

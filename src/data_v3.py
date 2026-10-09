@@ -4,6 +4,7 @@ Candidates and full shares are precomputed per level by `scripts/fetch_salons.py
 import json
 from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
 
 import pandas as pd
 
@@ -42,9 +43,12 @@ def _lounges(path) -> list[Lounge]:
     return [Lounge(**r) for r in df[list(Lounge.model_fields)].to_dict("records")]
 
 
-@lru_cache(maxsize=None)
 def load_v3(settings: Settings | None = None) -> V3:
-    d = (settings or default_settings).v3_dir
+    return _load((settings or default_settings).v3_dir)
+
+
+@lru_cache(maxsize=None)
+def _load(d: Path) -> V3:       # cached on the directory: Settings is unhashable
     lounges = _lounges(d / "branches.csv")
     polygons = {(f["properties"]["branch_id"], f["properties"]["minutes"]): f["geometry"]
                 for f in json.load(open(d / "lounge_isochrones.geojson"))["features"]}
