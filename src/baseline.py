@@ -21,8 +21,7 @@ class Run(BaseModel):
 
 
 @lru_cache(maxsize=64)
-def run(levels: Levels = Levels(), closed: frozenset[str] = frozenset(),  # noqa: B008 (frozen)
-        search_recall: float | None = None) -> Run:
+def _run(levels: Levels, closed: frozenset[str], search_recall: float | None) -> Run:
     """Features, decisions (with level-sensitivity confidence) and growth areas for one scenario."""
     v3 = load_v3()
     ids = {lo.branch_id for lo in v3.lounges}
@@ -37,6 +36,12 @@ def run(levels: Levels = Levels(), closed: frozenset[str] = frozenset(),  # noqa
     flips = scorecard.level_flips(v3, a, levels, closed)
     return Run(levels=levels, closed=sorted(closed), features=features,
                decisions=scorecard.decide(features, flips), flips=flips, areas=areas, area_decisions=growth.classify_all(areas))
+
+
+def run(levels: Levels = Levels(), closed: frozenset[str] = frozenset(),  # noqa: B008 (frozen)
+        search_recall: float | None = None) -> Run:
+    """A deep copy of the cached run, so callers can mutate it freely."""
+    return _run(levels, frozenset(closed), search_recall).model_copy(deep=True)
 
 
 class LoungeChange(BaseModel):

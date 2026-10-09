@@ -3,6 +3,7 @@ import math
 import pytest
 
 from src.baseline import diff, run
+from src.config import REPO_ROOT, load_baseline_assumptions
 from src.models import Levels
 
 
@@ -25,7 +26,10 @@ def test_closing_al_barsha_moves_neighbours_and_opens_no_core_area():
     # capture moves only where the closed lounge was among the substitutes (city-walk, not jumeirah-park)
     assert a["city-walk"].capture != b["city-walk"].capture
     d = diff(base, after)
-    assert not [x for x in d.areas_appeared if "dubai" in x and "al-barsha" in x]
+    # small fringe areas do open up (al-sufouh, mudon...), but none is worth growing into
+    acts = {x.area_id: x.action for x in after.area_decisions}
+    assert d.areas_appeared and all(acts[i] == "SKIP" for i in d.areas_appeared)
+    assert all(x.women < 10_000 for x in after.areas if x.area_id in d.areas_appeared)
     assert {c.branch_id for c in d.lounges} >= {"al-barsha", "jumeirah-park", "city-walk"}
     assert next(c for c in d.lounges if c.branch_id == "al-barsha").new_action is None
 
@@ -59,4 +63,13 @@ def test_no_nan_when_one_lounge_left():
 
 
 def test_diff_of_same_run_is_empty():
-    assert diff(run(), run()).empty
+    assert diff(run(), run(search_recall=load_baseline_assumptions(
+        REPO_ROOT / "data" / "scenarios" / "baseline.yaml").search_recall)).empty
+
+
+def test_mutating_a_returned_run_does_not_leak():
+    r, action = run(), run().decisions[0].action
+    r.features.clear()
+    r.decisions[0].action = "SHRINK" if action != "SHRINK" else "HOLD"
+    again = run()
+    assert len(again.features) == 24 and again.decisions[0].action == action
