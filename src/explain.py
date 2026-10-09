@@ -792,8 +792,8 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
             elif not _match(e.value, facts[e.field]):
                 errors.append(f"{e.field}: cited {e.value!r}, actual {facts[e.field]!r}")
     # Ids like "mirdif-35" are cited verbatim; drop them so their digits aren't read as data.
-    ids = sorted({part for v in facts.values() if isinstance(v, str) for part in v.split(", ")},
-                 key=len, reverse=True)
+    ids = sorted({part for v in facts.values() if isinstance(v, str) for part in v.split(", ")}
+                 | {exp.subject_id}, key=len, reverse=True)
     for text in [exp.headline, exp.table_caption] + [r.claim for r in exp.reasons]:
         for ident in ids:
             text = re.sub(re.escape(ident), "", text, flags=re.IGNORECASE)
