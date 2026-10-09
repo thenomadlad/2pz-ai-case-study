@@ -23,7 +23,14 @@ lounge_candidates.csv (branch_id, place_id: non-excluded candidates, the lounge 
 and lounge_search_saturation.csv (per lounge: circles over its catchment and how many came back
 full; feeds recall_multiplier).
 
+Second mode, `growth` (2026-10-09, paid ~$7, approved): the same circles over populated cells
+outside every lounge's 15-min catchment (>= GROWTH_MIN_WOMEN women 15+), so growth areas can be
+judged on competition too. Writes growth_salons.csv and adds those circles to search_circles.csv.
+search_circles.csv records every circle (both modes): centre, radius, results, and whether it hit
+Google's cap, so the recall correction can be computed for any grouping of cells.
+
 Run: uv run --extra notebook python scripts/fetch_salons.py [--force]
+     uv run --extra notebook python scripts/fetch_salons.py growth
 """
 import csv
 import hashlib
@@ -45,6 +52,8 @@ QUERIES = ("beauty salon", "ladies salon")   # the earlier text searches, merged
 CIRCLE_M = 1800        # 576 circles for the 15-min catchments: inside the free tier (1,500 m needed 770)
 FULL = 20              # Nearby Search returns at most 20: a full circle may hold more
 MAX_CALLS = 620        # the run is cached: a re-run costs 0. Never raise this without approval
+GROWTH_MIN_WOMEN = 2000
+GROWTH_MAX_CALLS = 300  # approved 2026-10-09: 282 circles, ~$7 beyond the free tier
 SALON_TYPES = {"beauty_salon", "hair_salon", "nail_salon", "beautician", "hair_care"}
 MALE_NAME = re.compile(r"\b(gents?|men|man|barber|barbershop|barbers)\b"
                        r"|حلاق|رجال", re.IGNORECASE)   # Arabic: barber / barbering, men's
@@ -148,6 +157,24 @@ def capture_by_coverage(lounge_reviews: int, premium: list[dict], coverage: floa
         return 1.0, 0
     subs = multiplier * sum(_reviews(s) for s in premium[:k])
     return lounge_reviews / (lounge_reviews + subs), k
+
+
+def growth_cells(women, catchment, level: str, min_women: float) -> list[str]:
+    """Cells with at least min_women women 15+ that no lounge's catchment reaches at `level`."""
+    inside = set(catchment.loc[catchment.level == level, "cell_id"])
+    return [c for c, w in women.items() if w >= min_women and c not in inside]
+
+
+def _write_circles(rows: list[dict]) -> None:
+    """Upsert circles into search_circles.csv (keyed by purpose, lat, lng, radius)."""
+    path = V3 / "search_circles.csv"
+    old = list(csv.DictReader(open(path))) if path.exists() else []
+    key = lambda r: (r["purpose"], str(r["lat"]), str(r["lng"]), str(r["radius_m"]))
+    merged = {key(r): r for r in old} | {key(r): r for r in rows}
+    with open(path, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["purpose", "lat", "lng", "radius_m", "results", "full"])
+        w.writeheader()
+        w.writerows(merged.values())
 
 
 def excluded_reason(r: dict) -> str:
@@ -265,6 +292,9 @@ def main() -> None:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
+    _write_circles([{"purpose": "catchment", "lat": la, "lng": ln, "radius_m": CIRCLE_M,
+                     "results": len(fetch_circle(la, ln, CIRCLE_M, CACHE)), "full": full[(la, ln)]}
+                    for la, ln in cs])
     with open(V3 / "lounge_search_saturation.csv", "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(saturation[0]))
         w.writeheader()
@@ -277,5 +307,47 @@ def main() -> None:
           f"{len(pairs)} lounge-candidate pairs; {places.calls} billed calls")
 
 
+def growth() -> None:
+    """Competitors around populated cells outside every catchment (see the module docstring)."""
+    import yaml
+    from shapely.geometry import box
+    from shapely.ops import unary_union
+    from scripts.build_cells import women_15plus
+
+    places.MAX_CALLS = GROWTH_MAX_CALLS
+    a = yaml.safe_load(open(ROOT / "data" / "scenarios" / "baseline.yaml"))["assumptions"]
+    cells = {r["cell_id"]: r for r in _read("cells.csv")}
+    import pandas as pd
+    cdf = pd.read_csv(V3 / "cells.csv").set_index("cell_id")
+    women = women_15plus(cdf, pd.read_csv(V3 / "emirates.csv").set_index("emirate"),
+                         a["worker_housing_female_share"]["medium"])
+    ids = growth_cells(women, pd.read_csv(V3 / "catchment_cells.csv"), "medium", GROWTH_MIN_WOMEN)
+    area = unary_union([box(float(cells[c]["west"]), float(cells[c]["south"]),
+                            float(cells[c]["east"]), float(cells[c]["north"])) for c in ids])
+    cs = circles(area)
+    print(f"{len(ids)} growth cells (>= {GROWTH_MIN_WOMEN:,} women, outside every "
+          f"{a['travel_time_minutes']['medium']}-min catchment): {len(cs)} circles")
+    if len(cs) > GROWTH_MAX_CALLS:
+        raise SystemExit(f"{len(cs)} circles > GROWTH_MAX_CALLS={GROWTH_MAX_CALLS}; not approved")
+    found, circle_rows = [], []
+    for i, (lat, lng) in enumerate(cs, start=1):
+        res = fetch_circle(lat, lng, CIRCLE_M, CACHE)
+        found += res
+        circle_rows.append({"purpose": "growth", "lat": lat, "lng": lng, "radius_m": CIRCLE_M,
+                            "results": len(res), "full": len(res) >= FULL})
+        if i % 50 == 0:
+            print(f"  {i}/{len(cs)} circles, {places.calls} billed calls")
+    today = date.today().isoformat()
+    rows = tag_bedashing(dedupe([to_row(p) for p in found]), _read("branches.csv"))
+    rows = [r | {"excluded_reason": excluded_reason(r), "fetched_at": today} for r in rows]
+    with open(V3 / "growth_salons.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    _write_circles(circle_rows)
+    print(f"wrote {len(rows)} salons ({sum(1 for r in rows if not r['excluded_reason'])} candidates) "
+          f"from {len(cs)} circles ({sum(r['full'] for r in circle_rows)} full); {places.calls} billed calls")
+
+
 if __name__ == "__main__":
-    main()
+    growth() if sys.argv[1:2] == ["growth"] else main()

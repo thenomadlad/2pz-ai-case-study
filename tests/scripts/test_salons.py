@@ -119,3 +119,11 @@ def test_capture_by_coverage_applies_multiplier():
     cap, k = capture_by_coverage(100, premium, coverage=0.6, multiplier=1.5)
     assert k == 1 and cap == 100 / (100 + 900)
     assert capture_by_coverage(100, [], 0.6, 1.3) == (1.0, 0)
+
+
+def test_growth_cells_are_populated_and_outside_every_catchment():
+    import pandas as pd
+    from scripts.fetch_salons import growth_cells
+    women = pd.Series({"in": 9000.0, "big": 5000.0, "small": 500.0})
+    catchment = pd.DataFrame({"cell_id": ["in"], "level": ["medium"], "branch_id": ["x"]})
+    assert growth_cells(women, catchment, level="medium", min_women=2000) == ["big"]
