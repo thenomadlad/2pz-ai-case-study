@@ -27,7 +27,8 @@ class BaselineAssumptions(BaseModel):
     bedashing_price_level: str = "expensive"
     comparable_price_levels: list[str] = ["expensive", "very_expensive"]
     premium_min_rating: float = 4.3
-    competitor_k: dict[str, int] = {"low": 10, "medium": 20, "high": 30}
+    competitor_coverage: dict[str, float] = {"low": 0.5, "medium": 0.6, "high": 0.7}
+    search_recall: float = 0.66
     # Female share of adults in worker housing (OSM industrial land use); calibrated on
     # Dubai Statistics Center labour-camp communities. See SOURCES.md, "Market size".
     worker_housing_female_share: dict[str, float] = {"low": 0.01, "medium": 0.055, "high": 0.15}

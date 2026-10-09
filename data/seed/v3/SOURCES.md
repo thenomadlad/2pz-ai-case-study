@@ -140,12 +140,20 @@ Script: `scripts/fetch_salons.py`. Notebook: `notebooks/competitors.ipynb`.
   men-only 1,337 (barber_shop type; "gents/men/barber" names; Arabic حلاق "barber", رجال "men"),
   not operational 44, not a women's salon 32. Other Bedashing lounges inside a catchment are
   candidates (added from `branches.csv`).
-- **Selection is not baked in:** the top-k premium substitutes are picked from
-  `lounge_candidates.csv` with `competitor_k` (10/20/30), `premium_min_rating` (4.3) and
+- **Selection is not baked in:** each lounge's premium substitutes are picked from
+  `lounge_candidates.csv` with `competitor_coverage` (the most-reviewed premium salons holding
+  50/60/70% of the catchment's premium reviews), `premium_min_rating` (4.3) and
   `comparable_price_levels` (expensive, very expensive) from `baseline.yaml`.
+- **Search saturation and recall (estimate):** `lounge_search_saturation.csv` gives, per lounge,
+  the share of search circles over its catchment that returned Google's cap of 20 (5% al-dhafra
+  to 76% zawaya-walk). On the fully swept Al Barsha tile (94% of circles full) our search found
+  66% of the premium reviews (28.6k of 43.7k): `search_recall: 0.66`. Substitutes' reviews are
+  scaled by 1 + full share x (1/0.66 − 1). An upper bound on recall (the sweep missed salons too);
+  replace it if a full sweep is ever run. Splitting full circles instead was costed at ~$54-210
+  and declined.
 - **Limitations:** lifetime review counts favour older salons; chains likely push for more
   reviews; home-service salons are invisible; ~36% of candidates have a Google price, so the
   premium test mostly uses the reviews-and-rating stand-in; capture is a share of the premium end,
-  not the whole market (the top 20 hold only 22-30% of reviews in dense centres); al-dhafra and
+  not the whole market; al-dhafra and
   al-falah have only 6-7 premium salons, so their capture is unreliable.
 - Google terms: only `place_id` may be stored indefinitely; refresh the rest within 30 days.

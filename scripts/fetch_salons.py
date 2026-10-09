@@ -9,17 +9,19 @@ Results from the earlier per-lounge text searches (cached) are merged in at no c
 candidates are the salons inside its 15-min polygon; other Bedashing lounges inside it are added
 from branches.csv, so lounges with overlapping catchments compete (cannibalisation).
 
-Nothing is selected here: the notebook and the app pick each lounge's top-k premium substitutes
-from lounge_candidates.csv with the baseline.yaml values (competitor_k, premium_min_rating,
-comparable_price_levels), so k = 10/20/30 costs nothing.
+Nothing is selected here: the notebook and the app pick each lounge's premium substitutes from
+lounge_candidates.csv with the baseline.yaml values (competitor_coverage, premium_min_rating,
+comparable_price_levels, search_recall), so changing them costs nothing.
 
 Each call asks for rating, review count and price ("Enterprise": 1,000 free calls a month).
 One call per circle (576 for the 15-min catchments at 1,800 m); MAX_CALLS stops it before the free tier
 runs out. Responses are cached per circle in data/raw/places_cache/, so a crash or a re-run costs
 nothing.
 
-Outputs (data/seed/v3/): salons.csv (one row per salon, with excluded_reason) and
-lounge_candidates.csv (branch_id, place_id: non-excluded candidates, the lounge itself left out).
+Outputs (data/seed/v3/): salons.csv (one row per salon, with excluded_reason),
+lounge_candidates.csv (branch_id, place_id: non-excluded candidates, the lounge itself left out),
+and lounge_search_saturation.csv (per lounge: circles over its catchment and how many came back
+full; feeds recall_multiplier).
 
 Run: uv run --extra notebook python scripts/fetch_salons.py [--force]
 """
@@ -41,7 +43,8 @@ V3 = ROOT / "data" / "seed" / "v3"
 CACHE = ROOT / "data" / "raw" / "places_cache"
 QUERIES = ("beauty salon", "ladies salon")   # the earlier text searches, merged in from cache
 CIRCLE_M = 1800        # 576 circles for the 15-min catchments: inside the free tier (1,500 m needed 770)
-MAX_CALLS = 620        # ~330 of the month's 1,000 free calls were already used
+FULL = 20              # Nearby Search returns at most 20: a full circle may hold more
+MAX_CALLS = 620        # the run is cached: a re-run costs 0. Never raise this without approval
 SALON_TYPES = {"beauty_salon", "hair_salon", "nail_salon", "beautician", "hair_care"}
 MALE_NAME = re.compile(r"\b(gents?|men|man|barber|barbershop|barbers)\b"
                        r"|حلاق|رجال", re.IGNORECASE)   # Arabic: barber / barbering, men's
@@ -116,6 +119,35 @@ def fetch_circle(lat: float, lng: float, radius_m: float, cache_dir: Path) -> li
     Path(cache_dir).mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(res))
     return res
+
+
+def coverage_k(substitutes: list[dict], share: float) -> int:
+    """How many of the (review-sorted) substitutes it takes to hold `share` of their reviews."""
+    total, run = sum(_reviews(s) for s in substitutes), 0
+    for k, s in enumerate(substitutes, start=1):
+        run += _reviews(s)
+        if run >= share * total:
+            return k
+    return len(substitutes)
+
+
+def recall_multiplier(full_share: float, recall: float) -> float:
+    """Correction for salons the search missed. Where a circle comes back full (Google's cap of
+    20), it may hold more; calibrated on the fully swept Al Barsha tile, our circles found `recall`
+    (~0.66) of premium reviews where they were all full. Scale linearly with the share of a
+    catchment's circles that were full: 1.0 where none were, 1/recall where all were."""
+    return 1 + full_share * (1 / recall - 1)
+
+
+def capture_by_coverage(lounge_reviews: int, premium: list[dict], coverage: float,
+                        multiplier: float) -> tuple[float, int]:
+    """Capture against the review-sorted premium salons that hold `coverage` of the premium
+    reviews found, with their reviews scaled up by the recall `multiplier`. Returns (capture, k)."""
+    k = coverage_k(premium, coverage)
+    if not k:
+        return 1.0, 0
+    subs = multiplier * sum(_reviews(s) for s in premium[:k])
+    return lounge_reviews / (lounge_reviews + subs), k
 
 
 def excluded_reason(r: dict) -> str:
@@ -216,11 +248,27 @@ def main() -> None:
         n = sum(1 for p in pairs if p["branch_id"] == b["branch_id"])
         print(f"{b['branch_id']:30} {len(rows):4} salons in catchment, {n:4} candidates")
 
+    # How saturated each catchment's search was: share of the circles over it that came back full.
+    from math import cos, radians
+    from shapely.affinity import scale
+    full = {(la, ln): len(fetch_circle(la, ln, CIRCLE_M, CACHE)) >= FULL for la, ln in cs}   # cached
+    disks = {k: scale(Point(k[1], k[0]).buffer(CIRCLE_M / 111_000), xfact=1 / cos(radians(k[0]))) for k in full}
+    saturation = []
+    for b in branches:
+        over = [k for k, d in disks.items() if d.intersects(polys[b["branch_id"]])]
+        saturation.append({"branch_id": b["branch_id"], "circles": len(over),
+                           "full_circles": sum(full[k] for k in over),
+                           "full_share": round(sum(full[k] for k in over) / len(over), 4) if over else 0.0})
+
     rows = list(salons.values())
     with open(V3 / "salons.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
+    with open(V3 / "lounge_search_saturation.csv", "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(saturation[0]))
+        w.writeheader()
+        w.writerows(saturation)
     with open(V3 / "lounge_candidates.csv", "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["branch_id", "place_id"])
         w.writeheader()

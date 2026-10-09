@@ -93,3 +93,29 @@ def test_arabic_mens_salon_names_are_men_only():
     assert excluded_reason(ok | {"name": "حلاق تركي hair cut"}) == "men-only"              # barber
     assert excluded_reason(ok | {"name": "صالون المشاهير للحلاقة الرجالية"}) == "men-only"  # men's
     assert excluded_reason(ok | {"name": "صالون نونه ستايل للسيدات"}) == ""               # ladies'
+
+
+def test_coverage_k_takes_salons_until_share_reached():
+    from scripts.fetch_salons import coverage_k
+    subs = [{"review_count": r} for r in (500, 300, 100, 100)]   # 1,000 reviews
+    assert coverage_k(subs, 0.5) == 1     # 500 = 50%
+    assert coverage_k(subs, 0.6) == 2     # 800 >= 600
+    assert coverage_k(subs, 1.0) == 4
+    assert coverage_k([], 0.6) == 0
+
+
+def test_recall_multiplier_scales_with_saturation():
+    from scripts.fetch_salons import recall_multiplier
+    assert recall_multiplier(0.0, 0.66) == 1.0                 # nothing truncated: no correction
+    assert round(recall_multiplier(1.0, 0.66), 3) == round(1 / 0.66, 3)
+    assert round(recall_multiplier(0.5, 0.5), 3) == 1.5
+
+
+def test_capture_by_coverage_applies_multiplier():
+    from scripts.fetch_salons import capture_by_coverage
+    premium = [{"review_count": r} for r in (600, 300, 100)]   # sorted by reviews
+    cap, k = capture_by_coverage(100, premium, coverage=0.6, multiplier=1.0)
+    assert k == 1 and cap == 100 / 700
+    cap, k = capture_by_coverage(100, premium, coverage=0.6, multiplier=1.5)
+    assert k == 1 and cap == 100 / (100 + 900)
+    assert capture_by_coverage(100, [], 0.6, 1.3) == (1.0, 0)
