@@ -77,10 +77,10 @@ DELETE (Task 9): data/seed/{branches,communities,competitors}.csv, src/acquire/*
 
 **Interfaces (moved unchanged):** `residential_share`, `market_women`, `women_15plus(cells, emirates, worker_share)`, `premium_substitutes(candidates, k, min_rating, price_levels)`, `coverage_k(substitutes, share)`, `capture(lounge_reviews, substitutes)`, `capture_by_coverage(lounge_reviews, premium, coverage, multiplier) -> (capture, k)`, `recall_multiplier(full_share, recall)`, `excluded_reason(row)`, `MALE_NAME`, `SALON_TYPES`.
 
-- [ ] **Step 1:** Create `tests/test_market.py` by moving the pure-function tests (block-sum stays with the script). Run it. Expected: FAIL (`src.market` missing).
-- [ ] **Step 2:** Create `src/market.py` with the function bodies moved verbatim; in the scripts replace them with `from src.market import ...`. Run `just test`. Expected: all pass.
-- [ ] **Step 3:** Re-run the four notebooks (`jupyter nbconvert --execute --inplace`); expect no errors and unchanged numbers.
-- [ ] **Step 4:** Commit and push.
+- [x] **Step 1:** Create `tests/test_market.py` by moving the pure-function tests (block-sum stays with the script). Run it. Expected: FAIL (`src.market` missing).
+- [x] **Step 2:** Create `src/market.py` with the function bodies moved verbatim; in the scripts replace them with `from src.market import ...`. Run `just test`. Expected: all pass.
+- [x] **Step 3:** Re-run the four notebooks (`jupyter nbconvert --execute --inplace`); expect no errors and unchanged numbers.
+- [x] **Step 4:** Commit and push.
 
 ### Task 2: Load the v3 data in one place, competition per travel level
 
@@ -109,9 +109,9 @@ def load_v3(settings: Settings | None = None) -> V3: ...   # cached with functoo
 ```
 `Lounge`: `branch_id, title, name, emirate, lat, lng, place_id, rating, review_count, address`. Candidates and full shares are computed once at load (vectorised shapely `contains_xy`), so switching levels in the app costs nothing.
 
-- [ ] **Step 1: Pool.** Add the `pool` mode, run it, commit the new `salons.csv`. Check: it's a superset of the old one; per lounge, the 15-min candidates computed from it equal `lounge_candidates.csv` plus at most a few salons only the growth run found (list them).
-- [ ] **Step 2: Failing test:** `load_v3()` returns 24 lounges, 2,373 cells, the three catchment levels, and a polygon for every lounge at 10/15/20/30/40 min; `cells` has no NaN in `adults`; no candidate has NaN `review_count`; for every lounge the candidates nest (10 ⊆ 15 ⊆ 20) and the 15-min ones contain `lounge_candidates.csv`; `full_share` at 15 min is within 0.05 of `lounge_search_saturation.csv` (growth circles now count too).
-- [ ] **Step 3:** Implement. Run. Expected: PASS. Commit and push.
+- [x] **Step 1: Pool.** Add the `pool` mode, run it, commit the new `salons.csv`. Check: it's a superset of the old one; per lounge, the 15-min candidates computed from it equal `lounge_candidates.csv` plus at most a few salons only the growth run found (list them).
+- [x] **Step 2: Failing test:** `load_v3()` returns 24 lounges, 2,373 cells, the three catchment levels, and a polygon for every lounge at 10/15/20/30/40 min; `cells` has no NaN in `adults`; no candidate has NaN `review_count`; for every lounge the candidates nest (10 ⊆ 15 ⊆ 20) and the 15-min ones contain `lounge_candidates.csv`; `full_share` at 15 min is within 0.05 of `lounge_search_saturation.csv` (growth circles now count too).
+- [x] **Step 3:** Implement. Run. Expected: PASS. Commit and push.
 
 ### Task 3: Lounge features and growth areas for any assumption levels
 
@@ -155,7 +155,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),
 ```
 **Rules:** women per cell = `women_15plus(cells, emirates, worker_share[level])`. Catchment = `catchment_cells` at `levels.travel`, open lounges only. `shared_share` counts only open lounges. Candidates = `v3.candidates[(branch_id, levels.travel)]` minus closed lounges; recall multiplier from `v3.full_share[(branch_id, levels.travel)]`. Growth areas = populated cells in **no** open lounge's catchment, grouped by `(name, emirate)` (the OSM name already on each cell) and split into contiguous pieces (cells touching by edge or corner: `r{row}c{col}` ids), so "Sharjah" isn't one 53-cell area; `area_id` = slug of name + emirate (+ `-2`, `-3` for further pieces, largest first); salons are assigned to cells by point-in-box from `salons.csv`; lat/lng = women-weighted centre; `NOT_SCORED = {"zayed-international-airport"}` (its catchment still counts as "reached" for growth areas, because the lounge exists).
 
-- [ ] **Step 1: Write the failing tests** (small synthetic V3 fixtures, no files):
+- [x] **Step 1: Write the failing tests** (small synthetic V3 fixtures, no files):
 
 ```python
 def test_shared_share_counts_only_open_lounges(tiny_v3):
@@ -188,9 +188,9 @@ def test_travel_level_changes_competition(real_v3):     # Review Focus 5
     assert all(hi[b].premium_pool >= lo[b].premium_pool for b in hi)
     assert any(hi[b].premium_pool > lo[b].premium_pool for b in hi)
 ```
-- [ ] **Step 2:** Run. Expected: FAIL. Implement `build`. Run. Expected: PASS.
-- [ ] **Step 3: `notebooks/features.ipynb`**, importing `build` (no logic of its own), each step plotted: catchment women per lounge at each travel level; the competition per level (premium pool, k, capture) next to the women, so the reader sees both move; the 20-min coverage check (share of each polygon under searched circles, a map of the holes); shared catchment between lounges (a lounge x lounge matrix); the growth areas on a map. At medium levels, catchment women match `market_size.ipynb` and capture and k match `competitors.ipynb` within the growth-run extras of Task 2 (explain any difference). Two examples at the bottom, as in the other notebooks.
-- [ ] **Step 4:** Commit and push.
+- [x] **Step 2:** Run. Expected: FAIL. Implement `build`. Run. Expected: PASS.
+- [x] **Step 3: `notebooks/features.ipynb`**, importing `build` (no logic of its own), each step plotted: catchment women per lounge at each travel level; the competition per level (premium pool, k, capture) next to the women, so the reader sees both move; the 20-min coverage check (share of each polygon under searched circles, a map of the holes); shared catchment between lounges (a lounge x lounge matrix); the growth areas on a map. At medium levels, catchment women match `market_size.ipynb` and capture and k match `competitors.ipynb` within the growth-run extras of Task 2 (explain any difference). Two examples at the bottom, as in the other notebooks.
+- [x] **Step 4:** Commit and push.
 
 ### Task 4: The scorecard and growth rule, calibrated (user reviews the anchors)
 
@@ -224,10 +224,10 @@ Preview with these anchors, the thin-market rule and the airport excluded: **2 P
 Every area is, by construction, beyond a 15-min drive of every open lounge; its straight-line
 distance to the nearest one is shown.
 
-- [ ] **Step 1: Failing tests:** scores on the anchors (0 at the 0-anchor, 1 at the 1-anchor, clipped); thin market → capture score 0.5 and confidence "low"; NOT SCORED lounge → action `"NOT SCORED"`, excluded from counts; growth thresholds and the worker-housing cap; the airport's catchment still blocks growth areas; a mixed area's saturation ignores its uncovered cells, and an area under 50% coverage can't be GROW (Review Focus 7).
-- [ ] **Step 2:** Implement (`SIGNALS` keep the `Signal(name, field, label, worst, best, why)` shape; `Decision.action` gains `"NOT SCORED"`; new `AreaDecision` beside the old `OpportunityDecision`). Run. Expected: PASS.
-- [ ] **Step 3: Calibration notebook** `notebooks/decisions.ipynb`: signal distributions with the anchors drawn on; composite and action per lounge at medium levels; the two open questions above; how actions move across all 27 level combinations (a lounge that flips often gets "low confidence"); growth areas ranked, mapped (`scripts/spot_maps.py`), with counts by emirate; two examples at the bottom (as in the other notebooks).
-- [ ] **Step 4: Stop and show the user** the anchors, the actions and the growth list. Adjust on their call. Commit and push.
+- [x] **Step 1: Failing tests:** scores on the anchors (0 at the 0-anchor, 1 at the 1-anchor, clipped); thin market → capture score 0.5 and confidence "low"; NOT SCORED lounge → action `"NOT SCORED"`, excluded from counts; growth thresholds and the worker-housing cap; the airport's catchment still blocks growth areas; a mixed area's saturation ignores its uncovered cells, and an area under 50% coverage can't be GROW (Review Focus 7).
+- [x] **Step 2:** Implement (`SIGNALS` keep the `Signal(name, field, label, worst, best, why)` shape; `Decision.action` gains `"NOT SCORED"`; new `AreaDecision` beside the old `OpportunityDecision`). Run. Expected: PASS.
+- [x] **Step 3: Calibration notebook** `notebooks/decisions.ipynb`: signal distributions with the anchors drawn on; composite and action per lounge at medium levels; the two open questions above; how actions move across all 27 level combinations (a lounge that flips often gets "low confidence"); growth areas ranked, mapped (`scripts/spot_maps.py`), with counts by emirate; two examples at the bottom (as in the other notebooks).
+- [x] **Step 4: Stop and show the user** the anchors, the actions and the growth list. Adjust on their call. Commit and push.
 
 ### Task 5: Baseline and what-ifs in memory
 
@@ -249,8 +249,8 @@ class RunDiff(BaseModel):   # per lounge: old/new action, composite and the four
 def diff(before: Run, after: Run) -> RunDiff: ...
 ```
 
-- [ ] **Step 1: Failing tests:** the baseline has 24 decisions, one NOT SCORED; closing al-barsha changes jumeirah-park's and city-walk's shared share and capture (they shared cells and it was in their substitute sets) and creates no growth area in Dubai's core (others still reach those cells); switching travel to `high` raises every catchment; an unknown lounge id in `closed` raises a clear error; `diff(run(), run())` is empty.
-- [ ] **Step 2:** Implement. Run. Commit and push.
+- [x] **Step 1: Failing tests:** the baseline has 24 decisions, one NOT SCORED; closing al-barsha changes jumeirah-park's and city-walk's shared share and capture (they shared cells and it was in their substitute sets) and creates no growth area in Dubai's core (others still reach those cells); switching travel to `high` raises every catchment; an unknown lounge id in `closed` raises a clear error; `diff(run(), run())` is empty.
+- [x] **Step 2:** Implement. Run. Commit and push.
 
 ### Task 6: (merged into Task 5)
 
@@ -265,8 +265,8 @@ Task numbers below are kept so the cross-references hold.
 - `PROMPT_VERSION = "v4"` (old cache entries no longer match). The grounding check (`verify`) is unchanged; the facts it checks change.
 - NOT SCORED lounges get a fixed template ("Not scored: serves travellers..."), never an LLM call.
 
-- [ ] **Step 1:** Update the tests for the new facts and topics (template explanations must pass `verify` for every lounge and area). Run. Expected: FAIL, then implement, PASS.
-- [ ] **Step 2: Ask the user**, then run `just explain` (needs `ANTHROPIC_API_KEY`; ~24 lounges + growth areas + network). Report how many pass grounding. Commit the cache and push.
+- [x] **Step 1:** Update the tests for the new facts and topics (template explanations must pass `verify` for every lounge and area). Run. Expected: FAIL, then implement, PASS.
+- [x] **Step 2: Ask the user**, then run `just explain` (needs `ANTHROPIC_API_KEY`; ~24 lounges + growth areas + network). Report how many pass grounding. Commit the cache and push. *(Done without the API: the user asked for no API spend, so the 65 explanations were written in a Claude Code session via `src.explain prompts|check|ingest`; all pass grounding.)*
 
 ### Task 8: The app
 
@@ -278,9 +278,9 @@ Task numbers below are kept so the cross-references hold.
 - **Area page:** GROW/WATCH/SKIP with the rule; women, worker share, nearest lounge; the cell map; competitor data coverage and the "no competitor data here" caveat.
 - **How it works:** a page or expander rendering `SOURCES.md` "Market model" and the README assumptions table, so reviewers see every assumption in the app.
 
-- [ ] **Step 1:** Update `tests/webapp/*` (AppTest: each page loads with no exception at medium levels and with a scenario closing two lounges; a level switch completes in < 2 s). Run. Expected: FAIL.
-- [ ] **Step 2:** Implement page by page; run the app (`just app`) and click through every page and the what-if panel in a browser; fix what's wrong. Expected: tests PASS.
-- [ ] **Step 3:** Commit and push.
+- [x] **Step 1:** Update `tests/webapp/*` (AppTest: each page loads with no exception at medium levels and with a scenario closing two lounges; a level switch completes in < 2 s). Run. Expected: FAIL.
+- [x] **Step 2:** Implement page by page; run the app (`just app`) and click through every page and the what-if panel in a browser; fix what's wrong. Expected: tests PASS.
+- [x] **Step 3:** Commit and push.
 
 ### Task 9: Remove the old data and code; docs
 
@@ -288,8 +288,8 @@ Task numbers below are kept so the cross-references hold.
 
 - **README:** rewrite "Run it", "Using the app", "What it currently says", "How it decides", "Data" and "Repo map" for the new model (keep the reviewer-first tone and the assumptions table at the bottom); remove the "live app still runs on the old data" note.
 - **CONTEXT.md:** add *Cell*, *Catchment (drive-time)*, *Premium substitute*, *Capture*, *Coverage*, *Search recall*, *Growth area*; retire *Community* as the unit.
-- [ ] **Step 1:** Delete; `grep -rn "communities.csv\|competitors.csv\|src.acquire\|BranchFeatures\|OpportunityDecision\|data/processed\|src.scenario" src tests scripts notebooks justfile` returns nothing; `just test` passes.
-- [ ] **Step 2:** Docs. Commit and push.
+- [x] **Step 1:** Delete; `grep -rn "communities.csv\|competitors.csv\|src.acquire\|BranchFeatures\|OpportunityDecision\|data/processed\|src.scenario" src tests scripts notebooks justfile` returns nothing; `just test` passes.
+- [x] **Step 2:** Docs. Commit and push.
 
 ### Task 10: Ship
 

@@ -45,7 +45,7 @@ Script: `scripts/fetch_branches.py`.
 
 ## Review counts: lifetime totals, not a rate
 
-`review_count` in `branches.csv` (and in `competitors.csv`, Task 4) is Google's **lifetime**
+`review_count` in `branches.csv` (and in `salons.csv`) is Google's **lifetime**
 total. It is used as-is, with no adjustment for age.
 
 **Caveat:** older salons have had longer to collect reviews, so the count partly measures age,
@@ -186,8 +186,22 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
 4. **Capture** = lounge reviews ÷ (lounge reviews + substitutes' reviews x recall multiplier).
    Multiplier = 1 + (share of the catchment's search circles that hit Google's cap) x
    (1 / `search_recall` − 1), with `search_recall` = 0.66 (an estimate).
-5. **Estimated customers** = capture x catchment market. **Headroom** = catchment market − estimated
-   customers. **Growth candidates** = populated cells outside every lounge's catchment.
+5. **Estimated customers** = capture x catchment market (shown, not scored).
+6. **Lounge scorecard** (`src/model/scorecard.py`): four signals, each on a fixed 0-1 scale.
+   Demand = catchment women (0 → 200k). Cannibalisation = share of them another open lounge also
+   reaches (100% → 0%). Capture (0 → 15%). Rating gap = lounge rating − substitutes' median rating
+   (−0.3 → +0.3★), at **half weight** (weights 1 / 1 / 1 / 0.5). Composite ≥ 0.65 is PROTECT,
+   ≤ 0.35 is SHRINK, HOLD between. A thin premium market scores capture 0.5; a missing rating gap
+   scores 0.5.
+7. **Low confidence** when the composite is within 0.05 of a line, an input is missing (thin
+   premium market, no rating gap), or the call **flips** in 9 or more of the 27 combinations of the
+   three assumption levels (travel time, coverage, worker-housing share). High confidence needs
+   0.10 from both lines; medium is in between.
+8. **Growth areas** = populated cells beyond a 15-min drive of every open lounge, grouped by OSM
+   place name into contiguous pieces (`src/model/growth.py`). GROW = at least 20k women 15+ (worker
+   housing under 50% of adults) **and** under 50 premium reviews per 1k women in the searched cells.
+   WATCH passes one test, or is big but under 50% searched. SKIP passes neither, or has under 5k
+   women.
 
 **Excluded from market measures:** `zayed-international-airport` (serves travellers, not its
 catchment); kept in the data and labelled. `al-dhafra` and `al-falah` have under 10 premium salons:

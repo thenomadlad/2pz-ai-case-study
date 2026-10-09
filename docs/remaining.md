@@ -172,3 +172,41 @@ old seed** until the integration plan below is done. Plan:
 | D22 | | Lifetime review counts, not per-year rates (per-year needs a full review scrape); age caveat stated |
 | D23 | | Bedashing's price level assumed `expensive`; no price imputation for competitors |
 | D24 | | Worker housing = OSM industrial land at 5.5% female, calibrated on DSC Dubai communities |
+
+## Integration (v3), 2026-10-09
+
+`data/seed/v3/` is now wired into `src/` and the app; the old Dubai community model is gone.
+Plan: `docs/superpowers/plans/2026-10-09-integration.md`. **The model is a first pass we will
+iterate on: the limitations matter more than the calls**, and the calls are a shortlist to test,
+not decisions.
+
+### Done
+- **Market model in `src/`:** `src/market.py` (women 15+, premium substitutes, capture),
+  `src/data_v3.py` (one loader), `src/features/lounges.py` (catchments at every travel level,
+  lounge features, growth areas).
+- **Calls:** `src/model/scorecard.py` (demand, cannibalisation, capture, rating gap at half weight;
+  PROTECT ≥ 0.65, SHRINK ≤ 0.35; low confidence near a line, on a missing input, or at 9+ flips of
+  27 level combinations) and `src/model/growth.py` (GROW / WATCH / SKIP, unsaturated line 50
+  premium reviews per 1k women). Anchors signed off by the user 2026-10-09
+  (`notebooks/decisions.ipynb`); an "estimated customers" signal was considered and rejected.
+- **What-ifs in memory** (`src/baseline.py`): levels, search recall and closed lounges; no
+  processed-JSON pipeline.
+- **Explanations** for the lounge / area / uae kinds. All 65 baseline explanations (23 lounges, 41
+  GROW/WATCH areas, the UAE summary) pass the grounding check. **They were written in a Claude Code
+  session from the same prompts the API would get (`python -m src.explain prompts|check|ingest`),
+  not via the API**, at the user's request (no API spend). `just explain` still uses the API.
+- **App:** Overview (summary, what-if panel, map), Lounges, Areas, How it works & limitations (which
+  renders `docs/limitations.md`).
+- **Removed:** the old seed CSVs, `src/acquire`, `src/scenario`, the rubric / opportunity model,
+  `data/processed`, `scripts/fetch_competitors.py` and the old explanation kinds.
+- **Baseline:** 3 PROTECT / 13 HOLD / 7 SHRINK, 1 NOT SCORED, 10 of 23 low confidence; 4 GROW (all
+  in Sharjah emirate), 37 WATCH.
+
+### What's left
+- **The fix list is [`docs/limitations.md`](limitations.md)**, ranked by how much each could change
+  the calls: no money in the model, lifetime-review capture, assumption sensitivity, midday drive
+  times with no decay, the coarse market estimate, the competitor search's gaps, first-cut growth
+  areas.
+- Merge `data-refresh` into `main` so the live deploy runs v3 (plan, Task 10).
+- Earlier follow-ups still open: a full sweep to replace `search_recall`, Bedashing's real price
+  level, rush-hour isochrones.
