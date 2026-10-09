@@ -7,7 +7,7 @@ from src.model.rubric import RubricModel
 from src.models import BranchFeatures, CommunityFeatures, NetworkStats
 
 # Bump when processed outputs change shape; the app regenerates an older baseline.
-PIPELINE_VERSION = 2
+PIPELINE_VERSION = 3
 
 
 def main(settings: Settings | None = None) -> None:

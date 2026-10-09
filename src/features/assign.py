@@ -48,17 +48,26 @@ def assign_communities(
     return assignments
 
 
+def competitor_community(
+    competitors: list[Competitor], communities: list[Community],
+    max_km: float = COMPETITOR_MAX_KM,
+) -> dict[str, str]:
+    """Competitor id -> the community it counts toward: its nearest, if within max_km."""
+    result = {}
+    for k in competitors if communities else []:
+        km, community_id = min((haversine_km(k.lat, k.lng, c.lat, c.lng), c.id)
+                               for c in communities)
+        if km <= max_km:
+            result[k.id] = community_id
+    return result
+
+
 def count_competitors(
     competitors: list[Competitor], communities: list[Community],
     max_km: float = COMPETITOR_MAX_KM,
 ) -> dict[str, int]:
     """Competitors per community: each competitor counts toward its nearest community."""
     counts = {c.id: 0 for c in communities}
-    if not communities:
-        return counts
-    for k in competitors:
-        km, community_id = min((haversine_km(k.lat, k.lng, c.lat, c.lng), c.id)
-                               for c in communities)
-        if km <= max_km:
-            counts[community_id] += 1
+    for community_id in competitor_community(competitors, communities, max_km).values():
+        counts[community_id] += 1
     return counts

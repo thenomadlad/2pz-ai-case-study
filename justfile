@@ -25,5 +25,9 @@ clean:
     rm -rf data/raw/* data/processed/*
     touch data/raw/.gitkeep data/processed/.gitkeep
 
+# Open the data-vetting notebook in JupyterLab
+notebook:
+    uv run --extra notebook jupyter lab notebooks/vet_data.ipynb
+
 test:
     uv run --extra dev pytest

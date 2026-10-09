@@ -18,6 +18,9 @@ MIN_POP = 20_000
 # gender split if Dubai Statistics Center ever publishes one.
 WORKER_HOUSING = re.compile(r"industrial|investment park", re.IGNORECASE)
 
+# Salon density used to size an area's market: the same Dubai median as the saturation test.
+MEDIAN_SALONS_PER_10K = UNSATURATED_PER_10K
+
 THRESHOLDS_WHY = (
     f"Underserved means the nearest Bedashing branch is over {FAR_KM:g} km away, about the "
     "median for a Dubai community today, so these are the less-covered half of the city. "
@@ -55,9 +58,18 @@ def classify(c: CommunityFeatures) -> OpportunityDecision:
                        "areas are mostly male, so real demand is likely far lower.")
 
     why += f" Nearest branch: {c.nearest_branch_id}, {c.nearest_branch_km:.1f} km."
-    return OpportunityDecision(community_id=c.community_id, action=action,
-                               underserved=underserved, unsaturated=unsaturated,
-                               rationale=why, caveats=caveats)
+    supported = c.female_pop / 10_000 * MEDIAN_SALONS_PER_10K
+    salons_here = c.competitors + c.branches_here
+    # ponytail: fair share assumes every salon is equally attractive; a Huff gravity model
+    # (attractiveness / distance) is the upgrade, see docs/remaining.md.
+    share = c.branches_here / salons_here if salons_here else 0.0
+    return OpportunityDecision(
+        community_id=c.community_id, action=action, underserved=underserved,
+        unsaturated=unsaturated, rationale=why, caveats=caveats,
+        salons_supported=round(supported, 1),
+        salon_headroom=max(0, round(supported - salons_here)),
+        uncovered_women=c.female_pop if underserved else 0,
+        fair_share=round(share, 4), captured_women_est=round(share * c.female_pop))
 
 
 def classify_all(communities: list[CommunityFeatures]) -> list[OpportunityDecision]:

@@ -13,6 +13,22 @@ uv run streamlit run streamlit_app.py     # http://localhost:8501
 
 No API key needed. On first load the app builds its data from committed seed files. `just test` runs the 115 tests.
 
+## Using the app
+
+Three pages, one loop: **start on the Overview, click a branch or an area, dig into its page, go back, repeat.**
+
+1. **Overview.** The executive summary comes first: one answer, then the ranked arguments behind it, each with its data. Below it is the map, with a side panel holding the layer toggles and a legend that states the thresholds (PROTECT ≥ 0.65, GROW = over 5 km from a branch *and* under 5 rival salons per 10k women, and so on). Every branch carries a flag. Click a branch and its catchment appears (its communities, tinted, with a line to each); click a branch or an area and its own short pyramid appears underneath. **Deselect** clears it.
+2. **Open area page →** shows one community:
+   - **What's left:** salon headroom (how many more salons it could support at Dubai's median density, after competitors and Bedashing), women not covered by Bedashing, and Bedashing's fair-share capture, a naive estimate that treats every salon as equally attractive;
+   - its pyramid and GROW / WATCH / SKIP tests against their thresholds;
+   - a map of its catchment, with every competitor salon and branch (hover for data);
+   - which branch's catchment it's in, and whether that's contested;
+   - the competitor salons there, by name, and links to its branches.
+3. **Open branch page →** shows one branch: its decision and pyramid, a map of its catchment, the areas in that catchment (each linking to its area page), each signal on its fixed scale, and a what-if form.
+4. **Back to overview** reopens the same panel, ready for the next one. Every factor table lists each input's value, unit, **threshold** and meaning, and wraps rather than scrolls.
+
+Links carry the selection (`/area?area=naif`, `/branch?branch=al-safa-2`), so any page can be shared directly.
+
 ## Who it's for
 
 The app supports one conversation between three roles:
@@ -55,10 +71,12 @@ Both → GROW, one → WATCH, neither → SKIP. Areas with fewer than 20k women,
 ## The AI layer
 
 The rules make every decision; Claude (Opus 5.5, low effort) **explains** them:
-- **3 reasons**, each backed by **2–3 data points** copied from the decision's fact sheet;
+- a **pyramid** for every decision and for the network as a whole: a one-sentence **answer**, then **2–5 supporting arguments**, each backed by **2–5 data points** copied from the fact sheet;
 - a plain-language **caption for the factor table**. Every table also shows each factor's unit and meaning.
 
-**Grounding check** (`src/explain.py:verify`): every cited field must exist with the same value, and every number in the prose must match a fact or a published threshold. A failed check is retried once with the errors fed back. If it fails again, the deterministic template is used instead. The app always labels which one you're reading.
+**The code decides what matters; the AI writes it up.** Which arguments appear, and in what order, is computed (`src/explain.py:prioritize`). For a branch, a signal is an argument when its score sits at least 0.1 from neutral in the direction of the call: weaknesses for SHRINK, strengths for PROTECT, either for HOLD. Strongest comes first, with at least 2 arguments. For areas, the two 2×2 tests come first, then demand. The executive summary covers where to cut back, where to grow, what to protect, how sure we are and what the model can't see, leaving out any that are empty. So "why is this the top reason?" has a deterministic answer.
+
+**Grounding check** (`src/explain.py:verify`): the arguments must be exactly the ranked ones, in order; every cited field must exist with the same value; and every number in the prose must be a fact or a published threshold, correctly rounded at the precision written ("4,400" for 4,431 passes, "4,500" doesn't). A failed check is retried once with the errors fed back. If it fails again, the deterministic template is used instead. The app always labels which one you're reading.
 
 **No key needed to see it.** Explanations are generated once with `just explain` and committed in `data/explanations/cache.json`, keyed by a hash of the exact numbers, so a stale explanation can never be served. In a scenario, a branch whose numbers changed gets a live explanation if a key is set, and the template otherwise.
 
@@ -68,7 +86,15 @@ All 59 baseline explanations (9 branches, 50 areas) are generated and pass the g
 
 **Trust it for** a first screen of location and market position, for spotting which branches sit near a threshold, and for seeing how a relocation or new site reshapes catchments.
 
-**Don't trust it for** anything about return on capital. There's no revenue, rent, capex or lease data. Treat SHRINK as "investigate first", not "close". The app lists what a return-on-capital view would need.
+**Don't trust it for** anything about return on capital. There's no revenue, rent, capex or lease data. Treat SHRINK as "investigate first", not "close". A return-on-capital view would need, per branch:
+
+| Input | Where analysts would get it |
+|---|---|
+| Revenue | branch P&L / POS system |
+| Rent and service charges | lease agreements |
+| Fit-out capex and remaining book value | fixed-asset register |
+| Lease expiry and break clauses | lease agreements |
+| Staff cost and utilisation | payroll and booking system |
 
 Known weak spots:
 - **Equal weights let strong signals hide a fatal one.** nad-al-sheba serves only ~3k women but scores HOLD (0.60), because it has no cannibalisation and little competition.
@@ -90,7 +116,8 @@ The research behind these sources, including what was tried and rejected (Dubai 
 ## Repo map
 
 ```
-streamlit_app.py           3 pages: Product (decisions + map + scenarios), Model, Story
+streamlit_app.py           3 pages: Overview (summary, map, click-through), Areas, Branches
+src/webapp/pages/          overview.py, area.py, branch.py; views.py holds shared rendering
 src/acquire/               seed CSVs -> data/raw/*.json
 src/features/              nearest-branch catchments, competitor counts, per-community features
 src/model/rubric.py        branch signals, scales, thresholds (with the reasons)

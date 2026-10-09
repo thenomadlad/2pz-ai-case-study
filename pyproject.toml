@@ -16,6 +16,12 @@ dev = [
     "pytest>=8.0",
     "ruff>=0.6",
 ]
+notebook = [
+    "jupyterlab>=4.6.4",
+    "matplotlib>=3.11.2",
+    "nbconvert>=7.17.1",
+    "pandas>=3.0.6",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

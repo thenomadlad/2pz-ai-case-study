@@ -7,7 +7,6 @@ from src.webapp.map import (
     build_deck,
     community_layer,
     diff_highlight_layers,
-    sibling_lines_layer,
 )
 
 
@@ -48,16 +47,6 @@ def test_assignment_lines_layer_connects_community_to_branch():
                                         female_pop=500)]
     layer = assignment_lines_layer(communities, assignments, features)
     assert layer.data[0]["target"] == [55.0, 25.0]
-
-
-def test_sibling_lines_layer_only_includes_branches_within_5km():
-    selected = _feature("a", 25.0, 55.0)
-    near = _feature("b", 25.01, 55.01)   # ~1.5km away
-    far = _feature("c", 26.0, 56.0)      # far away
-    layer = sibling_lines_layer(selected, [selected, near, far])
-    targets = [row["target"] for row in layer.data]
-    assert [near.lng, near.lat] in targets
-    assert [far.lng, far.lat] not in targets
 
 
 def test_diff_highlight_layers_separates_new_ring_and_relocation():
@@ -135,3 +124,26 @@ def test_diff_highlight_ring_and_new_branch_layers_radius_units_is_literal_pixel
     ring_layer, new_layer, _move_layer = diff_highlight_layers(diff, [_feature("a", 25.0, 55.0)])
     assert _serialized_radius_units(ring_layer) == "pixels"
     assert _serialized_radius_units(new_layer) == "pixels"
+
+
+def test_catchment_layers_filter_to_the_selected_branch():
+    communities = [Community(id=c, name_en=c, lat=25.0, lng=55.0, population_total=100,
+                             population_female=50, is_estimated=False) for c in ("c1", "c2")]
+    assignments = [CommunityAssignment(community_id="c1", nearest_branch_id="a", nearest_km=1,
+                                       second_branch_id=None, second_km=None, contested=False,
+                                       female_pop=50),
+                   CommunityAssignment(community_id="c2", nearest_branch_id="b", nearest_km=1,
+                                       second_branch_id=None, second_km=None, contested=False,
+                                       female_pop=50)]
+    features = [_feature("a", 25.0, 55.0), _feature("b", 25.1, 55.1)]
+    assert len(community_layer(communities, assignments, {}, branch_ids={"a"}).data) == 1
+    assert len(assignment_lines_layer(communities, assignments, features,
+                                      branch_ids={"a"}).data) == 1
+
+
+def test_flag_layer_marks_every_branch_and_tooltips_have_detail():
+    from src.webapp.map import flag_layer
+    features = [_feature("a", 25.0, 55.0), _feature("b", 25.1, 55.1)]
+    flags = flag_layer(features)
+    assert len(flags.data) == 2 and flags.data[0]["icon"]["mask"] is True
+    assert "detail" in branch_layer(features, []).data[0]

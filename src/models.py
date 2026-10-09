@@ -86,6 +86,7 @@ class CommunityFeatures(BaseModel):
     nearest_branch_km: float
     nearest_branch_pop_served: int
     hosts_branch: bool
+    branches_here: int = 0  # Bedashing branches whose nearest community centroid this is
 
 
 class NetworkStats(BaseModel):
@@ -124,6 +125,12 @@ class OpportunityDecision(BaseModel):
     unsaturated: bool
     rationale: str
     caveats: list[str]
+    # What's left in this area, shown on its page and cited by its explanation.
+    salons_supported: float = 0.0   # at the Dubai median density
+    salon_headroom: int = 0         # salons supported minus salons already here
+    uncovered_women: int = 0        # women whose nearest Bedashing branch is beyond the line
+    fair_share: float = 0.0         # Bedashing's share of the salons here (naive capture)
+    captured_women_est: int = 0     # fair share x women
 
 
 class Evidence(BaseModel):
@@ -133,14 +140,18 @@ class Evidence(BaseModel):
 
 
 class Reason(BaseModel):
+    # Which ranked argument this is (e.g. "cannibalisation"), set by src/explain.prioritize.
+    topic: str = ""
     claim: str
     evidence: list[Evidence]
 
 
 class Explanation(BaseModel):
     subject_id: str
-    kind: Literal["branch", "opportunity"]
+    kind: Literal["branch", "opportunity", "network"]
     action: str
+    # The answer, in one sentence: the top of the pyramid.
+    headline: str = ""
     reasons: list[Reason]
     # Plain-language caption for the factor table shown next to this decision.
     table_caption: str

@@ -1,5 +1,6 @@
 import json
 import statistics
+from collections import Counter
 
 from src.config import Settings
 from src.config import settings as default_settings
@@ -137,8 +138,9 @@ def build_community_features(
     assignment_by_id = {a.community_id: a for a in assignments}
     pop_served_by_branch = {f.branch_id: f.female_pop_served for f in features}
     # A community "hosts" a branch when it's that branch's nearest community centroid.
-    host_ids = {min(communities, key=lambda c: haversine_km(b.lat, b.lng, c.lat, c.lng)).id
-                for b in branches} if communities else set()
+    host_counts = Counter(
+        min(communities, key=lambda c: haversine_km(b.lat, b.lng, c.lat, c.lng)).id
+        for b in branches) if communities else Counter()
 
     result = []
     for c in communities:
@@ -150,7 +152,7 @@ def build_community_features(
             competitors_per_10k=per_10k(count, a.female_pop),
             nearest_branch_id=a.nearest_branch_id, nearest_branch_km=a.nearest_km,
             nearest_branch_pop_served=pop_served_by_branch.get(a.nearest_branch_id, 0),
-            hosts_branch=c.id in host_ids,
+            hosts_branch=c.id in host_counts, branches_here=host_counts[c.id],
         ))
     return result
 

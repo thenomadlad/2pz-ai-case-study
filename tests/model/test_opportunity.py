@@ -26,3 +26,19 @@ def test_worker_housing_capped_at_watch():
     o = classify(_c(name="Jebel Ali Industrial First"))
     assert o.action == "WATCH"
     assert "worker housing" in o.rationale
+
+
+def test_room_left_numbers():
+    c = _c(pop=24_000, per_10k=0.4)
+    c = c.model_copy(update={"competitors": 1, "branches_here": 0})
+    o = classify(c)
+    assert o.salons_supported == 12.0            # 24,000 / 10,000 x 5
+    assert o.salon_headroom == 11                # 12 supported - 1 competitor
+    assert o.uncovered_women == 24_000           # nearest branch beyond the line
+    assert o.fair_share == 0 and o.captured_women_est == 0
+    crowded = classify(c.model_copy(update={"competitors": 30, "branches_here": 2,
+                                            "nearest_branch_km": 0.5}))
+    assert crowded.salon_headroom == 0           # never below zero
+    assert crowded.uncovered_women == 0
+    assert crowded.fair_share == 0.0625          # 2 of 32 salons
+    assert crowded.captured_women_est == 1500

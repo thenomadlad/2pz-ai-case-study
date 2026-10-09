@@ -36,6 +36,20 @@ _Avoid_: contested share, self-overlap, overlap (unqualified)
 A branch's catchment being shared with competitors.
 _Avoid_: saturation (unless meaning per-capita density), overlap (unqualified)
 
+### What's left in an area
+
+**Salon headroom**:
+How many more salons an opportunity area could support at the Dubai median density (5 per 10,000 women), after the competitors and Bedashing branches already there. Never below zero.
+_Avoid_: capacity, white space, room (unqualified)
+
+**Uncovered women**:
+An opportunity area's women when its nearest branch is beyond the underserved line; otherwise zero.
+_Avoid_: unserved demand, gap
+
+**Fair-share capture**:
+Bedashing's share of the salons physically in an area, read as a naive estimate of how many of its women Bedashing serves. Assumes every salon is equally attractive.
+_Avoid_: market share, capture (unqualified)
+
 ### Decisions
 
 **Branch action**:

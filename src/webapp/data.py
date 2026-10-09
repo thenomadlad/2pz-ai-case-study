@@ -4,6 +4,7 @@ import json
 
 from src.config import Settings
 from src.config import settings as default_settings
+from src.features.assign import haversine_km
 from src.features.build import load_competitors
 from src.models import (
     BranchFeatures,
@@ -35,6 +36,23 @@ class BaselineData:
 
     def opportunity_for(self, community_id: str) -> OpportunityDecision | None:
         return next((o for o in self.opportunities if o.community_id == community_id), None)
+
+    def area_of(self, branch_id: str) -> str:
+        """The community hosting a branch: its nearest community centroid (the same rule as
+        CommunityFeatures.hosts_branch)."""
+        f = next(f for f in self.features if f.branch_id == branch_id)
+        return min(self.community_features,
+                   key=lambda c: haversine_km(f.lat, f.lng, c.lat, c.lng)).community_id
+
+    def branches_in(self, community_id: str) -> list[BranchFeatures]:
+        return [f for f in self.features if self.area_of(f.branch_id) == community_id]
+
+    def with_scenario(self, run) -> "BaselineData":
+        """The same view, with a ScenarioRun's recomputed numbers and decisions."""
+        return dataclasses.replace(
+            self, features=run.features, decisions=run.decisions, assignments=run.assignments,
+            communities=run.communities, network=run.network,
+            community_features=run.community_features, opportunities=run.opportunities)
 
     def communities_by_id(self) -> dict[str, Community]:
         return {c.id: c for c in self.communities}

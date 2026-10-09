@@ -8,3 +8,5 @@ data/processed/
 .ruff_cache/
 .streamlit/secrets.toml
 .DS_Store
+.playwright-mcp/
+.ipynb_checkpoints/
