@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
@@ -192,3 +193,52 @@ class Lounge(BaseModel):
     rating: float | None
     review_count: int
     address: str
+
+
+@dataclass(frozen=True)
+class Levels:
+    """Assumption level names ("low"/"medium"/"high"); the values live in baseline.yaml."""
+    travel: str = "medium"          # travel_time_minutes
+    coverage: str = "medium"        # competitor_coverage
+    worker_share: str = "medium"    # worker_housing_female_share
+
+
+class LoungeFeatures(BaseModel):
+    branch_id: str
+    name: str
+    emirate: str
+    lat: float
+    lng: float
+    rating: float | None
+    review_count: int
+    catchment_women: float          # women 15+ in its catchment cells
+    catchment_cells: int
+    shared_share: float             # share of those women in cells another open lounge also reaches
+    capture: float                  # capture_by_coverage
+    substitutes_k: int
+    recall_multiplier: float
+    premium_pool: int               # premium salons in its catchment
+    thin_premium_market: bool       # premium_pool < THIN_MARKET
+    substitutes_median_rating: float | None
+    rating_gap: float | None        # rating - substitutes_median_rating
+    est_customers: float            # capture x catchment_women (0 if not scored)
+    not_scored: bool                # the airport lounge
+
+
+class Area(BaseModel):
+    """A growth candidate: a contiguous piece of populated cells no open lounge reaches."""
+    area_id: str
+    name: str
+    emirate: str
+    lat: float
+    lng: float
+    women: float
+    cells: int
+    worker_share: float
+    premium_salons: int | None              # over covered cells; None = none covered
+    premium_reviews_per_1k: float | None
+    full_circle_share: float | None
+    data_coverage: float                    # share of the area's women in cells with competitor data
+    cell_ids: list[str]
+    nearest_lounge_id: str                  # straight-line, among open lounges
+    nearest_lounge_km: float
