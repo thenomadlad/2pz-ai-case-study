@@ -196,3 +196,19 @@ their capture is a share of a tiny pool and is flagged `thin_premium_market`.
 - Home-service salons are invisible; income and nationality mix are ignored; mall lounges draw from
   further than 15 minutes.
 - Nothing here measures revenue, rent or capital: no return-on-capital view.
+
+## Competitors around growth cells (`growth_salons.csv`, `search_circles.csv`, fetched 2026-10-09)
+
+Script: `scripts/fetch_salons.py growth`. Approved spend: 282 calls, ~$7 beyond the free tier.
+
+- **Area:** the 146 populated cells (≥ 2,000 women 15+) outside every lounge's 15-min catchment
+  (505k women; Sharjah 53 cells, Ajman 23, Dubai 32, Abu Dhabi 28, RAK/UAQ/Fujairah 10).
+- **Method:** identical to the catchment run (1.8 km popularity circles, women's-salon primary
+  types, 20 results each): 282 circles, 70 (25%) hit Google's cap. 1,905 salons, 1,179 candidates.
+- **`search_circles.csv`** logs every circle from both runs (purpose, centre, radius, results,
+  full), so the recall correction (`search_recall`) can be computed for any grouping of cells.
+- **First look (medians per cell, candidates only):** 7.6 salons per 10k women in growth cells
+  vs 12.5 in catchment cells; **8 Google reviews per 1k women vs 177**; 27% of growth cells have no
+  salon (10% of catchment cells). Growth areas have salons, but small, little-reviewed ones.
+- Same limitations as the catchment run (long tail missed where circles are full; lifetime
+  reviews; home-service salons invisible).

@@ -14,7 +14,7 @@
 |---|---|
 | What-ifs | **Switch assumption levels + close a lounge.** All precomputed; no API calls at runtime; works on the public deploy. Moving or adding a lounge is dropped (it needs live Mapbox/Google calls) |
 | Rating signal | **Relative to the lounge's substitutes:** lounge rating minus the median rating of its premium substitutes |
-| Growth areas | **Population and distance only:** populated cells outside every lounge's catchment, grouped into named areas. No competitor data outside catchments; stated as a limitation |
+| Growth areas | Populated cells outside every lounge's catchment, grouped into named areas. **Updated 2026-10-09:** competitor data was fetched for the 146 cells with ≥ 2,000 women (`growth_salons.csv`, 282 calls), so the rule adds a saturation test; smaller cells stay population-only |
 | Branch decision | **Same scorecard, new signals:** fixed-scale, equal-weight composite of four 0-1 scores; PROTECT ≥ 0.65, SHRINK ≤ 0.35 |
 
 ## Global Constraints
@@ -86,6 +86,8 @@ class V3:
     emirates: pd.DataFrame           # emirates.csv, indexed by emirate
     catchment: pd.DataFrame          # catchment_cells.csv (cell_id, level, branch_id)
     salons: pd.DataFrame             # salons.csv
+    growth_salons: pd.DataFrame      # growth_salons.csv
+    circles: pd.DataFrame            # search_circles.csv (both runs)
     candidates: pd.DataFrame         # lounge_candidates.csv
     saturation: pd.DataFrame         # lounge_search_saturation.csv, indexed by branch_id
     polygons: dict[tuple[str, int], dict]   # (branch_id, minutes) -> GeoJSON geometry (lounge_isochrones)
@@ -129,6 +131,8 @@ class LoungeFeatures(BaseModel):
 class Area(BaseModel):              # growth candidate
     area_id: str; name: str; emirate: str; lat: float; lng: float
     women: float; cells: int; worker_share: float
+    premium_salons: int | None; premium_reviews_per_1k: float | None   # None = no competitor data
+    full_circle_share: float | None
     cell_ids: list[str]             # for the map and the closed-lounge test
     nearest_lounge_id: str; nearest_lounge_km: float   # straight-line, among OPEN lounges
 
@@ -183,11 +187,16 @@ def test_every_level_combination_builds(real_v3):       # Review Focus 5
 
 Preview with these anchors, the thin-market rule and the airport excluded: **2 PROTECT** (al-ain, al-taif-mall), **13 HOLD**, **8 SHRINK** (al-barsha, al-maqta, shahama, khaleej-al-arabi, noya-plaza, mohammed-bin-zayed-city, delma, westyas), **1 NOT SCORED**. Without the thin-market rule al-falah would be PROTECT on capture alone (54% of a 6-salon pool). Expect the user to question al-barsha as SHRINK: it's Dubai's biggest catchment but captures 0.8% of a crowded premium market and shares 86% of its catchment with other lounges. **The user reviews this before it's frozen** (decision D10's pattern: Claude proposes anchors with reasons, the user can veto).
 
-**Growth rule** (population and distance only; competitors unknown outside catchments):
-- **GROW:** ≥ `GROW_MIN_WOMEN` (20,000) women 15+ and worker housing < 50% of adults.
-- **WATCH:** 5,000-20,000 women, or ≥ 20,000 but mostly worker housing.
-- **SKIP:** under 5,000 women.
-Every area is, by construction, beyond a 15-min drive of every open lounge; its straight-line distance to the nearest one is shown. Limitation, stated on every area: *no competitor data; saturation unknown*.
+**Growth rule** (updated 2026-10-09: competitor data now exists for cells with ≥ 2,000 women):
+- **Big enough:** ≥ `GROW_MIN_WOMEN` (20,000) women 15+ and worker housing < 50% of adults.
+- **Unsaturated:** premium-salon reviews per 1k women (recall-corrected with the area's own
+  share of full circles from `search_circles.csv`) below a line set in the calibration notebook.
+  First look: growth cells median 8 reviews per 1k women vs 177 in catchment cells.
+- **GROW** = both; **WATCH** = one, or big but mostly worker housing; **SKIP** = neither, or under
+  5,000 women. Areas made only of cells under 2,000 women have no competitor data: their
+  saturation is shown as *unknown* and they can reach WATCH at most.
+Every area is, by construction, beyond a 15-min drive of every open lounge; its straight-line
+distance to the nearest one is shown.
 
 - [ ] **Step 1: Failing tests:** scores on the anchors (0 at the 0-anchor, 1 at the 1-anchor, clipped); thin market → capture score 0.5 and confidence "low"; NOT SCORED lounge → action `"NOT SCORED"`, excluded from counts; growth thresholds and the worker-housing cap; the airport's catchment still blocks growth areas.
 - [ ] **Step 2:** Implement (`SIGNALS` keep the `Signal(name, field, label, worst, best, why)` shape; `Decision.action` gains `"NOT SCORED"`; `AreaDecision` replaces `OpportunityDecision`). Run. Expected: PASS.
@@ -260,5 +269,5 @@ Every area is, by construction, beyond a 15-min drive of every open lounge; its 
 ## Not in this plan (deliberate)
 
 - Moving or adding a lounge in what-ifs (needs live Mapbox/Google calls).
-- Competitor data for growth areas (outside catchments); a full sweep to replace `search_recall`.
+- Competitor data for growth cells under 2,000 women (~2,000 calls); a full sweep to replace `search_recall`.
 - Distance decay (Huff), rush-hour catchments, Bedashing's real price level.

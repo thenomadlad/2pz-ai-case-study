@@ -13,6 +13,7 @@ Tunable assumptions: `data/scenarios/baseline.yaml`. Assumptions with evidence: 
 | Worker-housing locations | OpenStreetMap industrial land use | Whole UAE | `data/raw/osm/` (not committed; re-fetchable) | 3,580 polygons |
 | Drive-time catchments | Mapbox Isochrone API, typical traffic, weekday 12:00 | 24 lounges x 10/15/20/30/40 min; 810 catchment cells x 10/15/20 min | `v3/lounge_isochrones.geojson`, `v3/catchment_cells.csv`, `v3/cell_isochrones.geojson` | 120 + 2,430 polygons |
 | Competitors | Google Places Nearby (popularity-ranked 1.8 km circles) | Inside the 24 lounges' 15-min catchments | `v3/salons.csv`, `v3/lounge_candidates.csv`, `v3/lounge_search_saturation.csv` | 4,237 salons (2,824 women's-salon candidates) |
+| Competitors around growth cells | Same method | The 146 populated cells (≥ 2,000 women) outside every catchment | `v3/growth_salons.csv`, `v3/search_circles.csv` (every circle, both runs) | 1,905 salons (1,179 candidates); 282 circles |
 | Search-recall calibration | A full sweep of one ~8 km tile around Al Barsha | One tile | `data/raw/places_cache/` (not committed) | 452 salons |
 
 ## Gaps
@@ -20,7 +21,7 @@ Tunable assumptions: `data/scenarios/baseline.yaml`. Assumptions with evidence: 
 | Gap | Effect on the analysis | How to fill it | Cost |
 |---|---|---|---|
 | **Revenue, rent, capex, lease terms** | Nothing measures return on capital; SHRINK means "investigate", not "close" | Bedashing's P&L, leases, fixed-asset register | Needs the client |
-| **Competitors outside the catchments** | Growth areas are judged on population and distance only; saturation unknown | Same 1.8 km circles over growth areas: 60 calls (cells ≥ 5k women), 282 (≥ 2k), 2,278 (all) | 60 free now; 282 free from 1 Nov (~$7 now); all ~$80 |
+| **Competitors in small growth cells** | Cells under 2,000 women outside the catchments have no competitor data (cells ≥ 2,000 were fetched 2026-10-09) | Same circles over the remaining 1,685 cells: ~2,000 calls | ~$70 |
 | **Small salons in dense areas** | Google's 20-result cap hid the long tail where 31% of circles were full; corrected with an *estimated* recall of 0.66 from one tile | Split the full circles (~1,600-6,000 calls) | Free from 1 Nov for the first level; ~$54-210 now |
 | **Worker housing not mapped as industrial** | Labour camps in DIP and (very likely) Sonapur are missed, so **Mirdif-35's market is overstated** | DSC community sex splits for all Dubai communities (~220 pages), or manual tagging | Free; ~4 minutes of polite scraping |
 | **Female share outside Dubai** | Calibrated on Dubai only; applied UAE-wide | Abu Dhabi (SCAD) and other emirates rarely publish below region level | Probably unavailable |
