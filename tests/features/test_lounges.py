@@ -141,6 +141,7 @@ def test_every_level_combination_builds(real_v3):
         f, a = build(real_v3, ASSUMPTIONS, Levels(t, c, w))
         assert len(f) == 24 and all(x.catchment_women > 0 for x in f)
         assert a and all(x.women > 0 for x in a)
+        assert len({x.area_id for x in a}) == len(a)       # Arabic-only names must not collide
 
 
 def test_travel_level_changes_competition(real_v3):

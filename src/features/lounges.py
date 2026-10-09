@@ -81,7 +81,7 @@ def _km(lat, lng, lats, lngs):
 
 
 def _slug(s: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+    return re.sub(r"[^a-z0-9\u0600-\u06ff]+", "-", s.lower()).strip("-")   # keeps Arabic-only names apart
 
 
 def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  # noqa: B008 (frozen)
