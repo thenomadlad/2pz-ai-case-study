@@ -180,7 +180,7 @@ class Reason(BaseModel):
 
 class Explanation(BaseModel):
     subject_id: str
-    kind: Literal["branch", "opportunity", "network"]
+    kind: Literal["branch", "opportunity", "network", "lounge", "area", "uae"]
     action: str
     # The answer, in one sentence: the top of the pyramid.
     headline: str = ""

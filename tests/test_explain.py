@@ -263,3 +263,31 @@ def test_branch_facts_cover_branch_table():
                  scores={"demand": 0.5, "cannibalisation": 0.5, "competition": 0.5,
                          "quality": 0.5})
     assert set(explain.BRANCH_TABLE) <= set(explain.branch_facts(f, d))
+
+
+# --- v3 kinds ---------------------------------------------------------------------------
+
+def test_v3_templates_are_grounded_for_every_subject():
+    from src.explain import GLOSSARY, TOPICS, template_explanation, v3_subjects, verify
+    subjects = v3_subjects()
+    assert {k for k, *_ in subjects} == {"uae", "lounge", "area"}
+    for kind, sid, action, facts in subjects:
+        assert verify(template_explanation(kind, sid, action, facts), facts, kind) == [], sid
+        assert all(k in GLOSSARY for k in facts), sid
+    assert all(f in GLOSSARY for t in ("lounge", "area", "uae") for fs in TOPICS[t].values()
+               for f in fs)
+
+
+def test_not_scored_lounge_never_goes_to_the_llm():
+    from src.explain import explain, v3_subjects
+    kind, sid, action, facts = next(s for s in v3_subjects() if s[2] == "NOT SCORED")
+
+    class Boom:
+        class beta:
+            class messages:
+                @staticmethod
+                def create(**_):
+                    raise AssertionError("LLM called for a NOT SCORED lounge")
+
+    exp = explain(kind, sid, action, facts, cache={}, client=Boom())
+    assert exp.source == "template" and exp.headline.startswith("Not scored")

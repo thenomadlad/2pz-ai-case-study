@@ -1,7 +1,8 @@
 """Pyramid explanations: an answer (headline), 2-5 supporting arguments, 2-5 data points each.
 
 Three kinds: a branch decision, an opportunity-area decision, and the network-wide
-executive summary. The rubric / 2x2 make every decision, and `prioritize` decides which
+executive summary. The v3 market model adds three more: `lounge`, `area` and `uae` (its network
+summary); the old kinds go once the app runs on v3. The rubric / 2x2 make every decision, and `prioritize` decides which
 arguments matter and in what order: importance is computed, never left to the AI. An LLM
 then writes the pyramid from a fact sheet. Every cited {field, value} and every number in
 its prose must match that fact sheet, and the arguments must be exactly the ranked topics
@@ -11,6 +12,8 @@ deploy shows AI output without an API key, and a stale entry can never be served
 changed numbers.
 
 `uv run python -m src.explain` (just explain) regenerates the cache for the baseline.
+`... src.explain prompts DIR` / `... src.explain ingest DIR` write the v3 prompts to files and
+read answers back (written outside the API, e.g. by Claude Code), verify them and cache them.
 """
 import hashlib
 import json
@@ -19,13 +22,16 @@ import re
 from dataclasses import dataclass
 
 from src.config import REPO_ROOT, settings
-from src.model import opportunity, rubric
+from src.model import growth, opportunity, rubric, scorecard
 from src.models import (
+    Area,
+    AreaDecision,
     BranchFeatures,
     CommunityFeatures,
     Decision,
     Evidence,
     Explanation,
+    LoungeFeatures,
     OpportunityDecision,
     Reason,
 )
@@ -73,7 +79,7 @@ GLOSSARY: dict[str, Field] = {
                           "Number of 2GIS reviews behind the rating; more means more reliable."),
     "composite": Field(
         "Composite score", "0-1",
-        "Equal-weight average of the four signal scores below. "
+        "Weighted average of the signal scores below (weights in the Threshold column). "
         f"PROTECT ≥ {rubric.PROTECT_AT}, SHRINK ≤ {rubric.SHRINK_AT}."),
     **{f"score_{s.name}": Field(
         f"{s.name.capitalize()} score", "0-1",
@@ -139,11 +145,12 @@ GLOSSARY: dict[str, Field] = {
                                   "Highest composite among SHRINK branches."),
     "low_confidence_count": Field(
         "Low-confidence calls", "branches",
-        "Branches within 0.05 of a threshold, or with a missing input."),
+        "Calls within 0.05 of a threshold, with a missing input, or (v3) that flip across "
+        "assumption levels."),
     "areas_total": Field("Communities", "count", "Dubai communities evaluated."),
-    "grow_count": Field("GROW", "areas", "Underserved, unsaturated communities."),
+    "grow_count": Field("GROW", "areas", "Areas passing both tests."),
     "watch_count": Field("WATCH", "areas", "Communities passing one of the two tests."),
-    "grow_areas": Field("GROW areas", "", "Ids of GROW communities."),
+    "grow_areas": Field("GROW areas", "", "Ids of GROW areas."),
     "grow_nearest_km_min": Field("Closest GROW area to a branch", "km",
                                  "Smallest nearest-branch distance among GROW areas."),
     "grow_nearest_km_max": Field("Furthest GROW area from a branch", "km",
@@ -155,6 +162,94 @@ GLOSSARY: dict[str, Field] = {
                                "OpenStreetMap salons in the competitive set (a lower bound)."),
     "revenue_data_available": Field("Revenue data", "yes/no", "Per-branch revenue or footfall."),
     "rent_data_available": Field("Rent data", "yes/no", "Per-branch rent, capex or lease terms."),
+    # --- v3: lounge ---
+    "catchment_women": Field(
+        "Women 15+ in catchment", "women",
+        "Women aged 15+ living in the ~2 km cells within a 15-min drive (typical midday traffic). "
+        "WorldPop adults, rebalanced so worker housing counts few women."),
+    "catchment_cells": Field("Cells in catchment", "count",
+                             "Populated ~2 km grid cells whose centre is within the drive time."),
+    "shared_share": Field(
+        "Shared catchment", "% of catchment women",
+        "Share of the catchment's women who live in cells another open Bedashing lounge also "
+        "reaches: the cannibalisation measure.", pct=True),
+    "premium_pool": Field(
+        "Premium salons in catchment", "count",
+        "Google Places salons in the catchment that count as premium: Google price "
+        "'expensive' or above, or (unpriced) at least the median reviews and rated 4.3+."),
+    "substitutes_k": Field(
+        "Premium substitutes", "count",
+        "The most-reviewed premium salons that together hold 60% of the catchment's premium "
+        "reviews: the lounge's real competition."),
+    "capture": Field(
+        "Capture", "% of reviews",
+        "Lounge reviews ÷ (lounge + substitutes' reviews, scaled up for salons the search "
+        "missed). A proxy for share of premium customers.", pct=True),
+    "thin_premium_market": Field(
+        "Thin premium market", "yes/no",
+        "Fewer than 10 premium salons: capture of a tiny pool is noise, so it scores neutral."),
+    "lounge_rating": Field("Google rating", "stars (of 5)", "The lounge's Google rating."),
+    "lounge_reviews": Field("Google reviews", "count", "Reviews behind the lounge's rating."),
+    "substitutes_median_rating": Field("Substitutes' median rating", "stars (of 5)",
+                                       "Median Google rating of the premium substitutes."),
+    "rating_gap": Field("Rating gap", "stars",
+                        "Lounge rating minus its substitutes' median rating."),
+    "est_customers": Field("Women captured (est.)", "women",
+                           "Capture × catchment women: a rough size of the lounge's share."),
+    "level_flips": Field(
+        "Assumption sensitivity", "of 27 combinations",
+        "How many of the 27 combinations of travel time, competitor coverage and worker-housing "
+        "share change this lounge's call."),
+    **{f"score_{s.name}": Field(
+        f"{s.name.capitalize()} score", "0-1",
+        f"{s.label}, converted to a fixed 0-1 score where 1 is best for the lounge "
+        "(scale in the Threshold column).")
+       for s in scorecard.SIGNALS if s.name in ("capture", "rating")},
+    # --- v3: growth area ---
+    "area_name": Field("Area", "", "OpenStreetMap place name nearest the area's cells."),
+    "emirate": Field("Emirate", "", "Emirate the area lies in."),
+    "women": Field("Women 15+", "women", "Women aged 15+ living in the area's cells."),
+    "cells": Field("Cells", "count", "Populated ~2 km cells in the area (one contiguous piece)."),
+    "worker_share": Field("Worker housing", "% of adults",
+                          "Share of the area's adults living in worker housing (OSM industrial "
+                          "land use).", pct=True),
+    "premium_salons": Field("Premium salons", "count",
+                            "Premium salons found in the area's searched cells."),
+    "premium_reviews_per_1k": Field(
+        "Premium saturation", "reviews per 1k women",
+        "Premium salons' Google reviews (scaled up for missed salons) per 1,000 women in the "
+        "searched cells. Lounge catchments run 88+; empty areas under 10."),
+    "data_coverage": Field("Competitor data coverage", "% of women",
+                           "Share of the area's women in cells our salon search covered.",
+                           pct=True),
+    "nearest_lounge_id": Field("Nearest lounge", "", "Closest open Bedashing lounge."),
+    "nearest_lounge_km": Field("Distance to nearest lounge", "km",
+                               "Straight-line distance; every area is beyond a 15-min drive."),
+    "big_enough": Field("Big enough", "yes/no",
+                        f"At least {growth.GROW_MIN_WOMEN:,} women and worker housing under "
+                        f"{growth.WORKER_CAP:.0%} of adults."),
+    "grow_min_women": Field("Size line", "women", "Women needed to carry a lounge."),
+    "skip_under_women": Field("Size floor", "women", "Under this the area is skipped."),
+    "unsaturated_per_1k": Field("Saturation line", "reviews per 1k women",
+                                "Under this the area is unsaturated."),
+    "worker_cap": Field("Worker-housing cap", "% of adults",
+                        "Above this the women estimate is too uncertain to GROW.", pct=True),
+    "min_coverage": Field("Coverage needed", "% of women",
+                          "Less competitor data than this caps the call at WATCH.", pct=True),
+    # --- v3: network ---
+    "lounges_scored": Field("Lounges scored", "count", "UAE lounges given a call."),
+    "not_scored_count": Field("Not scored", "lounges",
+                              "Lounges that serve travellers (the airport lounge)."),
+    "protect_lounges": Field("PROTECT lounges", "", "Ids of PROTECT lounges."),
+    "shrink_lounges": Field("SHRINK lounges", "", "Ids of SHRINK lounges."),
+    "growth_areas_total": Field("Growth areas", "count",
+                                "Populated areas beyond a 15-min drive of every lounge."),
+    "grow_women_total": Field("Women in GROW areas", "women", "Sum over GROW areas."),
+    "grow_reviews_per_1k_max": Field("Most saturated GROW area", "reviews per 1k women",
+                                     "Highest premium saturation among GROW areas."),
+    "salons_total": Field("Salons searched", "count",
+                          "Women's salons found by the Google Places search (all of the UAE "
+                          "searched)."),
 }
 
 BRANCH_TABLE = ("female_pop_served", "communities_served", "contested_share",
@@ -197,6 +292,30 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
         "confidence": ("hold_count", "low_confidence_count", "branches_total"),
         "data_gaps": ("revenue_data_available", "rent_data_available", "competitors_total"),
     },
+    "lounge": {
+        "demand": ("catchment_women", "catchment_cells", "score_demand", "est_customers"),
+        "cannibalisation": ("shared_share", "score_cannibalisation"),
+        "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market",
+                    "score_capture"),
+        "rating": ("rating_gap", "lounge_rating", "substitutes_median_rating", "lounge_reviews",
+                   "score_rating"),
+    },
+    "area": {
+        "size": ("women", "grow_min_women", "big_enough", "skip_under_women"),
+        "saturation": ("premium_reviews_per_1k", "premium_salons", "unsaturated",
+                       "unsaturated_per_1k"),
+        "reach": ("nearest_lounge_km", "nearest_lounge_id"),
+        "worker_housing": ("worker_share", "worker_cap"),
+        "data_gap": ("data_coverage", "min_coverage", "unsaturated"),
+    },
+    "uae": {
+        "shrink": ("shrink_count", "shrink_lounges", "shrink_composite_max"),
+        "grow": ("grow_count", "grow_areas", "grow_women_total", "grow_nearest_km_min",
+                 "grow_nearest_km_max"),
+        "protect": ("protect_count", "protect_lounges", "protect_composite_min"),
+        "confidence": ("hold_count", "low_confidence_count", "lounges_scored"),
+        "data_gaps": ("revenue_data_available", "rent_data_available", "salons_total"),
+    },
 }
 TOPIC_LABELS = {
     "demand": "Demand", "cannibalisation": "Cannibalisation", "competition": "Competition",
@@ -204,7 +323,9 @@ TOPIC_LABELS = {
     "headroom": "Room left",
     "worker_housing": "Demand reliability", "shrink": "Where to cut back",
     "grow": "Where to grow", "protect": "What to protect", "confidence": "How sure we are",
-    "data_gaps": "What this can't see",
+    "data_gaps": "What this can't see", "capture": "Capture", "rating": "Rating vs rivals",
+    "size": "Size", "saturation": "Competition", "reach": "Distance to a lounge",
+    "data_gap": "What we couldn't search",
 }
 IMPORTANT = 0.1  # a branch signal must sit this far from neutral (0.5) to be an argument
 
@@ -259,6 +380,27 @@ THRESHOLDS: dict[str, str] = {
 }
 
 
+THRESHOLDS.update({
+    **{s.field: f"{_scale(s)}; weight {s.weight:g}" for s in scorecard.SIGNALS},
+    **{f"score_{s.name}": f"Weight {s.weight:g} of {sum(x.weight for x in scorecard.SIGNALS):g}"
+       for s in scorecard.SIGNALS if s.name in ("capture", "rating")},
+    "thin_premium_market": "Capture scores 0.5 when yes",
+    "level_flips": f"Low confidence at {scorecard.FLIP_LOW} or more",
+    "women": (f"GROW needs {growth.GROW_MIN_WOMEN:,}; SKIP under {growth.SKIP_UNDER_WOMEN:,}"),
+    "worker_share": f"GROW needs under {growth.WORKER_CAP:.0%}",
+    "premium_reviews_per_1k": f"Unsaturated under {growth.UNSATURATED_PER_1K:g}",
+    "data_coverage": f"GROW needs {growth.MIN_COVERAGE:.0%}",
+    "big_enough": "GROW needs both tests, WATCH one, SKIP neither",
+})
+# v3 lounge rows that share an old key (score_demand, score_cannibalisation, composite).
+LOUNGE_THRESHOLDS = {
+    **{f"score_{s.name}": f"Weight {s.weight:g} of {sum(x.weight for x in scorecard.SIGNALS):g}"
+       for s in scorecard.SIGNALS},
+    "composite": (f"PROTECT ≥ {scorecard.PROTECT_AT} · HOLD between · "
+                  f"SHRINK ≤ {scorecard.SHRINK_AT}"),
+}
+
+
 # Where an area's rule for a shared field differs from the branch rule.
 AREA_THRESHOLDS = {
     "competitors_per_10k": f"Unsaturated if under {opportunity.UNSATURATED_PER_10K:g}",
@@ -266,7 +408,8 @@ AREA_THRESHOLDS = {
 
 
 def table_rows(fields: tuple[str, ...], facts: dict, kind: str = "branch") -> list[dict]:
-    rules = {**THRESHOLDS, **(AREA_THRESHOLDS if kind == "opportunity" else {})}
+    rules = {**THRESHOLDS, **(AREA_THRESHOLDS if kind == "opportunity" else {}),
+             **(LOUNGE_THRESHOLDS if kind == "lounge" else {})}
     return [{"Factor": GLOSSARY[k].label, "Value": fmt(k, facts.get(k)),
              "Unit": GLOSSARY[k].unit, "Threshold": rules.get(k, "—"),
              "What it means": GLOSSARY[k].meaning}
@@ -325,10 +468,94 @@ def network_facts(decisions: list[Decision], opportunities: list[OpportunityDeci
     })
 
 
+# --- v3 facts ---------------------------------------------------------------------------
+
+LOUNGE_TABLE = ("catchment_women", "catchment_cells", "shared_share", "premium_pool",
+                "substitutes_k", "capture", "thin_premium_market", "est_customers",
+                "lounge_rating", "lounge_reviews", "substitutes_median_rating", "rating_gap",
+                "level_flips", "composite", "score_demand", "score_cannibalisation",
+                "score_capture", "score_rating")
+AREA_TABLE = ("women", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
+              "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
+              "unsaturated")
+NOT_SCORED_ACTION = "NOT SCORED"
+
+
+def lounge_facts(f: LoungeFeatures, d: Decision, flips: int | None = None) -> dict:
+    facts = {k: getattr(f, k) for k in LOUNGE_TABLE if hasattr(f, k)}
+    facts.update(lounge_rating=f.rating, lounge_reviews=f.review_count, level_flips=flips,
+                 composite=d.composite, **{f"score_{k}": v for k, v in d.scores.items()})
+    return _rounded(facts)
+
+
+def area_facts(a: Area, d: AreaDecision) -> dict:
+    facts = {k: getattr(a, k) for k in AREA_TABLE if hasattr(a, k)}
+    facts.update(area_name=a.name, emirate=a.emirate, big_enough=d.big_enough,
+                 unsaturated=d.unsaturated, grow_min_women=growth.GROW_MIN_WOMEN,
+                 skip_under_women=growth.SKIP_UNDER_WOMEN,
+                 unsaturated_per_1k=growth.UNSATURATED_PER_1K, worker_cap=growth.WORKER_CAP,
+                 min_coverage=growth.MIN_COVERAGE)
+    return _rounded(facts)
+
+
+def uae_facts(decisions: list[Decision], areas: list[Area], area_decisions: list[AreaDecision],
+              salons_total: int) -> dict:
+    scored = [d for d in decisions if d.action != NOT_SCORED_ACTION]
+    by_action = {a: [d for d in scored if d.action == a] for a in ("PROTECT", "HOLD", "SHRINK")}
+    act = {d.area_id: d.action for d in area_decisions}
+    grow = [a for a in areas if act[a.area_id] == "GROW"]
+    return _rounded({
+        "lounges_scored": len(scored),
+        "not_scored_count": len(decisions) - len(scored),
+        "protect_count": len(by_action["PROTECT"]),
+        "hold_count": len(by_action["HOLD"]),
+        "shrink_count": len(by_action["SHRINK"]),
+        "protect_lounges": ", ".join(sorted(d.branch_id for d in by_action["PROTECT"])) or "none",
+        "shrink_lounges": ", ".join(sorted(d.branch_id for d in by_action["SHRINK"])) or "none",
+        "protect_composite_min": min((d.composite for d in by_action["PROTECT"]), default=None),
+        "shrink_composite_max": max((d.composite for d in by_action["SHRINK"]), default=None),
+        "low_confidence_count": sum(d.confidence == "low" for d in scored),
+        "growth_areas_total": len(areas),
+        "grow_count": len(grow),
+        "watch_count": sum(d.action == "WATCH" for d in area_decisions),
+        "grow_areas": ", ".join(sorted(a.area_id for a in grow)) or "none",
+        "grow_women_total": round(sum(a.women for a in grow)),
+        "grow_nearest_km_min": min((a.nearest_lounge_km for a in grow), default=None),
+        "grow_nearest_km_max": max((a.nearest_lounge_km for a in grow), default=None),
+        "grow_reviews_per_1k_max": max((a.premium_reviews_per_1k for a in grow), default=None),
+        "salons_total": salons_total,
+        "revenue_data_available": False,
+        "rent_data_available": False,
+    })
+
+
 # --- prioritization: which arguments, in what order --------------------------------------
 
 def prioritize(kind: str, facts: dict, action: str) -> list[str]:
     """The 2-5 arguments that matter most for this decision, most important first."""
+    if kind == "lounge":
+        if action == NOT_SCORED_ACTION:
+            return ["demand", "capture"]
+        sign = {"PROTECT": 1, "SHRINK": -1}.get(action)
+        w = {s.name: s.weight for s in scorecard.SIGNALS}
+
+        def lweight(topic: str) -> float:
+            delta = (facts[f"score_{topic}"] - 0.5) * w[topic]
+            return delta * sign if sign else abs(delta)
+
+        ranked = sorted(TOPICS["lounge"], key=lweight, reverse=True)
+        chosen = [t for t in ranked if lweight(t) >= IMPORTANT]
+        return (chosen + [t for t in ranked if t not in chosen])[:max(MIN_ITEMS, len(chosen))]
+    if kind == "area":
+        if facts["women"] < facts["skip_under_women"]:
+            return ["size", "reach"]
+        topics = ["size", "saturation" if facts["unsaturated"] is not None else "data_gap",
+                  "reach"]
+        if facts["worker_share"] >= facts["worker_cap"]:
+            topics.append("worker_housing")
+        if facts["unsaturated"] is not None and facts["data_coverage"] < facts["min_coverage"]:
+            topics.append("data_gap")
+        return topics
     if kind == "branch":
         # Importance = how far a signal sits from neutral, in the direction of the call:
         # strengths for PROTECT, weaknesses for SHRINK, either for HOLD.
@@ -352,10 +579,25 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
         return topics
     skip = {"shrink": facts["shrink_count"] == 0, "grow": facts["grow_count"] == 0,
             "protect": facts["protect_count"] == 0}
-    return [t for t in TOPICS["network"] if not skip.get(t)][:MAX_ITEMS]
+    return [t for t in TOPICS[kind] if not skip.get(t)][:MAX_ITEMS]
+
+
+GROWTH_WHY = (
+    f"GROW needs both tests: at least {growth.GROW_MIN_WOMEN:,} women 15+ (worker housing under "
+    f"{growth.WORKER_CAP:.0%} of adults), and fewer than {growth.UNSATURATED_PER_1K:g} premium "
+    f"reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not "
+    f"searched enough to tell (under {growth.MIN_COVERAGE:.0%} of its women). SKIP passes "
+    f"neither, or has under {growth.SKIP_UNDER_WOMEN:,} women. Every area is beyond a 15-min "
+    "drive of every lounge.")
 
 
 def _thresholds_note(kind: str) -> str:
+    if kind == "lounge":
+        return f"{scorecard.THRESHOLDS_WHY} {scorecard.FLIP_WHY}"
+    if kind == "area":
+        return GROWTH_WHY
+    if kind == "uae":
+        return f"{scorecard.THRESHOLDS_WHY} {GROWTH_WHY}"
     if kind == "network":
         return f"{rubric.THRESHOLDS_WHY} {opportunity.THRESHOLDS_WHY}"
     return rubric.THRESHOLDS_WHY if kind == "branch" else opportunity.THRESHOLDS_WHY
@@ -368,11 +610,30 @@ def _ev(field: str, facts: dict) -> Evidence:
 # --- template (no AI) ---------------------------------------------------------------
 
 def _template_claim(kind: str, topic: str, f: dict) -> str:
-    if kind == "branch":
+    if kind == "lounge" and f.get(f"score_{topic}") is None:  # NOT SCORED: no scores
+        main = TOPICS["lounge"][topic][0]
+        return f"{GLOSSARY[main].label}: {fmt_unit(main, f[main])}, shown but not scored."
+    if kind in ("branch", "lounge"):
         score = f[f"score_{topic}"]
         strength = "a strength" if score >= 0.6 else "a weakness" if score <= 0.4 else "middling"
-        main = TOPICS["branch"][topic][0]
+        main = TOPICS[kind][topic][0]
         return f"{GLOSSARY[main].label} is {strength}: {fmt_unit(main, f[main])}."
+    if kind == "area":
+        sat = f["premium_reviews_per_1k"]
+        return {
+            "size": (f"About {fmt('women', f['women'])} women 15+ live here (GROW needs "
+                     f"{fmt('grow_min_women', f['grow_min_women'])})."),
+            "saturation": (f"{fmt('premium_reviews_per_1k', sat)} premium reviews per 1k women, "
+                           f"{'under' if f['unsaturated'] else 'over'} the "
+                           f"{fmt('unsaturated_per_1k', f['unsaturated_per_1k'])} line."),
+            "reach": (f"The nearest lounge, {f['nearest_lounge_id']}, is "
+                      f"{fmt('nearest_lounge_km', f['nearest_lounge_km'])} km away in a straight "
+                      "line, beyond a 15-min drive."),
+            "worker_housing": (f"{fmt('worker_share', f['worker_share'])} of adults live in "
+                               "worker housing, so the women estimate is uncertain."),
+            "data_gap": (f"Our salon search covered {fmt('data_coverage', f['data_coverage'])} "
+                         "of the women here, so competition is partly unknown."),
+        }[topic]
     if kind == "opportunity":
         return {
             "presence": f"Already served: Bedashing has a branch here ({f['nearest_branch_id']}).",
@@ -392,6 +653,17 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
             "worker_housing": ("Likely worker housing: the uniform female-share estimate "
                                "overstates demand here, so the call is capped at WATCH."),
         }[topic]
+    if kind == "uae":
+        return {
+            "shrink": f"Investigate before shrinking: {f['shrink_lounges']}.",
+            "grow": (f"{f['grow_count']} areas to GROW, with "
+                     f"{fmt('grow_women_total', f['grow_women_total'])} women 15+ between them."),
+            "protect": f"Protect {f['protect_lounges']}.",
+            "confidence": (f"{f['hold_count']} lounges sit in the HOLD band and "
+                           f"{f['low_confidence_count']} calls are low confidence."),
+            "data_gaps": ("No revenue or rent data: these are location and market calls, not "
+                          "return-on-capital calls."),
+        }[topic]
     return {
         "shrink": f"Investigate before shrinking: {f['shrink_branches']}.",
         "grow": (f"{f['grow_count']} areas to GROW, each "
@@ -406,6 +678,20 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
 
 
 def _template_headline(kind: str, action: str, f: dict) -> str:
+    if kind == "lounge":
+        if action == NOT_SCORED_ACTION:
+            return ("Not scored: this lounge serves travellers, not the women living around it, "
+                    "so the catchment model doesn't apply.")
+        return (f"{action}: composite {f['composite']:.2f} (PROTECT at {scorecard.PROTECT_AT} or "
+                f"more, SHRINK at {scorecard.SHRINK_AT} or less).")
+    if kind == "area":
+        return (f"{action}: {'big enough' if f['big_enough'] else 'not big enough'}, and "
+                + {True: "unsaturated", False: "saturated", None: "saturation unknown"}[
+                    f["unsaturated"]] + ".")
+    if kind == "uae":
+        return (f"{f['protect_count']} PROTECT, {f['hold_count']} HOLD and {f['shrink_count']} "
+                f"SHRINK across {f['lounges_scored']} scored lounges, with {f['grow_count']} "
+                "areas to GROW.")
     if kind == "branch":
         return (f"{action}: composite {f['composite']:.2f} (PROTECT at {rubric.PROTECT_AT} or "
                 f"more, SHRINK at {rubric.SHRINK_AT} or less).")
@@ -428,13 +714,25 @@ _TEMPLATE_CAPTIONS = {
                     "both, WATCH has one, and SKIP has neither."),
     "network": ("Branch calls come from a fixed-scale rubric; area calls come from two tests, "
                 "distance to the nearest branch and competitor density."),
+    "lounge": ("Each signal is scored 0-1 on a fixed scale, where 1 is good for the lounge, and "
+               "the composite is their weighted average. Demand counts women within a 15-min "
+               "drive, cannibalisation how many of them another lounge also reaches, capture the "
+               "lounge's share of premium-salon reviews nearby, and rating its Google rating "
+               "against those rivals."),
+    "area": ("An area is big enough when enough women live there, and unsaturated when few "
+             "premium-salon reviews exist per woman. GROW needs both, WATCH has one, SKIP has "
+             "neither."),
+    "uae": ("Lounge calls come from a fixed-scale scorecard; growth-area calls from two tests, "
+            "size and premium saturation."),
 }
 
 
 def template_explanation(kind: str, subject_id: str, action: str, facts: dict) -> Explanation:
     topics = prioritize(kind, facts, action)
     reasons = [Reason(topic=t, claim=_template_claim(kind, t, facts),
-                      evidence=[_ev(k, facts) for k in TOPICS[kind][t][:MAX_ITEMS]])
+                      evidence=[_ev(k, facts) for k in TOPICS[kind][t][:MAX_ITEMS]
+                                if not (kind == "lounge" and k.startswith("score_")
+                                        and facts.get(k) is None)])
                for t in topics]
     return Explanation(subject_id=subject_id, kind=kind, action=action,
                        headline=_template_headline(kind, action, facts), reasons=reasons,
@@ -454,6 +752,8 @@ def _allowed_numbers(facts: dict) -> list[float]:
     nums += [rubric.PROTECT_AT, rubric.SHRINK_AT, 4, 0, 1]
     nums += [x for s in rubric.SIGNALS for x in (s.worst, s.best)]
     nums += [opportunity.FAR_KM, opportunity.UNSATURATED_PER_10K, opportunity.MIN_POP]
+    nums += [scorecard.PROTECT_AT, scorecard.SHRINK_AT, scorecard.FLIP_LOW, 27, 15, 60, 1_000]
+    nums += [x for s in scorecard.SIGNALS for x in (s.worst, s.best, s.weight)]
     nums += [2, 3, 10, 10_000, 100, 5]  # "per 10k", "2GIS", "out of 5"
     return nums
 
@@ -668,7 +968,7 @@ def explain(kind: str, subject_id: str, action: str, facts: dict,
     key = cache_key(kind, subject_id, action, facts)
     if key in cache:
         return Explanation(**cache[key])
-    if client is not None:
+    if client is not None and action != NOT_SCORED_ACTION:
         exp = llm_explanation(client, kind, subject_id, action, facts)
         if exp is not None:
             cache[key] = exp.model_dump()
@@ -690,6 +990,77 @@ def subjects_for(data) -> list[tuple[str, str, str, dict]]:
     subjects += [("opportunity", c.community_id, opp[c.community_id].action,
                   opportunity_facts(c, opp[c.community_id])) for c in data.community_features]
     return subjects
+
+
+V3_NETWORK_ID = "uae"
+
+
+def v3_subjects() -> list[tuple[str, str, str, dict]]:
+    """(kind, id, action, facts) for every v3 explanation at the baseline (medium levels)."""
+    from src.config import load_baseline_assumptions
+    from src.data_v3 import load_v3
+    from src.features.lounges import build
+    from src.models import Levels
+
+    v3 = load_v3()
+    assumptions = load_baseline_assumptions(REPO_ROOT / "data" / "scenarios" / "baseline.yaml")
+    features, areas = build(v3, assumptions)
+    flips = scorecard.level_flips(v3, assumptions, Levels())
+    decisions = scorecard.decide(features, flips)
+    area_decisions = growth.classify_all(areas)
+    salons = int((v3.salons.excluded_reason == "").sum())
+    subjects = [("uae", V3_NETWORK_ID, NETWORK_ACTION,
+                 uae_facts(decisions, areas, area_decisions, salons))]
+    subjects += [("lounge", f.branch_id, d.action, lounge_facts(f, d, flips.get(f.branch_id)))
+                 for f, d in zip(features, decisions)]
+    subjects += [("area", a.area_id, d.action, area_facts(a, d))
+                 for a, d in zip(areas, area_decisions)]
+    return subjects
+
+
+def _needs_writing(kind: str, action: str) -> bool:
+    """AI explanations are written for every v3 subject except the fixed NOT SCORED template and
+    SKIP areas (hundreds of small places; their template says enough)."""
+    return action not in (NOT_SCORED_ACTION, "SKIP")
+
+
+def write_prompts(out_dir) -> int:
+    """One JSON prompt per v3 subject not yet in the cache, for a writer outside the API."""
+    from pathlib import Path
+    out = Path(out_dir)
+    (out / "answers").mkdir(parents=True, exist_ok=True)
+    cache, n = load_cache(), 0
+    for kind, sid, action, facts in v3_subjects():
+        if not _needs_writing(kind, action) or cache_key(kind, sid, action, facts) in cache:
+            continue
+        (out / f"{kind}__{sid}.json").write_text(json.dumps({
+            "system": SYSTEM_PROMPT, "request": json.loads(_user_message(kind, sid, action, facts, [])),
+            "answer_schema": EXPLAIN_TOOL["input_schema"],
+            "answer_file": str(out / "answers" / f"{kind}__{sid}.json")}, indent=2, ensure_ascii=False))
+        n += 1
+    return n
+
+
+def ingest_answers(out_dir, write: bool = True) -> tuple[int, dict[str, list[str]]]:
+    """Verify every answer file and cache the grounded ones (write=False: only check).
+    Returns (grounded, errors by file)."""
+    from pathlib import Path
+    answers = Path(out_dir) / "answers"
+    cache, ok, failed = load_cache(), 0, {}
+    for kind, sid, action, facts in v3_subjects():
+        path = answers / f"{kind}__{sid}.json"
+        if not path.exists():
+            continue
+        exp = _parse(json.loads(path.read_text()), kind, sid, action)
+        errors = verify(exp, facts, kind)
+        if errors:
+            failed[path.name] = errors
+            continue
+        cache[cache_key(kind, sid, action, facts)] = exp.model_dump()
+        ok += 1
+    if write:
+        CACHE_PATH.write_text(json.dumps(cache, indent=2, ensure_ascii=False, sort_keys=True))
+    return ok, failed
 
 
 def make_client():
@@ -750,5 +1121,15 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    import sys
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-    main()
+    if sys.argv[1:2] == ["prompts"]:
+        print(f"wrote {write_prompts(sys.argv[2])} prompts to {sys.argv[2]}")
+    elif sys.argv[1:2] in (["ingest"], ["check"]):
+        cached, failed = ingest_answers(sys.argv[2], write=sys.argv[1] == "ingest")
+        for name, errors in failed.items():
+            print(f"FAILED {name}: {errors}")
+        print(f"{cached} grounded explanations{' cached' if sys.argv[1] == 'ingest' else ''}; "
+              f"{len(failed)} failed the checks")
+    else:
+        main()
