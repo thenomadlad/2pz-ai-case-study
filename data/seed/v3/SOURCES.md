@@ -42,8 +42,6 @@ Script: `scripts/fetch_branches.py`.
   is `zayed-international-airport-abu-dhabi`).
 - Ratings span 4.4-4.9 (median 4.6); review counts 215-2,465 (median 755).
 - Google terms: only `place_id` may be stored indefinitely; refresh the rest within 30 days.
-- Replaces the old `data/seed/branches.csv` (9 "Dubai branches" from 2GIS), of which 4
-  don't exist (al-safa-2, palm-jumeirah, sheikh-zayed-road, the old nad-al-sheba pin).
 
 ## Review counts: lifetime totals, not a rate
 
@@ -81,3 +79,32 @@ reviews oldest-first, so finding the first review needs a full scrape of every r
 - **Limitations:** brackets are coarse and user-reported; one neighbourhood can mix cheap
   and premium salons, so neighbourhood imputation smooths that over; coverage is likely
   lower outside central Dubai.
+
+## Market size (`cells.csv`, `emirates.csv`, `dubai_community_gender.csv`, built 2026-10-08)
+
+Script: `scripts/build_cells.py`. Notebook: `notebooks/market_size.ipynb` (model structure,
+assumptions, validation).
+
+- **Population:** WorldPop 2025, R2025A v1, constrained, 100 m, age/sex structures for the UAE
+  (DOI 10.5258/SOTON/WP00841, CC BY 4.0): the 16 female and 16 male rasters for ages 15-90+, from
+  `https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/ARE/v1/100m/constrained/`.
+  UAE adults 15+: 9.42M.
+- **WorldPop's sex split is flat:** every pixel is 33.6% female (one national ratio). We keep its
+  adults and redo the split.
+- **Worker housing** = adults inside OSM `landuse=industrial` (3,580 polygons, Overpass,
+  2026-10-09). Their female share is `worker_housing_female_share` (low 1% / medium 5.5% / high
+  15%, `baseline.yaml`); every other pixel gets the share that keeps its emirate's WorldPop female
+  total.
+- **Calibration and validation:** Dubai Statistics Center 2022 community estimates with the sex
+  split, republished by citypopulation.de (23 communities, `dubai_community_gender.csv`).
+  Labour-camp areas 0.1-27% female (5.5% population-weighted); residential 43-54%. Against 21
+  of them, located by OSM place points: mean absolute error 0.21 (WorldPop) → 0.13 (corrected).
+- **Limitation:** camps not mapped as industrial in OSM are missed: Dubai Investment Park 1-2,
+  Ras Al Khor Industrial 1-2 and very likely Sonapur (Muhaisnah 2), so **Mirdif-35's market is
+  overstated**. One false positive: Al Qusais Industrial 4 (residential, 59% industrial land). OSM
+  labour-accommodation tags were tried as a second signal and rejected (79 features UAE-wide,
+  none near Sonapur).
+- **Grid:** 0.02° cells (~2.2 x 2.0 km), cells with ≥ 500 adults: 2,373 cells, 94.4% of UAE adults.
+  Names from OSM admin boundaries (level 10, then 8, 2026-07-28 snapshot) or the nearest OSM place
+  within 3 km. Cells, not official neighbourhoods, because OSM neighbourhoods cover 66% of
+  Dubai's women, Sharjah's are whole towns and Fujairah has none.

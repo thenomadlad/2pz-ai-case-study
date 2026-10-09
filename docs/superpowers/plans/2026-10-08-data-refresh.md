@@ -7,10 +7,12 @@
 **Architecture:** One script per stage under `scripts/`, each reading the previous stage's committed output from `data/seed/v3/` and writing its own. Each script is run once by hand, its output is vetted in a notebook, then committed. The pipeline under `src/` and the app are **not** touched here; switching them to `data/seed/v3/` is a follow-up plan, so the live app and the existing 115 tests keep working throughout.
 
 **Market model (agreed 2026-10-08; built in the integration plan, data for it built here):**
-- **Market size per neighbourhood** `market(n)` = female population (WorldPop, Task 2). Only *relative* accuracy matters; precision beyond that doesn't. The one thing it must get right is the sex skew in worker-housing areas (the bug that inflated jumeirah-park).
-- **Reach:** salon `s` can serve neighbourhood `n` if `s` lies inside `n`'s drive-time isochrone (Task 3), at each `travel_time_minutes` level.
-- **Share out per neighbourhood, never per catchment:** `market(n)` is split among **every** salon that can reach `n`, in proportion to lifetime review count: `share(s, n) = reviews(s) / Σ reviews(s')` over the salons reaching `n`. A lounge's **captured market** = `Σ_n market(n) × share(lounge, n)`. Shares in each neighbourhood sum to 1, so overlapping catchments can't double-count, and two lounges near each other split the same neighbourhoods (cannibalisation falls out of this).
-- **A lounge's catchment** = the neighbourhoods it can reach. Decision measures: **share** (lounge reviews ÷ all reviews reaching its neighbourhoods) and **headroom** (catchment market minus captured). Raw captured women largely mirrors review count; don't headline it.
+- **Unit:** a ~2 km grid **cell** (0.02°), not an official neighbourhood: OSM neighbourhoods are patchy outside Abu Dhabi, and the model never needed official boundaries. Cells carry an OSM name for display. (Changed 2026-10-08; "neighbourhood" below means cell.)
+- **Market size per cell** `market(n)` = women 15+ (Task 2): WorldPop adults, with the sex split redone because WorldPop applies one national ratio (33.6%) everywhere. Adults in OSM industrial land use (worker housing) get `worker_housing_female_share` (calibrated on Dubai labour-camp communities: 5.5%); every other cell gets the share that keeps each emirate's female total. Only *relative* accuracy matters; the one thing it must get right is the worker-housing skew (the bug that inflated jumeirah-park).
+- **Catchment:** a lounge's catchment = the cells inside its drive-time isochrone at `travel_time_minutes` (medium 15 min). **Competitor bound:** any salon that can reach a catchment cell within the travel time is at most 2x the travel time from the lounge, so salons are swept within **2x** (30 min at medium) of each lounge. Nothing relevant is missed.
+- **Reach (only for catchment cells):** salon `s` can serve cell `n` if `s` lies inside `n`'s own drive-time isochrone (Task 3). Cells outside every catchment get no isochrone.
+- **Share out per cell, never per catchment:** `market(n)` is split among **every** salon that can reach `n`, in proportion to lifetime review count: `share(s, n) = reviews(s) / Σ reviews(s')` over the salons reaching `n`. A lounge's **captured market** = `Σ_n market(n) × share(lounge, n)`. Shares in each cell sum to 1, so overlapping catchments can't double-count, and two lounges near each other split the same cells (cannibalisation falls out of this). Rejected alternative: lounge share = lounge reviews ÷ all reviews within 30 min. Simpler, but biased low, because a salon 28 min away would count as competing for the whole catchment.
+- **Growth candidates:** populated cells outside every lounge's catchment (all cells are in `cells.csv`, so this costs nothing extra). Decision measures: **share** (lounge reviews ÷ all reviews reaching its neighbourhoods) and **headroom** (catchment market minus captured). Raw captured women largely mirrors review count; don't headline it.
 - **Stated limitations:** review counts are lifetime totals (older salons are favoured; see `SOURCES.md`); chains likely push for more reviews than independents, inflating Bedashing's share; no distance decay inside the travel time (every reachable salon competes equally; a Huff model is the later upgrade, the three travel-time levels are the sensitivity check); home-service salons are invisible; income and nationality mix are ignored; mall lounges draw beyond their drive-time zone.
 - **Price segment (added 2026-10-08):** only salons in Bedashing's price segment compete for its market. Bedashing's own level is an **assumption** (`bedashing_price_level: expensive` in `baseline.yaml`; to be revisited later, e.g. from its Phorest menu), and only salons at a `comparable_price_levels` level (default `[expensive]`) enter the share formula as competitors. Price comes from Google's `priceLevel` (crowd-sourced spend per person; about half of salons have it). Missing levels are **imputed** (see Task 4); a salon stays in the comparison if its level is still unknown after imputation, so missing data never silently removes competition. Limitation: Google's levels are coarse brackets from user answers, not price lists, and one neighbourhood can mix cheap and premium salons.
 - **Excluded from the market model:** `zayed-international-airport` (serves travellers, not a neighbourhood). Kept in the data, flagged.
@@ -49,22 +51,26 @@
 ```
 data/seed/lounges.json                 # store-locator snapshot (already saved, 24 lounges)
 data/seed/v3/branches.csv              # Task 1: 24 lounges + Google place, rating, reviews
-data/seed/v3/neighbourhoods.geojson    # Task 2: polygons + female population (= market size)
-data/seed/v3/isochrones.geojson        # Task 3: drive-time polygon per neighbourhood x level
-data/seed/v3/lounge_reach.csv          # Task 3: neighbourhood x level x lounge it reaches
-data/seed/v3/salons.csv                # Task 4: every salon in the market area (competitors + Bedashing)
-data/seed/v3/salon_reach.csv           # Task 4: neighbourhood x level x salon it reaches
+data/seed/v3/cells.csv                 # Task 2: ~2 km cells: adults, worker-housing adults, name, emirate
+data/seed/v3/emirates.csv              # Task 2: emirate totals (to rebalance the female share)
+data/seed/v3/dubai_community_gender.csv # Task 2: DSC 2022 sex split, 23 Dubai communities (calibration)
+data/seed/v3/lounge_isochrones.geojson # Task 3: per lounge, catchment levels + 2x competitor bounds
+data/seed/v3/cell_isochrones.geojson   # Task 3: per catchment cell x level
+data/seed/v3/catchment_cells.csv       # Task 3: cell x level x lounge whose catchment holds it
+data/seed/v3/salons.csv                # Task 4: every salon within 2x travel time of a lounge
+data/seed/v3/salon_reach.csv           # Task 4: cell x level x salon inside the cell's isochrone
 data/seed/v3/SOURCES.md                # provenance for every file above
 scripts/places.py                      # shared Google Places client (from scripts/fetch_places.py)
 scripts/fetch_branches.py              # Task 1
-scripts/fetch_neighbourhoods.py        # Task 2
+scripts/build_cells.py                 # Task 2
 scripts/fetch_isochrones.py           # Task 3
 scripts/fetch_salons.py                # Task 4
 tests/scripts/test_places.py           # Task 1 helpers: name filter, matching
+tests/scripts/test_cells.py            # Task 2: block sums, female-share rebalancing
 tests/scripts/test_isochrones.py       # Task 3: reaches
 tests/scripts/test_salons.py           # Task 4: tiling, dedupe, cache
 notebooks/branches.ipynb               # vets Task 1 (exists; extend)
-notebooks/neighbourhoods.ipynb         # vets Task 2
+notebooks/market_size.ipynb            # Task 2: model structure, assumptions, vetting
 notebooks/reach.ipynb                  # vets Task 3
 notebooks/salons.ipynb                 # vets Task 4
 ```
@@ -140,48 +146,43 @@ scrape of every review (~21k for Bedashing, unaffordable for competitors) and br
 terms. **Decision:** use raw lifetime `review_count` for lounges and competitors alike, and
 state the age caveat (see `SOURCES.md`, "Review counts").
 
-### Task 2: Neighbourhoods with market size (female population)
+### Task 2: Market size per grid cell — DONE 2026-10-08
 
-**What we need (market model):** every populated neighbourhood in the emirates we cover, each
-with an approximate **female population** (its market size). Relative accuracy is enough; the
-sex split must be real, not a flat 49%. Official community-level census figures are **not**
-required.
+**What was found (research, 2026-10-08):**
+- **WorldPop 2025 (R2025A, 100 m, constrained, CC BY 4.0)** has female and male rasters by
+  5-year age band for the whole UAE. But **every cell is 33.6% female**: one national ratio,
+  no local variation. It overstates women in labour camps *and* understates them in residential areas.
+- **OSM neighbourhoods are patchy:** Abu Dhabi's level-8 polygons cover 100% of its women; Dubai's
+  128 communities 66%; Sharjah's level 8 is whole towns; Fujairah has none. So: a grid.
+- **Dubai Statistics Center community figures with sex split** (2022, via citypopulation.de, 23
+  communities fetched): labour-camp industrial areas are 0.1-27% female (5.5% weighted by
+  population); residential 43-54%; **Al Qusais "Industrial" is residential** (42-48%), so names
+  don't identify worker housing.
 
-**Files:** Create `scripts/fetch_neighbourhoods.py`. Output: `data/seed/v3/neighbourhoods.geojson`.
+**Built:** `scripts/build_cells.py` → `cells.csv` (2,373 cells with ≥ 500 adults, 94.4% of UAE
+adults: adults, adults in OSM industrial land use, WorldPop women, OSM name), `emirates.csv`
+(totals). The female split is **not** baked in: women are recomputed from
+`worker_housing_female_share` (low 1% / medium 5.5% / high 15%, `baseline.yaml`), with the
+residential share rebalanced per emirate. Tests: `tests/scripts/test_cells.py`.
 
-**Interfaces:**
-- Produces a GeoJSON FeatureCollection. Each feature has properties `id, name, emirate, population_female, population_total, centroid_lat, centroid_lng` and a Polygon geometry. `population_female` is `market(n)`.
+- [x] **Step 1:** Sources confirmed (above); raw files in `data/raw/worldpop/`, `data/raw/osm/` (gitignored).
+- [x] **Step 2:** `build_cells.py` + tests; `dubai_community_gender.csv` committed as calibration evidence.
+- [x] **Step 3: Notebook** `notebooks/market_size.ipynb`: the model structure and every assumption, with its reasons (the user asked for this to live next to the data); WorldPop emirate totals; the flat 33.6% finding; the calibration table; **validation**: modelled female share vs measured for the 21 measured communities located by OSM place points (MAE 0.21 → 0.13; unmapped camps such as DIP and Sonapur are missed); the women per cell map; how much the correction moves women near each lounge (low/medium/high).
+- [x] **Step 4:** `SOURCES.md` "Market size" section, README table rows (3, 4, 5, new 13), commit.
 
-- [ ] **Step 1: Confirm sources (research, about 30 min).** Record findings in `SOURCES.md`:
+### Task 3: Lounge catchments and cell reach (drive-time isochrones)
 
-  | Need | Source | Check |
-  |---|---|---|
-  | **Female population** | **WorldPop** age/sex-structured rasters for ARE (100 m), female bands summed across ages | latest year; licence (CC BY 4.0 expected); download size; which raster reader (`rasterio`, or a lighter one) |
-  | Neighbourhood **boundaries + names** | OSM via Overpass: `boundary=administrative` (Dubai communities exist at some admin level) or `place=suburb\|neighbourhood\|quarter` | coverage per emirate; Abu Dhabi, Sharjah, RAK, Fujairah may only have `place` nodes, not polygons. If so, make Voronoi polygons from the nodes, clipped to the emirate |
-  | Sanity totals | Dubai Statistics Center, SCAD, emirate-level totals | only to check WorldPop's emirate totals, not as input |
-
-  Scope: every emirate with a lounge (Abu Dhabi, Dubai, Sharjah, Ras Al Khaimah, Fujairah). WorldPop covers all of them with one method, which is what makes all-emirates scope feasible. Bring findings to the user before writing code.
-- [ ] **Step 2:** Write `fetch_neighbourhoods.py`: fetch the boundaries, sum the WorldPop female (and total) rasters inside each polygon, drop polygons with no population, write the GeoJSON. Raw rasters go in `data/raw/` (gitignored); record their URLs and checksums in `SOURCES.md`.
-- [ ] **Step 3: Vet** in `notebooks/neighbourhoods.ipynb`: emirate totals vs. official totals (within about 15%); female share per neighbourhood (industrial and worker-housing areas well under 49%, residential near 45-50%); the largest neighbourhoods by women (does Jebel Ali Industrial drop out of the top?); compare with the old 50-community seed for Dubai; a choropleth map.
-- [ ] **Step 4:** Add a `SOURCES.md` row and commit.
-
-### Task 3: Reach (drive-time isochrones per neighbourhood)
-
-**Why per neighbourhood, not per lounge:** the market is shared out per neighbourhood, among
-every salon that can reach it. A lounge-centred catchment would miss competitors just
-outside it that still serve its edge neighbourhoods. So each neighbourhood gets its own
-isochrone; a lounge's catchment is then simply the neighbourhoods whose isochrone contains it.
-
-**Files:** Create `scripts/fetch_isochrones.py`. Outputs: `data/seed/v3/isochrones.geojson` and `data/seed/v3/lounge_reach.csv`.
+**Files:** Create `scripts/fetch_isochrones.py`. Outputs: `lounge_isochrones.geojson`, `cell_isochrones.geojson`, `catchment_cells.csv`.
 
 **Interfaces:**
-- Consumes: `neighbourhoods.geojson` (`id`, `centroid_lat`, `centroid_lng`), `branches.csv` (`branch_id`, `lat`, `lng`: Google's pin), and `travel_time_minutes` from `data/scenarios/baseline.yaml`.
+- Consumes: `branches.csv` (`branch_id`, `lat`, `lng`: Google's pin), `cells.csv` (`cell_id`, `lat`, `lng`), and `travel_time_minutes` from `baseline.yaml`.
 - Produces:
-  - `isochrones.geojson`: one feature per neighbourhood × level, properties `neighbourhood_id, level, minutes`.
-  - `lounge_reach.csv` columns `neighbourhood_id, level, branch_id`: one row per lounge inside that neighbourhood's isochrone.
-  - `scripts/fetch_isochrones.py`: `reaches(isochrone: Polygon, points: dict[str, tuple[float, float]]) -> list[str]` (ids of the points inside).
+  - `lounge_isochrones.geojson`: per lounge, one polygon per range in {10, 15, 20, 30, 40} min (the three catchment levels, plus 2x bounds 30 and 40 for medium and high; 2x low = 20 is already there), properties `branch_id, minutes`.
+  - `catchment_cells.csv` columns `cell_id, level, branch_id`: cells whose centre is inside the lounge's catchment polygon at that level.
+  - `cell_isochrones.geojson`: per catchment cell (any level), one polygon per catchment level, properties `cell_id, level, minutes`.
+  - `reaches(isochrone: Polygon, points: dict[str, tuple[float, float]]) -> list[str]`.
 
-- [ ] **Step 1: API and key.** **openrouteservice** isochrones (free key; about 500 requests a day, 5 locations and several ranges per request). Neighbourhoods ÷ 5 requests in total, all three levels in each, so about 100-200 requests for a few hundred neighbourhoods: one day's quota. The user creates the key and adds `ORS_API_KEY` to `.env` and `src/config.py`. Typical traffic only (ORS has no live traffic): say so in `SOURCES.md`. Cache each response in `data/raw/isochrone_cache/`.
+- [ ] **Step 1: Key.** openrouteservice isochrones (free key; ~500 requests a day; 5 locations and up to 10 ranges per request). The user creates the key and adds `ORS_API_KEY` to `.env` and `src/config.py`. Cache every response in `data/raw/isochrone_cache/`. Typical traffic only: say so in `SOURCES.md`.
 - [ ] **Step 2: Write the failing test**
 
 ```python
@@ -196,30 +197,32 @@ def test_reaches_returns_points_inside_only():
     pts = {"in": (25.05, 55.05), "out": (25.2, 55.2)}   # (lat, lng)
     assert reaches(square, pts) == ["in"]
 ```
-- [ ] **Step 3:** Run it. Expected: FAIL. Implement `reaches` with `shapely` (note: shapely points are `(lng, lat)`). Add `shapely` to the `notebook` extra. Run again. Expected: PASS.
-- [ ] **Step 4:** Ask the user, then run. **Vet** in `notebooks/reach.ipynb`: isochrones over the map for a few neighbourhoods; per lounge, catchment women at each level; lounges sharing neighbourhoods (cannibalisation); populated neighbourhoods that reach **no** lounge (GROW candidates); the **market area** for Task 4 = the union of the high-level (20 min) isochrones of every neighbourhood that reaches a lounge, with its size in km².
-- [ ] **Step 5:** Add a `SOURCES.md` row and commit.
+- [ ] **Step 3:** Run it. Expected: FAIL. Implement `reaches` (shapely points are `(lng, lat)`). Run again. Expected: PASS.
+- [ ] **Step 4: Lounge isochrones** (24 lounges ÷ 5 = 5 requests). Compute `catchment_cells.csv`. **Report the count of catchment cells** (at the high level) before Step 5: cell isochrones cost (cells ÷ 5) requests; if that exceeds ~450, ask the user (options: medium level only, or two days of quota).
+- [ ] **Step 5: Cell isochrones** for every catchment cell, all three levels per request.
+- [ ] **Step 6: Vet** in `notebooks/catchments.ipynb`: each lounge's catchment polygon and cells on a map; women per catchment at each level (with the worker-housing correction at low/medium/high); lounges sharing cells (cannibalisation); the 30-min competitor bounds (the Task 4 sweep area, in km²); populated cells outside every catchment (growth candidates).
+- [ ] **Step 7:** `SOURCES.md` row, commit.
 
-### Task 4: Every salon in the market area, with ratings and review counts
+### Task 4: Every salon within 2x travel time of a lounge, with ratings, review counts and prices
 
-**What we need (market model):** every salon that can reach a neighbourhood in any lounge's
-catchment, with its lifetime review count (the share weight). That means the whole **market
-area** from Task 3, not just lounge catchments, and **Bedashing's own lounges stay in**:
-they're salons in the same share formula.
+**What we need (market model):** every salon that can reach a cell in any lounge's catchment,
+with its lifetime review count (the share weight). The sweep area is the union of the lounges'
+**2x travel-time** isochrones (30 min at medium; 40 min if the high level is used), which
+bounds every such salon. **Bedashing's own lounges stay in**: they're salons in the same share formula.
 
 **Files:** Create `scripts/fetch_salons.py`. Outputs: `data/seed/v3/salons.csv` and `data/seed/v3/salon_reach.csv`.
 
 **Interfaces:**
-- Consumes: the market area and `isochrones.geojson` (Task 3), plus `search` and `is_bedashing` from `scripts/places.py`, and `reaches` from `scripts/fetch_isochrones.py`.
+- Consumes: the 2x isochrones in `lounge_isochrones.geojson` and `cell_isochrones.geojson` (Task 3), plus `search` and `is_bedashing` from `scripts/places.py`, and `reaches` from `scripts/fetch_isochrones.py`.
 - Produces:
   - `salons.csv` columns: `place_id, name, address, lat, lng, rating, review_count, status, primary_type, price_level` (Google's, may be empty), `price_low_aed, price_high_aed` (Google's `priceRange`), `neighbourhood_id` (the polygon it sits in), `price_level_used, price_level_source` (`google` / `neighbourhood` / `emirate` / `unknown`), `is_bedashing, branch_id` (`branch_id` set for Bedashing rows, joined on `place_id` to `branches.csv`), `excluded_reason` (empty, or e.g. `men-only`, `not-operational`, `out-of-set-type`), `fetched_at`. One row per salon.
   - `salon_reach.csv` columns: `neighbourhood_id, level, place_id`.
   - Helpers: `split(bbox) -> list[bbox]`, `dedupe(rows) -> list[dict]`, `fetch_tile(bbox, cache_dir) -> list[dict]`, `tag_bedashing(rows: list[dict], branches: list[dict]) -> list[dict]` (sets `is_bedashing` and `branch_id` by `place_id`), and `impute_price_levels(rows: list[dict]) -> list[dict]` (fills `price_level_used` and `price_level_source`; rows carry `price_level`, `neighbourhood_id`, `emirate`).
 
-**Method:** tile the market area's bounding box into rectangles. Each gets a Text Search
+**Method:** tile the sweep area's bounding box into rectangles. Each gets a Text Search
 `"beauty salon"` with `locationRestriction` set to that rectangle, paged up to 3 × 20. A tile
 that returns a full 60 is split into 4 and re-queried, down to about 250 m. Keep results
-inside the market area, dedupe by `place_id`, cache each tile in `data/raw/places_cache/`.
+inside the sweep area, dedupe by `place_id`, cache each tile in `data/raw/places_cache/`.
 Also query `"nail salon"` and `"hair salon"` on the same tiles **only if** the probe shows
 `"beauty salon"` misses them (that triples the cost; the user's call).
 
@@ -294,8 +297,8 @@ def test_impute_unknown_when_nothing_priced():
     assert impute_price_levels(rows)[0]["price_level_source"] == "unknown"
 ```
 - [ ] **Step 2:** Run them. Expected: FAIL. Implement `split`, `dedupe`, `fetch_tile`, `tag_bedashing`, `impute_price_levels` and the tiling loop. For an even count of levels, take the lower median (the conservative choice: it doesn't inflate a neighbourhood's price). Run again. Expected: PASS.
-- [ ] **Step 3: Probe (ask the user first, about 10-20 calls).** One dense tile (Al Barsha) and one sparse one (Al Dhafra). Report calls per km², salons found, tiles hitting the cap, the `primary_type` mix, and **price-level coverage** (share of salons with a Google `priceLevel`, by level). Extrapolate over the market area's km² to a cost estimate. **Budget warning:** `review_count` is an Enterprise-tier field, so every call bills at Enterprise (1,000 free a month, then $35 per 1,000), and the market area covers most of the urban UAE. Expect roughly 1,000-3,000 calls, so possibly $0-70. **Stop and get approval.** Ways to cut it: drop the high (20 min) level from the market area, or split the run across two calendar months.
-- [ ] **Step 4:** Full run with `MAX_CALLS` set to the approved estimate plus 20%. Then compute `salon_reach.csv` with `reaches` for every isochrone.
+- [ ] **Step 3: Probe (ask the user first, about 10-20 calls).** One dense tile (Al Barsha) and one sparse one (Al Dhafra). Report calls per km², salons found, tiles hitting the cap, the `primary_type` mix, and **price-level coverage** (share of salons with a Google `priceLevel`, by level). Extrapolate over the sweep area's km² to a cost estimate. **Budget warning:** `review_count` is an Enterprise-tier field, so every call bills at Enterprise (1,000 free a month, then $35 per 1,000), and 30-min zones around 24 lounges cover much of the urban UAE. Expect roughly 1,000-3,000 calls, so possibly $0-70. **Stop and get approval.** Ways to cut it: sweep only the medium (30 min) bound, not the high one (40 min), or split the run across two calendar months.
+- [ ] **Step 4:** Full run with `MAX_CALLS` set to the approved estimate plus 20%. Then compute `salon_reach.csv` with `reaches` for every cell isochrone.
 - [ ] **Step 5: Vet** in `notebooks/salons.ipynb`: price-level coverage by emirate and the share imputed per source; how many competitors survive the price filter per lounge, at `[expensive]` and at the wider `[moderate, expensive, very_expensive]` (if the strict filter leaves most lounges with almost no competitors, raise it with the user before integration); Bedashing's lounges' own Google price levels, if any (a check on the `expensive` assumption); salons per lounge catchment and per 10k women; the review-count distribution (competitors vs. Bedashing: how big is Bedashing's review advantage, i.e. the chain-solicitation caveat?); the `excluded_reason` counts; neighbourhoods reached by zero salons or only zero-review salons; Google vs. the old OSM count for Dubai.
 - [ ] **Step 6:** Add `SOURCES.md` rows (competitive-set rules, price fields and imputation, 30-day terms caveat, home-service limitation) and commit.
 
@@ -321,7 +324,7 @@ def test_zero_review_neighbourhood_stays_unallocated():
     out = apportion({"n": 1000}, {"n": ["a"]}, {"a": 0})
     assert out.get("a", 0.0) == 0.0
 ```
-  - The rubric changes: models gain `emirate` and `place_id`; catchments from `lounge_reach.csv` replace nearest-centroid assignment; the demand signal becomes captured market and share; competition comes from `salon_reach.csv` (Google, not OSM), filtered to `comparable_price_levels` using `price_level_used`; the quality signal is replaced or made relative to nearby salons (ratings only span 4.4-4.9); GROW/WATCH/SKIP uses headroom in neighbourhoods that reach no lounge; the app map handles every emirate; the airport lounge is excluded from market measures and labelled.
+  - The rubric changes: models gain `emirate` and `place_id`; catchments from `catchment_cells.csv` replace nearest-centroid assignment; the demand signal becomes captured market and share; competition comes from `salon_reach.csv` (Google, not OSM), filtered to `comparable_price_levels` using `price_level_used`; the quality signal is replaced or made relative to nearby salons (ratings only span 4.4-4.9); GROW/WATCH/SKIP uses populated cells outside every catchment; the app map handles every emirate; the airport lounge is excluded from market measures and labelled.
 - [ ] **Step 4:** Update the **"Assumptions and evidence"** table at the bottom of `README.md`: move each row's status to *in data* once its data is committed, update values and evidence from the notebooks' findings (e.g. price-level coverage, how many competitors survive the price filter), and add rows for any new assumption.
 - [ ] **Step 5:** Commit.
 

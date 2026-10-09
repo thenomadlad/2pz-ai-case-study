@@ -25,6 +25,9 @@ class BaselineAssumptions(BaseModel):
     # that count as its market. See data/seed/v3/SOURCES.md, "Price segment".
     bedashing_price_level: str = "expensive"
     comparable_price_levels: list[str] = ["expensive"]
+    # Female share of adults in worker housing (OSM industrial land use); calibrated on
+    # Dubai Statistics Center labour-camp communities. See SOURCES.md, "Market size".
+    worker_housing_female_share: dict[str, float] = {"low": 0.01, "medium": 0.055, "high": 0.15}
 
 
 class ScenarioAssumptions(BaseModel):

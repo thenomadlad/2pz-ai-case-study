@@ -1,0 +1,24 @@
+code,name,kind,males,females,female_share
+DUB242,Al-Quṣaīṣ aṣ-Ṣinā'iyah 1,industrial_named,6065,5003,0.452
+DUB243,Al-Quṣaīṣ aṣ-Ṣinā'iyah 2,industrial_named,5346,4281,0.4447
+DUB246,Al-Quṣaīṣ aṣ-Ṣinā'iyah 3,industrial_named,1643,1195,0.4211
+DUB247,Al-Quṣaīṣ aṣ-Ṣinā'iyah 4,industrial_named,1631,1301,0.4437
+DUB248,Al-Quṣaīṣ aṣ-Ṣinā'iyah 5,industrial_named,3689,3343,0.4754
+DUB264,Muḥaīṣanah 2,industrial_named,149345,1365,0.0091
+DUB364,Al-Qūz aṣ-Ṣinā'iyah 1,industrial_named,27565,996,0.0349
+DUB365,Al-Qūz aṣ-Ṣinā'iyah 2,industrial_named,111072,18685,0.144
+DUB368,Al-Qūz aṣ-Ṣinā'iyah 3,industrial_named,16791,735,0.0419
+DUB369,Al-Qūz aṣ-Ṣinā'iyah 4,industrial_named,38254,838,0.0214
+DUB516,Jabal 'Alī aṣ-Ṣinā'iyah 3,industrial_named,,,
+DUB518,Jabal 'Alī aṣ-Ṣinā'iyah 2,industrial_named,28122,30,0.0011
+DUB594,Mīnā' Jabal 'Alī,industrial_named,8894,633,0.0664
+DUB597,Majm' Dubayy Lil'āstathmār 2,industrial_named,75964,4573,0.0568
+DUB598,Majm' Dubayy Lil'āstathmār 1,industrial_named,55724,7867,0.1237
+DUB599,Jabal 'Alī aṣ-Ṣinā'iyah 1,industrial_named,198815,965,0.0048
+DUB612,R'ās al-Khūr aṣ-Ṣinā'iyah 1,industrial_named,2161,15,0.0069
+DUB613,R'ās al-Khūr aṣ-Ṣinā'iyah 2,industrial_named,1847,4,0.0022
+DUB614,R'ās al-Khūr aṣ-Ṣinā'iyah 3,industrial_named,16385,6057,0.2699
+DUB251,Mirdif,residential,31158,37188,0.5441
+DUB332,Jumīrā 1,residential,12431,9483,0.4327
+DUB373,Al-Barshā' 1,residential,23758,18574,0.4388
+DUB392,Mursā Dubayy,residential,33040,30764,0.4822

@@ -21,7 +21,9 @@ notebook = [
     "matplotlib>=3.11.2",
     "nbconvert>=7.17.1",
     "pandas>=3.0.6",
+    "rasterio>=1.4.4",
     "scipy>=1.17.1",
+    "shapely>=2.2.0",
 ]
 
 [tool.pytest.ini_options]

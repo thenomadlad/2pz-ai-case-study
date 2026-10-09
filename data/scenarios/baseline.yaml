@@ -17,3 +17,11 @@ assumptions:
   # Google's: inexpensive, moderate, expensive, very_expensive.
   bedashing_price_level: expensive
   comparable_price_levels: [expensive]   # strict; the salons notebook also tests a wider band
+  # Market size = women 15+ per ~2 km cell. WorldPop gives adults; its sex split is one national
+  # ratio (33.6%) everywhere, so adults in OSM industrial land use (worker housing) get this
+  # female share, and every other cell is rebalanced to keep each emirate's female total.
+  # Calibrated on 13 Dubai labour-camp communities (DSC 2022): 5.5% female, population-weighted.
+  worker_housing_female_share:
+    low: 0.01     # the near-all-male camps (Jebel Ali Industrial 1-2, Muhaisnah 2: 0.1-0.9%)
+    medium: 0.055
+    high: 0.15    # mixed industrial areas (Al Quoz Industrial 2: 14%, DIP 1: 12%)

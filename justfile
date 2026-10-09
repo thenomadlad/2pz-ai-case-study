@@ -30,4 +30,4 @@ notebook:
     uv run --extra notebook jupyter lab notebooks/branches.ipynb
 
 test:
-    uv run --extra dev pytest
+    uv run --extra dev --extra notebook pytest
