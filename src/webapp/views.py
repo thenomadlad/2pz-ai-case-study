@@ -1,36 +1,76 @@
-"""Rendering pieces shared by the Overview and Details pages."""
+"""Rendering pieces shared by the pages: the what-if banner, explanations, tables, caveats and the
+"before you trust these calls" box."""
+from functools import cache
+
 import pandas as pd
 import streamlit as st
 
 from src import explain
-from src.config import settings
-from src.models import Explanation
-from src.webapp.data import BaselineData, load_baseline
+from src.baseline import Run
+from src.model import growth, scorecard
+from src.models import Area, AreaDecision, Decision, Explanation, Levels, LoungeFeatures
+from src.webapp import data
 
-BADGE_COLORS = {"PROTECT": "green", "HOLD": "orange", "SHRINK": "red",
+BADGE_COLORS = {"PROTECT": "green", "HOLD": "orange", "SHRINK": "red", "NOT SCORED": "gray",
                 "GROW": "blue", "WATCH": "violet", "SKIP": "gray"}
+FEW_REVIEWS = 300   # under this many lifetime reviews, capture understates a lounge (noya-plaza: 215)
 
 
-def current_data() -> tuple[BaselineData, bool]:
-    """The numbers the user is looking at: the baseline, or the active scenario's."""
-    data = load_baseline(settings)
-    run = st.session_state.get("scenario_run")
-    return (data.with_scenario(run), True) if run else (data, False)
+# --- what-if labels and banner ------------------------------------------------------------
+
+def level_label(axis: str, level: str) -> str:
+    """"15 min (medium)", "60% of premium reviews (medium)", "5.5% women (medium)"."""
+    a = data.assumptions()
+    if axis == "travel":
+        return f"{a.travel_time_minutes[level]} min ({level})"
+    if axis == "coverage":
+        return f"{a.competitor_coverage[level]:.0%} of premium reviews ({level})"
+    return f"{a.worker_housing_female_share[level]:.1%} women ({level})"
 
 
-def scenario_banner(is_scenario: bool) -> None:
-    if is_scenario:
-        st.warning("**Scenario view.** These numbers include your what-if overrides, not the "
-                   "baseline. Reset to baseline from the overview's What if…? panel.")
+def what_if_summary() -> str:
+    w, base, parts = data.what_if(), Levels(), []
+    for axis, name in (("travel", "travel time"), ("coverage", "competitor coverage"),
+                       ("worker_share", "worker-housing women")):
+        if getattr(w["levels"], axis) != getattr(base, axis):
+            parts.append(f"{name} {level_label(axis, getattr(w['levels'], axis))}")
+    if w["recall"] is not None:
+        parts.append(f"search recall {w['recall']:.2f}")
+    if w["closed"]:
+        parts.append("closed: " + ", ".join(sorted(w["closed"])))
+    return "; ".join(parts)
+
+
+def banner() -> None:
+    if data.active():
+        st.warning(f"**What-if view**, not the baseline: {what_if_summary()}. Reset it in the "
+                   "Overview's what-if panel.", icon="🧪")
+
+
+# --- explanations -------------------------------------------------------------------------
+
+@cache
+def _cache() -> dict:
+    return explain.load_cache()
 
 
 def get_explanation(kind: str, subject_id: str, action: str, facts: dict) -> Explanation:
-    # Committed AI explanations, plus any generated live this session (only with a key).
-    if "explanation_cache" not in st.session_state:
-        st.session_state["explanation_cache"] = explain.load_cache()
-    return explain.explain(kind, subject_id, action, facts,
-                           cache=st.session_state["explanation_cache"],
-                           client=explain.make_client())
+    """Cached AI text when these exact numbers were explained, else the template. Never calls an API."""
+    return explain.explain(kind, subject_id, action, facts, cache=_cache(), client=None)
+
+
+def explanation_for(r: Run, kind: str, subject_id: str) -> tuple[Explanation, dict]:
+    action, facts = data.subject(r, kind, subject_id)
+    return get_explanation(kind, subject_id, action, facts), facts
+
+
+def source_note(exp: Explanation) -> str:
+    if exp.source == "ai":
+        return "AI-written (cached): every number in it was checked against the data."
+    if not explain.needs_ai(exp.action):
+        return "Template (fixed rules): SKIP areas and NOT SCORED lounges always use it."
+    return ("Template — numbers changed by the what-if, so the cached AI text no longer applies."
+            if data.active() else "Template (fixed rules): no cached AI text for these numbers.")
 
 
 def badge(action: str) -> None:
@@ -38,62 +78,36 @@ def badge(action: str) -> None:
 
 
 def render_pyramid(exp: Explanation) -> None:
-    """Answer first, then each ranked argument with its data points."""
+    """Answer first, then each ranked argument with its data points, then where the text came from."""
     st.markdown(f"**{exp.headline}**")
     for i, reason in enumerate(exp.reasons, start=1):
         label = explain.TOPIC_LABELS.get(reason.topic, reason.topic)
         st.markdown(f"{i}. **{label}.** {reason.claim}")
-        st.caption(" · ".join(f"{e.label}: {explain.fmt_unit(e.field, e.value)}"
-                              for e in reason.evidence))
-    st.caption("Written by Claude; every number checked against the data."
-               if exp.source == "ai" else "Template explanation (no AI): written from fixed rules.")
+        st.caption(" · ".join(f"{e.label}: {explain.fmt(e.field, e.value)}" for e in reason.evidence))
+    st.caption(source_note(exp))
+
+
+def val(field: str, value) -> str:
+    """A value with its unit ("105,000 women", "12%")."""
+    f = explain.GLOSSARY[field]
+    text = explain.fmt(field, value)
+    return text if f.pct or value is None or isinstance(value, bool) else f"{text} {f.unit}"
 
 
 def wrapped_table(rows: list[dict]) -> None:
-    """A static table that wraps long text instead of scrolling it; the first column labels
-    the rows."""
+    """A static table that wraps long text; the first column labels the rows."""
     df = pd.DataFrame(rows)
     st.table(df.set_index(df.columns[0]))
 
 
-def render_factor_table(exp: Explanation, fields: tuple[str, ...], facts: dict) -> None:
+def render_factor_table(exp: Explanation, fields: tuple[str, ...], facts: dict, kind: str) -> None:
     st.caption(exp.table_caption)
-    wrapped_table(explain.table_rows(fields, facts, exp.kind))
-
-
-def render_how_to_read() -> None:
-    st.info(
-        "**How to read this · where not to trust it**\n\n"
-        "- **Who it's for:** Bedashing's portfolio team forms the calls; the COO approves or "
-        "questions them; the PE board needs them defensible.\n"
-        "- **Dubai only, by design:** 9 of 23 UAE branches; the only emirate with "
-        "community-level population data.\n"
-        "- **Location and market only:** no revenue, rent or capex data, so nothing here is a "
-        "return-on-capital call. Treat SHRINK as *investigate first*, not *close*.\n"
-        "- **Estimates:** female population is a uniform 49% of census figures; competitor "
-        "counts come from OpenStreetMap and are a lower bound.\n"
-        "- **Catchments are straight-line:** each community goes to its nearest branch, "
-        "ignoring roads, malls and habit."
-    )
-    with st.expander("What a return-on-invested-capital view would need"):
-        wrapped_table([{"Missing input": name, "Where analysts would get it": source}
-                       for name, source in ROIC_NEEDS])
-
-
-ROIC_NEEDS = [
-    ("Revenue per branch", "the branch P&L / POS system"),
-    ("Rent and service charges", "lease agreements"),
-    ("Fit-out capex and remaining book value", "the fixed-asset register"),
-    ("Lease expiry and break clauses", "lease agreements"),
-    ("Staff cost and utilisation", "payroll and booking system"),
-]
+    wrapped_table(explain.table_rows(fields, facts, kind))
 
 
 def url_picker(label: str, param: str, options: list[str], format_func, key: str) -> str:
     """A selectbox driven by ?param=. The URL is the source of truth: the keyed widget is set
-    from it before rendering and writes back only on a real user change. (An unkeyed
-    selectbox with a moving `index` gets a new identity, and a stale value from an earlier
-    visit could overwrite the URL.)"""
+    from it before rendering and writes back only on a real user change."""
     wanted = st.query_params.get(param)
     st.session_state[key] = wanted if wanted in options else options[0]
 
@@ -103,47 +117,83 @@ def url_picker(label: str, param: str, options: list[str], format_func, key: str
     return st.selectbox(label, options, key=key, on_change=_picked, format_func=format_func)
 
 
-def render_catchment_map(data, catchment_of: set[str], lat: float, lng: float, key: str,
-                         area=None) -> int:
-    """The catchment of `catchment_of` (tinted communities, a line to each), the competitor
-    salons in it, optionally one highlighted area, and every branch with its flag. Display
-    only: hover for each point's data. Returns how many competitors it shows."""
-    from src.features.assign import competitor_community
-    from src.webapp.map import (
-        area_view,
-        assignment_lines_layer,
-        branch_layer,
-        build_deck,
-        community_layer,
-        competitor_layer,
-        flag_layer,
-        opportunity_layer,
-    )
+# --- limitations and caveats --------------------------------------------------------------
 
-    shown = {a.community_id for a in data.assignments if a.nearest_branch_id in catchment_of}
-    if area is not None:
-        shown.add(area.community_id)
-    counted_in = competitor_community(data.competitors, data.communities)
-    rivals = [k for k in data.competitors if counted_in.get(k.id) in shown]
-    actions = {d.branch_id: d.action for d in data.decisions}
-    layers = [
-        competitor_layer(rivals),
-        assignment_lines_layer(data.communities, data.assignments, data.features, catchment_of),
-        community_layer(data.communities, data.assignments, actions, catchment_of),
-    ]
-    if area is not None:
-        layers.append(opportunity_layer([area], [data.opportunity_for(area.community_id)]))
-    layers += [branch_layer(data.features, data.decisions), flag_layer(data.features)]
-    st.pydeck_chart(build_deck(layers, area_view(lat, lng, 12)), key=key)
-    return len(rivals)
+def limitations_box(r: Run) -> None:
+    """The biggest limitations, right under the executive summary."""
+    from src.webapp import nav
+
+    scored = [d for d in r.decisions if d.action != "NOT SCORED"]
+    low = sum(d.confidence == "low" for d in scored)
+    act = {d.area_id: d.action for d in r.area_decisions}
+    grow = [a for a in r.areas if act[a.area_id] == "GROW"]
+    sharjah = sum(a.emirate == "Sharjah" for a in grow)
+    with st.container(border=True):
+        st.markdown("#### ⚠️ Before you trust these calls")
+        st.markdown(
+            "These calls are a shortlist to test with the business, not decisions.\n\n"
+            "1. **No money in the model.** No revenue, rent, capex or lease data: it scores location "
+            "and market position only. SHRINK means *investigate*, not *close*; a SHRINK lounge can be "
+            "profitable and a PROTECT one unprofitable.\n"
+            "2. **Capture comes from lifetime Google reviews.** Older salons look bigger, so new lounges "
+            "(noya-plaza, 215 reviews) look weak partly because they are new. Reviews are a proxy for "
+            "customers, not a count.\n"
+            f"3. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
+            "lounges are low confidence: near a threshold, a thin market, a missing input, or a call "
+            f"that changes in {scorecard.FLIP_LOW}+ of the 27 assumption combinations. Try the what-if "
+            "panel below.\n"
+            f"4. **Growth areas are a first cut.** Competitor data is partial and the saturation line "
+            f"was set from the data it judges. {sharjah} of {len(grow)} GROW areas are in Sharjah "
+            "emirate, where Bedashing has no lounge — possibly for reasons the model can't see.")
+        st.page_link(nav.HOW, label="All the limitations, every assumption and threshold →", icon="⚠️")
 
 
-def render_glossary() -> None:
-    with st.expander("Glossary: every factor shown in the app"):
-        wrapped_table([{"Factor": f.label, "Unit": f.unit, "What it means": f.meaning}
-                       for f in explain.GLOSSARY.values()])
+def near_threshold(d: Decision) -> str | None:
+    for name, line in (("PROTECT", scorecard.PROTECT_AT), ("SHRINK", scorecard.SHRINK_AT)):
+        if abs(d.composite - line) < 0.05:
+            return (f"Composite {d.composite:.2f} is within 0.05 of the {name} line ({line}): a small "
+                    "change in any input moves the call.")
+    return None
 
 
-SOURCES = ("Sources: female residents are 49% of the Dubai Statistics Center census (an "
-           "estimate); competitor salons are from OpenStreetMap (a lower bound); ratings are "
-           "from 2GIS; all distances are straight-line.")
+def lounge_caveats(f: LoungeFeatures, d: Decision, flips: int | None) -> list[str]:
+    """Everything that weakens this lounge's call, most specific first."""
+    if d.action == "NOT SCORED":
+        return [d.rationale, ("It stays on the map, and its catchment still counts as reached for "
+                              "the growth areas.")]
+    out = [c for c in (near_threshold(d),) if c] + d.caveats[1:]
+    if flips and flips < scorecard.FLIP_LOW:
+        out.append(f"The call changes in {flips} of 27 assumption combinations (low confidence "
+                   f"from {scorecard.FLIP_LOW}).")
+    if f.review_count < FEW_REVIEWS:
+        out.append(f"Only {f.review_count:,} lifetime Google reviews. Capture uses lifetime reviews, "
+                   "so a newer lounge looks weaker than it is.")
+    if f.branch_id == "mirdif-35":
+        out.append("Market overstated: worker housing not mapped as industrial in OpenStreetMap "
+                   "(Dubai Investment Park, very likely Sonapur) counts as ordinary housing here.")
+    return out + d.caveats[:1]      # no money in the model, last: it applies to every lounge
+
+
+def area_caveats(a: Area, d: AreaDecision) -> list[str]:
+    out = list(d.caveats)
+    if a.premium_reviews_per_1k is not None and growth.MIN_COVERAGE <= a.data_coverage < 0.99:
+        out.append(f"Competitor data covers {a.data_coverage:.0%} of the women here; saturation is "
+                   "computed over the searched cells only.")
+    if a.premium_reviews_per_1k is not None and abs(a.premium_reviews_per_1k - growth.UNSATURATED_PER_1K) < 10:
+        out.append(f"Near the saturation line ({a.premium_reviews_per_1k:.0f} vs "
+                   f"{growth.UNSATURATED_PER_1K:g} premium reviews per 1k women), and that line was "
+                   "set from the data it judges.")
+    if a.worker_share >= 0.25:
+        out.append(f"{a.worker_share:.0%} of adults live in worker housing: the women estimate rests "
+                   "on the worker-housing female share assumption.")
+    if a.emirate == "Sharjah":
+        out.append("Bedashing has no lounge in Sharjah emirate. That may be for reasons the model "
+                   "can't see: licensing, brand fit, landlord terms or customer mix.")
+    out.append(f"Distance to the nearest lounge ({a.nearest_lounge_km:.1f} km to {a.nearest_lounge_id}) "
+               "is a straight line, not a drive.")
+    return out
+
+
+def render_caveats(title: str, items: list[str], strong: bool) -> None:
+    """Caveats as a visible box: a warning when they weaken the call, else an info box."""
+    (st.warning if strong else st.info)(f"**{title}**\n\n" + "\n".join(f"- {c}" for c in items))
