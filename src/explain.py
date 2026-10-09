@@ -999,17 +999,11 @@ V3_NETWORK_ID = "uae"
 
 def v3_subjects() -> list[tuple[str, str, str, dict]]:
     """(kind, id, action, facts) for every v3 explanation at the baseline (medium levels)."""
-    from src.config import load_baseline_assumptions
+    from src.baseline import run
     from src.data_v3 import load_v3
-    from src.features.lounges import build
-    from src.models import Levels
 
-    v3 = load_v3()
-    assumptions = load_baseline_assumptions(REPO_ROOT / "data" / "scenarios" / "baseline.yaml")
-    features, areas = build(v3, assumptions)
-    flips = scorecard.level_flips(v3, assumptions, Levels())
-    decisions = scorecard.decide(features, flips)
-    area_decisions = growth.classify_all(areas)
+    v3, r = load_v3(), run()
+    features, areas, decisions, area_decisions, flips = r.features, r.areas, r.decisions, r.area_decisions, r.flips
     salons = int((v3.salons.excluded_reason == "").sum())
     subjects = [("uae", V3_NETWORK_ID, NETWORK_ACTION,
                  uae_facts(decisions, areas, area_decisions, salons))]
