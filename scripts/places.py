@@ -11,8 +11,8 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from src.config import settings  # noqa: E402
-from src.features.assign import haversine_km as km  # noqa: E402,F401
+from src.config import settings
+from src.features.lounges import haversine_km as km
 
 URL = "https://places.googleapis.com/v1/places:searchText"
 NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby"

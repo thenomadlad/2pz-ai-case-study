@@ -3,7 +3,6 @@ __pycache__/
 *.pyc
 .env
 data/raw/
-data/processed/
 .pytest_cache/
 .ruff_cache/
 .streamlit/secrets.toml

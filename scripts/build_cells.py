@@ -118,7 +118,7 @@ def main() -> None:
               if p["tags"].get("name:en") or p["tags"].get("name")]
     place_tree = STRtree([Point(p["lon"], p["lat"]) for p in places])
     em_tree, em_list = STRtree([emirates[n] for n in em_names]), em_names
-    from src.features.assign import haversine_km
+    from src.features.lounges import haversine_km
 
     out = []
     step = CELL_PX * transform.a

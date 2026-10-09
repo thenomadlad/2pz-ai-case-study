@@ -12,7 +12,6 @@ from src.webapp.views import banner, wrapped_table
 
 LIMITATIONS = REPO_ROOT / "docs" / "limitations.md"
 SOURCES = REPO_ROOT / "data" / "seed" / "v3" / "SOURCES.md"
-OLD_MODEL = {"contest_ratio", "global_female_share", "fallback_price_aed"}   # read by the old model only
 
 
 def section(markdown: str, heading: str) -> str:
@@ -60,7 +59,7 @@ def render() -> None:
                "search recall.")
     notes = yaml_notes(data.BASELINE_YAML.read_text())
     wrapped_table([{"Assumption": k, "Value (levels)": _fmt(v),
-                    "Why / source": "Not used by the v3 model." if k in OLD_MODEL else notes.get(k) or "See the row above."}
+                    "Why / source": notes.get(k) or "See the row above."}
                    for k, v in data.assumptions().model_dump().items()])
 
     st.header("Lounge scorecard (src/model/scorecard.py)")

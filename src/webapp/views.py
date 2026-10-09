@@ -100,9 +100,9 @@ def wrapped_table(rows: list[dict]) -> None:
     st.table(df.set_index(df.columns[0]))
 
 
-def render_factor_table(exp: Explanation, fields: tuple[str, ...], facts: dict, kind: str) -> None:
+def render_factor_table(exp: Explanation, fields: tuple[str, ...], facts: dict) -> None:
     st.caption(exp.table_caption)
-    wrapped_table(explain.table_rows(fields, facts, kind))
+    wrapped_table(explain.table_rows(fields, facts))
 
 
 def url_picker(label: str, param: str, options: list[str], format_func, key: str) -> str:

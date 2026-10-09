@@ -74,4 +74,4 @@ def render() -> None:
                f"{a.nearest_lounge_id}, {a.nearest_lounge_km:.1f} km away in a straight line.")
     st.page_link(nav.LOUNGE, label=f"Nearest lounge: {a.nearest_lounge_id} →", icon="💇",
                  query_params={"lounge": a.nearest_lounge_id})
-    render_factor_table(exp, explain.AREA_TABLE, facts, "area")
+    render_factor_table(exp, explain.AREA_TABLE, facts)

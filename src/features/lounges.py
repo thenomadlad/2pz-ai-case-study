@@ -75,7 +75,8 @@ def _pieces(cells: list[str], rc: dict) -> list[list[str]]:
     return out
 
 
-def _km(lat, lng, lats, lngs):
+def haversine_km(lat, lng, lats, lngs):
+    """Great-circle km; numpy, so lats/lngs can be arrays or scalars."""
     p1, p2 = np.radians(lat), np.radians(lats)
     a = np.sin((p2 - p1) / 2) ** 2 + np.cos(p1) * np.cos(p2) * np.sin(np.radians(lngs - lng) / 2) ** 2
     return 2 * 6371.0 * np.arcsin(np.sqrt(a))
@@ -165,7 +166,7 @@ def _area(area_id, name, emirate, piece, w, p, a, lounges, lats, lngs) -> Area:
         circ = set().union(*(p["owns"][c] for c in covered)) or set().union(*(p["touch"][c] for c in covered))
         fcs = float(np.mean(p["full"][sorted(circ)]))
         n, per_1k = len(prem), sum(_reviews(s) for s in prem) * recall_multiplier(fcs, a.search_recall) / (cw / 1000)
-    d = _km(lat, lng, lats, lngs)
+    d = haversine_km(lat, lng, lats, lngs)
     j = int(d.argmin()) if len(d) else None
     return Area(area_id=area_id, name=name, emirate=emirate, lat=lat, lng=lng, women=women, cells=len(piece),
                 worker_share=sum(cell[c]["adults_worker"] for c in piece) / sum(cell[c]["adults"] for c in piece),

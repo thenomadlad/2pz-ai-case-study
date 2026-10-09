@@ -1,50 +1,18 @@
-"""Proves the autouse `_guard_real_data_dirs` fixture in conftest.py actually fires.
-
-See the incident recorded in src/scenario/baseline.py's history: a test that
-forgot to pin `processed_dir` to a tmp_path let a legitimate `shutil.rmtree`
-call delete the real repo's data/processed/current/ directory. This test
-creates a real (non-tmp_path) scratch directory under the protected tree,
-attempts to rmtree it, and asserts that the guard refuses -- proving the
-directory survives rather than merely that the call didn't crash.
-"""
+"""Proves the autouse `_guard_real_data_dirs` fixture in conftest.py actually fires."""
 
 import shutil
 
+import pytest
+
 from src.config import REPO_ROOT
-
-
-def test_guard_refuses_to_rmtree_real_processed_dir():
-    scratch = REPO_ROOT / "data" / "processed" / "test-guard-scratch"
-    scratch.mkdir(parents=True, exist_ok=False)
-    try:
-        (scratch / "marker.txt").write_text("should survive the refused rmtree")
-
-        import pytest
-
-        with pytest.raises(RuntimeError, match="real repo data directory"):
-            shutil.rmtree(scratch)
-
-        # Prove the guard actually fired (not just that rmtree happened to no-op):
-        # the directory and its contents must still be exactly as created.
-        assert scratch.exists()
-        assert (scratch / "marker.txt").exists()
-        assert (scratch / "marker.txt").read_text() == "should survive the refused rmtree"
-    finally:
-        # Clean up directly (bypassing the guarded shutil.rmtree) so this test's
-        # teardown doesn't depend on the very thing it's testing.
-        (scratch / "marker.txt").unlink(missing_ok=True)
-        scratch.rmdir()
 
 
 def test_guard_refuses_to_rmtree_real_raw_dir_subpath():
     scratch = REPO_ROOT / "data" / "raw" / "test-guard-scratch"
     scratch.mkdir(parents=True, exist_ok=False)
     try:
-        import pytest
-
         with pytest.raises(RuntimeError, match="real repo data directory"):
             shutil.rmtree(scratch)
-
         assert scratch.exists()
     finally:
         scratch.rmdir()
@@ -54,20 +22,11 @@ def test_guard_leaves_tmp_path_rmtree_unaffected(tmp_path):
     victim = tmp_path / "some_dir"
     victim.mkdir()
     (victim / "f.txt").write_text("x")
-
-    # Must NOT raise -- tmp_path is exactly what the test suite should use.
-    shutil.rmtree(victim)
-
+    shutil.rmtree(victim)  # must not raise
     assert not victim.exists()
 
 
 def test_guard_allows_rmtree_on_a_protected_path_that_does_not_exist():
-    # src/scenario/baseline.py's main() unconditionally calls
-    # shutil.rmtree(current_dir, ignore_errors=True), including on a fresh checkout where
-    # current_dir never existed -- src/webapp/data.py's load_baseline() triggers exactly
-    # this path when it self-heals a missing baseline. There's no real data to lose here,
-    # so the guard must let it through rather than raising on a path that was never there.
-    nonexistent = REPO_ROOT / "data" / "processed" / "test-guard-scratch-nonexistent"
+    nonexistent = REPO_ROOT / "data" / "raw" / "test-guard-scratch-nonexistent"
     assert not nonexistent.exists()
-
     shutil.rmtree(nonexistent, ignore_errors=True)  # must not raise

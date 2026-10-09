@@ -1,10 +1,6 @@
-# Baseline assumptions -- "reality". Edit this file and re-run `just all` to
-# regenerate the one true baseline raw data and report. Never edited by a
-# scenario run.
+# Baseline assumptions for the v3 market model (src/baseline.py reads this). The app's what-if
+# panel overrides levels in memory; it never edits this file.
 assumptions:
-  contest_ratio: 1.25
-  global_female_share: 0.49
-  fallback_price_aed: 99.0
   # Catchment = drive time a customer will travel to a lounge (typical traffic, not rush
   # hour). Evidence and caveats: data/seed/v3/SOURCES.md, "Catchment travel time".
   travel_time_minutes:

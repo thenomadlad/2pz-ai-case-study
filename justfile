@@ -1,11 +1,12 @@
-# Stages 1-3: acquire -> features -> model, using data/scenarios/baseline.yaml's
-# assumptions. Writes data/raw/*.json and data/processed/baseline/*.json.
-all:
-    uv run python -m src.scenario.baseline
-
-# Generate grounded AI explanations for the baseline (needs ANTHROPIC_API_KEY in .env)
-# and write
-# the committed cache data/explanations/cache.json. Commit the result.
+# Generate grounded AI explanations for the baseline through the Anthropic API (needs
+# ANTHROPIC_API_KEY in .env) and write the committed cache data/explanations/cache.json.
+# Commit the result. NOT SCORED lounges and SKIP areas keep their template.
+#
+# Offline path (no API key; how the committed cache was written, in a Claude Code session):
+#   uv run python -m src.explain prompts DIR   # one prompt per subject missing from the cache
+#   # write each answer to the DIR/answers/<file> named in its prompt
+#   uv run python -m src.explain check DIR     # verify the answers, write nothing
+#   uv run python -m src.explain ingest DIR    # verify again and cache the grounded ones
 explain:
     uv run python -m src.explain
 
@@ -13,21 +14,15 @@ explain:
 app:
     uv run streamlit run streamlit_app.py
 
-# Run a scenario: apply its overrides on top of the fixed baseline raw data,
-# recompute features+model, diff against data/processed/baseline/, write
-# data/processed/current/*.json including diff.json.
-# Example: just scenario data/scenarios/example-perturbations.yaml
-scenario SCENARIO:
-    uv run python -m src.scenario.run {{SCENARIO}}
-
-# Wipe generated data. Never touches data/seed or data/scenarios.
+# Wipe data/raw: the fetch scripts' API response caches and the WorldPop / OSM downloads.
+# Re-fetching costs Google Places and Mapbox quota. Never touches data/seed or data/scenarios.
 clean:
-    rm -rf data/raw/* data/processed/*
-    touch data/raw/.gitkeep data/processed/.gitkeep
+    rm -rf data/raw/*
+    touch data/raw/.gitkeep
 
-# Open the data-vetting notebook in JupyterLab
+# Open the notebooks in JupyterLab, starting at the scorecard and growth decisions
 notebook:
-    uv run --extra notebook jupyter lab notebooks/branches.ipynb
+    uv run --extra notebook jupyter lab notebooks/decisions.ipynb
 
 test:
     uv run --extra dev --extra notebook pytest

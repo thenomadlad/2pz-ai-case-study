@@ -1,19 +1,19 @@
 """Pyramid explanations: an answer (headline), 2-5 supporting arguments, 2-5 data points each.
 
-Three kinds: a branch decision, an opportunity-area decision, and the network-wide
-executive summary. The v3 market model adds three more: `lounge`, `area` and `uae` (its network
-summary); the old kinds go once the app runs on v3. The rubric / 2x2 make every decision, and `prioritize` decides which
-arguments matter and in what order: importance is computed, never left to the AI. An LLM
-then writes the pyramid from a fact sheet. Every cited {field, value} and every number in
-its prose must match that fact sheet, and the arguments must be exactly the ranked topics
-(`verify`), or it is regenerated once and then replaced by the deterministic template.
-Explanations are cached by a hash of their fact sheet in a committed file, so the public
-deploy shows AI output without an API key, and a stale entry can never be served for
-changed numbers.
+Three kinds: a `lounge` call, a growth-`area` call and the `uae` network summary. The scorecard /
+growth tests make every decision, and `prioritize` decides which arguments matter and in what
+order: importance is computed, never left to the AI. An LLM then writes the pyramid from a fact
+sheet. Every cited {field, value} and every number in its prose must match that fact sheet, and
+the arguments must be exactly the ranked topics (`verify`), or it is regenerated once and then
+replaced by the deterministic template. Explanations are cached by a hash of their fact sheet in
+a committed file, so the public deploy shows AI output without an API key, and a stale entry can
+never be served for changed numbers.
 
-`uv run python -m src.explain` (just explain) regenerates the cache for the baseline.
-`... src.explain prompts DIR` / `... src.explain ingest DIR` write the v3 prompts to files and
-read answers back (written outside the API, e.g. by Claude Code), verify them and cache them.
+Two ways to fill the cache for the baseline (both skip NOT SCORED lounges and SKIP areas):
+- `uv run python -m src.explain` (just explain): the Anthropic API, needs ANTHROPIC_API_KEY.
+- Offline: `... src.explain prompts DIR` writes one prompt per missing subject; write the answers
+  (e.g. in a Claude Code session) to DIR/answers/; `... src.explain check DIR` verifies them;
+  `... src.explain ingest DIR` verifies and caches the grounded ones.
 """
 import hashlib
 import json
@@ -22,17 +22,14 @@ import re
 from dataclasses import dataclass
 
 from src.config import REPO_ROOT, settings
-from src.model import growth, opportunity, rubric, scorecard
+from src.model import growth, scorecard
 from src.models import (
     Area,
     AreaDecision,
-    BranchFeatures,
-    CommunityFeatures,
     Decision,
     Evidence,
     Explanation,
     LoungeFeatures,
-    OpportunityDecision,
     Reason,
 )
 
@@ -52,117 +49,7 @@ class Field:
 
 
 GLOSSARY: dict[str, Field] = {
-    # --- branch ---
-    "female_pop_served": Field(
-        "Female residents in catchment", "people",
-        "Estimated women living in the communities closer to this branch than to any other "
-        "Bedashing branch (straight-line). 49% of each community's census population."),
-    "communities_served": Field(
-        "Communities in catchment", "count",
-        "Official Dubai communities whose nearest Bedashing branch is this one."),
-    "contested_share": Field(
-        "Cannibalisation", "% of catchment",
-        "Share of the catchment's residents whose second-nearest Bedashing branch is almost "
-        "as close as this one (within the contest ratio), so two branches compete for them.",
-        pct=True),
-    "nearest_sibling_km": Field(
-        "Nearest other Bedashing branch", "km", "Straight-line distance to the closest sibling."),
-    "competitors_in_catchment": Field(
-        "Competitor salons in catchment", "count",
-        "Women's beauty and hair salons (OpenStreetMap) in this branch's catchment "
-        "communities. A lower bound: OSM misses some salons."),
-    "competitors_per_10k": Field(
-        "Competitive overlap", "salons per 10k women",
-        "Competitor salons per 10,000 female residents. Higher means a more saturated market."),
-    "rating": Field("Customer rating", "stars (of 5)", "Average review score on 2GIS."),
-    "review_count": Field("Reviews", "count",
-                          "Number of 2GIS reviews behind the rating; more means more reliable."),
-    "composite": Field(
-        "Composite score", "0-1",
-        "Weighted average of the signal scores below (weights in the Threshold column). "
-        f"PROTECT ≥ {rubric.PROTECT_AT}, SHRINK ≤ {rubric.SHRINK_AT}."),
-    **{f"score_{s.name}": Field(
-        f"{s.name.capitalize()} score", "0-1",
-        f"{s.label}, converted to a fixed 0-1 score where 1 is best for the branch "
-        "(scale in the Threshold column).")
-       for s in rubric.SIGNALS},
-    # --- opportunity area ---
-    "female_pop": Field(
-        "Female residents", "people",
-        "Estimated women living in this community: 49% of its census population."),
-    "competitors": Field("Competitor salons", "count",
-                         "Women's beauty and hair salons in this community (OpenStreetMap)."),
-    "nearest_branch_id": Field("Nearest Bedashing branch", "", "The closest existing branch."),
-    "nearest_branch_km": Field("Distance to nearest branch", "km", "Straight-line distance."),
-    "hosts_branch": Field("Already has a branch", "yes/no",
-                          "Whether a Bedashing branch already sits in this community."),
-    "underserved": Field("Underserved", "yes/no",
-                         f"Nearest branch more than {opportunity.FAR_KM:g} km away."),
-    "unsaturated": Field(
-        "Unsaturated", "yes/no",
-        f"Fewer than {opportunity.UNSATURATED_PER_10K:g} competitor salons per 10k women."),
-    "branches_here": Field("Bedashing branches here", "count",
-                           "Bedashing branches located in this community."),
-    "salons_supported": Field(
-        "Salons this area could support", "salons",
-        f"Women ÷ 10,000 × {opportunity.MEDIAN_SALONS_PER_10K:g}, the Dubai median density."),
-    "salon_headroom": Field(
-        "Room for more salons", "salons",
-        "Salons it could support minus competitors and Bedashing branches already here "
-        "(never below 0)."),
-    "uncovered_women": Field(
-        "Women not covered by Bedashing", "people",
-        f"All the area's women when its nearest branch is over {opportunity.FAR_KM:g} km away; "
-        "otherwise 0."),
-    "fair_share": Field(
-        "Bedashing fair share", "% of salons here",
-        "Bedashing's share of the salons in this area. A naive capture estimate: it assumes "
-        "every salon is equally attractive.", pct=True),
-    "captured_women_est": Field("Women Bedashing captures (est.)", "people",
-                                "Fair share × the area's women."),
-    "far_km_threshold": Field("Underserved line", "km",
-                              "Nearest branch further than this means underserved."),
-    "unsaturated_threshold": Field("Saturation cut-off", "salons per 10k women",
-                                   "Fewer competitors than this means unsaturated."),
-    "min_pop_floor": Field("Population floor", "people",
-                           "Fewer women than this is too small to carry a branch."),
-    "worker_housing": Field(
-        "Likely worker housing", "yes/no",
-        "Industrial / investment-park community, where demand is overstated."),
-    "estimated_female_share": Field(
-        "Estimated female share", "%", "Uniform share applied to every community's census "
-        "population; no per-community split is published.", pct=True),
-    # --- network ---
-    "branches_total": Field("Branches", "count", "Bedashing branches in Dubai."),
-    "protect_count": Field("PROTECT", "branches", "Branches with composite ≥ 0.65."),
-    "hold_count": Field("HOLD", "branches", "Branches between the two thresholds."),
-    "shrink_count": Field("SHRINK", "branches", "Branches with composite ≤ 0.35."),
-    "protect_branches": Field("PROTECT branches", "", "Ids of PROTECT branches."),
-    "shrink_branches": Field("SHRINK branches", "", "Ids of SHRINK branches."),
-    "protect_composite_min": Field("Weakest PROTECT composite", "0-1",
-                                   "Lowest composite among PROTECT branches."),
-    "shrink_composite_max": Field("Strongest SHRINK composite", "0-1",
-                                  "Highest composite among SHRINK branches."),
-    "low_confidence_count": Field(
-        "Low-confidence calls", "branches",
-        "Calls within 0.05 of a threshold, with a missing input, or (v3) that flip across "
-        "assumption levels."),
-    "areas_total": Field("Communities", "count", "Dubai communities evaluated."),
-    "grow_count": Field("GROW", "areas", "Areas passing both tests."),
-    "watch_count": Field("WATCH", "areas", "Communities passing one of the two tests."),
-    "grow_areas": Field("GROW areas", "", "Ids of GROW areas."),
-    "grow_nearest_km_min": Field("Closest GROW area to a branch", "km",
-                                 "Smallest nearest-branch distance among GROW areas."),
-    "grow_nearest_km_max": Field("Furthest GROW area from a branch", "km",
-                                 "Largest nearest-branch distance among GROW areas."),
-    "grow_competitors_per_10k_max": Field(
-        "Most competitive GROW area", "salons per 10k women",
-        "Highest competitive overlap among GROW areas."),
-    "competitors_total": Field("Competitor salons mapped", "count",
-                               "OpenStreetMap salons in the competitive set (a lower bound)."),
-    "revenue_data_available": Field("Revenue data", "yes/no", "Per-branch revenue or footfall."),
-    "rent_data_available": Field("Rent data", "yes/no", "Per-branch rent, capex or lease terms."),
-    # --- v3: lounge ---
+    # --- lounge ---
     "catchment_women": Field(
         "Women 15+ in catchment", "women",
         "Women aged 15+ living in the ~2 km cells within a 15-min drive (typical midday traffic). "
@@ -200,12 +87,16 @@ GLOSSARY: dict[str, Field] = {
         "Assumption sensitivity", "of 27 combinations",
         "How many of the 27 combinations of travel time, competitor coverage and worker-housing "
         "share change this lounge's call."),
+    "composite": Field(
+        "Composite score", "0-1",
+        "Weighted average of the signal scores below (weights in the Threshold column). "
+        f"PROTECT ≥ {scorecard.PROTECT_AT}, SHRINK ≤ {scorecard.SHRINK_AT}."),
     **{f"score_{s.name}": Field(
         f"{s.name.capitalize()} score", "0-1",
         f"{s.label}, converted to a fixed 0-1 score where 1 is best for the lounge "
         "(scale in the Threshold column).")
-       for s in scorecard.SIGNALS if s.name in ("capture", "rating")},
-    # --- v3: growth area ---
+       for s in scorecard.SIGNALS},
+    # --- growth area ---
     "area_name": Field("Area", "", "OpenStreetMap place name nearest the area's cells."),
     "emirate": Field("Emirate", "", "Emirate the area lies in."),
     "women": Field("Women 15+", "women", "Women aged 15+ living in the area's cells."),
@@ -228,6 +119,9 @@ GLOSSARY: dict[str, Field] = {
     "big_enough": Field("Big enough", "yes/no",
                         f"At least {growth.GROW_MIN_WOMEN:,} women and worker housing under "
                         f"{growth.WORKER_CAP:.0%} of adults."),
+    "unsaturated": Field("Unsaturated", "yes/no",
+                         f"Fewer than {growth.UNSATURATED_PER_1K:g} premium reviews per 1k women "
+                         "(n/a when too little of the area was searched)."),
     "grow_min_women": Field("Size line", "women", "Women needed to carry a lounge."),
     "skip_under_women": Field("Size floor", "women", "Under this the area is skipped."),
     "unsaturated_per_1k": Field("Saturation line", "reviews per 1k women",
@@ -236,62 +130,46 @@ GLOSSARY: dict[str, Field] = {
                         "Above this the women estimate is too uncertain to GROW.", pct=True),
     "min_coverage": Field("Coverage needed", "% of women",
                           "Less competitor data than this caps the call at WATCH.", pct=True),
-    # --- v3: network ---
+    # --- uae (network summary) ---
     "lounges_scored": Field("Lounges scored", "count", "UAE lounges given a call."),
     "not_scored_count": Field("Not scored", "lounges",
                               "Lounges that serve travellers (the airport lounge)."),
+    "protect_count": Field("PROTECT", "lounges",
+                           f"Lounges with composite ≥ {scorecard.PROTECT_AT}."),
+    "hold_count": Field("HOLD", "lounges", "Lounges between the two thresholds."),
+    "shrink_count": Field("SHRINK", "lounges", f"Lounges with composite ≤ {scorecard.SHRINK_AT}."),
     "protect_lounges": Field("PROTECT lounges", "", "Ids of PROTECT lounges."),
     "shrink_lounges": Field("SHRINK lounges", "", "Ids of SHRINK lounges."),
+    "protect_composite_min": Field("Weakest PROTECT composite", "0-1",
+                                   "Lowest composite among PROTECT lounges."),
+    "shrink_composite_max": Field("Strongest SHRINK composite", "0-1",
+                                  "Highest composite among SHRINK lounges."),
+    "low_confidence_count": Field(
+        "Low-confidence calls", "lounges",
+        "Calls within 0.05 of a threshold, with a missing input, or that flip across "
+        "assumption levels."),
     "growth_areas_total": Field("Growth areas", "count",
                                 "Populated areas beyond a 15-min drive of every lounge."),
+    "grow_count": Field("GROW", "areas", "Areas passing both tests."),
+    "watch_count": Field("WATCH", "areas", "Areas passing one of the two tests."),
+    "grow_areas": Field("GROW areas", "", "Ids of GROW areas."),
     "grow_women_total": Field("Women in GROW areas", "women", "Sum over GROW areas."),
+    "grow_nearest_km_min": Field("Closest GROW area to a lounge", "km",
+                                 "Smallest nearest-lounge distance among GROW areas."),
+    "grow_nearest_km_max": Field("Furthest GROW area from a lounge", "km",
+                                 "Largest nearest-lounge distance among GROW areas."),
     "grow_reviews_per_1k_max": Field("Most saturated GROW area", "reviews per 1k women",
                                      "Highest premium saturation among GROW areas."),
     "salons_total": Field("Salons searched", "count",
                           "Women's salons found by the Google Places search (all of the UAE "
                           "searched)."),
+    "revenue_data_available": Field("Revenue data", "yes/no", "Per-lounge revenue or footfall."),
+    "rent_data_available": Field("Rent data", "yes/no", "Per-lounge rent, capex or lease terms."),
 }
-
-BRANCH_TABLE = ("female_pop_served", "communities_served", "contested_share",
-                "nearest_sibling_km", "competitors_in_catchment", "competitors_per_10k",
-                "rating", "review_count", "composite", "score_demand",
-                "score_cannibalisation", "score_competition", "score_quality")
-OPPORTUNITY_TABLE = ("female_pop", "competitors", "competitors_per_10k", "branches_here",
-                     "salons_supported", "salon_headroom", "uncovered_women", "fair_share",
-                     "captured_women_est", "nearest_branch_id", "nearest_branch_km",
-                     "hosts_branch", "underserved", "unsaturated")
-# Fields that live on the OpportunityDecision rather than the CommunityFeatures.
-_OPPORTUNITY_OUTPUTS = ("underserved", "unsaturated", "salons_supported", "salon_headroom",
-                        "uncovered_women", "fair_share", "captured_women_est")
 
 # Each argument a pyramid can make, with the facts that can back it. `prioritize` picks
 # which apply and orders them; every reason must cite at least one of its topic's fields.
 TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
-    "branch": {
-        "demand": ("female_pop_served", "communities_served", "score_demand"),
-        "cannibalisation": ("contested_share", "nearest_sibling_km", "score_cannibalisation"),
-        "competition": ("competitors_per_10k", "competitors_in_catchment", "score_competition"),
-        "quality": ("rating", "review_count", "score_quality"),
-    },
-    "opportunity": {
-        "presence": ("hosts_branch", "nearest_branch_id", "nearest_branch_km"),
-        "coverage": ("nearest_branch_km", "nearest_branch_id", "underserved",
-                     "far_km_threshold"),
-        "competition": ("competitors_per_10k", "competitors", "unsaturated",
-                        "unsaturated_threshold"),
-        "demand": ("female_pop", "min_pop_floor", "hosts_branch"),
-        "headroom": ("salon_headroom", "salons_supported", "competitors", "branches_here",
-                     "uncovered_women"),
-        "worker_housing": ("worker_housing", "estimated_female_share", "female_pop"),
-    },
-    "network": {
-        "shrink": ("shrink_count", "shrink_branches", "shrink_composite_max"),
-        "grow": ("grow_count", "grow_areas", "grow_nearest_km_min", "grow_nearest_km_max",
-                 "grow_competitors_per_10k_max"),
-        "protect": ("protect_count", "protect_branches", "protect_composite_min"),
-        "confidence": ("hold_count", "low_confidence_count", "branches_total"),
-        "data_gaps": ("revenue_data_available", "rent_data_available", "competitors_total"),
-    },
     "lounge": {
         "demand": ("catchment_women", "catchment_cells", "score_demand", "est_customers"),
         "cannibalisation": ("shared_share", "score_cannibalisation"),
@@ -318,16 +196,14 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     },
 }
 TOPIC_LABELS = {
-    "demand": "Demand", "cannibalisation": "Cannibalisation", "competition": "Competition",
-    "quality": "Customer quality", "presence": "Existing branch", "coverage": "Coverage",
-    "headroom": "Room left",
-    "worker_housing": "Demand reliability", "shrink": "Where to cut back",
+    "demand": "Demand", "cannibalisation": "Cannibalisation", "capture": "Capture",
+    "rating": "Rating vs rivals", "size": "Size", "saturation": "Competition",
+    "reach": "Distance to a lounge", "worker_housing": "Demand reliability",
+    "data_gap": "What we couldn't search", "shrink": "Where to investigate",
     "grow": "Where to grow", "protect": "What to protect", "confidence": "How sure we are",
-    "data_gaps": "What this can't see", "capture": "Capture", "rating": "Rating vs rivals",
-    "size": "Size", "saturation": "Competition", "reach": "Distance to a lounge",
-    "data_gap": "What we couldn't search",
+    "data_gaps": "What this can't see",
 }
-IMPORTANT = 0.1  # a branch signal must sit this far from neutral (0.5) to be an argument
+IMPORTANT = 0.1  # a lounge signal must sit this far from neutral (0.5), weighted, to be an argument
 
 
 def fmt(field: str, value) -> str:
@@ -361,29 +237,12 @@ def _scale(signal) -> str:
 
 
 # The decision rule each factor feeds, built from the model's own constants.
+_TOTAL_WEIGHT = sum(s.weight for s in scorecard.SIGNALS)
 THRESHOLDS: dict[str, str] = {
-    **{s.field: _scale(s) for s in rubric.SIGNALS},
-    **{f"score_{s.name}": "One quarter of the composite" for s in rubric.SIGNALS},
-    "contested_share": (f"{_scale(next(s for s in rubric.SIGNALS if s.name == 'cannibalisation'))}"
-                        f"; contested when the 2nd-nearest branch is within "
-                        f"{settings.contest_ratio}× the nearest"),
-    "composite": f"PROTECT ≥ {rubric.PROTECT_AT} · HOLD between · SHRINK ≤ {rubric.SHRINK_AT}",
-    "female_pop": f"At least {opportunity.MIN_POP:,} women to be a candidate",
-    "nearest_branch_km": f"Underserved if over {opportunity.FAR_KM:g} km",
-    "hosts_branch": "SKIP if yes",
-    "salons_supported": f"At {opportunity.MEDIAN_SALONS_PER_10K:g} salons per 10k women",
-    "salon_headroom": "Positive when the area is below the median density",
-    "uncovered_women": f"Counted when the nearest branch is over {opportunity.FAR_KM:g} km away",
-    "fair_share": "Naive: every salon equally attractive",
-    "underserved": "GROW needs both tests, WATCH one, SKIP neither",
-    "unsaturated": "GROW needs both tests, WATCH one, SKIP neither",
-}
-
-
-THRESHOLDS.update({
     **{s.field: f"{_scale(s)}; weight {s.weight:g}" for s in scorecard.SIGNALS},
-    **{f"score_{s.name}": f"Weight {s.weight:g} of {sum(x.weight for x in scorecard.SIGNALS):g}"
-       for s in scorecard.SIGNALS if s.name in ("capture", "rating")},
+    **{f"score_{s.name}": f"Weight {s.weight:g} of {_TOTAL_WEIGHT:g}" for s in scorecard.SIGNALS},
+    "composite": (f"PROTECT ≥ {scorecard.PROTECT_AT} · HOLD between · "
+                  f"SHRINK ≤ {scorecard.SHRINK_AT}"),
     "thin_premium_market": "Capture scores 0.5 when yes",
     "level_flips": f"Low confidence at {scorecard.FLIP_LOW} or more",
     "women": (f"GROW needs {growth.GROW_MIN_WOMEN:,}; SKIP under {growth.SKIP_UNDER_WOMEN:,}"),
@@ -391,27 +250,13 @@ THRESHOLDS.update({
     "premium_reviews_per_1k": f"Unsaturated under {growth.UNSATURATED_PER_1K:g}",
     "data_coverage": f"GROW needs {growth.MIN_COVERAGE:.0%}",
     "big_enough": "GROW needs both tests, WATCH one, SKIP neither",
-})
-# v3 lounge rows that share an old key (score_demand, score_cannibalisation, composite).
-LOUNGE_THRESHOLDS = {
-    **{f"score_{s.name}": f"Weight {s.weight:g} of {sum(x.weight for x in scorecard.SIGNALS):g}"
-       for s in scorecard.SIGNALS},
-    "composite": (f"PROTECT ≥ {scorecard.PROTECT_AT} · HOLD between · "
-                  f"SHRINK ≤ {scorecard.SHRINK_AT}"),
+    "unsaturated": "GROW needs both tests, WATCH one, SKIP neither",
 }
 
 
-# Where an area's rule for a shared field differs from the branch rule.
-AREA_THRESHOLDS = {
-    "competitors_per_10k": f"Unsaturated if under {opportunity.UNSATURATED_PER_10K:g}",
-}
-
-
-def table_rows(fields: tuple[str, ...], facts: dict, kind: str = "branch") -> list[dict]:
-    rules = {**THRESHOLDS, **(AREA_THRESHOLDS if kind == "opportunity" else {}),
-             **(LOUNGE_THRESHOLDS if kind == "lounge" else {})}
+def table_rows(fields: tuple[str, ...], facts: dict) -> list[dict]:
     return [{"Factor": GLOSSARY[k].label, "Value": fmt(k, facts.get(k)),
-             "Unit": GLOSSARY[k].unit, "Threshold": rules.get(k, "—"),
+             "Unit": GLOSSARY[k].unit, "Threshold": THRESHOLDS.get(k, "—"),
              "What it means": GLOSSARY[k].meaning}
             for k in fields]
 
@@ -420,55 +265,7 @@ def _rounded(facts: dict) -> dict:
     return {k: round(v, 4) if isinstance(v, float) else v for k, v in facts.items()}
 
 
-def branch_facts(f: BranchFeatures, d: Decision) -> dict:
-    facts = {k: getattr(f, k) for k in BRANCH_TABLE if hasattr(f, k)}
-    facts.update(composite=d.composite, **{f"score_{k}": v for k, v in d.scores.items()})
-    return _rounded(facts)
-
-
-def opportunity_facts(c: CommunityFeatures, o: OpportunityDecision) -> dict:
-    facts = {k: getattr(c, k) for k in OPPORTUNITY_TABLE if hasattr(c, k)}
-    facts.update({k: getattr(o, k) for k in _OPPORTUNITY_OUTPUTS})
-    facts.update(
-        far_km_threshold=opportunity.FAR_KM,
-        unsaturated_threshold=opportunity.UNSATURATED_PER_10K,
-        min_pop_floor=opportunity.MIN_POP,
-        worker_housing=bool(opportunity.WORKER_HOUSING.search(c.name)),
-        estimated_female_share=settings.global_female_share,
-    )
-    return _rounded(facts)
-
-
-def network_facts(decisions: list[Decision], opportunities: list[OpportunityDecision],
-                  communities: list[CommunityFeatures], competitors_total: int) -> dict:
-    by_action = {a: [d for d in decisions if d.action == a]
-                 for a in ("PROTECT", "HOLD", "SHRINK")}
-    grow_ids = {o.community_id for o in opportunities if o.action == "GROW"}
-    grow = [c for c in communities if c.community_id in grow_ids]
-    return _rounded({
-        "branches_total": len(decisions),
-        "protect_count": len(by_action["PROTECT"]),
-        "hold_count": len(by_action["HOLD"]),
-        "shrink_count": len(by_action["SHRINK"]),
-        "protect_branches": ", ".join(sorted(d.branch_id for d in by_action["PROTECT"])) or "none",
-        "shrink_branches": ", ".join(sorted(d.branch_id for d in by_action["SHRINK"])) or "none",
-        "protect_composite_min": min((d.composite for d in by_action["PROTECT"]), default=None),
-        "shrink_composite_max": max((d.composite for d in by_action["SHRINK"]), default=None),
-        "low_confidence_count": sum(d.confidence == "low" for d in decisions),
-        "areas_total": len(opportunities),
-        "grow_count": len(grow),
-        "watch_count": sum(o.action == "WATCH" for o in opportunities),
-        "grow_areas": ", ".join(sorted(grow_ids)) or "none",
-        "grow_nearest_km_min": min((c.nearest_branch_km for c in grow), default=None),
-        "grow_nearest_km_max": max((c.nearest_branch_km for c in grow), default=None),
-        "grow_competitors_per_10k_max": max((c.competitors_per_10k for c in grow), default=None),
-        "competitors_total": competitors_total,
-        "revenue_data_available": False,
-        "rent_data_available": False,
-    })
-
-
-# --- v3 facts ---------------------------------------------------------------------------
+# --- facts ------------------------------------------------------------------------------
 
 LOUNGE_TABLE = ("catchment_women", "catchment_cells", "shared_share", "premium_pool",
                 "substitutes_k", "capture", "thin_premium_market", "est_customers",
@@ -536,6 +333,8 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
     if kind == "lounge":
         if action == NOT_SCORED_ACTION:
             return ["demand", "capture"]
+        # Importance = how far a weighted signal sits from neutral, in the direction of the call:
+        # strengths for PROTECT, weaknesses for SHRINK, either for HOLD.
         sign = {"PROTECT": 1, "SHRINK": -1}.get(action)
         w = {s.name: s.weight for s in scorecard.SIGNALS}
 
@@ -556,27 +355,6 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
         if facts["unsaturated"] is not None and facts["data_coverage"] < facts["min_coverage"]:
             topics.append("data_gap")
         return topics
-    if kind == "branch":
-        # Importance = how far a signal sits from neutral, in the direction of the call:
-        # strengths for PROTECT, weaknesses for SHRINK, either for HOLD.
-        sign = {"PROTECT": 1, "SHRINK": -1}.get(action)
-
-        def weight(topic: str) -> float:
-            delta = facts[f"score_{topic}"] - 0.5
-            return delta * sign if sign else abs(delta)
-
-        ranked = sorted(TOPICS["branch"], key=weight, reverse=True)
-        chosen = [t for t in ranked if weight(t) >= IMPORTANT]
-        return (chosen + [t for t in ranked if t not in chosen])[:max(MIN_ITEMS, len(chosen))]
-    if kind == "opportunity":
-        if facts["hosts_branch"]:
-            return ["presence", "competition", "headroom"]
-        if facts["female_pop"] < facts["min_pop_floor"]:
-            return ["demand", "coverage", "competition"]
-        topics = ["coverage", "competition", "headroom", "demand"]
-        if facts["worker_housing"] and facts["underserved"] and facts["unsaturated"]:
-            topics.append("worker_housing")
-        return topics
     skip = {"shrink": facts["shrink_count"] == 0, "grow": facts["grow_count"] == 0,
             "protect": facts["protect_count"] == 0}
     return [t for t in TOPICS[kind] if not skip.get(t)][:MAX_ITEMS]
@@ -596,11 +374,7 @@ def _thresholds_note(kind: str) -> str:
         return f"{scorecard.THRESHOLDS_WHY} {scorecard.FLIP_WHY}"
     if kind == "area":
         return GROWTH_WHY
-    if kind == "uae":
-        return f"{scorecard.THRESHOLDS_WHY} {GROWTH_WHY}"
-    if kind == "network":
-        return f"{rubric.THRESHOLDS_WHY} {opportunity.THRESHOLDS_WHY}"
-    return rubric.THRESHOLDS_WHY if kind == "branch" else opportunity.THRESHOLDS_WHY
+    return f"{scorecard.THRESHOLDS_WHY} {GROWTH_WHY}"   # uae
 
 
 def _ev(field: str, facts: dict) -> Evidence:
@@ -613,7 +387,7 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
     if kind == "lounge" and f.get(f"score_{topic}") is None:  # NOT SCORED: no scores
         main = TOPICS["lounge"][topic][0]
         return f"{GLOSSARY[main].label}: {fmt_unit(main, f[main])}, shown but not scored."
-    if kind in ("branch", "lounge"):
+    if kind == "lounge":
         score = f[f"score_{topic}"]
         strength = "a strength" if score >= 0.6 else "a weakness" if score <= 0.4 else "middling"
         main = TOPICS[kind][topic][0]
@@ -634,43 +408,12 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
             "data_gap": (f"Our salon search covered {fmt('data_coverage', f['data_coverage'])} "
                          "of the women here, so competition is partly unknown."),
         }[topic]
-    if kind == "opportunity":
-        return {
-            "presence": f"Already served: Bedashing has a branch here ({f['nearest_branch_id']}).",
-            "coverage": (f"Nearest branch {f['nearest_branch_id']} is "
-                         f"{fmt('nearest_branch_km', f['nearest_branch_km'])} km away, "
-                         f"{'beyond' if f['underserved'] else 'within'} the "
-                         f"{f['far_km_threshold']:g} km line."),
-            "competition": (f"{fmt('competitors_per_10k', f['competitors_per_10k'])} competitor "
-                            f"salons per 10k women, {'below' if f['unsaturated'] else 'above'} "
-                            f"the {f['unsaturated_threshold']:g} cut-off."),
-            "demand": (f"About {fmt('female_pop', f['female_pop'])} women live here "
-                       f"(floor {fmt('min_pop_floor', f['min_pop_floor'])})."),
-            "headroom": (f"Room for {f['salon_headroom']} more salons: it could support about "
-                         f"{fmt('salons_supported', f['salons_supported'])} and has "
-                         f"{f['competitors']} competitors plus {f['branches_here']} Bedashing "
-                         f"branch{'' if f['branches_here'] == 1 else 'es'}."),
-            "worker_housing": ("Likely worker housing: the uniform female-share estimate "
-                               "overstates demand here, so the call is capped at WATCH."),
-        }[topic]
-    if kind == "uae":
-        return {
-            "shrink": f"Investigate before shrinking: {f['shrink_lounges']}.",
-            "grow": (f"{f['grow_count']} areas to GROW, with "
-                     f"{fmt('grow_women_total', f['grow_women_total'])} women 15+ between them."),
-            "protect": f"Protect {f['protect_lounges']}.",
-            "confidence": (f"{f['hold_count']} lounges sit in the HOLD band and "
-                           f"{f['low_confidence_count']} calls are low confidence."),
-            "data_gaps": ("No revenue or rent data: these are location and market calls, not "
-                          "return-on-capital calls."),
-        }[topic]
-    return {
-        "shrink": f"Investigate before shrinking: {f['shrink_branches']}.",
-        "grow": (f"{f['grow_count']} areas to GROW, each "
-                 f"{fmt('grow_nearest_km_min', f['grow_nearest_km_min'])}-"
-                 f"{fmt('grow_nearest_km_max', f['grow_nearest_km_max'])} km from a branch."),
-        "protect": f"Protect {f['protect_branches']}.",
-        "confidence": (f"{f['hold_count']} branches sit in the HOLD band and "
+    return {  # uae
+        "shrink": f"Investigate before shrinking: {f['shrink_lounges']}.",
+        "grow": (f"{f['grow_count']} areas to GROW, with "
+                 f"{fmt('grow_women_total', f['grow_women_total'])} women 15+ between them."),
+        "protect": f"Protect {f['protect_lounges']}.",
+        "confidence": (f"{f['hold_count']} lounges sit in the HOLD band and "
                        f"{f['low_confidence_count']} calls are low confidence."),
         "data_gaps": ("No revenue or rent data: these are location and market calls, not "
                       "return-on-capital calls."),
@@ -688,32 +431,12 @@ def _template_headline(kind: str, action: str, f: dict) -> str:
         return (f"{action}: {'big enough' if f['big_enough'] else 'not big enough'}, and "
                 + {True: "unsaturated", False: "saturated", None: "saturation unknown"}[
                     f["unsaturated"]] + ".")
-    if kind == "uae":
-        return (f"{f['protect_count']} PROTECT, {f['hold_count']} HOLD and {f['shrink_count']} "
-                f"SHRINK across {f['lounges_scored']} scored lounges, with {f['grow_count']} "
-                "areas to GROW.")
-    if kind == "branch":
-        return (f"{action}: composite {f['composite']:.2f} (PROTECT at {rubric.PROTECT_AT} or "
-                f"more, SHRINK at {rubric.SHRINK_AT} or less).")
-    if kind == "opportunity":
-        return (f"{action}: {'underserved' if f['underserved'] else 'covered'} and "
-                f"{'unsaturated' if f['unsaturated'] else 'saturated'}.")
     return (f"{f['protect_count']} PROTECT, {f['hold_count']} HOLD and {f['shrink_count']} "
-            f"SHRINK across {f['branches_total']} branches, with {f['grow_count']} areas to "
-            "GROW.")
+            f"SHRINK across {f['lounges_scored']} scored lounges, with {f['grow_count']} "
+            "areas to GROW.")
 
 
 _TEMPLATE_CAPTIONS = {
-    "branch": ("Each signal is scored 0-1 on a fixed scale, where 1 is good for the branch, "
-               "and the composite is their equal-weight average. Demand counts the women "
-               "nearest this branch, cannibalisation counts how many of them a sibling branch "
-               "also competes for, competitive overlap counts rival salons per 10k women, and "
-               "quality is the customer rating."),
-    "opportunity": ("An area is underserved when the nearest Bedashing branch is far away, and "
-                    "unsaturated when it has few rival salons for its population. GROW needs "
-                    "both, WATCH has one, and SKIP has neither."),
-    "network": ("Branch calls come from a fixed-scale rubric; area calls come from two tests, "
-                "distance to the nearest branch and competitor density."),
     "lounge": ("Each signal is scored 0-1 on a fixed scale, where 1 is good for the lounge, and "
                "the composite is their weighted average. Demand counts women within a 15-min "
                "drive, cannibalisation how many of them another lounge also reaches, capture the "
@@ -749,9 +472,7 @@ def _allowed_numbers(facts: dict) -> list[float]:
     nums = [float(v) for v in facts.values()
             if isinstance(v, (int, float)) and not isinstance(v, bool)]
     nums += [v * 100 for v in nums if 0 <= v <= 1]  # shares and scores quoted as %
-    nums += [rubric.PROTECT_AT, rubric.SHRINK_AT, 4, 0, 1]
-    nums += [x for s in rubric.SIGNALS for x in (s.worst, s.best)]
-    nums += [opportunity.FAR_KM, opportunity.UNSATURATED_PER_10K, opportunity.MIN_POP]
+    nums += [4, 0, 1]
     nums += [scorecard.PROTECT_AT, scorecard.SHRINK_AT, scorecard.FLIP_LOW, 27, 15, 60, 1_000]
     nums += [x for s in scorecard.SIGNALS for x in (s.worst, s.best, s.weight)]
     nums += [growth.GROW_MIN_WOMEN, growth.SKIP_UNDER_WOMEN, growth.UNSATURATED_PER_1K,
@@ -874,8 +595,8 @@ EXPLAIN_TOOL = {
             "table_caption": {
                 "type": "string",
                 "description": "2-3 sentences explaining, for a non-technical executive, what "
-                               "the factors measure and how to read them for this branch, "
-                               "area or network.",
+                               "the factors measure and how to read them for this lounge, "
+                               "area or the UAE network.",
             },
         },
         "required": ["headline", "reasons", "table_caption"],
@@ -978,22 +699,7 @@ def explain(kind: str, subject_id: str, action: str, facts: dict,
     return template_explanation(kind, subject_id, action, facts)
 
 
-NETWORK_ID, NETWORK_ACTION = "dubai", "SUMMARY"
-
-
-def subjects_for(data) -> list[tuple[str, str, str, dict]]:
-    """(kind, id, action, facts) for every explanation the app shows for this data."""
-    subjects = [("network", NETWORK_ID, NETWORK_ACTION,
-                 network_facts(data.decisions, data.opportunities, data.community_features,
-                               len(data.competitors)))]
-    subjects += [("branch", f.branch_id, data.decision_for(f.branch_id).action,
-                  branch_facts(f, data.decision_for(f.branch_id))) for f in data.features]
-    opp = {o.community_id: o for o in data.opportunities}
-    subjects += [("opportunity", c.community_id, opp[c.community_id].action,
-                  opportunity_facts(c, opp[c.community_id])) for c in data.community_features]
-    return subjects
-
-
+NETWORK_ACTION = "SUMMARY"
 V3_NETWORK_ID = "uae"
 
 
@@ -1072,14 +778,15 @@ def make_client():
 
 
 def main() -> None:
-    """Regenerate AI explanations for the current baseline and write the committed cache."""
+    """Regenerate AI explanations for the baseline through the API and write the committed cache.
+    Same subjects as the offline `prompts` path: NOT SCORED lounges and SKIP areas keep their
+    template."""
     import anthropic
-
-    from src.webapp.data import load_baseline
 
     client = make_client()
     if client is None:
-        raise SystemExit("Set ANTHROPIC_API_KEY in .env first.")
+        raise SystemExit("Set ANTHROPIC_API_KEY in .env first (or use the offline path: "
+                         "`python -m src.explain prompts DIR`).")
     # Batch job: let the SDK's exponential backoff (honours retry-after) ride out per-minute
     # rate limits. Calls are sequential, so no concurrency limit is needed.
     client = client.with_options(max_retries=8)
@@ -1094,7 +801,7 @@ def main() -> None:
                          "shortly or check the key's rate limits in the console.") from exc
     except anthropic.APIStatusError as exc:
         raise SystemExit(f"Preflight failed ({exc.status_code}): {exc.message}") from exc
-    subjects = subjects_for(load_baseline(settings))
+    subjects = [s for s in v3_subjects() if needs_ai(s[2])]
     # Reuse entries whose exact facts are unchanged and that still pass today's checks, so
     # a re-run only fills gaps. Entries for subjects that no longer match are dropped below.
     old = load_cache()
