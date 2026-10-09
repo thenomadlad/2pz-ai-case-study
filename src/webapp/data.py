@@ -2,7 +2,7 @@
 
 The what-if lives in st.session_state["what_if"] (not in widget keys, which Streamlit drops on
 pages that don't render the widget), so every page sees it."""
-from functools import cache
+from functools import cache, lru_cache
 
 import pandas as pd
 import streamlit as st
@@ -37,10 +37,15 @@ def active() -> bool:
     return w["levels"] != Levels() or bool(w["closed"]) or w["recall"] is not None
 
 
+@lru_cache(maxsize=64)
+def _run(levels: Levels, closed: frozenset[str], recall: float | None) -> Run:
+    return run(levels, closed, recall)     # run() deep-copies; keep one copy per what-if
+
+
 def current() -> Run:
-    """The run for the current what-if (cached in src.baseline.run; read-only)."""
+    """The run for the current what-if: the same object for the same what-if, so treat it as read-only."""
     w = what_if()
-    return run(w["levels"], w["closed"], w["recall"])
+    return _run(w["levels"], w["closed"], w["recall"])
 
 
 _SUBJECTS: dict[int, tuple[Run, dict]] = {}
