@@ -130,7 +130,7 @@ class NetworkStats(BaseModel):
 
 class Decision(BaseModel):
     branch_id: str
-    action: Literal["PROTECT", "HOLD", "SHRINK"]
+    action: Literal["PROTECT", "HOLD", "SHRINK", "NOT SCORED"]
     confidence: Literal["low", "medium", "high"]
     rationale: str
     key_drivers: list[str]
@@ -153,6 +153,16 @@ class OpportunityDecision(BaseModel):
     uncovered_women: int = 0        # women whose nearest Bedashing branch is beyond the line
     fair_share: float = 0.0         # Bedashing's share of the salons here (naive capture)
     captured_women_est: int = 0     # fair share x women
+
+
+class AreaDecision(BaseModel):
+    """A growth area's call: GROW / WATCH / SKIP (src/model/growth.py)."""
+    area_id: str
+    action: Literal["GROW", "WATCH", "SKIP"]
+    big_enough: bool
+    unsaturated: bool | None        # None: no competitor data
+    rationale: str
+    caveats: list[str]
 
 
 class Evidence(BaseModel):
