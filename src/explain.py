@@ -754,6 +754,8 @@ def _allowed_numbers(facts: dict) -> list[float]:
     nums += [opportunity.FAR_KM, opportunity.UNSATURATED_PER_10K, opportunity.MIN_POP]
     nums += [scorecard.PROTECT_AT, scorecard.SHRINK_AT, scorecard.FLIP_LOW, 27, 15, 60, 1_000]
     nums += [x for s in scorecard.SIGNALS for x in (s.worst, s.best, s.weight)]
+    nums += [growth.GROW_MIN_WOMEN, growth.SKIP_UNDER_WOMEN, growth.UNSATURATED_PER_1K,
+             growth.WORKER_CAP * 100, growth.MIN_COVERAGE * 100]
     nums += [2, 3, 10, 10_000, 100, 5]  # "per 10k", "2GIS", "out of 5"
     return nums
 
