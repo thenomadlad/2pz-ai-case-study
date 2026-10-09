@@ -15,20 +15,22 @@ from src.config import settings  # noqa: E402
 from src.features.assign import haversine_km as km  # noqa: E402,F401
 
 URL = "https://places.googleapis.com/v1/places:searchText"
+NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby"
 FIELDS = ("places.id,places.displayName,places.formattedAddress,places.location,"
-          "places.rating,places.userRatingCount,places.businessStatus,places.primaryType")
+          "places.rating,places.userRatingCount,places.businessStatus,places.primaryType,"
+          "places.priceLevel,places.priceRange")
 MAX_CALLS = 150
 calls = 0
 
 
-def search(body: dict, *, paged: bool = False) -> dict:
+def search(body: dict, *, paged: bool = False, url: str = URL) -> dict:
     global calls
     if not settings.google_maps_api_key:
         raise SystemExit("GOOGLE_MAPS_API_KEY missing from .env")
     if calls >= MAX_CALLS:
         raise SystemExit(f"stopped at MAX_CALLS={MAX_CALLS}")
     calls += 1
-    req = urllib.request.Request(URL, data=json.dumps(body).encode(), headers={
+    req = urllib.request.Request(url, data=json.dumps(body).encode(), headers={
         "Content-Type": "application/json",
         "X-Goog-Api-Key": settings.google_maps_api_key,
         "X-Goog-FieldMask": FIELDS + (",nextPageToken" if paged else ""),
@@ -70,12 +72,25 @@ def best_match(places: list[dict], lat: float, lng: float, title: str = "",
     return min(named or near, key=lambda p: _km_to(p, lat, lng), default=None)
 
 
+def price_level(place: dict) -> str:
+    """Google's PRICE_LEVEL_VERY_EXPENSIVE -> "very_expensive"; missing/unspecified -> ""."""
+    lvl = place.get("priceLevel", "").removeprefix("PRICE_LEVEL_").lower()
+    return "" if lvl in ("", "unspecified", "free") else lvl
+
+
+def _aed(price: dict | None):
+    return int(price["units"]) if price and price.get("units") else None
+
+
 def to_row(place: dict) -> dict:
     loc = place.get("location", {})
+    pr = place.get("priceRange", {})
     return {
         "place_id": place["id"], "name": name_of(place),
         "address": place.get("formattedAddress", ""),
         "lat": loc.get("latitude"), "lng": loc.get("longitude"),
         "rating": place.get("rating"), "review_count": place.get("userRatingCount"),
         "status": place.get("businessStatus"), "primary_type": place.get("primaryType"),
+        "price_level": price_level(place), "price_low_aed": _aed(pr.get("startPrice")),
+        "price_high_aed": _aed(pr.get("endPrice")),
     }

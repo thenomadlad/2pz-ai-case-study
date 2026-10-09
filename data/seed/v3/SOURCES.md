@@ -59,26 +59,21 @@ reflects a genuinely stronger hold on its area. The app should label the measure
 reviews oldest-first, so finding the first review needs a full scrape of every review
 (~21k for Bedashing's lounges; unaffordable for competitors) and breaks Google's terms.
 
-## Price segment (assumption; competitor prices fetched in Task 4)
+## Price segment (assumption)
 
 - **Source:** Google Places `priceLevel` (inexpensive / moderate / expensive / very expensive) and
-  `priceRange` (AED from-to). Crowd-sourced "spend per person" from Google users, in coarse
-  brackets: not a price list. Probe on 2026-10-08 (1 call, 20 salons near Bedashing Al
-  Barsha): 9 of 19 competitors had a level (6 moderate, 1 expensive, 2 very expensive);
-  ranges like AED 100-300 and 300-900, with some loose ones like AED 1-600.
-- **Bedashing:** its lounge had no price data. Its level is an **assumption**, `expensive`
-  (`bedashing_price_level` in `data/scenarios/baseline.yaml`), to be revisited from its own
-  menu (Phorest booking pages).
-- **Comparable competitors:** salons at a `comparable_price_levels` level (default `[expensive]`).
-  Strict on purpose; the salons notebook reports how many competitors survive it and at a
-  wider band.
-- **Missing levels are imputed:** the median level of priced salons in the same
-  neighbourhood, else the emirate median, else `unknown`. An `unknown` salon **stays** in
-  the comparison, so missing data never silently removes competition. `price_level_source`
-  records which rule applied.
-- **Limitations:** brackets are coarse and user-reported; one neighbourhood can mix cheap
-  and premium salons, so neighbourhood imputation smooths that over; coverage is likely
-  lower outside central Dubai.
+  `priceRange` (AED from-to): crowd-sourced "spend per person" from Google users, in coarse
+  brackets, not a price list.
+- **Coverage is thin:** a 1-call sample near Bedashing Al Barsha found 9 of 19 competitors priced,
+  but the larger probe (2026-10-08) found ~20% of salons priced around Al Barsha and ~4% around
+  Al Dhafra.
+- **Bedashing:** its lounges have no Google price. Its level is an **assumption**, `expensive`
+  (`bedashing_price_level` in `data/scenarios/baseline.yaml`), to be revisited from its own menu
+  (Phorest booking pages).
+- **Use:** a competitor counts as a premium substitute if Google prices it expensive or very
+  expensive (`comparable_price_levels`); where Google has no price, popularity and rating stand
+  in (see "Competitors", Task 4). No imputation: neighbourhood-median imputation was planned
+  and dropped once coverage turned out to be ~20%.
 
 ## Market size (`cells.csv`, `emirates.csv`, `dubai_community_gender.csv`, built 2026-10-08)
 

@@ -2,19 +2,21 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the hand-curated seed (4 of 9 Dubai "branches" don't exist) with data fetched once from real sources and committed: Bedashing's lounges, neighbourhoods with an approximate market size, travel-time reach, and every salon (Bedashing and competitors) within reach, with Google ratings and review counts. Together these feed the market model below.
+**Goal:** Replace the hand-curated seed (4 of 9 Dubai "branches" don't exist) with data fetched once from real sources and committed: Bedashing's lounges, neighbourhoods with an approximate market size, travel-time reach, and each lounge's top premium substitutes (competitors) inside its catchment, with Google ratings and review counts. Together these feed the market model below.
 
 **Architecture:** One script per stage under `scripts/`, each reading the previous stage's committed output from `data/seed/v3/` and writing its own. Each script is run once by hand, its output is vetted in a notebook, then committed. The pipeline under `src/` and the app are **not** touched here; switching them to `data/seed/v3/` is a follow-up plan, so the live app and the existing 115 tests keep working throughout.
 
 **Market model (agreed 2026-10-08; built in the integration plan, data for it built here):**
 - **Unit:** a ~2 km grid **cell** (0.02°), not an official neighbourhood: OSM neighbourhoods are patchy outside Abu Dhabi, and the model never needed official boundaries. Cells carry an OSM name for display. (Changed 2026-10-08; "neighbourhood" below means cell.)
 - **Market size per cell** `market(n)` = women 15+ (Task 2): WorldPop adults, with the sex split redone because WorldPop applies one national ratio (33.6%) everywhere. Adults in OSM industrial land use (worker housing) get `worker_housing_female_share` (calibrated on Dubai labour-camp communities: 5.5%); every other cell gets the share that keeps each emirate's female total. Only *relative* accuracy matters; the one thing it must get right is the worker-housing skew (the bug that inflated jumeirah-park).
-- **Catchment:** a lounge's catchment = the cells inside its drive-time isochrone at `travel_time_minutes` (medium 15 min). **Competitor bound:** any salon that can reach a catchment cell within the travel time is at most 2x the travel time from the lounge, so salons are swept within **2x** (30 min at medium) of each lounge. Nothing relevant is missed.
-- **Reach (only for catchment cells):** salon `s` can serve cell `n` if `s` lies inside `n`'s own drive-time isochrone (Task 3). Cells outside every catchment get no isochrone.
-- **Share out per cell, never per catchment:** `market(n)` is split among **every** salon that can reach `n`, in proportion to lifetime review count: `share(s, n) = reviews(s) / Σ reviews(s')` over the salons reaching `n`. A lounge's **captured market** = `Σ_n market(n) × share(lounge, n)`. Shares in each cell sum to 1, so overlapping catchments can't double-count, and two lounges near each other split the same cells (cannibalisation falls out of this). Rejected alternative: lounge share = lounge reviews ÷ all reviews within 30 min. Simpler, but biased low, because a salon 28 min away would count as competing for the whole catchment.
-- **Growth candidates:** populated cells outside every lounge's catchment (all cells are in `cells.csv`, so this costs nothing extra). Decision measures: **share** (lounge reviews ÷ all reviews reaching its neighbourhoods) and **headroom** (catchment market minus captured). Raw captured women largely mirrors review count; don't headline it.
+- **Catchment:** a lounge's catchment = the cells inside its drive-time isochrone at `travel_time_minutes` (medium 15 min). **Catchment market** = the women 15+ in those cells.
+- **Competitors = premium substitutes, top k (revised 2026-10-08).** For each lounge, candidates are women's beauty, hair and nail salons inside its catchment (men-only and closed excluded). A candidate is a **premium substitute** if Google's price level is `comparable_price_levels` (expensive, very expensive) or, where Google has no price (~80% of salons), if its reviews are at least the catchment's median and its rating is at least `premium_min_rating` (4.3). Keep the **top k by review count**, k = `competitor_k` (**20**; 10 and 30 as sensitivity). **Other Bedashing lounges in the catchment count as substitutes**, so lounges with overlapping catchments split their shared demand (cannibalisation).
+- **Capture** = lounge reviews ÷ (lounge reviews + the k substitutes' reviews). **Estimated customers** = capture x catchment market; **headroom** = catchment market minus estimated customers. Name it "share among premium substitutes", not market penetration.
+- **Known bias, measured:** reviews are concentrated in thin markets and spread out in dense ones (probe, 2026-10-08: the top 10 salons hold 82% of reviews around Al Dhafra but 24% around Al Barsha). So a fixed k leaves out more of the market in dense cities, and capture is overstated more there than in small towns. The k = 10/20/30 sensitivity shows how much; the notebook reports, per lounge, what share of all candidate reviews the k substitutes cover.
+- **Rejected (2026-10-08):** splitting each cell's women among every salon that reaches it. More exact, but it needs every salon in the 30-min zones: ~2,100 Places calls (~$15-60) against 72-144 for this design. The cell isochrones from Task 3 stay committed for that later upgrade.
+- **Growth candidates:** populated cells outside every lounge's catchment (all cells are in `cells.csv`, so this costs nothing extra).
 - **Stated limitations:** review counts are lifetime totals (older salons are favoured; see `SOURCES.md`); chains likely push for more reviews than independents, inflating Bedashing's share; no distance decay inside the travel time (every reachable salon competes equally; a Huff model is the later upgrade, the three travel-time levels are the sensitivity check); home-service salons are invisible; income and nationality mix are ignored; mall lounges draw beyond their drive-time zone.
-- **Price segment (added 2026-10-08):** only salons in Bedashing's price segment compete for its market. Bedashing's own level is an **assumption** (`bedashing_price_level: expensive` in `baseline.yaml`; to be revisited later, e.g. from its Phorest menu), and only salons at a `comparable_price_levels` level (default `[expensive]`) enter the share formula as competitors. Price comes from Google's `priceLevel` (crowd-sourced spend per person; about half of salons have it). Missing levels are **imputed** (see Task 4); a salon stays in the comparison if its level is still unknown after imputation, so missing data never silently removes competition. Limitation: Google's levels are coarse brackets from user answers, not price lists, and one neighbourhood can mix cheap and premium salons.
+- **Price segment:** Bedashing's own level is an **assumption** (`bedashing_price_level: expensive` in `baseline.yaml`; Google has no price for its lounges; to be revisited from its own menu). Google's `priceLevel` is crowd-sourced spend per person in coarse brackets, and only ~20% of salons have it (probe, 2026-10-08), so where it's missing the premium stand-in (reviews and rating, above) decides. No imputation.
 - **Excluded from the market model:** `zayed-international-airport` (serves travellers, not a neighbourhood). Kept in the data, flagged.
 - **Optional, later:** a market value in AED = women × visits per year × average spend, as low/medium/high assumptions in `baseline.yaml`. It scales every number equally and changes no rankings, so it's not needed for decisions.
 
@@ -36,14 +38,11 @@
 ## Review Focus
 
 1. **A lounge with no Google match.** Expect `place_id` empty and the row kept and flagged, not silently matched to the nearest random salon. Tested in Task 1 (`best_match` returns `None`).
-2. **Bedashing's own listings among the salons.** The search returns them too. Expect them kept (they're salons in the share formula) with `is_bedashing` true and `branch_id` joined from `branches.csv`, never counted as competitors. Test in Task 4.
-3. **Dense tiles hitting Google's 60-result cap.** Al Barsha has more than 60 salons within 1 km, so a full tile means "split it", never "that's all of them". Test in Task 4.
-4. **A salon reachable from many neighbourhoods.** Expect it stored once in `salons.csv`, with one row per neighbourhood that can reach it in `salon_reach.csv`, not duplicated. Test in Task 4.
-5. **Re-running a script after a crash halfway through.** Expect no re-billing for completed lounges or tiles: progress is cached per lounge or tile in `data/raw/places_cache/` (gitignored), and the final CSV is written only at the end. Test in Task 4.
-6. **A neighbourhood whose reachable salons all have zero reviews** (or no salons at all). The share formula divides by zero. Expect that neighbourhood's market to stay unallocated (reported as headroom), never NaN or a crash. Test in the integration plan (`apportion`, spec in Task 5).
-7. **Shares not adding up.** Expect, per neighbourhood, the shares of all reaching salons to sum to 1, and total captured market ≤ total market. Test in the integration plan (spec in Task 5).
-8. **A salon with no price level in a neighbourhood with no priced salons.** Expect the fallback chain (neighbourhood → emirate → unknown) and the salon kept as comparable with `price_level_source = "unknown"`, never dropped. Test in Task 4.
-
+2. **Bedashing's own listings among the candidates.** The search returns them too. Expect each lounge excluded from its **own** substitute set but kept (with `is_bedashing` and `branch_id`) in other lounges' sets. Test in Task 4.
+3. **Fewer than k premium substitutes** (Al Dhafra has ~33 women's salons in all). Expect the set to hold however many qualify, its size reported, and capture computed on that; a lounge with **zero** substitutes gets capture 1.0, flagged, never a crash. Test in Task 4.
+4. **A salon in two lounges' catchments.** Expect it stored once in `salons.csv`, with a row per lounge in `lounge_candidates.csv`, and counted in both lounges' sets. Test in Task 4.
+5. **Re-running a script after a crash halfway through.** Expect no re-billing: each lounge's query responses are cached in `data/raw/places_cache/` (gitignored), and the CSVs are written only at the end. Test in Task 4.
+6. **Missing review count or rating** on a candidate. Expect review count 0 (never in the top k by reviews) and no premium stand-in without a rating; never NaN in capture. Test in Task 4.
 ---
 
 ## File structure
@@ -57,8 +56,8 @@ data/seed/v3/dubai_community_gender.csv # Task 2: DSC 2022 sex split, 23 Dubai c
 data/seed/v3/lounge_isochrones.geojson # Task 3: per lounge, catchment levels + 2x competitor bounds
 data/seed/v3/cell_isochrones.geojson   # Task 3: per catchment cell x level
 data/seed/v3/catchment_cells.csv       # Task 3: cell x level x lounge whose catchment holds it
-data/seed/v3/salons.csv                # Task 4: every salon within 2x travel time of a lounge
-data/seed/v3/salon_reach.csv           # Task 4: cell x level x salon inside the cell's isochrone
+data/seed/v3/salons.csv                # Task 4: unique candidate salons (type, rating, reviews, price, Bedashing flag, excluded reason)
+data/seed/v3/lounge_candidates.csv     # Task 4: lounge x candidate salon inside its 15-min catchment
 data/seed/v3/SOURCES.md                # provenance for every file above
 scripts/places.py                      # shared Google Places client (from scripts/fetch_places.py)
 scripts/fetch_branches.py              # Task 1
@@ -68,11 +67,11 @@ scripts/fetch_salons.py                # Task 4
 tests/scripts/test_places.py           # Task 1 helpers: name filter, matching
 tests/scripts/test_cells.py            # Task 2: block sums, female-share rebalancing
 tests/scripts/test_isochrones.py       # Task 3: reaches
-tests/scripts/test_salons.py           # Task 4: tiling, dedupe, cache
+tests/scripts/test_salons.py           # Task 4: exclusions, Bedashing tagging, premium set, capture, cache
 notebooks/branches.ipynb               # vets Task 1 (exists; extend)
 notebooks/market_size.ipynb            # Task 2: model structure, assumptions, vetting
 notebooks/reach.ipynb                  # vets Task 3
-notebooks/salons.ipynb                 # vets Task 4
+notebooks/competitors.ipynb            # Task 4: substitutes, capture at k = 10/20/30
 ```
 
 `scripts/fetch_places.py` (written earlier, partially run: about 29 billed calls, no output) is split into `scripts/places.py` (client and helpers) and `scripts/fetch_branches.py`. Its competitor half is replaced by Task 4.
@@ -206,74 +205,95 @@ def test_reaches_returns_points_inside_only():
 - [x] **Step 6: Vet** in `notebooks/catchments.ipynb`: each lounge's catchment polygon and cells on a map; women per catchment at each level (with the worker-housing correction at low/medium/high); lounges sharing cells (cannibalisation); the 30-min competitor bounds (the Task 4 sweep area, in km²); populated cells outside every catchment (growth candidates).
 - [x] **Step 7:** `SOURCES.md` row, commit.
 
-### Task 4: Every salon within 2x travel time of a lounge, with ratings, review counts and prices
+### Task 4: Premium substitutes per lounge, with ratings and review counts (revised 2026-10-08)
 
-**What we need (market model):** every salon that can reach a cell in any lounge's catchment,
-with its lifetime review count (the share weight). The sweep area is the union of the lounges'
-**2x travel-time** isochrones (30 min at medium; 40 min if the high level is used), which
-bounds every such salon. **Bedashing's own lounges stay in**: they're salons in the same share formula.
+**Why this shape:** see *Market model* (top). A full sweep of every salon in the 30-min zones was
+designed, probed and rejected: ~2,100 calls for a split we don't need.
 
-**Files:** Create `scripts/fetch_salons.py`. Outputs: `data/seed/v3/salons.csv` and `data/seed/v3/salon_reach.csv`.
+**Probe already done (2026-10-08, 62 calls, cached in `data/raw/places_cache/`):** one ~8 km tile
+around Al Barsha (452 salons; 374 women's salons) and one around Al Dhafra (52; 33). Findings:
+review concentration (top 10 hold 24% vs 82% of reviews), price coverage (~20% vs ~4%), and that
+"beauty salon" also returns barbers, spas, clinics, shops and schools. These feed the notebook.
+
+**Files:**
+- Rewrite: `scripts/fetch_salons.py` (the sweep version is replaced)
+- Modify: `scripts/places.py` (price fields, done), `data/scenarios/baseline.yaml` + `src/scenario/models.py` (`competitor_k`, `premium_min_rating`, `comparable_price_levels`)
+- Test: `tests/scripts/test_salons.py`
+- Outputs: `data/seed/v3/salons.csv`, `data/seed/v3/lounge_candidates.csv`
 
 **Interfaces:**
-- Consumes: the 2x isochrones in `lounge_isochrones.geojson` and `cell_isochrones.geojson` (Task 3), plus `search` and `is_bedashing` from `scripts/places.py`, and `reaches` from `scripts/fetch_isochrones.py`.
+- Consumes: `branches.csv`, the 15-min polygons in `lounge_isochrones.geojson`, and `search`, `to_row`, `is_bedashing` from `scripts/places.py`.
 - Produces:
-  - `salons.csv` columns: `place_id, name, address, lat, lng, rating, review_count, status, primary_type, price_level` (Google's, may be empty), `price_low_aed, price_high_aed` (Google's `priceRange`), `neighbourhood_id` (the polygon it sits in), `price_level_used, price_level_source` (`google` / `neighbourhood` / `emirate` / `unknown`), `is_bedashing, branch_id` (`branch_id` set for Bedashing rows, joined on `place_id` to `branches.csv`), `excluded_reason` (empty, or e.g. `men-only`, `not-operational`, `out-of-set-type`), `fetched_at`. One row per salon.
-  - `salon_reach.csv` columns: `neighbourhood_id, level, place_id`.
-  - Helpers: `split(bbox) -> list[bbox]`, `dedupe(rows) -> list[dict]`, `fetch_tile(bbox, cache_dir) -> list[dict]`, `tag_bedashing(rows: list[dict], branches: list[dict]) -> list[dict]` (sets `is_bedashing` and `branch_id` by `place_id`), and `impute_price_levels(rows: list[dict]) -> list[dict]` (fills `price_level_used` and `price_level_source`; rows carry `price_level`, `neighbourhood_id`, `emirate`).
+  - `salons.csv`: `place_id, name, address, lat, lng, rating, review_count, status, primary_type, price_level, price_low_aed, price_high_aed, is_bedashing, branch_id, excluded_reason, fetched_at`. One row per salon.
+  - `lounge_candidates.csv`: `branch_id, place_id`, every non-excluded candidate inside the lounge's 15-min polygon (including other Bedashing lounges, excluding the lounge itself). **Selection is not baked in:** the top-k premium set is computed from these with the `baseline.yaml` values, so k = 10/20/30 costs nothing.
+  - Helpers: `fetch_lounge(branch, polygon, cache_dir) -> list[dict]`, `excluded_reason(row) -> str` (`men-only`, `not-operational`, `not-a-salon`, or ""), `tag_bedashing(rows, branches)`, `dedupe(rows)`, `premium_substitutes(candidates, k, min_rating, price_levels) -> list[dict]`, `capture(lounge_reviews, substitutes) -> float`.
 
-**Method:** tile the sweep area's bounding box into rectangles. Each gets a Text Search
-`"beauty salon"` with `locationRestriction` set to that rectangle, paged up to 3 × 20. A tile
-that returns a full 60 is split into 4 and re-queried, down to about 250 m. Keep results
-inside the sweep area, dedupe by `place_id`, cache each tile in `data/raw/places_cache/`.
-Also query `"nail salon"` and `"hair salon"` on the same tiles **only if** the probe shows
-`"beauty salon"` misses them (that triples the cost; the user's call).
+**Method (revised again 2026-10-09, after validation):** cover the union of the 15-min
+catchments with **1.8 km circles** on a gap-free hexagonal grid; each circle gets one **Nearby
+Search** for women's-salon *primary* types (`beauty_salon, hair_salon, nail_salon, beautician,
+hair_care`), ranked by **popularity**, 20 results. A lounge's candidates are the salons inside its
+15-min polygon (other Bedashing lounges added from `branches.csv`). 576 circles = 576 calls,
+inside the month's free tier (1.5 km circles would need 770). The first design's per-lounge text
+searches (144 calls, done) are merged in from cache.
 
-**Price fields:** add `places.priceLevel,places.priceRange` to `FIELDS` in `scripts/places.py`.
-They bill at the same Enterprise tier as `review_count`, so they cost nothing extra. Store the level **normalised to lowercase without the prefix** (`PRICE_LEVEL_VERY_EXPENSIVE` → `very_expensive`), matching `baseline.yaml`. (A probe
-on 2026-10-08 near Bedashing Al Barsha: 9 of 19 competitors had both; the Bedashing lounge had neither.)
+**Why (validation on the fully swept Al Barsha probe tile, recall of the true top-20 premium
+salons by reviews):** one large text search per lounge (the first design): **0-2 / 20**; one large
+popularity search: **5 / 20**; text + popularity merged: 5 / 20; **1.5 km popularity circles: 17 /
+20** (8/10 at k=10, 23/30 at k=30) for 14 calls. No Google search ranks by review count, and over
+a large area its rankings favour keyword matches or its own popularity blend; locally, popularity
+finds the most-reviewed salons. `includedPrimaryTypes`, not `includedTypes`: the latter matches any
+type and returned hotels, clinics and a car wash.
 
-**Price imputation** (after the fetch, once each salon has its `neighbourhood_id`): for a salon
-without a Google `priceLevel`, use the **median level of priced salons in the same
-neighbourhood** (levels are ordinal: inexpensive < moderate < expensive < very expensive); if
-the neighbourhood has none, the median for the emirate; if still none, `unknown`. Keep Google's
-raw value in `price_level` and the result in `price_level_used`, with its `price_level_source`.
-Bedashing rows are not imputed; their level comes from the assumption.
+**Interfaces added:** `circles(area, radius_m) -> list[(lat, lng)]` (gap-free hexagonal cover),
+`fetch_circle(lat, lng, radius_m, cache_dir) -> list[dict]` (cached per circle);
+`scripts.places.search(..., url=NEARBY_URL)`.
 
-**Competitive set:** exclude (and keep with an `excluded_reason`, not delete) men-only salons
-(the name regex from `scripts/fetch_competitors.py`), barbershops, and anything not
-`OPERATIONAL`. Decide with the user, from the probe's `primary_type` counts, whether spas and
-massage centres count. Home-service salons can't be seen: a stated limitation.
-
-- [ ] **Step 1: Write the failing tests**
+- [ ] **Step 1: Write the failing tests** (replace `tests/scripts/test_salons.py`)
 
 ```python
-# tests/scripts/test_salons.py
-from scripts.fetch_salons import dedupe, impute_price_levels, split, tag_bedashing
+from scripts.fetch_salons import capture, dedupe, excluded_reason, premium_substitutes, tag_bedashing
 
 
-def test_split_quarters_a_full_tile():
-    quads = split((25.0, 55.0, 25.2, 55.2))   # (south, west, north, east)
-    assert len(quads) == 4
-    assert (25.0, 55.0, 25.1, 55.1) in quads and (25.1, 55.1, 25.2, 55.2) in quads
+def cand(pid, reviews, rating=4.6, price=""):
+    return {"place_id": pid, "review_count": reviews, "rating": rating, "price_level": price}
 
 
-def test_dedupe_keeps_one_row_per_place():
-    rows = [{"place_id": "a", "n": "x"}, {"place_id": "a", "n": "y"}, {"place_id": "b", "n": "x"}]
-    assert [r["place_id"] for r in dedupe(rows)] == ["a", "b"]
+def test_premium_takes_priced_premium_and_popular_well_rated_unpriced():
+    c = [cand("a", 50, price="expensive"),          # priced premium: in, whatever its reviews
+         cand("b", 10, price="moderate"),           # priced below: out
+         cand("c", 900), cand("d", 300),            # unpriced, popular and well rated: in
+         cand("e", 400, rating=4.0),                # popular but rated below 4.3: out
+         cand("f", 5)]                              # unpriced, below the median: out
+    got = [x["place_id"] for x in premium_substitutes(c, k=20, min_rating=4.3,
+                                                      price_levels=["expensive", "very_expensive"])]
+    assert got == ["c", "d", "a"]                   # ranked by reviews
 
 
-def test_cached_tile_is_not_rebilled(tmp_path, monkeypatch):
-    import scripts.fetch_salons as f
-    calls = []
-    monkeypatch.setattr(f, "search", lambda body, **kw: calls.append(body) or {"places": []})
-    tile = (25.0, 55.0, 25.01, 55.01)
-    f.fetch_tile(tile, tmp_path)
-    f.fetch_tile(tile, tmp_path)
-    assert len(calls) == 1
+def test_premium_caps_at_k():
+    c = [cand(str(i), 1000 - i) for i in range(30)]
+    assert len(premium_substitutes(c, k=10, min_rating=4.3, price_levels=["expensive"])) == 10
 
 
-def test_bedashing_kept_and_joined_not_competitor():
+def test_missing_reviews_and_rating_never_premium_stand_in():
+    c = [cand("x", None, rating=None), cand("y", 100)]
+    assert [x["place_id"] for x in premium_substitutes(c, 20, 4.3, ["expensive"])] == ["y"]
+
+
+def test_capture_and_no_substitutes():
+    assert capture(300, [{"review_count": 600}, {"review_count": 300}]) == 0.25
+    assert capture(300, []) == 1.0
+
+
+def test_excluded_reason():
+    ok = {"name": "Pink Lady Salon", "status": "OPERATIONAL", "primary_type": "beauty_salon"}
+    assert excluded_reason(ok) == ""
+    assert excluded_reason(ok | {"name": "Royal Gents Salon"}) == "men-only"
+    assert excluded_reason(ok | {"primary_type": "barber_shop"}) == "men-only"
+    assert excluded_reason(ok | {"primary_type": "dental_clinic"}) == "not-a-salon"
+    assert excluded_reason(ok | {"status": "CLOSED_PERMANENTLY"}) == "not-operational"
+
+
+def test_bedashing_kept_and_joined():
     rows = [{"place_id": "g1", "name": "Bedashing Beauty Lounge Delma"},
             {"place_id": "g2", "name": "Pink Madi Beauty Salon"}]
     out = {r["place_id"]: r for r in tag_bedashing(rows, [{"place_id": "g1", "branch_id": "delma"}])}
@@ -281,53 +301,33 @@ def test_bedashing_kept_and_joined_not_competitor():
     assert not out["g2"]["is_bedashing"] and not out["g2"]["branch_id"]
 
 
-def test_impute_uses_neighbourhood_median_then_emirate():
-    rows = [
-        {"place_id": "a", "price_level": "expensive", "neighbourhood_id": "n1", "emirate": "Dubai"},
-        {"place_id": "b", "price_level": "expensive", "neighbourhood_id": "n1", "emirate": "Dubai"},
-        {"place_id": "c", "price_level": "", "neighbourhood_id": "n1", "emirate": "Dubai"},
-        {"place_id": "d", "price_level": "moderate", "neighbourhood_id": "n2", "emirate": "Dubai"},
-        {"place_id": "e", "price_level": "", "neighbourhood_id": "n3", "emirate": "Dubai"},
-    ]
-    out = {r["place_id"]: r for r in impute_price_levels(rows)}
-    assert (out["c"]["price_level_used"], out["c"]["price_level_source"]) == ("expensive", "neighbourhood")
-    assert out["e"]["price_level_source"] == "emirate"            # n3 has no priced salons
-    assert (out["a"]["price_level_used"], out["a"]["price_level_source"]) == ("expensive", "google")
+def test_dedupe_keeps_one_row_per_place():
+    rows = [{"place_id": "a"}, {"place_id": "a"}, {"place_id": "b"}]
+    assert [r["place_id"] for r in dedupe(rows)] == ["a", "b"]
 
 
-def test_impute_unknown_when_nothing_priced():
-    rows = [{"place_id": "x", "price_level": "", "neighbourhood_id": "n9", "emirate": "Fujairah"}]
-    assert impute_price_levels(rows)[0]["price_level_source"] == "unknown"
+def test_cached_lounge_is_not_rebilled(tmp_path, monkeypatch):
+    from shapely.geometry import box
+    import scripts.fetch_salons as f
+    calls = []
+    monkeypatch.setattr(f, "search", lambda body, **kw: calls.append(body) or {"places": []})
+    branch = {"branch_id": "x", "lat": "25.0", "lng": "55.0"}
+    f.fetch_lounge(branch, box(54.9, 24.9, 55.1, 25.1), tmp_path)
+    f.fetch_lounge(branch, box(54.9, 24.9, 55.1, 25.1), tmp_path)
+    assert len(calls) == 2                          # 2 queries, 1 page each, then cached
 ```
-- [ ] **Step 2:** Run them. Expected: FAIL. Implement `split`, `dedupe`, `fetch_tile`, `tag_bedashing`, `impute_price_levels` and the tiling loop. For an even count of levels, take the lower median (the conservative choice: it doesn't inflate a neighbourhood's price). Run again. Expected: PASS.
-- [ ] **Step 3: Probe (ask the user first, about 10-20 calls).** One dense tile (Al Barsha) and one sparse one (Al Dhafra). Report calls per km², salons found, tiles hitting the cap, the `primary_type` mix, and **price-level coverage** (share of salons with a Google `priceLevel`, by level). Extrapolate over the sweep area's km² to a cost estimate. **Budget warning:** `review_count` is an Enterprise-tier field, so every call bills at Enterprise (1,000 free a month, then $35 per 1,000), and 30-min zones around 24 lounges cover much of the urban UAE. Expect roughly 1,000-3,000 calls, so possibly $0-70. **Stop and get approval.** Ways to cut it: sweep only the medium (30 min) bound, not the high one (40 min), or split the run across two calendar months.
-- [ ] **Step 4:** Full run with `MAX_CALLS` set to the approved estimate plus 20%. Then compute `salon_reach.csv` with `reaches` for every cell isochrone, using the **full-detail** polygons from `data/raw/isochrone_cache/mapbox/` (via `scripts.fetch_isochrones.polygons`, which reads the cache), not the simplified committed file.
-- [ ] **Step 5: Vet** in `notebooks/salons.ipynb`: price-level coverage by emirate and the share imputed per source; how many competitors survive the price filter per lounge, at `[expensive]` and at the wider `[moderate, expensive, very_expensive]` (if the strict filter leaves most lounges with almost no competitors, raise it with the user before integration); Bedashing's lounges' own Google price levels, if any (a check on the `expensive` assumption); salons per lounge catchment and per 10k women; the review-count distribution (competitors vs. Bedashing: how big is Bedashing's review advantage, i.e. the chain-solicitation caveat?); the `excluded_reason` counts; neighbourhoods reached by zero salons or only zero-review salons; Google vs. the old OSM count for Dubai.
-- [ ] **Step 6:** Add `SOURCES.md` rows (competitive-set rules, price fields and imputation, 30-day terms caveat, home-service limitation) and commit.
+- [ ] **Step 2:** Run them. Expected: FAIL. Rewrite `scripts/fetch_salons.py` (the median for the premium stand-in is over the candidates passed in, i.e. that lounge's catchment). Run again. Expected: PASS.
+- [ ] **Step 3:** Run it (576 calls, free; `MAX_CALLS = 620`). Report calls used and candidates per lounge. **Commit and push immediately after the fetch** (user request: don't risk losing paid-for data).
+- [ ] **Step 4: Vet** in `notebooks/competitors.ipynb`: the design and its reasons (from *Market model*); the recall validation above, re-measured on the actual 1.8 km circles against the Al Barsha probe; the probe's concentration and price-coverage numbers; candidates and premium substitutes per lounge; how often the premium stand-in vs. Google's price decided; each lounge's capture at k = 10 / 20 / 30 and the share of all candidate reviews the k substitutes cover (the dense-market bias); Bedashing's rank among its substitutes; other Bedashing lounges appearing in each other's sets; estimated customers and headroom (capture x catchment women).
+- [ ] **Step 5:** `SOURCES.md` section (sources, competitive-set rules, premium rule, the bias, 30-day terms caveat, home-service limitation); README rows; commit.
 
 ### Task 5: Hand-off
 
 - [ ] **Step 1:** Run `just test`. Expected: all existing tests and the new `tests/scripts` pass. The pipeline is untouched.
 - [ ] **Step 2:** Add a **"Market model"** section to `data/seed/v3/SOURCES.md` (so the app can show it): the formula, the per-neighbourhood rule, the excluded airport lounge, and every limitation listed under *Market model* at the top of this plan.
 - [ ] **Step 3:** Add a "Data refresh (v3)" entry to `docs/remaining.md`: what's now in `data/seed/v3/`, the open findings from each notebook, and the follow-up **integration plan**. That plan must include:
-  - `apportion(market: dict[n, float], reach: dict[n, list[s]], reviews: dict[s, int]) -> dict[s, float]` with these tests (from Review Focus 6-7):
-
-```python
-def test_shares_split_one_neighbourhood_by_reviews():
-    out = apportion({"n": 1000}, {"n": ["a", "b"]}, {"a": 300, "b": 100})
-    assert out == {"a": 750.0, "b": 250.0}
-
-def test_overlap_never_exceeds_market():
-    market = {"n1": 1000, "n2": 500}
-    reach = {"n1": ["a", "b"], "n2": ["a", "b"]}
-    out = apportion(market, reach, {"a": 1, "b": 1})
-    assert sum(out.values()) <= sum(market.values())
-
-def test_zero_review_neighbourhood_stays_unallocated():
-    out = apportion({"n": 1000}, {"n": ["a"]}, {"a": 0})
-    assert out.get("a", 0.0) == 0.0
-```
-  - The rubric changes: models gain `emirate` and `place_id`; catchments from `catchment_cells.csv` replace nearest-centroid assignment; the demand signal becomes captured market and share; competition comes from `salon_reach.csv` (Google, not OSM), filtered to `comparable_price_levels` using `price_level_used`; the quality signal is replaced or made relative to nearby salons (ratings only span 4.4-4.9); GROW/WATCH/SKIP uses populated cells outside every catchment; the app map handles every emirate; the airport lounge is excluded from market measures and labelled.
+  - Reuse `premium_substitutes` and `capture` from `scripts/fetch_salons.py` (move them into `src/` with their tests).
+  - The rubric changes: models gain `emirate` and `place_id`; catchments from `catchment_cells.csv` replace nearest-centroid assignment; the demand signal becomes catchment market and estimated customers; competition becomes capture among the top-k premium substitutes (Google, not OSM), shown at k = 10/20/30; the quality signal is replaced or made relative to nearby salons (ratings only span 4.4-4.9); GROW/WATCH/SKIP uses populated cells outside every catchment; the app map handles every emirate; the airport lounge is excluded from market measures and labelled.
 - [ ] **Step 4:** Update the **"Assumptions and evidence"** table at the bottom of `README.md`: move each row's status to *in data* once its data is committed, update values and evidence from the notebooks' findings (e.g. price-level coverage, how many competitors survive the price filter), and add rows for any new assumption.
 - [ ] **Step 5:** Commit.
 

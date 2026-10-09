@@ -14,12 +14,17 @@ assumptions:
   # Drive times use Mapbox's typical traffic at this local departure time (a weekday midday).
   # A weekday 18:00 (after-work peak, when salon demand is high) gives smaller catchments.
   isochrone_depart_at: "2026-10-13T12:00"
-  # Price segment. Bedashing's level is assumed (Google has no price data for its lounges;
-  # revisit from its own menu). Only competitors at a comparable level share its market;
-  # missing competitor levels are imputed (neighbourhood, then emirate median). Levels are
-  # Google's: inexpensive, moderate, expensive, very_expensive.
+  # Competitors = each lounge's premium substitutes inside its catchment, top k by Google reviews.
+  # Premium: Google price level in comparable_price_levels; where Google has no price (~80% of
+  # salons), reviews >= the catchment median and rating >= premium_min_rating. Bedashing's own
+  # level is assumed (Google has none for its lounges); revisit from its menu.
   bedashing_price_level: expensive
-  comparable_price_levels: [expensive]   # strict; the salons notebook also tests a wider band
+  comparable_price_levels: [expensive, very_expensive]
+  premium_min_rating: 4.3
+  competitor_k:
+    low: 10     # thin markets: the top 10 hold ~80% of reviews (Al Dhafra probe)
+    medium: 20
+    high: 30    # dense markets: the top 10 hold only ~24% (Al Barsha probe)
   # Market size = women 15+ per ~2 km cell. WorldPop gives adults; its sex split is one national
   # ratio (33.6%) everywhere, so adults in OSM industrial land use (worker housing) get this
   # female share, and every other cell is rebalanced to keep each emirate's female total.
