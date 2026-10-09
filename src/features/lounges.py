@@ -11,6 +11,7 @@ from src.data_v3 import V3
 from src.market import (
     _reviews,
     capture_by_coverage,
+    coverage_k,
     premium_substitutes,
     recall_multiplier,
     women_15plus,
@@ -84,13 +85,37 @@ def _slug(s: str) -> str:
     return re.sub(r"[^a-z0-9\u0600-\u06ff]+", "-", s.lower()).strip("-")   # keeps Arabic-only names apart
 
 
+def _candidates(v3: V3, levels: Levels, closed: frozenset[str], branch_id: str) -> list[dict]:
+    gone = {lo.place_id for lo in v3.lounges if lo.branch_id in closed}
+    return [s for s in v3.candidates[(branch_id, levels.travel)] if s["place_id"] not in gone]
+
+
+def premium_pool(v3: V3, a: BaselineAssumptions, levels: Levels, closed: frozenset[str],
+                 branch_id: str) -> list[dict]:
+    """A lounge's premium salons in its catchment at this travel level, most-reviewed first."""
+    cands = _candidates(v3, levels, closed, branch_id)
+    return premium_substitutes(cands, len(cands), a.premium_min_rating, a.comparable_price_levels)
+
+
+def substitutes(v3: V3, a: BaselineAssumptions, levels: Levels, closed: frozenset[str],
+                branch_id: str) -> list[dict]:
+    """The premium salons a lounge's capture is measured against (the most-reviewed ones holding
+    competitor_coverage of the pool's reviews), each with `premium_because`. Copies: safe to keep."""
+    pool = premium_pool(v3, a, levels, closed, branch_id)
+    median = statistics.median(_reviews(s) for s in _candidates(v3, levels, closed, branch_id)) if pool else 0
+    return [{**s, "premium_because": (
+                f"Google price: {s['price_level']}" if s["price_level"] else
+                f"no Google price; {_reviews(s):,} reviews ≥ the catchment median ({median:,.0f}) "
+                f"and {float(s['rating']):.1f}★ ≥ {a.premium_min_rating}")}
+            for s in pool[:coverage_k(pool, a.competitor_coverage[levels.coverage])]]
+
+
 def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  # noqa: B008 (frozen)
           closed: frozenset[str] = frozenset()) -> tuple[list[LoungeFeatures], list[Area]]:
     """Features of every open lounge, and the growth areas no open lounge reaches."""
     a, p = assumptions, _prep(v3)
     w = women_15plus(v3.cells, v3.emirates, a.worker_housing_female_share[levels.worker_share]).to_dict()
     lounges = [lo for lo in v3.lounges if lo.branch_id not in closed]
-    gone = {lo.place_id for lo in v3.lounges if lo.branch_id in closed}
     catch = {lo.branch_id: p["catch"].get(levels.travel, {}).get(lo.branch_id, []) for lo in lounges}
     reach = Counter(c for cs in catch.values() for c in cs)
 
@@ -98,8 +123,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     for lo in lounges:
         b, cs = lo.branch_id, catch[lo.branch_id]
         women = sum(w[c] for c in cs)
-        cands = [s for s in v3.candidates[(b, levels.travel)] if s["place_id"] not in gone]
-        prem = premium_substitutes(cands, len(cands), a.premium_min_rating, a.comparable_price_levels)
+        prem = premium_pool(v3, a, levels, closed, b)
         mult = recall_multiplier(v3.full_share[(b, levels.travel)], a.search_recall)
         cap, k = capture_by_coverage(lo.review_count, prem, a.competitor_coverage[levels.coverage], mult)
         rated = [float(s["rating"]) for s in prem[:k] if s.get("rating") is not None]

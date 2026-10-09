@@ -1000,21 +1000,25 @@ V3_NETWORK_ID = "uae"
 def v3_subjects() -> list[tuple[str, str, str, dict]]:
     """(kind, id, action, facts) for every v3 explanation at the baseline (medium levels)."""
     from src.baseline import run
+    return run_subjects(run())
+
+
+def run_subjects(r) -> list[tuple[str, str, str, dict]]:
+    """(kind, id, action, facts) for every explanation of one baseline.Run (the app uses this too,
+    so its fact sheets hit the committed cache exactly when the numbers match the baseline)."""
     from src.data_v3 import load_v3
 
-    v3, r = load_v3(), run()
-    features, areas, decisions, area_decisions, flips = r.features, r.areas, r.decisions, r.area_decisions, r.flips
-    salons = int((v3.salons.excluded_reason == "").sum())
+    salons = int((load_v3().salons.excluded_reason == "").sum())
     subjects = [("uae", V3_NETWORK_ID, NETWORK_ACTION,
-                 uae_facts(decisions, areas, area_decisions, salons))]
-    subjects += [("lounge", f.branch_id, d.action, lounge_facts(f, d, flips.get(f.branch_id)))
-                 for f, d in zip(features, decisions)]
+                 uae_facts(r.decisions, r.areas, r.area_decisions, salons))]
+    subjects += [("lounge", f.branch_id, d.action, lounge_facts(f, d, r.flips.get(f.branch_id)))
+                 for f, d in zip(r.features, r.decisions)]
     subjects += [("area", a.area_id, d.action, area_facts(a, d))
-                 for a, d in zip(areas, area_decisions)]
+                 for a, d in zip(r.areas, r.area_decisions)]
     return subjects
 
 
-def _needs_writing(kind: str, action: str) -> bool:
+def needs_ai(action: str) -> bool:
     """AI explanations are written for every v3 subject except the fixed NOT SCORED template and
     SKIP areas (hundreds of small places; their template says enough)."""
     return action not in (NOT_SCORED_ACTION, "SKIP")
@@ -1027,7 +1031,7 @@ def write_prompts(out_dir) -> int:
     (out / "answers").mkdir(parents=True, exist_ok=True)
     cache, n = load_cache(), 0
     for kind, sid, action, facts in v3_subjects():
-        if not _needs_writing(kind, action) or cache_key(kind, sid, action, facts) in cache:
+        if not needs_ai(action) or cache_key(kind, sid, action, facts) in cache:
             continue
         (out / f"{kind}__{sid}.json").write_text(json.dumps({
             "system": SYSTEM_PROMPT, "request": json.loads(_user_message(kind, sid, action, facts, [])),
