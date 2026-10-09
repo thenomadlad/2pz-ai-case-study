@@ -31,7 +31,7 @@ SIGNALS: tuple[Signal, ...] = (
            "Already a 0-100% share: 0% means no sibling reaches this lounge's women. Abu Dhabi "
            "city lounges sit at 85-100%."),
     Signal("capture", "capture", "Lounge reviews as a share of lounge + premium substitutes", 0, 0.15,
-           "Median 5.8%; 15% is about the best reliable lounge (al-taif-mall, 14%). Thin premium "
+           "Median 6.5% over the scored lounges; 15% is about the best reliable lounge (al-taif-mall, 14%). Thin premium "
            "markets (under 10 premium salons) score 0.5: a share of a tiny pool is noise."),
     Signal("rating", "rating_gap", "Rating minus the substitutes' median rating (stars)", -0.3, 0.3,
            "Gaps run -0.2 to +0.3, median -0.1: most lounges rate slightly below their premium "

@@ -41,14 +41,14 @@ def lounge_layer(features: list[LoungeFeatures], decisions: list[Decision]) -> p
     for f in features:
         d = by_id[f.branch_id]
         color = ACTION_COLORS[d.action]
-        low = d.confidence == "low"
+        low = d.confidence == "low" and d.action != "NOT SCORED"
         comp = "" if d.action == "NOT SCORED" else f" · composite {d.composite:.2f}"
         rows.append({
             "branch_id": f.branch_id, "name": f.name, "lat": f.lat, "lng": f.lng, "action": d.action,
             "radius": max(6.0, min(14.0, math.sqrt(f.catchment_women) / 35)),
             "color": [*color, 50 if low else 230], "line": color if low else [255, 255, 255],
             "line_px": 3 if low else 1,
-            "detail": (f"{d.action}{comp} · confidence {d.confidence}<br/>"
+            "detail": (f"{d.action}{comp} · confidence {'n/a' if d.action == 'NOT SCORED' else d.confidence}<br/>"
                        f"{f.catchment_women:,.0f} women in catchment · "
                        f"{f.rating or 'no'}★ · {f.review_count:,} reviews"),
         })

@@ -1,5 +1,5 @@
-"""Area page: one growth area (populated cells beyond the drive time of every open lounge). The
-GROW / WATCH / SKIP call with its rule and caveats, women, worker share, nearest lounge, the cell
+"""Area page: one growth area (populated cells beyond the current travel-time catchment, 15 min at
+baseline, of every open lounge). The GROW / WATCH / SKIP call with its rule and caveats, women, worker share, nearest lounge, the cell
 map and competitor data coverage."""
 import streamlit as st
 

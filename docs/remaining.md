@@ -138,7 +138,7 @@ old seed** until the integration plan below is done. Plan:
   al-falah are too thin to read. `search_recall` (0.66) is an estimate from one swept tile.
 
 ### Follow-ups (not done)
-- **Integration plan** (next): wire `data/seed/v3/` into `src/` and the app (spec below).
+- **Integration plan** (done): `data/seed/v3/` is wired into `src/` and the app; see "Integration (v3)" below.
 - Replace `search_recall` with a full sweep of the capped circles (~1,600-6,000 calls; free from
   1 November, or ~$54-210 now; declined 2026-10-09).
 - Bedashing's real price level from its own menu (Phorest booking pages); `expensive` is assumed.

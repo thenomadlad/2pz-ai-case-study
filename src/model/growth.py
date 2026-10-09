@@ -1,5 +1,5 @@
-"""Growth areas: GROW / WATCH / SKIP from two questions (every area is already beyond a 15-min
-drive of every open lounge, by construction in src/features/lounges.py).
+"""Growth areas: GROW / WATCH / SKIP from two questions (every area is already beyond the current travel-time
+catchment, 15 min at baseline, of every open lounge, by construction in src/features/lounges.py).
 
   Big enough?   at least GROW_MIN_WOMEN women 15+, and worker housing under WORKER_CAP of adults.
   Unsaturated?  premium-salon reviews per 1k women (over the cells we searched) under

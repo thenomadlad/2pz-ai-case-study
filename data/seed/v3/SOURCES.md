@@ -200,7 +200,7 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
 8. **Growth areas** = populated cells beyond a 15-min drive of every open lounge, grouped by OSM
    place name into contiguous pieces (`src/model/growth.py`). GROW = at least 20k women 15+ (worker
    housing under 50% of adults) **and** under 50 premium reviews per 1k women in the searched cells.
-   WATCH passes one test, or is big but under 50% searched. SKIP passes neither, or has under 5k
+   WATCH passes one test, or is big but under 50% searched, or big but mostly worker housing (≥ 50% of adults). SKIP passes neither, or has under 5k
    women.
 
 **Excluded from market measures:** `zayed-international-airport` (serves travellers, not its

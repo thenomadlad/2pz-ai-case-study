@@ -100,7 +100,8 @@ def render() -> None:
     with left:
         render_pyramid(exp)
     with right:
-        render_caveats(f"Confidence: {d.confidence}. Caveats for this lounge",
+        render_caveats("Caveats for this lounge" if d.action == "NOT SCORED"
+                       else f"Confidence: {d.confidence}. Caveats for this lounge",
                        lounge_caveats(f, d, flips), d.confidence == "low")
 
     v3, minutes = data.v3(), data.minutes(r.levels)

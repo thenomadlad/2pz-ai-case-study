@@ -94,7 +94,8 @@ def _lounge_panel(r, b: str) -> None:
     with left:
         render_pyramid(exp)
     with right:
-        render_caveats(f"Confidence: {d.confidence}. Caveats for this lounge",
+        render_caveats("Caveats for this lounge" if d.action == "NOT SCORED"
+                       else f"Confidence: {d.confidence}. Caveats for this lounge",
                        lounge_caveats(f, d, r.flips.get(b)), d.confidence == "low")
     st.page_link(nav.LOUNGE, label="Open the lounge page →", icon="💇", query_params={"lounge": b})
 

@@ -31,7 +31,7 @@ review counts are **lifetime totals**, so:
 
 Capture also falls as competition rises. Across lounges, catchment women and capture have a
 Spearman correlation of **−0.74**: big Dubai markets are crowded, so the lounge's share there is
-tiny (~1% at al-barsha, city-walk, jumeirah-park and nad-al-sheba). Demand and capture
+tiny (about 1%, 0.8-1.6%, at al-barsha, city-walk, jumeirah-park and nad-al-sheba). Demand and capture
 partly cancel, and a big crowded market tends to land in HOLD. We considered replacing both with
 one "estimated customers" signal and rejected it, because it turned four of the five Dubai
 lounges into SHRINK (`decisions.ipynb`, open question a).
@@ -86,7 +86,7 @@ error from 0.21 to 0.13.
 Competitors come from Google Places nearby searches on 1.8 km circles. Each search returns at most
 20 salons, ranked by popularity.
 
-- Where circles hit the cap (5% of circles around al-dhafra, 76% around zawaya-walk), smaller
+- Where circles hit the cap (5% of circles around al-dhafra, 77% around zawaya-walk), smaller
   salons are missed. The correction (`search_recall` 0.66) comes from **one** fully swept tile
   (Al Barsha) and is an upper bound.
 - "Premium" is mostly a stand-in. Only ~36% of salons have a Google price, so unpriced salons count
@@ -110,13 +110,15 @@ and split into contiguous pieces.
 - **The saturation line (50 premium reviews per 1k women) was set from the data it judges.** It
   sits well below the least crowded working catchment (88) and above most growth areas (median 5).
   Al Jerf (59) and Kalba (44) sit near it.
-- **All 4 GROW areas are in Sharjah emirate** (Sharjah, Al Dhaid, Khor Fakkan, Kalba). Bedashing
-  has no lounge there, and that may be for reasons the model can't see: licensing, brand fit,
+- **All 4 GROW areas are in Sharjah emirate** (Sharjah, Al Dhaid, Khor Fakkan, Kalba). All are beyond a
+  15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), both on the Dubai
+  side; the "Sharjah" area's centre is ~13 km from al-jada. The business question is why the
+  Sharjah footprint is only two lounges. The model can't see licensing, brand fit,
   landlord terms or customer mix. "Sharjah" is one 91k-women area. It's contiguous, so it wasn't
   split, and it may support more than one site.
 - Distance to the nearest lounge is a straight line, not a drive.
 - **Fix:** competitor searches for the remaining cells (~2,000 calls), drive-time catchments
-  around candidate sites, and a business view on why there's no Sharjah lounge.
+  around candidate sites, and a business view on why Sharjah has only two lounges.
 
 ## 8. The rating signal is weak
 

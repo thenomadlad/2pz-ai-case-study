@@ -144,7 +144,9 @@ def limitations_box(r: Run) -> None:
             "panel below.\n"
             f"4. **Growth areas are a first cut.** Competitor data is partial and the saturation line "
             f"was set from the data it judges. {sharjah} of {len(grow)} GROW areas are in Sharjah "
-            "emirate, where Bedashing has no lounge — possibly for reasons the model can't see.")
+            "emirate but beyond a 15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), "
+            "both on the Dubai side. Why the footprint there is only two lounges is a business question: "
+            "the model can't see licensing, brand fit, landlord terms or customer mix.")
         st.page_link(nav.HOW, label="All the limitations, every assumption and threshold →", icon="⚠️")
 
 
@@ -187,8 +189,10 @@ def area_caveats(a: Area, d: AreaDecision) -> list[str]:
         out.append(f"{a.worker_share:.0%} of adults live in worker housing: the women estimate rests "
                    "on the worker-housing female share assumption.")
     if a.emirate == "Sharjah":
-        out.append("Bedashing has no lounge in Sharjah emirate. That may be for reasons the model "
-                   "can't see: licensing, brand fit, landlord terms or customer mix.")
+        out.append(f"Bedashing's only Sharjah lounges (al-jada, zawaya-walk) are on the Dubai side; "
+                   f"this area is beyond the drive time of both ({a.nearest_lounge_id} is nearest). Why the "
+                   "footprint is only two lounges is a business question: the model can't see licensing, "
+                   "brand fit, landlord terms or customer mix.")
     out.append(f"Distance to the nearest lounge ({a.nearest_lounge_km:.1f} km to {a.nearest_lounge_id}) "
                "is a straight line, not a drive.")
     return out

@@ -25,6 +25,8 @@ def yaml_notes(text: str) -> dict[str, str]:
     notes, pending, key = {}, [], None
     for line in text.splitlines():
         s = line.strip()
+        if s and not line[0].isspace() and not s.startswith("#"):
+            pending = []
         if s.startswith("#"):
             pending.append(s.lstrip("# "))
         elif m := re.match(r"^  (\w+):", line):

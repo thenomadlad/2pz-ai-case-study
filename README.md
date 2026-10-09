@@ -38,8 +38,9 @@ housing):
   a sibling, and capture is middling to low. Three of them (shahama, mohammed-bin-zayed-city,
   al-maqta) flip to HOLD in 12-21 of the 27 assumption combinations. Investigate, don't cut.
 - **Growth areas:** 4 GROW, all in Sharjah emirate (Sharjah, Al Dhaid, Khor Fakkan, Kalba; 218k
-  women between them), and 37 WATCH. Bedashing has no Sharjah lounge, possibly for reasons the model
-  can't see (licensing, brand fit, landlords).
+  women between them), and 37 WATCH. All are beyond a 15-minute drive of Bedashing's two Sharjah lounges
+  (al-jada, zawaya-walk, both on the Dubai side); why the footprint is only two is a business
+  question the model can't answer (licensing, brand fit, landlords).
 
 Treat these as the places to look first, not as answers.
 
