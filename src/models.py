@@ -178,3 +178,17 @@ class Explanation(BaseModel):
     table_caption: str
     thresholds_note: str
     source: Literal["ai", "template"]
+
+
+class Lounge(BaseModel):
+    """A Bedashing lounge from data/seed/v3/branches.csv."""
+    branch_id: str
+    title: str
+    name: str
+    emirate: str
+    lat: float
+    lng: float
+    place_id: str
+    rating: float | None
+    review_count: int
+    address: str

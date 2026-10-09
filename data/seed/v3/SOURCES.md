@@ -140,6 +140,16 @@ Script: `scripts/fetch_salons.py`. Notebook: `notebooks/competitors.ipynb`.
   men-only 1,337 (barber_shop type; "gents/men/barber" names; Arabic حلاق "barber", رجال "men"),
   not operational 44, not a women's salon 32. Other Bedashing lounges inside a catchment are
   candidates (added from `branches.csv`).
+- **Pool and per-level files (`python scripts/fetch_salons.py pool`, offline from the Places cache):**
+  `salons.csv` is rebuilt as every salon any circle returned (both runs, no polygon filter) plus
+  `growth_salons.csv`, 5,924 rows; `lounge_candidates.csv` and `lounge_search_saturation.csv` stay as the
+  15-min record. `lounge_candidates_by_level.csv` (branch_id, level, place_id) lists the non-excluded
+  salons inside each lounge's low/medium/high polygon (lounge itself left out), and
+  `lounge_search_saturation_by_level.csv` (branch_id, level, circles, full_circles, full_share) the
+  circles of both runs whose disk touches that polygon. Both use the full-detail polygons from the
+  isochrone cache, not the simplified `lounge_isochrones.geojson` (drawing only), and are what the app
+  reads. At 15 min the candidates contain the old record; full shares match it except where growth
+  circles now reach the polygon edge (al-ain 0.19 -> 0.26, al-jada 0.49 -> 0.42).
 - **Selection is not baked in:** each lounge's premium substitutes are picked from
   `lounge_candidates.csv` with `competitor_coverage` (the most-reviewed premium salons holding
   50/60/70% of the catchment's premium reviews), `premium_min_rating` (4.3) and

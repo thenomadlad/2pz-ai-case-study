@@ -10,7 +10,7 @@ dependencies = [
     "pyyaml>=6.0",
     "streamlit>=1.65.0",
     "pandas>=3.0.6",
-    "numpy",
+    "numpy>=2.4.6",
     "shapely>=2.2.0",
 ]
 

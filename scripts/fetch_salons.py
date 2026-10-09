@@ -158,17 +158,58 @@ def _read(name):
         return list(csv.DictReader(f))
 
 
-def _medium_polygons(branches: list[dict]) -> tuple[dict, dict]:
-    """(branch_id -> full-detail medium-level polygon from the isochrone cache, levels)."""
+def _level_polygons(branches: list[dict]) -> tuple[dict, dict]:
+    """({branch_id: {level: full-detail polygon from the isochrone cache}}, levels)."""
     import yaml
     from shapely import make_valid
     from shapely.geometry import shape
     from scripts.fetch_isochrones import polygons, ranges_minutes
     a = yaml.safe_load(open(ROOT / "data" / "scenarios" / "baseline.yaml"))["assumptions"]
     levels, depart_at = a["travel_time_minutes"], a["isochrone_depart_at"]
-    return {b["branch_id"]: make_valid(shape(polygons(float(b["lat"]), float(b["lng"]),
-                                                      ranges_minutes(levels), depart_at)[levels["medium"]]))
-            for b in branches}, levels
+    out = {}
+    for b in branches:
+        p = polygons(float(b["lat"]), float(b["lng"]), ranges_minutes(levels), depart_at)
+        out[b["branch_id"]] = {lv: make_valid(shape(p[m])) for lv, m in levels.items()}
+    return out, levels
+
+
+def _medium_polygons(branches: list[dict]) -> tuple[dict, dict]:
+    """(branch_id -> full-detail medium-level polygon, levels)."""
+    by_level, levels = _level_polygons(branches)
+    return {b: p["medium"] for b, p in by_level.items()}, levels
+
+
+def _write(name: str, rows: list[dict]) -> None:
+    with open(V3 / name, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+
+
+def by_level_files(rows: list[dict], branches: list[dict], by_level: dict) -> None:
+    """Per lounge and level: its candidates and how saturated the search was over its polygon."""
+    from math import cos, radians
+    import shapely
+    from shapely.affinity import scale
+    from shapely.geometry import Point
+    pool = [r for r in rows if not r["excluded_reason"]]
+    xs, ys = [float(r["lng"]) for r in pool], [float(r["lat"]) for r in pool]
+    cs = _read("search_circles.csv")
+    disks = [scale(Point(float(c["lng"]), float(c["lat"])).buffer(float(c["radius_m"]) / 111_000),
+                   xfact=1 / cos(radians(float(c["lat"])))) for c in cs]
+    full = [c["full"] == "True" for c in cs]
+    pairs, sat = [], []
+    for b in branches:
+        for level, poly in by_level[b["branch_id"]].items():
+            inside = shapely.contains_xy(poly, xs, ys)
+            pairs += [{"branch_id": b["branch_id"], "level": level, "place_id": r["place_id"]}
+                      for r, i in zip(pool, inside) if i and r["place_id"] != b["place_id"]]
+            over = shapely.intersects(disks, poly)
+            n, f = int(over.sum()), sum(fl for fl, o in zip(full, over) if o)
+            sat.append({"branch_id": b["branch_id"], "level": level, "circles": n, "full_circles": f,
+                        "full_share": round(f / n, 4) if n else 0.0})
+    _write("lounge_candidates_by_level.csv", pairs)
+    _write("lounge_search_saturation_by_level.csv", sat)
 
 
 def build_pool(cs: list[tuple[float, float]], branches: list[dict], polys: dict) -> list[dict]:
@@ -292,7 +333,8 @@ def pool() -> None:
     """Offline: rewrite salons.csv with every salon in the cache (all circles, no polygon filter)."""
     places.MAX_CALLS = 0                                               # a cache miss raises
     branches = _read("branches.csv")
-    polys, _ = _medium_polygons(branches)
+    by_level, _ = _level_polygons(branches)
+    polys = {b: p["medium"] for b, p in by_level.items()}
     cs = [(float(r["lat"]), float(r["lng"])) for r in _read("search_circles.csv")]
     today = date.today().isoformat()
     rows = [r | {"excluded_reason": excluded_reason(r), "fetched_at": today}
@@ -303,8 +345,9 @@ def pool() -> None:
         w = csv.DictWriter(f, fieldnames=list(fields))
         w.writeheader()
         w.writerows(rows)
-    print(f"wrote {len(rows)} salons ({sum(1 for r in rows if not r['excluded_reason'])} candidates); "
-          f"{places.calls} billed calls")
+    by_level_files(rows, branches, by_level)
+    print(f"wrote {len(rows)} salons ({sum(1 for r in rows if not r['excluded_reason'])} candidates) "
+          f"and the by-level candidate/saturation files; {places.calls} billed calls")
 
 
 if __name__ == "__main__":
