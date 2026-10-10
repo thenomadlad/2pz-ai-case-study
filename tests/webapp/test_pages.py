@@ -173,3 +173,12 @@ def test_lounge_and_area_pages_show_raw_and_addressable_women():
     assert {m.label: m.value for m in abu.metric}["Affluence rent (median, AED/yr)"] == "no data"
     awir = _text(_page("area", area="al-awir-dubai"))
     assert "Affluence unknown here: weighted neutral. Only 38%" in awir
+
+
+def test_overview_affluence_toggle_adds_the_layer_and_its_legend():
+    at = _page("overview")
+    box = next(c for c in at.checkbox if c.label == "Affluence (Dubai rents)")
+    assert not box.value
+    box.check().run()
+    assert not at.exception
+    assert "uncoloured cells have no data" in _text(at)
