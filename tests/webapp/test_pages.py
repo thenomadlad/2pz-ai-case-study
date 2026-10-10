@@ -1,6 +1,5 @@
 import time
 
-import pytest
 from streamlit.testing.v1 import AppTest
 
 from src.models import Levels
@@ -55,16 +54,13 @@ def test_overview_full_app_leads_with_summary_then_limitations():
 
 # Affluence changed every fact sheet on 2026-10-10; the cache is regenerated offline afterwards
 # (justfile, "Offline path"). Until then the app shows templates. Drop this mark once it is.
-STALE_CACHE = pytest.mark.xfail(strict=False, reason="explanation cache awaiting offline regeneration")
 
 
-@STALE_CACHE
 def test_overview_shows_cached_ai_summary():
     at = AppTest.from_file(APP, default_timeout=30).run()
     assert any(c.value.startswith("AI-written (cached)") for c in at.caption)
 
 
-@STALE_CACHE
 def test_baseline_explanations_are_all_ai_except_skip_and_not_scored():
     from src.baseline import run
     from src.webapp.views import explanation_for

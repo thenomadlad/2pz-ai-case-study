@@ -143,9 +143,8 @@ supporting arguments, each backed by 2-5 data points from the fact sheet.
 - **No key needed to see it.** Explanations are cached in `data/explanations/cache.json`, keyed by a
   hash of the exact numbers, so a stale one is never served; a what-if with changed numbers gets the
   template. The committed explanations were written in a Claude Code session from the same prompts
-  the API would get, not by the API, for the numbers before the affluence weighting; until they are
-  regenerated for the current baseline (below), the app shows the template. NOT SCORED and SKIP
-  always use the template.
+  the API would get, not by the API, for the current baseline (with the affluence weighting):
+  65 explanations, all passing the grounding check. NOT SCORED and SKIP always use the template.
 - **Regenerate** after changing the model or data: `just explain` (API, needs `ANTHROPIC_API_KEY`),
   or offline with `python -m src.explain prompts DIR` → write the answers → `check DIR` → `ingest DIR`
   (see `justfile`).
