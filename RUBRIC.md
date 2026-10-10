@@ -1,16 +1,23 @@
 # Case Study Rubric
 
-A checklist for grading our solution against the brief in `ai-associate-case-study.docx`. Every requirement in the brief maps to at least one item here. The traceability table at the bottom shows where.
+Our **go/no-go criteria**: the checklist that grades our solution against the brief in `ai-associate-case-study.docx`. Every requirement in the brief maps to at least one item here. The traceability table at the bottom shows where.
 
 **How to use it:** this is our own working checklist, and we make repeated passes over it. Tick an item only when the solution clearly meets it. "It kind of does this" doesn't count. Leave the box open and add the gap under that section's *To improve* list, with the item ID (e.g. `- E3: no per-cell driver breakdown`). Strike or delete an entry once it's fixed.
 
-**Tags:** `[brief]` means the item is stated in the brief or directly implied by it. Failing one is a real gap against the assignment. `[ours]` means it's our own quality bar. Failing one is a judgement call: fix it if it's cheap or if it makes a `[brief]` item stronger, and otherwise park it. Parts 7 and 8 are all `[ours]`.
+**Tags:** `[brief]` means the item is stated in the brief or directly implied by it. Failing one is a real gap against the assignment. `[ours]` means it's our own quality bar. Failing one is a judgement call: fix it if it's cheap or if it makes a `[brief]` item stronger, and otherwise park it. Part 7 is all `[ours]`.
+
+**Go / no-go.** The solution is **GO** (ready to submit) only when all three hold:
+1. Every `[brief]` item is ticked.
+2. Every `[ours]` item is either ticked or parked, with a `parked:` reason in its To-improve list.
+3. The latest run of [`SANITY_CHECKS.md`](SANITY_CHECKS.md) has no unexplained failure. That file holds the user stories, back-tests and sanity checks, which are about whether the answers are *believable* rather than whether a box exists.
+
+Anything else is **NO-GO**, and the audit log records which condition failed.
 
 ## Audit log
 
-| Pass | Date | `[brief]` | `[ours]` (Parts 1–6) | Parts 7–8 | Headline |
-|---|---|---|---|---|---|
-| 1 | 2026-10-10 | 37/80 | 17/40 | 6/35 | Brief coverage is solid on data, explainability and the AI layer. The model has no capacity, served-demand or ROIC concept (OB1–OB5), so 1.4, 2.5, 3.6, E6, US4/US5/US7 fail together, and the back-test shows the growth rule calls our own lounges saturated (MO5). There's no demo or walkthrough, and the docs are stale. |
+| Pass | Date | `[brief]` | `[ours]` (Parts 1–6) | Part 7 | Verdict | Headline |
+|---|---|---|---|---|---|---|
+| 1 | 2026-10-10 | 37/80 | 17/40 | 5/26 | **NO-GO**: 43 `[brief]` items open, nothing parked, sanity checks not yet run as a set | Brief coverage is solid on data, explainability and the AI layer. The model has no capacity, served-demand or ROIC concept (OB1–OB5), so 1.4, 2.5, 3.6, E6, US4/US5/US7 fail together, and the back-test shows the growth rule calls our own lounges saturated (MO5). There's no demo or walkthrough, and the docs are stale. |
 
 
 ---
@@ -423,14 +430,13 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
   - [ ] **Multi-criteria suitability / weighted overlay (MCDA, AHP):** likely what our whitespace model really is. Weights are justified the way MCDA requires (stated, sensitivity-tested), not just picked.
   - [ ] **Location-allocation / maximal coverage (MCLP):** picks the *set* of new sites that maximises coverage. We score cells one by one, so two adjacent GROW cells could cannibalise each other. Stated, or handled.
   - [ ] **Analog / sales-regression models:** these need revenue we don't have. Stated as the main reason our health score is a proxy.
-- [ ] **MO5. Validated against reality.**
-  - [ ] Spot checks: known hot areas (e.g. Dubai Marina, Downtown) come out saturated, and known empty areas come out as SKIP.
-  - [ ] Back-test: existing branch locations, scored as if they were whitespace, mostly come out GROW or WATCH. If they come out SKIP, either the model or the branch is wrong, and we say which.
+- [ ] **MO5. Validated against reality.** The latest run of [`SANITY_CHECKS.md`](SANITY_CHECKS.md) (back-tests BT1–BT5, sanity checks SC1–SC6) has no unexplained failure, and each expected outcome was written down before the check ran.
 - [ ] **MO6. Sensitivity is known** (see 1.7). We report which labels flip under reasonable changes to weights and thresholds. Labels that sit near a boundary are presented as borderline, not as confident calls.
 - [ ] **MO7. Not tuned to taste.** Weights and thresholds weren't adjusted until the label mix "looked right". Where we did tune them, we say so and give the target.
 - [ ] **MO8. Branch and whitespace models are consistent** (see B1). They use the same catchment, competitor definition and demand measure, so a branch's cell scored by the whitespace model gives an answer that fits with its branch label.
 - [ ] **MO9. Parameters live in one place.** Every weight, threshold and radius lives in config with its rationale. No magic numbers scattered through the code.
 - [x] **MO10. Failure modes are named with examples,** feeding E4: where the model is known to be wrong or blind, with real cells or branches as illustrations.
+- [ ] **MO11. Clustering is modeled, not just penalised.** Salons bunch together for good reasons: malls and high streets concentrate footfall, customers like to compare, and logistics are easier. That's agglomeration, which Huff's attractiveness term and the "competing destinations" extension (Fotheringham) capture. The model treats a cluster as something that pulls in demand up to the point where demand per unit of supply runs out, and it doesn't assume that empty areas away from other salons are automatically better. Validated by BT5.
 
 *To improve:*
 
@@ -443,50 +449,12 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
   - The weighted overlay is never named as MCDA, and only the rating weight was ever tested.
   - GROW areas are scored independently, so cannibalisation between them is unstated (MCLP).
   - Analog and regression methods aren't named as the reason the health score is a proxy.
-- MO5-spot: there's no Marina/Downtown "saturated" check and no "known empty area → SKIP" check.
-- MO5-backtest (run during the audit): scoring each lounge's 15-min catchment with the growth rule gives 22 WATCH ("big but saturated", 88–629 premium reviews per 1k), 2 GROW (al-dhafra, al-falah) and 0 SKIP. The saturation line of 50 was set below every working lounge (decisions.ipynb §7), so the growth model calls our own lounges saturated, which contradicts PROTECT for al-ain.
+- MO5: no sanity check runs as a repeatable script yet. Pass-1 findings live in SANITY_CHECKS.md (BT2, BT3, SC1). The headline finding: scoring each lounge's 15-min catchment with the growth rule gives 22 WATCH ("big but saturated", 88–629 premium reviews per 1k), 2 GROW (al-dhafra, al-falah) and 0 SKIP. The saturation line of 50 was set below every working lounge (decisions.ipynb §7), so the growth model calls our own lounges saturated, which contradicts PROTECT for al-ain.
 - MO6: growth areas get no flips and no confidence. There's no weight or threshold sensitivity.
 - MO7: estimated customers was rejected partly because of the outcome it produced (limitations §2).
 - MO8: the two models differ on demand (catchment vs. OSM-name pieces) and on competition (capture vs. reviews per 1k), and the back-test shows the inconsistency.
+- MO11: saturation (premium reviews per 1k women) is a pure penalty in the growth rule, so GROW tends to favour areas with no salons at all (all 4 GROWs are in thin Sharjah-area markets). Agglomeration is never considered.
 - MO9: constants are scattered: THIN_MARKET and NOT_SCORED (lounges.py:23-24), the clip (market.py:121), RADIUS_KM and MIN_CONTRACTS (build_affluence.py:44-45), GROWTH_MIN_WOMEN and CIRCLE_M (fetch_salons.py:53,56), MIN_ADULTS (build_cells.py:32).
-
-
----
-
-## Part 8: User stories (audit walkthroughs)
-
-Every audit pass starts here. Open the app as the **COO** (accountable for lounge operations and return on capital), try each story, and tick it only if the answer is *findable in the product without help*, *grounded in our data* and *framed in business terms* (E6). Any failure points at the rubric items listed, and that's where the To-improve note goes.
-
-### From the overview
-
-- [ ] **US1. "Where is the pressure in my network?"** At a glance I can see which lounges and areas are under pressure (saturated catchments, cannibalization, SHRINK candidates) and roughly how much is at stake. *Rubric: A7, Q1, Q3, Q4.4, 5.1*
-- [ ] **US2. "Why was this decision made?"** From the overview, one click on a lounge or area shows its label, the business reason (what / so what / now what), the top drivers with their weight, and caveats. *Rubric: E1–E4, E6, 1.8*
-- [ ] **US3. "Who am I up against here?"** I can see the competitors around any lounge: where they are, how many, how they're rated next to us, and whether the catchment is saturated. *Rubric: Q4, L3, C5, C6*
-- [ ] **US4. "Where should we open next?"** A ranked shortlist of GROW areas, each showing the unserved demand it captures, its ROIC gate tier, and the reason. *Rubric: Q2, 2.8, OB3, OB5*
-
-### Drilling in
-
-- [ ] **US5. "Are these two lounges eating each other?"** For an overlapping pair I can see whether it's cannibalization or healthy density, and why. *Rubric: Q3, 3.6*
-- [x] **US6. "Why not here?"** For a WATCH or SKIP area, I can see what's holding it back and what would have to change for it to become GROW. *Rubric: 2.6, 2.7, E2*
-- [ ] **US7. "Does this one actually pay?"** For any GROW or PROTECT call I can see the contribution and ROIC estimate, the assumptions behind them, and whether the call survives pessimistic assumptions. *Rubric: OB5*
-- [ ] **US8. "How much should I trust this?"** Every recommendation shows its confidence and what data is missing or proxied. *Rubric: E4, DA6*
-
-### Asking the AI
-
-- [ ] **US9. Plain-English question.** For example, "Which Dubai lounges are under the most pressure and why?" gets a grounded answer in what / so what / now what form, with numbers that match the screens. *Rubric: D1, D2, D4, E6*
-- [ ] **US10. "What if?"** For example, "What if margin per visit is 20% lower?" or "What if we weight competition more?". I can see which labels change. *Rubric: 5.5, MO6, OB5*
-
-*To improve:*
-
-- US1: the summary names the SHRINKs and GROWs, but there's no saturation, no "at stake" figure and no network pressure view.
-- US2: the weighted drivers are only on the lounge page, and the text has no now-what (see E6).
-- US3: only premium substitutes are shown, and there's no catchment saturation.
-- US4 (fail): no ranked GROW list, no unserved-demand figure, no ROIC.
-- US5 (fail): the shared-women table never judges cannibalisation against healthy density.
-- US7 (fail): there's no money in the model.
-- US8: areas have no confidence grade.
-- US9 (fail): there's no free-text question box. The AI only explains precomputed calls.
-- US10: only the level what-if exists. Margin and weights can't be changed.
 
 
 ---
@@ -518,4 +486,5 @@ Every audit pass starts here. Open the app as the **COO** (accountable for loung
 | Submission format | Repo, README, demo; fallback for secrets | U1–U3, K1–K3 |
 | "What we care about" | Framing, research, structure, stack, trade-offs, AI use, delivery | J1–J7 |
 | Final note | First / simplify / abstract / trust / automate / explain / ship | H1–H7 |
-| *(ours)* | Business focus, ROIC gate, user walkthroughs | A7, E6, OB5, US1–US10 |
+| *(ours)* | Business focus, ROIC gate, clustering | A7, E6, OB5, MO11 |
+| *(ours)* | User stories, back-tests, sanity checks | [`SANITY_CHECKS.md`](SANITY_CHECKS.md) via MO5 |
