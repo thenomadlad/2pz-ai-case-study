@@ -26,19 +26,19 @@ Open the [Overview](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.a
 COO's question, **"Where is my network under pressure, and where should we grow?"**, and answers it
 in the **Executive summary**:
 
-> **Of 23 scored lounges, 3 are PROTECT, 14 HOLD and 6 SHRINK, and 5 growth areas pass both tests
+> **Of 23 scored lounges, 3 are PROTECT, 15 HOLD and 5 SHRINK, and 5 growth areas pass both tests
 > to GROW.**
 
 Five numbered arguments follow (where to investigate, where to grow, what to protect, how sure we
 are, what this can't see), each with its data underneath, then **So what** ("About 242,000 women
-live in the 5 GROW areas, beyond a 15-min drive of every lounge, while 6 lounges need a closer look;
+live in the 5 GROW areas, beyond a 15-min drive of every lounge, while 5 lounges need a closer look;
 with 10 low-confidence calls, this is a shortlist to test, not a set of decisions.") and **Now what**.
 
 Below it, three at-stake figures, counted in women because the model has no money:
 
 | Metric | Value | Counts |
 |---|---|---|
-| Under pressure: 6 SHRINK lounges | 235,801 women | women in their catchment cells that a sibling also reaches |
+| Under pressure: 5 SHRINK lounges | 233,883 women | women in their catchment cells that a sibling also reaches |
 | To defend: 3 PROTECT lounges | 203,096 women | women within a 15-min drive of al-ain, al-taif-mall, ras-al-khaimah |
 | To grow: 5 GROW areas | 242,151 women | addressable women beyond a 15-min drive of every lounge; 35 more areas on WATCH |
 
@@ -97,7 +97,7 @@ the HOLD line. On its own, shared catchment would have to reach 55% of catchment
 catchment women) to make it HOLD."
 
 **Who it shares with.** The **Shared catchment** table names the siblings: khaleej-al-arabi reaches
-73% of delma's women, ministries-complex 69%, al-maqta 47%. khaleej-al-arabi is itself SHRINK, so
+73% of delma's women, ministries-complex 69%, al-maqta 47% (a HOLD by only 0.003). khaleej-al-arabi is itself SHRINK, so
 the consolidation question is about the pair, not one lounge.
 
 **Caveats and confidence.** The blue box beside the call: confidence high, no observed rents
@@ -172,10 +172,11 @@ the data."*
 
 **Fallback.** The cache is keyed by a hash of the exact numbers. Change them and the cached text no
 longer applies, so a deterministic template takes over. Try it: in **🧪 What if…?** set **Travel
-time to a lounge** to **20 min (high)**, then click the **al-maqta** flag (another SHRINK, low
-confidence) and **Open the lounge page →** in its panel (navigate inside the app: reloading the URL
-starts a fresh session at the baseline). A *What-if view* banner appears, al-maqta is now HOLD
-(composite 0.41), and its text is captioned *"Template — numbers changed by
+time to a lounge** to **20 min (high)**, then click the **mohammed-bin-zayed-city** flag (another
+SHRINK, low confidence: it flips in 54 of 81 combinations) and **Open the lounge page →** in its
+panel (navigate inside the app: reloading the URL starts a fresh session at the baseline). A
+*What-if view* banner appears, mohammed-bin-zayed-city is now HOLD (composite 0.36, up from 0.28),
+and its text is captioned *"Template — numbers changed by
 the what-if, so the cached AI text no longer applies."* **Reset to baseline** brings the AI text
 back. SKIP areas and the NOT SCORED airport lounge always use the template.
 
@@ -194,7 +195,11 @@ These matter more than the calls. The full ranked list is the **How it works & l
   0.32, 87% shared). Part of that was the NOT SCORED airport lounge, which still counted as its
   sibling and as one of its premium substitutes. The sanity checks flagged it; taking the airport
   out of every comparison made shahama a low-confidence **HOLD** (0.38, 82% shared, 0.03 above the
-  line). A call that rests on a modelling choice is exactly what this list is for.
+  line). It happened again: sanity check SC4 found that the rating gap compared a lounge with its
+  top-k substitutes' median, and k grows with the pool, so adding a strong competitor could raise a
+  lounge's score. The gap now uses the median of the whole premium pool (salons with 20+ reviews).
+  That moved al-maqta from SHRINK to **HOLD** at 0.353, 0.003 above the line: a knife-edge call,
+  flagged low confidence. A call that rests on a modelling choice is exactly what this list is for.
 - **The growth saturation line is still calibrated on our own lounges.** It was 50 premium reviews
   per 1k women, below every lounge market with 10+ premium salons (88+), so GROW only went to near-empty places.
   A back-test (BT5 in `SANITY_CHECKS.md`) found that clustering doesn't hurt premium salons, so the
@@ -203,7 +208,7 @@ These matter more than the calls. The full ranked list is the **How it works & l
   without removing it: the five GROWs run 5-59, and 150 is still judgement. GROW is a shortlist for
   site visits, not evidence of a market.
 - **Calls move with assumptions.** 10 of 23 lounge calls are low confidence; mohammed-bin-zayed-city
-  flips in 54 of 81 combinations, al-maqta in 36.
+  flips in 54 of 81 combinations, al-barsha and city-walk in 27.
 - **Capture rests on lifetime Google reviews**, so new lounges look weak. **Affluence is observed in
   Dubai only**: every lounge and area in this walkthrough is weighted neutral.
 - **Midday drive times, no distance decay**, and a competitor search that misses smaller salons where

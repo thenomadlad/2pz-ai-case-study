@@ -94,10 +94,10 @@ GLOSSARY: dict[str, Field] = {
         "distance from it."),
     "lounge_rating": Field("Google rating", "stars (of 5)", "The lounge's Google rating."),
     "lounge_reviews": Field("Google reviews", "count", "Reviews behind the lounge's rating."),
-    "substitutes_median_rating": Field("Substitutes' median rating", "stars (of 5)",
-                                       "Median Google rating of the premium substitutes."),
+    "substitutes_median_rating": Field("Premium salons' median rating", "stars (of 5)",
+                                       "Median Google rating of the premium salons in the catchment with 20+ reviews."),
     "rating_gap": Field("Rating gap", "stars",
-                        "Lounge rating minus its substitutes' median rating."),
+                        "Lounge rating minus the median rating of the premium salons in its catchment (20+ reviews)."),
     "est_customers": Field("Women captured (est.)", "women",
                            "Capture × addressable women: a rough size of the lounge's share."),
     "level_flips": Field(

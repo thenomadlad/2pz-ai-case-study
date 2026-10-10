@@ -88,7 +88,7 @@ The rents are DLD Ejari contracts for one flat, villa or studio, registered 2026
   observed cells, so affluence only reshuffles demand between Dubai cells; it can't say whether
   Dubai is richer than Abu Dhabi. Dubai lounges in above-average-rent catchments gain (al-barsha
   +18%), while an equally affluent Abu Dhabi catchment stays at 1, so Dubai lounges are inflated
-  relative to non-Dubai ones. All 6 SHRINKs are in Abu Dhabi, the part affluence can't see. The
+  relative to non-Dubai ones. All 5 SHRINKs are in Abu Dhabi, the part affluence can't see. The
   near-zero effect on the calls is partly this design, not evidence that affluence doesn't matter.
 - **Fix:** Abu Dhabi rents from ADREC (its public map's data service refuses queries, HTTP 403;
   the API needs a subscription); the Sharjah rental index when it is published; per-cell income or
@@ -104,8 +104,8 @@ a third.
 - **10 of 23** scored lounges are **low confidence**: within 0.05 of a threshold, missing an input,
   a thin market, a call that changes in a third or more (27+) of the 81 level combinations, or one
   that changes when a single signal weight moves ±25% (in practice that only catches calls already
-  within 0.05 of a line). mohammed-bin-zayed-city flips in 54 of 81, al-maqta in 36, and al-barsha
-  and city-walk in 27. The affluence level moves no lounge on its own, so these are three times the
+  within 0.05 of a line). mohammed-bin-zayed-city flips in 54 of 81, and al-barsha and city-walk
+  in 27. al-maqta flips in only 9, but it is low confidence anyway: it is HOLD by 0.003. The affluence level moves no lounge on its own, so these are three times the
   counts over the other three levels.
 - The app's what-if panel switches the levels, so you can watch a lounge move.
 - **Fix:** evidence on how far UAE women actually travel to a salon (a customer postcode sample
@@ -203,8 +203,8 @@ name and split into contiguous pieces.
 ## 9. The rating signal is weak
 
 Google ratings come in 0.1★ steps, and lounges span only 4.4-4.9★. The rating gap (lounge minus
-its substitutes' median) takes only a handful of values. It counts at **half weight**. Most lounges rate slightly
-below their substitutes (the median gap is −0.1★); we checked, and this is not caused by the
+the median rating of the premium salons in its catchment with 20+ reviews) takes only a handful of values. It counts at **half weight**. Most lounges rate slightly
+below those salons (the median gap is −0.1★); we checked, and this is not caused by the
 premium filter.
 
 ## 10. The scorecard's anchors were calibrated on the data they score
@@ -233,6 +233,11 @@ no capacity, no served demand and no ROIC (see 1).
   Removing it from both moved shahama to HOLD (0.38, 82% shared), and shifted al-maqta,
   khalifa-city-a (100% → 97% shared), ministries-complex, noya-plaza and westyas slightly. The
   sanity checks caught it, not the model's own tests.
+- **The rating gap used the top-k substitutes' median until 2026-10-10.** k grows with the premium
+  pool, so adding a strong competitor could change which salons counted and raise a lounge's score
+  (sanity check SC4). The gap now uses the median of the whole premium pool (salons with 20+
+  reviews). Fixing it moved al-maqta from SHRINK to HOLD at 0.353, 0.003 above the line: a
+  knife-edge call, flagged low confidence.
 - **New lounges** (e.g. noya-plaza): see 2. Lifetime reviews understate them.
 
 ## 13. The explanations

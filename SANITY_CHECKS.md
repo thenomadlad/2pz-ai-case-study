@@ -122,6 +122,8 @@ The 24 operating lounges are our only revealed-preference data: Bedashing picked
     - *Median-based premium test:* in 32 areas, adding a popular mid-market salon *lowers* measured saturation (e.g. al-bustan-ajman 63.7 → 0).
   - **Margin / ROIC rule:** not testable yet.
 
+  *Run 3:* **PARTIAL, explained.** The al-maqta flip is gone: the rating median runs over the whole premium pool (20+ reviews), and a regression test pins it. No competitor raises any label. The remaining composite rises are al-dhafra and al-falah at +0.014, the thin-market blend by design. The median-premium test is still non-monotone in 32 areas, deferred, with no label effect.
+
   *Run 2:* **FAIL, unexplained model bug.**
   - The thin-market cliff is gone: one extra salon adds +0.014, against +0.14 before.
   - The median-based premium test is still non-monotone in 32 areas, with no label effect. Deliberately deferred.
@@ -172,6 +174,15 @@ What the run-2 fixes are expected to do. Each fix uses the current model, with n
 
 What we learned: size, not saturation, is the constraint that binds for growth. The recalibration was right, but it mostly removed a contradiction rather than changing the answer.
 
+## Expected outcomes for run 3 (written 2026-10-10, before the fix)
+
+**The fix (the SC4 bug).** The substitutes' median rating will be taken over the lounge's **whole premium pool**, counting only salons with at least 20 reviews (rubric 4.6). Today it's taken over the top-k by reviews, and k moves with the pool. Capture keeps its top-k, which is already monotone.
+
+- **The SC4 case.** Adding a 4.9★ salon with 259 reviews no longer raises al-maqta, or any lounge. A competitor rated *above* the median can only raise the median, so the gap can only shrink.
+- **Labels.** At half weight, 0.1 stars of rating gap moves a composite by about 0.024. Only lounges that close to a line can change: al-maqta (0.009 under SHRINK), ras-al-khaimah (0.014 over PROTECT) and al-barsha (0.016 over SHRINK). Every other label holds. Areas are unaffected, since they have no rating signal.
+- **Still allowed.** Adding a competitor rated *below* the median can still raise a label slightly, through the rating gap. That's the signal working as designed: a weaker peer does improve relative standing. If it happens, it gets reported, not treated as a bug.
+- **Explanations.** Every lounge whose median moves gets a new fact sheet, so its cached explanation goes stale and is regenerated offline.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
@@ -180,5 +191,7 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 | 1 | 2026-10-10 | Rubric pass 2, after the non-model fixes (docs, UI, explanations) | 2/10 | BT2, BT3, BT4 fail; BT5 run, which falsifies saturation-as-penalty; BT1 not runnable | SC2, SC5 pass; SC1, SC4 partial; SC3 fails; SC6 not runnable | BT2/BT3 (models disagree, PROTECT sites read as SKIP), BT4/SC3 (WORKER_CAP bug), BT5 (MO11), SC4 latent bugs, airport counted as sibling and substitute (decides shahama's SHRINK) |
 
 | 2 | 2026-10-10 | Rubric pass 3, after the non-structural model fixes (A1–A4, B1–B4, D1) | 3/10 | BT2, BT3 explained fails (unit); BT4 partial, explained (DIP); BT5 explained fail (tilt reduced, not removed) | SC2, SC5 pass; SC1, SC3 partial; SC4 fails | **SC4: a new competitor flips al-maqta SHRINK → HOLD** (the coverage-k median bug) |
+
+| 3 | 2026-10-10 | The SC4 fix (rating median over the whole premium pool, 20+ reviews) | 3/10 | unchanged from run 2 (explained) | SC4 now partial, explained; others unchanged | **none.** Outcome vs expectation: only al-maqta changed label (SHRINK → HOLD, 0.341 → 0.353), one of the three predicted candidates; ras-al-khaimah moved within PROTECT and al-barsha didn't move. |
 
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.

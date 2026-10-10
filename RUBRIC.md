@@ -20,6 +20,7 @@ Anything else is **NO-GO**, and the audit log records which condition failed.
 | 1 | 2026-10-10 | 37/80 | 17/40 | 5/26 | **NO-GO**: 43 `[brief]` items open, nothing parked, sanity checks not yet run as a set | Brief coverage is solid on data, explainability and the AI layer. The model has no capacity, served-demand or ROIC concept (OB1–OB5), so 1.4, 2.5, 3.6, E6, US4/US5/US7 fail together, and the back-test shows the growth rule calls our own lounges saturated (MO5). There's no demo or walkthrough, and the docs are stale. |
 | 2 | 2026-10-10 | 69/80 | 30/40 | 5/26 | **NO-GO**: 11 `[brief]` open (2.5, 4.4, L3, A3, B1, B3, C3, C6, E4, P1, J7); sanity run 1 has unexplained fails | Every non-model gap is closed: docs, UI, explanations (what / so what / now what, enforced) and the walkthrough. What's left is the model: capacity, served demand and ROIC (OB1–OB5), the growth rule (WORKER_CAP bug, a saturation penalty against BT5's clustering evidence) and the airport-in-comparison bug. |
 | 3 | 2026-10-10 | 74/80 | 33/40 | 9/26 | **NO-GO**: 6 `[brief]` open (2.5, A3, B1, C3, P1, J7), all structural model items except P1/J7 (pending a live click-through); sanity run 2 has one unexplained fail (SC4 al-maqta) | The non-structural model fixes landed: the airport is out of comparisons (shahama SHRINK → HOLD), name and worker-cap SKIP rules, the thin-market blend, lounge saturation, a 150 line by a pre-fixed rule (+al-jerf GROW), area confidence and weight sensitivity. What's left is the structural model work: capacity, served demand and ROIC (OB1–OB5), plus the coverage-k median bug. |
+| 3b | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO** on the `[brief]` model items only (2.5, A3, B1, C3) and P1/J7 (the live app hasn't redeployed; reboot it on Streamlit Cloud); sanity checks now GO (no unexplained failure) | Fixed the SC4 bug: rating gap over the whole premium pool with 20+ reviews (al-maqta SHRINK → HOLD by 0.003, low confidence). Lounges 3 PROTECT / 15 HOLD / 5 SHRINK. UI: the area picker drops sub-5k areas (580 → 68), and emirate checkboxes on both pickers (Abu Dhabi and Dubai by default). |
 
 
 ---
@@ -42,7 +43,7 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 *To improve:*
 
 - 1.4 *(model)*: the cannibalisation signal is still raw `shared_share` among scored lounges, with no capacity or demand test. Blocked on OB3.
-- New, an unexplained bug (SC4): adding one 4.9★ competitor *raises* al-maqta from SHRINK to HOLD (0.341 → 0.351). The rating gap uses the median rating of the top-k substitutes, where k comes from `coverage_k`; the extra salon raises k from 20 to 21 and moves the median. A non-structural fix is to take the median over a fixed set (the whole premium pool, or a fixed k). That changes some composites, so the explanations would need regenerating. Not fixed yet.
+- Fixed (sanity run 3): the rating gap now uses the whole premium pool's median (20+ reviews), not a top-k that grew with the pool. al-maqta moved SHRINK → HOLD by 0.003: a knife-edge call, flagged low confidence and disclosed in README, walkthrough and limitations. A regression test pins it.
 
 ### Q2. Where should we consider opening new branches?
 
@@ -81,12 +82,12 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 - [x] `[brief]` **4.3 Competitive density indicators:** a count and/or per-capita measure of competitors in each catchment.
 - [x] `[brief]` **4.4 Saturation indicator:** a supply-vs-demand measure such as salons per 10k population or per unit of spend.
 - [x] `[ours]` **4.5 Competitor definition.** What counts as a competitor (category, tier, minimum review count) is written down, and noise like barbers or nail-only shops is handled deliberately.
-- [ ] `[ours]` **4.6 Small-sample handling.** A 5.0 rating from 3 reviews is not treated as equal to 4.6 from 900. We use shrinkage, a minimum-n rule or a flag.
+- [x] `[ours]` **4.6 Small-sample handling.** A 5.0 rating from 3 reviews is not treated as equal to 4.6 from 900. We use shrinkage, a minimum-n rule or a flag.
 - [x] `[brief]` **4.7 A comparison method.** There's a side-by-side view, a ranking or a scorecard across branches on common axes.
 
 *To improve:*
 
-- 4.6: the thin-market cliff is gone (now a blend), but the substitutes' median rating still has no minimum-n rule; the smallest substitute in use has 26 reviews (al-dhafra). Related to the SC4 bug in Q1.
+- (none open; 4.6 passes since run 3: a 20-review minimum for the rating median, `MIN_RATING_REVIEWS`)
 
 ### Q5. How can decision-makers explore these answers visually and interactively?
 
@@ -371,7 +372,7 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
   - [ ] **Multi-criteria suitability / weighted overlay (MCDA, AHP):** likely what our whitespace model really is. Weights are justified the way MCDA requires (stated, sensitivity-tested), not just picked.
   - [x] **Location-allocation / maximal coverage (MCLP):** picks the *set* of new sites that maximises coverage. We score cells one by one, so two adjacent GROW cells could cannibalise each other. Stated, or handled.
   - [x] **Analog / sales-regression models:** these need revenue we don't have. Stated as the main reason our health score is a proxy.
-- [ ] **MO5. Validated against reality.** The latest run of [`SANITY_CHECKS.md`](SANITY_CHECKS.md) (back-tests BT1–BT5, sanity checks SC1–SC6) has no unexplained failure, and each expected outcome was written down before the check ran.
+- [x] **MO5. Validated against reality.** The latest run of [`SANITY_CHECKS.md`](SANITY_CHECKS.md) (back-tests BT1–BT5, sanity checks SC1–SC6) has no unexplained failure, and each expected outcome was written down before the check ran.
 - [ ] **MO6. Sensitivity is known** (see 1.7). We report which labels flip under reasonable changes to weights and thresholds. Labels that sit near a boundary are presented as borderline, not as confident calls.
 - [x] **MO7. Not tuned to taste.** Weights and thresholds weren't adjusted until the label mix "looked right". Where we did tune them, we say so and give the target.
 - [ ] **MO8. Branch and whitespace models are consistent** (see B1). They use the same catchment, competitor definition and demand measure, so a branch's cell scored by the whitespace model gives an answer that fits with its branch label.
@@ -383,7 +384,7 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 - MO1 *(model)*: the affluence layer still "changes no call", but is kept.
 - MO4: the methods table is in limitations. Two gaps remain: Huff is not implemented, and there's no "where our catchments differ from a Voronoi split" comparison.
-- MO5: NO-GO. See SANITY_CHECKS run 2. The one *unexplained* failure left is the SC4 al-maqta flip; the rest are explained and documented.
+- MO5 (passes since run 3): no unexplained sanity failure remains. BT2/BT3 (unit), BT4/SC3 (DIP) and BT5 (empty-area tilt) are explained and documented failures; SC4 is explained (the thin-market blend's +0.014 slope by design; the median-premium test is deferred with no label effect).
 - MO6: lounges are covered (weights ±25%, assumption levels, margin). Growth areas get near-line confidence, but no assumption-level flips.
 - MO8 *(model)*: same saturation helper for both models now, but BT3 still disagrees on unit.
 - MO9: constants are module-level with a WHY and shown on the How page, but spread over 4 modules plus baseline.yaml; views.py and explain.py still have a few bare presentation numbers.

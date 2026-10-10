@@ -177,13 +177,15 @@ def test_travel_level_changes_competition(real_v3):
 # al-maqta, khalifa-city-a, ministries-complex, noya-plaza, shahama and westyas; A4 (thin-market
 # blend) moved al-dhafra 0.4851 -> 0.5851 and al-falah 0.4809 -> 0.5666; D1 (saturation line 50 ->
 # 150) added al-jerf-ajman to GROW. Affluence off must still reproduce the unweighted model.
+# Run 3 (2026-10-10): rating gap vs the whole premium pool (20+ reviews), not the top-k substitutes:
+# al-ain, al-maqta (SHRINK -> HOLD), mirdif-35, noya-plaza, ras-al-khaimah, westyas, zawaya-walk moved (SC4).
 BEFORE_AFFLUENCE = {
-    "al-ain": 0.7619, "al-barsha": 0.3664, "al-dhafra": 0.5851, "al-falah": 0.5666, "al-jada": 0.4872,
-    "al-maqta": 0.3411, "al-taif-mall": 0.6933, "baniyas": 0.4224, "city-walk": 0.4074, "delma": 0.227,
+    "al-ain": 0.7738, "al-barsha": 0.3664, "al-dhafra": 0.5851, "al-falah": 0.5666, "al-jada": 0.4872,
+    "al-maqta": 0.353, "al-taif-mall": 0.6933, "baniyas": 0.4224, "city-walk": 0.4074, "delma": 0.227,
     "jumeirah-park": 0.4132, "khaleej-al-arabi": 0.2773, "khalifa-city-a": 0.4255,
-    "ministries-complex": 0.3831, "mirdif-35": 0.4974, "mohammed-bin-zayed-city": 0.2769,
-    "nad-al-sheba": 0.4345, "noya-plaza": 0.2156, "ras-al-khaimah": 0.6643, "shahama": 0.3828,
-    "shakhbout-city": 0.4194, "westyas": 0.2252, "zawaya-walk": 0.5135}
+    "ministries-complex": 0.3831, "mirdif-35": 0.5212, "mohammed-bin-zayed-city": 0.2769,
+    "nad-al-sheba": 0.4345, "noya-plaza": 0.2394, "ras-al-khaimah": 0.6762, "shahama": 0.3828,
+    "shakhbout-city": 0.4194, "westyas": 0.249, "zawaya-walk": 0.5374}
 GROW_BEFORE = {"sharjah-sharjah", "al-dhaid-sharjah", "khor-fakkan-sharjah", "kalba-sharjah", "al-jerf-ajman"}
 
 
@@ -213,3 +215,21 @@ def test_every_lounge_and_area_has_an_affluence_source(real_v3):
     assert all(x.affluence_coverage > 0.5 for x in dubai.values())
     assert all(x.affluence_rent is None and x.addressable_women == x.catchment_women
                for x in f if x.emirate in ("Abu Dhabi", "Ras Al Khaimah"))
+
+
+def test_a_better_rated_competitor_never_raises_a_lounge(real_v3):
+    # Sanity check SC4, run 2: one 4.9-star salon added to al-maqta's pool raised it SHRINK -> HOLD,
+    # because the rating median ran over a top-k whose k grew with the pool.
+    from src.features import lounges
+    from src.model import scorecard
+    b, travel = "al-maqta", Levels().travel
+    base = {d.branch_id: d.composite for d in scorecard.decide(build(real_v3, ASSUMPTIONS)[0])}
+    rival = {"place_id": "test-rival", "name": "Test rival", "rating": 4.9, "review_count": 259,
+             "price_level": "", "lat": 0.0, "lng": 0.0}
+    real_v3.candidates[(b, travel)].append(rival)
+    lounges._PREP.clear()
+    try:
+        after = {d.branch_id: d.composite for d in scorecard.decide(build(real_v3, ASSUMPTIONS)[0])}
+    finally:
+        real_v3.candidates[(b, travel)].remove(rival)
+    assert after[b] <= base[b]

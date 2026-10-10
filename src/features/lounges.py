@@ -25,6 +25,12 @@ NOT_SCORED = {"zayed-international-airport"}
 NOT_SCORED_WHY = ("Serves travellers, not the women in its catchment, so it gets no call and is left out "
                   "of every comparison: it is no lounge's sibling (shared catchment) or premium substitute, "
                   "no area's nearest lounge, and its catchment cells are open to growth areas.")
+MIN_RATING_REVIEWS = 20
+MIN_RATING_REVIEWS_WHY = ("The rating gap compares a lounge with the median rating of its whole premium pool, "
+                          "counting salons with at least 20 reviews: a Google rating from fewer moves 0.1+ "
+                          "stars on a single review. The whole pool, not the top-k substitutes, because k "
+                          "grows with the pool, so one added salon could shift which salons count and "
+                          "raise a lounge's score (sanity check SC4, run 2).")
 _PREP: dict[int, tuple[V3, dict]] = {}
 
 
@@ -137,7 +143,8 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
         prem = premium_pool(v3, a, levels, closed, b)
         mult = recall_multiplier(v3.full_share[(b, levels.travel)], a.search_recall)
         cap, k = capture_by_coverage(lo.review_count, prem, a.competitor_coverage[levels.coverage], mult)
-        rated = [float(s["rating"]) for s in prem[:k] if s.get("rating") is not None]
+        rated = [float(s["rating"]) for s in prem
+                 if s.get("rating") not in (None, "") and _reviews(s) >= MIN_RATING_REVIEWS]
         med = statistics.median(rated) if rated else None
         sat = _saturation(cs, w, p, a)
         feats.append(LoungeFeatures(

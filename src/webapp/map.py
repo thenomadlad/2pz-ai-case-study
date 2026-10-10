@@ -10,6 +10,7 @@ import math
 import pandas as pd
 import pydeck as pdk
 
+from src.model import growth
 from src.models import Area, AreaDecision, Decision, LoungeFeatures
 
 ACTION_COLORS: dict[str, list[int]] = {
@@ -109,7 +110,8 @@ def area_cells_layer(cells: pd.DataFrame, areas: list[Area], decisions: list[Are
     rows = []
     for a in areas:
         action = act[a.area_id]
-        if (only and a.area_id != only) or (not only and action == "SKIP" and not show_skip):
+        thin = a.women < growth.SKIP_UNDER_WOMEN   # always SKIP: not worth drawing
+        if (only and a.area_id != only) or (not only and action == "SKIP" and (not show_skip or thin)):
             continue
         detail = (f"Growth area: {action}<br/>{a.women:,.0f} women 15+ · {a.worker_share:.0%} worker housing"
                   f"<br/>{a.nearest_lounge_km:.1f} km (straight line) to {a.nearest_lounge_id}")

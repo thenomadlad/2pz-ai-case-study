@@ -11,7 +11,7 @@ is checked against the data.
 ## Look at this in 5 minutes
 
 1. **[Overview](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the COO's
-   question, the executive summary and three at-stake figures (6 SHRINK lounges, 235,801 women in
+   question, the executive summary and three at-stake figures (5 SHRINK lounges, 233,883 women in
    shared cells; 5 GROW areas, 242,151 women).
 2. **Tick "All catchments (overlap)"** above the map: the red cells shared by 2+ lounges are the
    SHRINK story; the PROTECT lounges sit alone.
@@ -22,7 +22,8 @@ is checked against the data.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah)
    (GROW):** 23,464 addressable women against a 20,000 line (thin), 44 premium reviews per 1k against 150.
 5. **The fallback:** in the Overview's **🧪 What if…?** panel set travel time to 20 min and reopen
-   al-maqta from its map panel: it turns HOLD and the text switches to the labelled template.
+   mohammed-bin-zayed-city from its map panel: it turns HOLD (0.36) and the text switches to the
+   labelled template.
 6. **[How it works & limitations](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how)**,
    then the limitations below.
 
@@ -77,7 +78,7 @@ full lounge from an empty one, and a SHRINK is driven by raw catchment overlap, 
 that would be lost. Read the calls with that in mind.
 
 **One flow, question to action.** *"Which Abu Dhabi lounges should we review before their
-leases?"* → Overview: the summary and map show 6 SHRINKs, all in Abu Dhabi city → click
+leases?"* → Overview: the summary and map show 5 SHRINKs, all in Abu Dhabi city → click
 **delma** → its page: 98% of its women are also reached by a sibling (the shared-women table
 names which: khaleej-al-arabi 73%, ministries-complex 69%), capture is 2%, and the call is high
 confidence: it holds in all 81 assumption combinations → action: put delma on the lease-review
@@ -96,7 +97,7 @@ thinner or new. Out of scope:
   data. It decides whether a SHRINK is closed; the model only says which lounges to look at.
 - **In-branch staffing and capacity.** How many chairs and stylists a lounge needs is an
   operations question, answered from bookings, not from maps.
-- **Service quality and operations.** Ratings are used only relative to nearby substitutes;
+- **Service quality and operations.** Ratings are used only relative to nearby premium salons;
   fixing a weak lounge's service is a management job, not a location one.
 
 ## What it currently says
@@ -104,14 +105,16 @@ thinner or new. Out of scope:
 At the baseline (medium levels: 15-min drive, 60% competitor coverage, 5.5% women in worker
 housing, affluence elasticity 0.5):
 
-- **Lounges:** 3 PROTECT (al-ain, al-taif-mall, ras-al-khaimah), 14 HOLD, 6 SHRINK, 1 NOT SCORED
+- **Lounges:** 3 PROTECT (al-ain, al-taif-mall, ras-al-khaimah), 15 HOLD, 5 SHRINK, 1 NOT SCORED
   (the airport lounge serves travellers). **10 of 23** calls are low confidence.
-- **The 6 SHRINKs are all Abu Dhabi city lounges** (al-maqta, delma, khaleej-al-arabi,
+- **The 5 SHRINKs are all Abu Dhabi city lounges** (delma, khaleej-al-arabi,
   mohammed-bin-zayed-city, noya-plaza, westyas): 98-100% of their women are also reached by
-  a sibling, and capture is middling to low. Two of them (mohammed-bin-zayed-city, al-maqta) flip
-  to HOLD in 36-54 of the 81 assumption combinations. Investigate, don't cut. shahama was the
-  seventh until the airport lounge stopped counting as its sibling and substitute; it is now a
-  low-confidence HOLD, 0.03 above the line.
+  a sibling, and capture is middling to low. One of them (mohammed-bin-zayed-city) flips
+  to HOLD in 54 of the 81 assumption combinations. Investigate, don't cut. shahama was a SHRINK
+  until the airport lounge stopped counting as its sibling and substitute; it is now a
+  low-confidence HOLD, 0.03 above the line. al-maqta was a SHRINK until the rating gap moved from
+  the top-k substitutes' median to the whole premium pool's (sanity check SC4); it is now HOLD by
+  0.003 (composite 0.353), a knife-edge call flagged low confidence.
 - **Growth areas:** 5 GROW (Sharjah, Al Dhaid, Khor Fakkan and Kalba in Sharjah emirate, Al Jerf
   in Ajman; 242k women between them), and 35 WATCH. The Sharjah four are beyond a 15-minute drive of Bedashing's two Sharjah
   lounges (al-jada, zawaya-walk, both on the Dubai side); why the footprint is only two is a business
@@ -121,7 +124,7 @@ housing, affluence elasticity 0.5):
 - **Affluence changes no call at medium or strong.** The four big Dubai lounges sit above the 200k
   demand anchor either way; jumeirah-park and zawaya-walk move by under 0.02 and neither crosses a
   line. That is partly by design (see limitations 3): the weighting only reshuffles demand inside
-  Dubai, and all 6 SHRINKs are in Abu Dhabi, where it sees nothing.
+  Dubai, and all 5 SHRINKs are in Abu Dhabi, where it sees nothing.
 
 Treat these as the places to look first, not as answers.
 
@@ -194,7 +197,7 @@ doesn't move when a sibling opens or closes:
 | Demand | addressable (affluence-weighted) women 15+ in the catchment | 0 | 200k | 1 |
 | Cannibalisation | share of them another lounge also reaches | 100% | 0% | 1 |
 | Capture | share of premium-substitute reviews | 0% | 15% | 1 |
-| Rating | rating minus the substitutes' median | −0.3★ | +0.3★ | ½ |
+| Rating | rating minus the premium pool's median (salons with 20+ reviews) | −0.3★ | +0.3★ | ½ |
 
 PROTECT ≥ 0.65, SHRINK ≤ 0.35, HOLD between: strong calls need the signals to agree. Rating counts
 half because Google ratings come in 0.1★ steps. **Low confidence** = within 0.05 of a line, a thin
@@ -223,7 +226,7 @@ Field names are as in `src/features/lounges.py`; files are in `data/seed/v3/`.
 | **Q1** protect / hold / shrink a lounge | the composite of the four signals below (`addressable_women`, `shared_share`, `capture`, `rating_gap`) | all of the files below | **Indirect.** Health is a market-position score; there is no revenue or rent (limitations 1) |
 | **Q2** where to open | `addressable_women` and `worker_share` per area (big enough?); `premium_reviews_per_1k` (unsaturated?) | `cells.csv` + `emirates.csv` (WorldPop, OSM worker housing), `cell_affluence.csv` (DLD rents, Dubai only), `catchment_cells.csv` (what's already reached), `salons.csv` + `search_circles.csv` (Places) | **Proxy.** Modelled women stand in for customers; premium reviews stand in for competing supply |
 | **Q3** overlap with ourselves | `shared_share`: share of a lounge's catchment women another lounge also reaches | `catchment_cells.csv`, `lounge_isochrones.geojson` (Mapbox), `cells.csv` | **Fairly direct** for geography; it can't say where customers would go if a lounge closed (limitations 11) |
-| **Q4** strength vs local competition | `capture` (lounge reviews ÷ lounge + premium substitutes), `rating_gap` (rating − substitutes' median) | `branches.csv` (lounge reviews, rating), `salons.csv`, `lounge_candidates_by_level.csv`, `lounge_search_saturation_by_level.csv` (recall correction) | **Proxy of a proxy** for capture: lifetime Google reviews stand in for customers, which stand in for market share. Rating is direct but coarse (0.1★ steps) |
+| **Q4** strength vs local competition | `capture` (lounge reviews ÷ lounge + premium substitutes), `rating_gap` (rating − median of the catchment's premium salons with 20+ reviews) | `branches.csv` (lounge reviews, rating), `salons.csv`, `lounge_candidates_by_level.csv`, `lounge_search_saturation_by_level.csv` (recall correction) | **Proxy of a proxy** for capture: lifetime Google reviews stand in for customers, which stand in for market share. Rating is direct but coarse (0.1★ steps) |
 
 ## The AI layer
 

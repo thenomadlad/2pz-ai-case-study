@@ -12,6 +12,7 @@ from src.webapp.views import (
     area_caveats,
     badge,
     banner,
+    emirate_filter,
     explanation_for,
     render_caveats,
     render_factor_table,
@@ -48,14 +49,18 @@ def render() -> None:
     r = data.current()
     act = {d.area_id: d.action for d in r.area_decisions}
     by_id = {a.area_id: a for a in r.areas}
-    options = sorted(by_id, key=lambda i: (ORDER[act[i]], -by_id[i].women))
+    # areas under the SKIP floor are noise: always SKIP, whatever the competition, so not listed
+    options = sorted((i for i in by_id if by_id[i].women >= growth.SKIP_UNDER_WOMEN),
+                     key=lambda i: (ORDER[act[i]], -by_id[i].women))
+    options = emirate_filter(options, {i: by_id[i].emirate for i in options}, "area", "area-em")
     wanted = st.query_params.get("area")
     area_id = url_picker("Growth area", "area", options,
                          lambda i: f"{by_id[i].name}, {by_id[i].emirate} · {act[i]}", "area-pick")
     st.page_link(nav.OVERVIEW, label="Back to overview", icon="⬅️", query_params={"area": area_id})
     banner()
-    if wanted and wanted not in by_id:
-        st.info(f"That area isn't a growth area in this view (a lounge reaches it), or the link is wrong; "
+    if wanted and wanted not in options:
+        st.info(f"That area isn't listed in this view (a lounge reaches it, it has under "
+                f"{growth.SKIP_UNDER_WOMEN:,} women, or the link is wrong); "
                 f"showing {area_id}.")
 
     a = by_id[area_id]

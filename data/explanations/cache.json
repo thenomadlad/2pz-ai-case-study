@@ -1,64 +1,4 @@
 {
-  "012db6f9679f3cdf": {
-    "action": "SHRINK",
-    "headline": "SHRINK, low confidence: every one of Al Maqta's 126,000 catchment women is also reached by a sibling, and it holds 5% of premium reviews; at 0.34 it is 0.01 under the HOLD line.",
-    "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review whether to downsize or consolidate into the sibling that shares most of its catchment. It is 0.01 below the HOLD line: shared catchment falling to 97% would make it HOLD.",
-    "reasons": [
-      {
-        "claim": "100% of its catchment women live in cells another Bedashing lounge also reaches.",
-        "evidence": [
-          {
-            "field": "shared_share",
-            "label": "Shared catchment",
-            "value": 1.0
-          },
-          {
-            "field": "score_cannibalisation",
-            "label": "Cannibalisation score",
-            "value": 0.0
-          },
-          {
-            "field": "contrib_cannibalisation",
-            "label": "Cannibalisation contribution",
-            "value": 0.0
-          }
-        ],
-        "topic": "cannibalisation"
-      },
-      {
-        "claim": "Against 20 premium substitutes in a pool of 87 it holds 5% of premium reviews, in a market with 278 premium reviews per 1k women.",
-        "evidence": [
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.0533
-          },
-          {
-            "field": "substitutes_k",
-            "label": "Premium substitutes",
-            "value": 20
-          },
-          {
-            "field": "premium_pool",
-            "label": "Premium salons in catchment",
-            "value": 87
-          },
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 277.8362
-          }
-        ],
-        "topic": "capture"
-      }
-    ],
-    "so_what": "About 6,700 women captured by the review proxy, all in cells siblings also reach. The call changes in 36 of 81 assumption combinations, so it is a question to test, not a finding.",
-    "source": "ai",
-    "subject_id": "al-maqta",
-    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "01deebeca6976429": {
     "action": "WATCH",
     "headline": "WATCH: Manama has little premium competition, but its 5,100 addressable women are 14,900 short of the 20,000 a lounge needs.",
@@ -200,6 +140,61 @@
     "subject_id": "um-ghafah-abu-dhabi",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
+  "0909b8aaa879c2ca": {
+    "action": "SHRINK",
+    "headline": "SHRINK: 98% of Westyas's 42,400 catchment women are also reached by a sibling, and its demand is low.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether to downsize or consolidate into the sibling that shares most of its catchment. It is 0.10 below the HOLD line; only shared catchment falling to 63% would make it HOLD.",
+    "reasons": [
+      {
+        "claim": "98% of its catchment women live in cells another Bedashing lounge also reaches.",
+        "evidence": [
+          {
+            "field": "shared_share",
+            "label": "Shared catchment",
+            "value": 0.9823
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 0.0177
+          },
+          {
+            "field": "contrib_cannibalisation",
+            "label": "Cannibalisation contribution",
+            "value": 0.0051
+          }
+        ],
+        "topic": "cannibalisation"
+      },
+      {
+        "claim": "About 42,400 women live within a 15-min drive, a demand score of 0.21.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 42368.0713
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.2118
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.0605
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "It holds 7% of premium reviews, about 3,000 women by the review proxy, but siblings reach almost all of them, so this site adds little coverage the network doesn't already have.",
+    "source": "ai",
+    "subject_id": "westyas",
+    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "0e6ce32ab03c7fab": {
     "action": "WATCH",
@@ -880,84 +875,84 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
-  "331eb108edeb4792": {
-    "action": "HOLD",
-    "headline": "HOLD: Nad Al Sheba's 239,000 addressable women offset a 2% share of premium reviews and a catchment siblings mostly share.",
+  "37f34f7815408dc1": {
+    "action": "PROTECT",
+    "headline": "PROTECT: Al Ain shares none of its 102,000 catchment women with a sibling and holds 12% of premium reviews, for a composite of 0.77.",
     "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. It is 0.08 above the SHRINK line; on its own, addressable women falling to 140,850 would make it SHRINK.",
+    "now_what": "Keep and defend the site: renew at the lease event and treat a competitor opening nearby as a threat to respond to. It is 0.12 above the HOLD line; only a sibling sharing 43% of its catchment women would drop it to HOLD.",
     "reasons": [
       {
-        "claim": "Demand is at the top of the scale: 239,000 addressable women, women-weighted rent AED 85,000, rents observed for 97% of them.",
+        "claim": "No other Bedashing lounge reaches any of its catchment women (0% shared).",
         "evidence": [
           {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 238506.3352
+            "field": "shared_share",
+            "label": "Shared catchment",
+            "value": 0.0
           },
           {
-            "field": "score_demand",
-            "label": "Demand score",
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
             "value": 1.0
           },
           {
-            "field": "affluence_rent",
-            "label": "Affluence rent",
-            "value": 85000.0
-          },
-          {
-            "field": "affluence_coverage",
-            "label": "Affluence coverage",
-            "value": 0.973
+            "field": "contrib_cannibalisation",
+            "label": "Cannibalisation contribution",
+            "value": 0.2857
           }
         ],
-        "topic": "demand"
+        "topic": "cannibalisation"
       },
       {
-        "claim": "Against 33 premium substitutes in a pool of 119 it holds 2% of premium reviews, in a market with 276 premium reviews per 1k women.",
+        "claim": "It holds 12% of premium reviews against 16 premium substitutes in a pool of 59.",
         "evidence": [
           {
             "field": "capture",
             "label": "Capture",
-            "value": 0.016
+            "value": 0.1232
           },
           {
             "field": "substitutes_k",
             "label": "Premium substitutes",
-            "value": 33
+            "value": 16
           },
           {
             "field": "premium_pool",
             "label": "Premium salons in catchment",
-            "value": 119
+            "value": 59
           },
           {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 276.1507
+            "field": "score_capture",
+            "label": "Capture score",
+            "value": 0.8211
           }
         ],
         "topic": "capture"
       },
       {
-        "claim": "75% of its catchment women are also reached by another lounge.",
+        "claim": "Its 4.7 rating is 0.15 above the 4.55 median of the premium salons in its catchment.",
         "evidence": [
           {
-            "field": "shared_share",
-            "label": "Shared catchment",
-            "value": 0.7527
+            "field": "lounge_rating",
+            "label": "Google rating",
+            "value": 4.7
           },
           {
-            "field": "score_cannibalisation",
-            "label": "Cannibalisation score",
-            "value": 0.2473
+            "field": "substitutes_median_rating",
+            "label": "Premium salons' median rating",
+            "value": 4.55
+          },
+          {
+            "field": "rating_gap",
+            "label": "Rating gap",
+            "value": 0.15
           }
         ],
-        "topic": "cannibalisation"
+        "topic": "rating"
       }
     ],
-    "so_what": "About 3,800 women captured by the review proxy in a crowded market, mostly in cells a sibling also reaches.",
+    "so_what": "About 12,600 women captured by the review proxy and no sibling reaches any of them, so if this site were lost those customers would go to competitors, not to another Bedashing lounge.",
     "source": "ai",
-    "subject_id": "nad-al-sheba",
+    "subject_id": "al-ain",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
@@ -1124,6 +1119,66 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
+  "48841d55a8008bcb": {
+    "action": "PROTECT",
+    "headline": "PROTECT, low confidence: Ras Al Khaimah shares none of its 55,800 women with a sibling and holds 14% of premium reviews, but at 0.68 it is 0.03 above the HOLD line.",
+    "kind": "lounge",
+    "now_what": "Keep and defend the site: renew at the lease event and treat a competitor opening nearby as a threat to respond to. It is 0.03 above the HOLD line; a sibling sharing just 9% of its catchment women would drop it to HOLD.",
+    "reasons": [
+      {
+        "claim": "No other Bedashing lounge reaches any of its catchment women (0% shared).",
+        "evidence": [
+          {
+            "field": "shared_share",
+            "label": "Shared catchment",
+            "value": 0.0
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 1.0
+          },
+          {
+            "field": "contrib_cannibalisation",
+            "label": "Cannibalisation contribution",
+            "value": 0.2857
+          }
+        ],
+        "topic": "cannibalisation"
+      },
+      {
+        "claim": "It holds 14% of premium reviews against 8 substitutes in a pool of 44 premium salons.",
+        "evidence": [
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.1381
+          },
+          {
+            "field": "substitutes_k",
+            "label": "Premium substitutes",
+            "value": 8
+          },
+          {
+            "field": "premium_pool",
+            "label": "Premium salons in catchment",
+            "value": 44
+          },
+          {
+            "field": "score_capture",
+            "label": "Capture score",
+            "value": 0.9209
+          }
+        ],
+        "topic": "capture"
+      }
+    ],
+    "so_what": "About 7,700 women captured by the review proxy with no sibling to absorb them if the site were lost, in a market with 145 premium reviews per 1k women; the call changes in 9 of 81 assumption combinations.",
+    "source": "ai",
+    "subject_id": "ras-al-khaimah",
+    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
   "48fe3012f94ec2bf": {
     "action": "GROW",
     "headline": "GROW: Khor Fakkan passes both tests, with 31,200 women and 28 premium reviews per 1k women.",
@@ -1265,66 +1320,6 @@
     "subject_id": "milehah-sharjah",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
-  },
-  "4ac19585315b26bd": {
-    "action": "HOLD",
-    "headline": "HOLD: Zawaya Walk has strong demand, 191,600 addressable women, but holds 2% of premium reviews, which keeps it short of PROTECT.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. It is 0.14 below the PROTECT line; on its own, capture would have to reach 9% of premium reviews to make it PROTECT.",
-    "reasons": [
-      {
-        "claim": "About 191,600 addressable women live within a 15-min drive, a demand score of 0.96, though rents are observed for only 3% of them.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 191565.2561
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.9578
-          },
-          {
-            "field": "affluence_coverage",
-            "label": "Affluence coverage",
-            "value": 0.0341
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "Against 25 premium substitutes in a pool of 102 it holds 2% of premium reviews, in a market with 183 premium reviews per 1k women.",
-        "evidence": [
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.0204
-          },
-          {
-            "field": "substitutes_k",
-            "label": "Premium substitutes",
-            "value": 25
-          },
-          {
-            "field": "premium_pool",
-            "label": "Premium salons in catchment",
-            "value": 102
-          },
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 182.6273
-          }
-        ],
-        "topic": "capture"
-      }
-    ],
-    "so_what": "About 3,900 women captured by the review proxy; 47% of its catchment women are also reached by a sibling.",
-    "source": "ai",
-    "subject_id": "zawaya-walk",
-    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "4aefef08e9862c1d": {
     "action": "WATCH",
@@ -1541,6 +1536,66 @@
     "so_what": "It holds 6.5% of premium reviews, about 4,500 women by the review proxy, in a market with 629 premium reviews per 1k women, and siblings reach nearly all of them.",
     "source": "ai",
     "subject_id": "khaleej-al-arabi",
+    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
+  "54aff5af2c432bc0": {
+    "action": "HOLD",
+    "headline": "HOLD: Zawaya Walk has strong demand, 191,600 addressable women, but holds 2% of premium reviews, which keeps it short of PROTECT.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. It is 0.12 below the PROTECT line; on its own, capture would have to reach 8% of premium reviews to make it PROTECT.",
+    "reasons": [
+      {
+        "claim": "About 191,600 addressable women live within a 15-min drive, a demand score of 0.96, though rents are observed for only 3% of them.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 191565.2561
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.9578
+          },
+          {
+            "field": "affluence_coverage",
+            "label": "Affluence coverage",
+            "value": 0.0341
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "Against 25 premium substitutes in a pool of 102 it holds 2% of premium reviews, in a market with 183 premium reviews per 1k women.",
+        "evidence": [
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.0204
+          },
+          {
+            "field": "substitutes_k",
+            "label": "Premium substitutes",
+            "value": 25
+          },
+          {
+            "field": "premium_pool",
+            "label": "Premium salons in catchment",
+            "value": 102
+          },
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 182.6273
+          }
+        ],
+        "topic": "capture"
+      }
+    ],
+    "so_what": "A large market the lounge wins little of: about 3,900 women captured by the review proxy out of 191,600 addressable, and 47% of its catchment women are also reached by a sibling.",
+    "source": "ai",
+    "subject_id": "zawaya-walk",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
@@ -1867,134 +1922,6 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
-  "5f4cb9c5539b8f98": {
-    "action": "SUMMARY",
-    "headline": "Of 23 scored lounges, 3 are PROTECT, 14 HOLD and 6 SHRINK, and 5 growth areas pass both tests to GROW.",
-    "kind": "uae",
-    "now_what": "Investigate the 6 SHRINK lounges before their lease events, start site searches in the 5 GROW areas, and defend the 3 PROTECT lounges.",
-    "reasons": [
-      {
-        "claim": "6 lounges are SHRINK, to investigate before their lease events: al-maqta, delma, khaleej-al-arabi, mohammed-bin-zayed-city, noya-plaza and westyas, the strongest at 0.34.",
-        "evidence": [
-          {
-            "field": "shrink_count",
-            "label": "SHRINK",
-            "value": 6
-          },
-          {
-            "field": "shrink_lounges",
-            "label": "SHRINK lounges",
-            "value": "al-maqta, delma, khaleej-al-arabi, mohammed-bin-zayed-city, noya-plaza, westyas"
-          },
-          {
-            "field": "shrink_composite_max",
-            "label": "Strongest SHRINK composite",
-            "value": 0.3411
-          }
-        ],
-        "topic": "shrink"
-      },
-      {
-        "claim": "5 areas are GROW, with 242,151 women 15+ between them, 11.1 to 43.8 km from the nearest lounge.",
-        "evidence": [
-          {
-            "field": "grow_count",
-            "label": "GROW",
-            "value": 5
-          },
-          {
-            "field": "grow_areas",
-            "label": "GROW areas",
-            "value": "al-dhaid-sharjah, al-jerf-ajman, kalba-sharjah, khor-fakkan-sharjah, sharjah-sharjah"
-          },
-          {
-            "field": "grow_women_total",
-            "label": "Women in GROW areas",
-            "value": 242151
-          },
-          {
-            "field": "grow_nearest_km_min",
-            "label": "Closest GROW area to a lounge",
-            "value": 11.0963
-          },
-          {
-            "field": "grow_nearest_km_max",
-            "label": "Furthest GROW area from a lounge",
-            "value": 43.7824
-          }
-        ],
-        "topic": "grow"
-      },
-      {
-        "claim": "3 lounges are PROTECT: al-ain, al-taif-mall and ras-al-khaimah, the weakest at 0.66.",
-        "evidence": [
-          {
-            "field": "protect_count",
-            "label": "PROTECT",
-            "value": 3
-          },
-          {
-            "field": "protect_lounges",
-            "label": "PROTECT lounges",
-            "value": "al-ain, al-taif-mall, ras-al-khaimah"
-          },
-          {
-            "field": "protect_composite_min",
-            "label": "Weakest PROTECT composite",
-            "value": 0.6643
-          }
-        ],
-        "topic": "protect"
-      },
-      {
-        "claim": "14 lounges sit in the HOLD band and 10 of the 23 calls are low confidence.",
-        "evidence": [
-          {
-            "field": "hold_count",
-            "label": "HOLD",
-            "value": 14
-          },
-          {
-            "field": "low_confidence_count",
-            "label": "Low-confidence calls",
-            "value": 10
-          },
-          {
-            "field": "lounges_scored",
-            "label": "Lounges scored",
-            "value": 23
-          }
-        ],
-        "topic": "confidence"
-      },
-      {
-        "claim": "There is no revenue or rent data, so these are location and market calls from 3,833 searched salons, not return-on-capital calls.",
-        "evidence": [
-          {
-            "field": "revenue_data_available",
-            "label": "Revenue data",
-            "value": false
-          },
-          {
-            "field": "rent_data_available",
-            "label": "Rent data",
-            "value": false
-          },
-          {
-            "field": "salons_total",
-            "label": "Salons searched",
-            "value": 3833
-          }
-        ],
-        "topic": "data_gaps"
-      }
-    ],
-    "so_what": "About 242,000 women live in the 5 GROW areas, beyond a 15-min drive of every lounge, while 6 lounges need a closer look; with 10 low-confidence calls, this is a shortlist to test, not a set of decisions.",
-    "source": "ai",
-    "subject_id": "uae",
-    "table_caption": "Lounge calls come from a fixed-scale scorecard of demand, cannibalisation, capture and rating; growth-area calls from two tests, size and premium saturation. Counts cover the 23 scored lounges; the airport lounge is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
-  },
   "6037579c3e2f5a3a": {
     "action": "WATCH",
     "headline": "WATCH: Al Sarouj has little premium competition, but its 6,000 addressable women are 14,000 short of the 20,000 a lounge needs.",
@@ -2066,89 +1993,79 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
-  "6aaa11b16981fc9f": {
-    "action": "SHRINK",
-    "headline": "SHRINK: every one of Noya Plaza's 45,000 catchment women is also reached by a sibling, and it holds 3% of premium reviews.",
+  "6915fb936e4baec7": {
+    "action": "HOLD",
+    "headline": "HOLD: Nad Al Sheba's 239,000 addressable women offset a 2% share of premium reviews and a catchment siblings mostly share.",
     "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review whether to downsize or consolidate into the sibling that shares most of its catchment. It is 0.13 below the HOLD line; only shared catchment falling to 53% would make it HOLD.",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. It is 0.08 above the SHRINK line; on its own, addressable women falling to 140,850 would make it SHRINK.",
     "reasons": [
       {
-        "claim": "100% of its catchment women live in cells another Bedashing lounge also reaches.",
+        "claim": "Demand is at the top of the scale: 239,000 addressable women, with rents observed for 97% of them.",
         "evidence": [
           {
-            "field": "shared_share",
-            "label": "Shared catchment",
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 238506.3352
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
             "value": 1.0
           },
           {
-            "field": "score_cannibalisation",
-            "label": "Cannibalisation score",
-            "value": 0.0
-          },
-          {
-            "field": "contrib_cannibalisation",
-            "label": "Cannibalisation contribution",
-            "value": 0.0
+            "field": "affluence_coverage",
+            "label": "Affluence coverage",
+            "value": 0.973
           }
         ],
-        "topic": "cannibalisation"
+        "topic": "demand"
       },
       {
-        "claim": "Against 8 premium substitutes in a pool of 38 it holds 3% of premium reviews, from 215 reviews, in a market with 220 premium reviews per 1k women.",
+        "claim": "Against 33 premium substitutes in a pool of 119 it holds 2% of premium reviews, in a market with 276 premium reviews per 1k women.",
         "evidence": [
           {
             "field": "capture",
             "label": "Capture",
-            "value": 0.0294
+            "value": 0.016
           },
           {
             "field": "substitutes_k",
             "label": "Premium substitutes",
-            "value": 8
+            "value": 33
           },
           {
             "field": "premium_pool",
             "label": "Premium salons in catchment",
-            "value": 38
-          },
-          {
-            "field": "lounge_reviews",
-            "label": "Google reviews",
-            "value": 215
+            "value": 119
           },
           {
             "field": "premium_reviews_per_1k",
             "label": "Premium saturation",
-            "value": 219.7295
+            "value": 276.1507
           }
         ],
         "topic": "capture"
       },
       {
-        "claim": "About 45,000 women live within a 15-min drive, a demand score of 0.23.",
+        "claim": "75% of its catchment women are also reached by another lounge.",
         "evidence": [
           {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 45036.5814
+            "field": "shared_share",
+            "label": "Shared catchment",
+            "value": 0.7527
           },
           {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.2252
-          },
-          {
-            "field": "contrib_demand",
-            "label": "Demand contribution",
-            "value": 0.0643
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 0.2473
           }
         ],
-        "topic": "demand"
+        "topic": "cannibalisation"
       }
     ],
-    "so_what": "About 1,300 women captured by the review proxy, all in cells siblings also reach. The call holds in all 81 assumption combinations.",
+    "so_what": "The site's value is its demand, not its share: about 3,800 women captured by the review proxy in a crowded market, and 75% of its catchment is also reached by a sibling.",
     "source": "ai",
-    "subject_id": "noya-plaza",
+    "subject_id": "nad-al-sheba",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
@@ -3126,66 +3043,6 @@
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
-  "91e3490c4e17c0d3": {
-    "action": "PROTECT",
-    "headline": "PROTECT, low confidence: Ras Al Khaimah shares none of its 55,800 women with a sibling and holds 14% of premium reviews, but at 0.66 it is 0.01 above the HOLD line.",
-    "kind": "lounge",
-    "now_what": "Keep and defend the site: renew at the lease event and treat a competitor opening nearby as a threat to respond to. It is 0.01 above the HOLD line; a sibling sharing just 5% of its catchment women would drop it to HOLD.",
-    "reasons": [
-      {
-        "claim": "No other Bedashing lounge reaches any of its catchment women (0% shared).",
-        "evidence": [
-          {
-            "field": "shared_share",
-            "label": "Shared catchment",
-            "value": 0.0
-          },
-          {
-            "field": "score_cannibalisation",
-            "label": "Cannibalisation score",
-            "value": 1.0
-          },
-          {
-            "field": "contrib_cannibalisation",
-            "label": "Cannibalisation contribution",
-            "value": 0.2857
-          }
-        ],
-        "topic": "cannibalisation"
-      },
-      {
-        "claim": "It holds 14% of premium reviews against 8 substitutes in a pool of 44 premium salons.",
-        "evidence": [
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.1381
-          },
-          {
-            "field": "substitutes_k",
-            "label": "Premium substitutes",
-            "value": 8
-          },
-          {
-            "field": "premium_pool",
-            "label": "Premium salons in catchment",
-            "value": 44
-          },
-          {
-            "field": "score_capture",
-            "label": "Capture score",
-            "value": 0.9209
-          }
-        ],
-        "topic": "capture"
-      }
-    ],
-    "so_what": "About 7,700 women captured by the review proxy with no sibling to absorb them, in a market with 145 premium reviews per 1k women.",
-    "source": "ai",
-    "subject_id": "ras-al-khaimah",
-    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "95e4a9e5c15f57df": {
     "action": "WATCH",
     "headline": "WATCH: Al Lesaily has little premium competition, but its 17,231 addressable women are 2,769 short of the 20,000 a lounge needs.",
@@ -3266,6 +3123,71 @@
     "subject_id": "al-lesaily-dubai",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
+  "962af4d580fa0972": {
+    "action": "HOLD",
+    "headline": "HOLD: mirdif-35's 232,000 addressable women carry it to 0.52, mid-band, but it holds only 3% of premium reviews.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. It is 0.13 below the PROTECT line; on its own, capture reaching 9% of premium reviews would make it PROTECT.",
+    "reasons": [
+      {
+        "claim": "Demand is at the top of the scale: 232,000 addressable women, with rents observed for 93% of them.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 231813.0706
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 1.0
+          },
+          {
+            "field": "affluence_coverage",
+            "label": "Affluence coverage",
+            "value": 0.9293
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.2857
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "Against 23 premium substitutes in a pool of 85 it holds 3% of premium reviews, in a market with 177 premium reviews per 1k women.",
+        "evidence": [
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.0265
+          },
+          {
+            "field": "substitutes_k",
+            "label": "Premium substitutes",
+            "value": 23
+          },
+          {
+            "field": "premium_pool",
+            "label": "Premium salons in catchment",
+            "value": 85
+          },
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 177.194
+          }
+        ],
+        "topic": "capture"
+      }
+    ],
+    "so_what": "The market is there but the lounge wins little of it: about 6,200 women captured by the review proxy out of 232,000 addressable, and 52% of its catchment women are also reached by a sibling.",
+    "source": "ai",
+    "subject_id": "mirdif-35",
+    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "9e495c4c0d6ffedb": {
     "action": "WATCH",
@@ -3631,66 +3553,6 @@
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
-  "b63d7af423710866": {
-    "action": "PROTECT",
-    "headline": "PROTECT: Al Ain shares none of its 102,000 catchment women with a sibling and holds 12% of premium reviews, for a composite of 0.76.",
-    "kind": "lounge",
-    "now_what": "Keep and defend the site: renew at the lease event and treat a competitor opening nearby as a threat to respond to. It is 0.11 above the HOLD line; only a sibling sharing 39% of its catchment women would drop it to HOLD.",
-    "reasons": [
-      {
-        "claim": "No other Bedashing lounge reaches any of its catchment women (0% shared).",
-        "evidence": [
-          {
-            "field": "shared_share",
-            "label": "Shared catchment",
-            "value": 0.0
-          },
-          {
-            "field": "score_cannibalisation",
-            "label": "Cannibalisation score",
-            "value": 1.0
-          },
-          {
-            "field": "contrib_cannibalisation",
-            "label": "Cannibalisation contribution",
-            "value": 0.2857
-          }
-        ],
-        "topic": "cannibalisation"
-      },
-      {
-        "claim": "It holds 12% of premium reviews against 16 premium substitutes in a pool of 59.",
-        "evidence": [
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.1232
-          },
-          {
-            "field": "substitutes_k",
-            "label": "Premium substitutes",
-            "value": 16
-          },
-          {
-            "field": "premium_pool",
-            "label": "Premium salons in catchment",
-            "value": 59
-          },
-          {
-            "field": "score_capture",
-            "label": "Capture score",
-            "value": 0.8211
-          }
-        ],
-        "topic": "capture"
-      }
-    ],
-    "so_what": "About 12,600 women captured by the review proxy, in a market with 122 premium reviews per 1k women, and no sibling lounge reaches any of them.",
-    "source": "ai",
-    "subject_id": "al-ain",
-    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "bb100138017939e4": {
     "action": "HOLD",
     "headline": "HOLD: Jumeirah Park's 173,000 addressable women keep it above the SHRINK line, though it holds about 1% of premium reviews.",
@@ -4000,6 +3862,92 @@
     "subject_id": "al-wathbah-abu-dhabi",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
+  "c4e950b9123ac32f": {
+    "action": "SHRINK",
+    "headline": "SHRINK: every one of Noya Plaza's 45,000 catchment women is also reached by a sibling, and it holds 3% of premium reviews.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether to downsize or consolidate into the sibling that shares most of its catchment. It is 0.11 below the HOLD line; only shared catchment falling to 61% would make it HOLD.",
+    "reasons": [
+      {
+        "claim": "100% of its catchment women live in cells another Bedashing lounge also reaches, so it scores 0 on cannibalisation.",
+        "evidence": [
+          {
+            "field": "shared_share",
+            "label": "Shared catchment",
+            "value": 1.0
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 0.0
+          },
+          {
+            "field": "contrib_cannibalisation",
+            "label": "Cannibalisation contribution",
+            "value": 0.0
+          }
+        ],
+        "topic": "cannibalisation"
+      },
+      {
+        "claim": "Against 8 premium substitutes in a pool of 38 it holds 3% of premium reviews, from 215 reviews, in a market with 220 premium reviews per 1k women.",
+        "evidence": [
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.0294
+          },
+          {
+            "field": "substitutes_k",
+            "label": "Premium substitutes",
+            "value": 8
+          },
+          {
+            "field": "premium_pool",
+            "label": "Premium salons in catchment",
+            "value": 38
+          },
+          {
+            "field": "lounge_reviews",
+            "label": "Google reviews",
+            "value": 215
+          },
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 219.7295
+          }
+        ],
+        "topic": "capture"
+      },
+      {
+        "claim": "About 45,000 women live within a 15-min drive, a demand score of 0.23.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 45036.5814
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.2252
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.0643
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "About 1,300 women captured by the review proxy, all living within reach of another Bedashing lounge, so this site adds little coverage the network doesn't already have. The call holds in all 81 assumption combinations.",
+    "source": "ai",
+    "subject_id": "noya-plaza",
+    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "c6770fa2111ab064": {
     "action": "WATCH",
@@ -4326,167 +4274,133 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
-  "d3bb034930d52dba": {
-    "action": "SHRINK",
-    "headline": "SHRINK: 98% of Westyas's 42,400 catchment women are also reached by a sibling, and its demand is low.",
-    "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review whether to downsize or consolidate into the sibling that shares most of its catchment. It is 0.12 below the HOLD line; only shared catchment falling to 55% would make it HOLD.",
+  "d52b6a065ba931c0": {
+    "action": "SUMMARY",
+    "headline": "Of 23 scored lounges, 3 are PROTECT, 15 HOLD and 5 SHRINK, and 5 growth areas pass both tests to GROW.",
+    "kind": "uae",
+    "now_what": "Investigate the 5 SHRINK lounges before their lease events, start site searches in the 5 GROW areas, and defend the 3 PROTECT lounges.",
     "reasons": [
       {
-        "claim": "98% of its catchment women live in cells another Bedashing lounge also reaches.",
+        "claim": "5 lounges are SHRINK, to investigate before their lease events: delma, khaleej-al-arabi, mohammed-bin-zayed-city, noya-plaza and westyas, the strongest at 0.28.",
         "evidence": [
           {
-            "field": "shared_share",
-            "label": "Shared catchment",
-            "value": 0.9823
+            "field": "shrink_count",
+            "label": "SHRINK",
+            "value": 5
           },
           {
-            "field": "score_cannibalisation",
-            "label": "Cannibalisation score",
-            "value": 0.0177
+            "field": "shrink_lounges",
+            "label": "SHRINK lounges",
+            "value": "delma, khaleej-al-arabi, mohammed-bin-zayed-city, noya-plaza, westyas"
           },
           {
-            "field": "contrib_cannibalisation",
-            "label": "Cannibalisation contribution",
-            "value": 0.0051
+            "field": "shrink_composite_max",
+            "label": "Strongest SHRINK composite",
+            "value": 0.2773
           }
         ],
-        "topic": "cannibalisation"
+        "topic": "shrink"
       },
       {
-        "claim": "About 42,400 women live within a 15-min drive, a demand score of 0.21.",
+        "claim": "5 areas are GROW, with 242,151 women 15+ between them, 11.1 to 43.8 km from the nearest lounge.",
         "evidence": [
           {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 42368.0713
+            "field": "grow_count",
+            "label": "GROW",
+            "value": 5
           },
           {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.2118
+            "field": "grow_areas",
+            "label": "GROW areas",
+            "value": "al-dhaid-sharjah, al-jerf-ajman, kalba-sharjah, khor-fakkan-sharjah, sharjah-sharjah"
           },
           {
-            "field": "contrib_demand",
-            "label": "Demand contribution",
-            "value": 0.0605
+            "field": "grow_women_total",
+            "label": "Women in GROW areas",
+            "value": 242151
+          },
+          {
+            "field": "grow_nearest_km_min",
+            "label": "Closest GROW area to a lounge",
+            "value": 11.0963
+          },
+          {
+            "field": "grow_nearest_km_max",
+            "label": "Furthest GROW area from a lounge",
+            "value": 43.7824
           }
         ],
-        "topic": "demand"
+        "topic": "grow"
       },
       {
-        "claim": "Its 4.6 rating is 0.2 below its rivals' 4.8 median.",
+        "claim": "3 lounges are PROTECT: al-ain, al-taif-mall and ras-al-khaimah, the weakest at 0.68.",
         "evidence": [
           {
-            "field": "lounge_rating",
-            "label": "Google rating",
-            "value": 4.6
+            "field": "protect_count",
+            "label": "PROTECT",
+            "value": 3
           },
           {
-            "field": "substitutes_median_rating",
-            "label": "Substitutes' median rating",
-            "value": 4.8
+            "field": "protect_lounges",
+            "label": "PROTECT lounges",
+            "value": "al-ain, al-taif-mall, ras-al-khaimah"
           },
           {
-            "field": "rating_gap",
-            "label": "Rating gap",
-            "value": -0.2
+            "field": "protect_composite_min",
+            "label": "Weakest PROTECT composite",
+            "value": 0.6762
           }
         ],
-        "topic": "rating"
-      }
-    ],
-    "so_what": "It holds 7% of premium reviews, about 3,000 women by the review proxy, in a market with 320 premium reviews per 1k women, and siblings reach almost all of them.",
-    "source": "ai",
-    "subject_id": "westyas",
-    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "d409b2c1e0131b98": {
-    "action": "HOLD",
-    "headline": "HOLD: mirdif-35's 232,000 addressable women carry it to mid-band, while it holds 3% of premium reviews.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. It is 0.15 above the SHRINK line; on its own, addressable women falling to 96,820 would make it SHRINK.",
-    "reasons": [
-      {
-        "claim": "Demand is at the top of the scale: 232,000 addressable women, women-weighted rent AED 90,000, rents observed for 93% of them.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 231813.0706
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 1.0
-          },
-          {
-            "field": "affluence_rent",
-            "label": "Affluence rent",
-            "value": 90000.0
-          },
-          {
-            "field": "affluence_coverage",
-            "label": "Affluence coverage",
-            "value": 0.9293
-          }
-        ],
-        "topic": "demand"
+        "topic": "protect"
       },
       {
-        "claim": "Against 23 premium substitutes in a pool of 85 it holds 3% of premium reviews, in a market with 177 premium reviews per 1k women.",
+        "claim": "15 lounges sit in the HOLD band and 10 of the 23 calls are low confidence.",
         "evidence": [
           {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.0265
+            "field": "hold_count",
+            "label": "HOLD",
+            "value": 15
           },
           {
-            "field": "substitutes_k",
-            "label": "Premium substitutes",
+            "field": "low_confidence_count",
+            "label": "Low-confidence calls",
+            "value": 10
+          },
+          {
+            "field": "lounges_scored",
+            "label": "Lounges scored",
             "value": 23
-          },
-          {
-            "field": "premium_pool",
-            "label": "Premium salons in catchment",
-            "value": 85
-          },
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 177.194
           }
         ],
-        "topic": "capture"
+        "topic": "confidence"
       },
       {
-        "claim": "Its 4.5 rating is 0.2 below its rivals' 4.7 median.",
+        "claim": "There is no revenue or rent data, so these are location and market calls from 3,833 searched salons, not return-on-capital calls.",
         "evidence": [
           {
-            "field": "lounge_rating",
-            "label": "Google rating",
-            "value": 4.5
+            "field": "revenue_data_available",
+            "label": "Revenue data",
+            "value": false
           },
           {
-            "field": "substitutes_median_rating",
-            "label": "Substitutes' median rating",
-            "value": 4.7
+            "field": "rent_data_available",
+            "label": "Rent data",
+            "value": false
           },
           {
-            "field": "rating_gap",
-            "label": "Rating gap",
-            "value": -0.2
+            "field": "salons_total",
+            "label": "Salons searched",
+            "value": 3833
           }
         ],
-        "topic": "rating"
+        "topic": "data_gaps"
       }
     ],
-    "so_what": "About 6,200 women captured by the review proxy; 52% of its catchment women are also reached by a sibling.",
+    "so_what": "About 242,000 women live in the 5 GROW areas, beyond a 15-min drive of every lounge, while 5 lounges need a closer look; with 10 low-confidence calls, this is a shortlist to test, not a set of decisions.",
     "source": "ai",
-    "subject_id": "mirdif-35",
-    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "subject_id": "uae",
+    "table_caption": "Lounge calls come from a fixed-scale scorecard of demand, cannibalisation, capture and rating; growth-area calls from two tests, size and premium saturation. Counts cover the 23 scored lounges; the airport lounge is not scored.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
   "d88e98b64deb3e46": {
     "action": "WATCH",
@@ -4867,5 +4781,86 @@
     "subject_id": "al-sader-abu-dhabi",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
+  "f9734a2311cabc13": {
+    "action": "HOLD",
+    "headline": "HOLD, low confidence: Al Maqta's composite of 0.353 sits just 0.003 above the SHRINK line, held up by 126,000 catchment women while every one of them is also reached by a sibling.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. On its own, capture slipping from 5.3% to 5.2% of premium reviews would make it SHRINK, so check it again before its lease event.",
+    "reasons": [
+      {
+        "claim": "100% of its catchment women live in cells another Bedashing lounge also reaches, so it scores 0 on cannibalisation.",
+        "evidence": [
+          {
+            "field": "shared_share",
+            "label": "Shared catchment",
+            "value": 1.0
+          },
+          {
+            "field": "score_cannibalisation",
+            "label": "Cannibalisation score",
+            "value": 0.0
+          },
+          {
+            "field": "contrib_cannibalisation",
+            "label": "Cannibalisation contribution",
+            "value": 0.0
+          }
+        ],
+        "topic": "cannibalisation"
+      },
+      {
+        "claim": "Against 20 premium substitutes in a pool of 87 it holds 5.3% of premium reviews, in a market with 278 premium reviews per 1k women.",
+        "evidence": [
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.0533
+          },
+          {
+            "field": "substitutes_k",
+            "label": "Premium substitutes",
+            "value": 20
+          },
+          {
+            "field": "premium_pool",
+            "label": "Premium salons in catchment",
+            "value": 87
+          },
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 277.8362
+          }
+        ],
+        "topic": "capture"
+      },
+      {
+        "claim": "About 126,100 women live within a 15-min drive, a demand score of 0.63, the signal that keeps it out of SHRINK.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 126053.6265
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.6303
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.1801
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "This is a knife-edge call: 0.003 of composite separates it from SHRINK, so treat it as a SHRINK candidate that just cleared the line, not a cleared site. All of its about 6,700 captured women live in cells a sibling also reaches.",
+    "source": "ai",
+    "subject_id": "al-maqta",
+    "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   }
 }

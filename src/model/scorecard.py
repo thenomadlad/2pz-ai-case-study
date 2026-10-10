@@ -37,7 +37,7 @@ SIGNALS: tuple[Signal, ...] = (
            "premium market (under 10 premium salons) a share of a tiny pool is noisy, so the score is pulled "
            "toward 0.5 in proportion: with n premium salons it keeps n/10 of its distance from 0.5. A blend, "
            "not a cliff, so one more salon can't swing the score."),
-    Signal("rating", "rating_gap", "Rating minus the substitutes' median rating (stars)", -0.3, 0.3,
+    Signal("rating", "rating_gap", "Rating minus the premium salons' median rating (stars)", -0.3, 0.3,
            "Gaps run -0.2 to +0.3, median -0.1: most lounges rate slightly below their premium "
            "substitutes; ±0.3 stars covers the whole range. Half weight: Google ratings come in "
            "0.1 steps, so the gap takes only a handful of values.", 0.5),

@@ -20,6 +20,7 @@ from src.webapp.views import (
     affluence_metrics,
     badge,
     banner,
+    emirate_filter,
     explanation_for,
     lounge_caveats,
     render_caveats,
@@ -83,7 +84,8 @@ def render() -> None:
     r = data.current()
     labels = {f.branch_id: f"{f.name} · {d.action}" for f, d in zip(r.features, r.decisions)}
     wanted = st.query_params.get("lounge")
-    b = url_picker("Lounge", "lounge", sorted(labels), labels.get, "lounge-pick")
+    options = emirate_filter(sorted(labels), {f.branch_id: f.emirate for f in r.features}, "lounge", "lounge-em")
+    b = url_picker("Lounge", "lounge", options, labels.get, "lounge-pick")
     st.page_link(nav.OVERVIEW, label="Back to overview", icon="⬅️", query_params={"lounge": b})
     banner()
     if wanted in r.closed:

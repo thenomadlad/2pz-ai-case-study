@@ -124,6 +124,36 @@ def test_area_page_caveats():
     assert "covers only 3%" in _text(_page("area", area="madinat-hind-4-dubai"))
 
 
+def test_area_picker_leaves_out_areas_under_the_skip_floor():
+    from src.baseline import run
+    from src.model import growth
+    r = run()
+    thin = next(a.area_id for a in r.areas if a.women < growth.SKIP_UNDER_WOMEN)
+    at = _page("area", area=thin)
+    opts = at.selectbox(key="area-pick").options
+    shown = {"Abu Dhabi", "Dubai"}       # the default emirates (a thin area's own emirate isn't ticked)
+    assert len(opts) == sum(a.women >= growth.SKIP_UNDER_WOMEN and a.emirate in shown for a in r.areas)
+    assert "isn't listed in this view" in _text(at)
+
+
+def test_pickers_filter_by_emirate_abu_dhabi_and_dubai_by_default():
+    from src.baseline import run
+    r = run()
+    emirate = {f"{f.name} · {d.action}": f.emirate for f, d in zip(r.features, r.decisions)}   # option labels
+    at = _page("lounge")
+    assert at.checkbox(key="lounge-em-Abu Dhabi").value and at.checkbox(key="lounge-em-Dubai").value
+    assert not at.checkbox(key="lounge-em-Sharjah").value
+    assert {emirate[b] for b in at.selectbox(key="lounge-pick").options} == {"Abu Dhabi", "Dubai"}
+    # a deep link outside the defaults ticks its emirate and shows it, never something else
+    at = _page("lounge", lounge="ras-al-khaimah")
+    assert at.checkbox(key="lounge-em-Ras Al Khaimah").value
+    assert at.selectbox(key="lounge-pick").value == "ras-al-khaimah"
+    # unticking narrows the list
+    at = _page("lounge")
+    at.checkbox(key="lounge-em-Dubai").uncheck().run()
+    assert {emirate[b] for b in at.selectbox(key="lounge-pick").options} == {"Abu Dhabi"}
+
+
 def test_how_page_renders_limitations_market_model_and_every_assumption():
     at = _page("how")
     assert not at.exception

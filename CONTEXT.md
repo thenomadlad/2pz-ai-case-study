@@ -71,6 +71,12 @@ The lounge's Google reviews ÷ (its own + its substitutes' reviews, scaled up by
 correction). A proxy for its share of premium customers in its catchment, not market penetration.
 _Avoid_: market share, fair share
 
+**Rating gap**:
+The lounge's Google rating minus the median rating of the premium salons in its catchment with 20+
+reviews (the whole premium pool, not the substitutes: their number grows with the pool, so one added
+salon could change which ones count). Context, not a lever: the scorecard gives it half weight.
+_Avoid_: substitutes' median
+
 **Search recall**:
 The estimated share of premium reviews our search finds where its circles hit Google's 20-result
 cap (0.66, calibrated on one fully swept tile). Substitutes' reviews are scaled up by it where the
