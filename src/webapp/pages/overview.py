@@ -106,7 +106,7 @@ def _area_legend(r) -> None:
 def _lounge_panel(r, b: str) -> None:
     f = next((f for f in r.features if f.branch_id == b), None)
     if f is None:
-        st.caption(f"{b} is closed in this what-if." if b in r.closed else f"Unknown lounge id: {b}.")
+        st.caption(f"{b} is closed in this what-if." if b in r.closed else "Unknown lounge in the link.")
         return
     d = next(d for d in r.decisions if d.branch_id == b)
     exp, _ = explanation_for(r, "lounge", b)
@@ -125,7 +125,7 @@ def _lounge_panel(r, b: str) -> None:
 def _area_panel(r, area_id: str) -> None:
     a = next((a for a in r.areas if a.area_id == area_id), None)
     if a is None:
-        st.caption(f"{area_id} is not a growth area in this what-if (a lounge reaches it).")
+        st.caption("That area isn't a growth area in this what-if (a lounge reaches it), or the link is wrong.")
         return
     d = next(d for d in r.area_decisions if d.area_id == area_id)
     exp, _ = explanation_for(r, "area", area_id)
@@ -168,7 +168,8 @@ def render() -> None:
     layers = map_layers(r, lounge if lounge in open_ else None, show_areas, show_skip, show_subs,
                         show_affluence)
     st.pydeck_chart(build_deck(layers), on_select="rerun", selection_mode="single-object", key=map_key)
-    _legend(r, lounge, show_affluence)
+    # Only known ids reach markdown: the URL value is untrusted.
+    _legend(r, lounge if lounge in open_ else None, show_affluence)
     if lounge:
         _lounge_panel(r, lounge)
     elif area_id:

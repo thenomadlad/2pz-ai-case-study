@@ -179,3 +179,12 @@ def test_overview_affluence_toggle_adds_the_layer_and_its_legend():
     box.check().run()
     assert not at.exception
     assert "uncoloured cells have no data" in _text(at)
+
+
+def test_untrusted_url_ids_never_reach_markdown():
+    evil = "[click](https://evil.example)"
+    for page, key in (("overview", "lounge"), ("overview", "area"), ("area", "area"), ("lounge", "lounge")):
+        at = _page(page, **{key: evil})
+        assert not at.exception
+        shown = [e.value for kind in ("markdown", "caption", "info") for e in getattr(at, kind)]
+        assert not any("evil.example" in str(v) for v in shown), (page, key)

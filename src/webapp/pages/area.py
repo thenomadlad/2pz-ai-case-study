@@ -55,7 +55,8 @@ def render() -> None:
     st.page_link(nav.OVERVIEW, label="Back to overview", icon="⬅️", query_params={"area": area_id})
     banner()
     if wanted and wanted not in by_id:
-        st.info(f"{wanted} is not a growth area in this view (a lounge reaches it); showing {area_id}.")
+        st.info(f"That area isn't a growth area in this view (a lounge reaches it), or the link is wrong; "
+                f"showing {area_id}.")
 
     a = by_id[area_id]
     d = next(d for d in r.area_decisions if d.area_id == area_id)
