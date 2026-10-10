@@ -78,7 +78,7 @@ The rents are DLD Ejari contracts for one flat, villa or studio, registered 2026
 - **The elasticity is an assumption** (off 0 / medium 0.5 / strong 1). No data ties salon spend to
   rent.
 - **Touches:** demand for the five Dubai lounges and zawaya-walk (3% observed), and the size test
-  of the 43 growth areas with any observed rent, all in Dubai. **No call changes** at any
+  of the 40 growth areas with any observed rent, all in Dubai. **No call changes** at any
   elasticity: the four big Dubai lounges sit above the 200k demand anchor weighted or not, and
   jumeirah-park and zawaya-walk move by under 0.02. **al-awir-dubai** (19.4k women, 20.1k
   addressable at medium) passes the size line only through the weighting, on one DLD area (Al
@@ -164,14 +164,24 @@ Competitors come from Google Places nearby searches on 1.8 km circles. Each sear
 
 ## 8. Growth areas are a first cut
 
-Growth areas are populated cells beyond a 15-min drive of every scored lounge, grouped by OSM place
-name and split into contiguous pieces.
+Growth areas are populated cells beyond a 15-min drive of every scored lounge, one area per OSM place
+name (and emirate), whether its cells touch or not.
 
+- **Unnamed cells make no growth area.** 67 populated cells outside every catchment (about 34k
+  women, 30 of the cells in Dubai) have no OSM admin boundary or place within 3 km, so their only
+  name is their emirate's. They stay in catchments, overlap and population totals, but are not
+  offered as growth areas: nothing actionable is known about where they are, and merged by name they would
+  become one meaningless "Dubai" area scattered across the emirate.
+- **Merging by name can add up scattered pieces.** Same-named cells that don't touch now count as
+  one area, so a place can pass the size test on pieces no single site would reach: Habshan's 21
+  cells span ~39 km centre to centre, and the GROW "Sharjah" area's 53 span ~33 km. Splitting into
+  contiguous pieces had the opposite fault (one place in several fragments, each judged on its own). The
+  area page's cell map shows the spread.
 - **Competitor data is partial.** Cells outside the catchments were searched only where they hold
   2,000+ women. Areas with under 50% of their women searched are capped at WATCH, and their
-  saturation is computed over the searched cells only. 540 of 580 areas are SKIP; most are small.
+  saturation is computed over the searched cells only. 372 of 413 areas are SKIP; most are small.
 - **Non-residential places are skipped by name.** WorldPop puts people in industrial zones, free
-  zones, military bases, airports and ports; 29 areas with such names are SKIP before any test. Small,
+  zones, military bases, airports and ports; 20 areas with such names are SKIP before any test. Small,
   unsaturated areas that are mostly worker housing are SKIP too. Camps without such a name get through
   on their worker share alone. Dubai Investments Park stays WATCH at 4% worker housing (see 6), and we
   accept that: it is mixed-use, with residential communities alongside the industrial plots, so it is
@@ -192,10 +202,10 @@ name and split into contiguous pieces.
   women, 20.1k addressable at medium, against a 20k line, with rents for 38% of its women.
 - **4 of the 5 GROW areas are in Sharjah emirate** (Sharjah, Al Dhaid, Khor Fakkan, Kalba); the
   fifth is Al Jerf in Ajman. The Sharjah four are beyond a 15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), both on the Dubai
-  side; the "Sharjah" area's centre is ~13 km from al-jada. The business question is why the
+  side; the "Sharjah" area's centre is ~9.7 km from al-jada. The business question is why the
   Sharjah footprint is only two lounges. The model can't see licensing, brand fit,
-  landlord terms or customer mix. "Sharjah" is one 91k-women area. It's contiguous, so it wasn't
-  split, and it may support more than one site.
+  landlord terms or customer mix. "Sharjah" is one 106k-women area over 53 cells, and it may
+  support more than one site.
 - Distance to the nearest lounge is a straight line, not a drive.
 - **Fix:** competitor searches for the remaining cells (~2,000 calls), drive-time catchments
   around candidate sites, and a business view on why Sharjah has only two lounges.

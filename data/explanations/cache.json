@@ -196,6 +196,87 @@
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
+  "0962f726fdce983d": {
+    "action": "WATCH",
+    "headline": "WATCH: Al Sad has no premium salon in the cells we searched, but its 6,700 addressable women are 13,300 short of the 20,000 a lounge needs.",
+    "kind": "area",
+    "now_what": "Don't act now: revisit if the market grows by about 13,300 addressable women; competition is not what holds it back.",
+    "reasons": [
+      {
+        "claim": "About 6,700 addressable women live here, 13,300 short of the 20,000 line.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 6698.3499
+          },
+          {
+            "field": "grow_min_women",
+            "label": "Size line",
+            "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": -13302
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": false
+          }
+        ],
+        "topic": "size"
+      },
+      {
+        "claim": "No premium salon was found in the searched cells, so premium saturation is 0, 150 under the line.",
+        "evidence": [
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 0.0
+          },
+          {
+            "field": "premium_salons",
+            "label": "Premium salons",
+            "value": 0
+          },
+          {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
+            "field": "saturation_gap",
+            "label": "Saturation gap",
+            "value": 150.0
+          }
+        ],
+        "topic": "saturation"
+      },
+      {
+        "claim": "The nearest lounge, al-ain, is 19 km away in a straight line, beyond a 15-min drive.",
+        "evidence": [
+          {
+            "field": "nearest_lounge_km",
+            "label": "Distance to nearest lounge",
+            "value": 19.0153
+          },
+          {
+            "field": "nearest_lounge_id",
+            "label": "Nearest lounge",
+            "value": "al-ain"
+          }
+        ],
+        "topic": "reach"
+      }
+    ],
+    "so_what": "An empty premium market, 61% of it searched, but too few women to carry a lounge: opening here would leave a site underfilled.",
+    "source": "ai",
+    "subject_id": "al-sad-abu-dhabi",
+    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
+    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
   "0e6ce32ab03c7fab": {
     "action": "WATCH",
     "headline": "WATCH: Al Marmoom has little premium competition, but its 5,100 addressable women are 14,900 short of the 20,000 a lounge needs.",
@@ -418,77 +499,6 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
-  "1cc77ea0df4b4d8e": {
-    "action": "GROW",
-    "headline": "GROW: Kalba passes both tests, with 23,500 women and 44 premium reviews per 1k women, though it clears the size line by only 3,464.",
-    "kind": "area",
-    "now_what": "Start a site search here: a shortlist for a site visit and lease search, verified on the ground before committing. It would drop to WATCH if addressable women fell by 3,464, or if premium saturation rose by 106 reviews per 1k women.",
-    "reasons": [
-      {
-        "claim": "23,464 addressable women live here, 3,464 above the 20,000 line.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 23464.2586
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": 3464
-          },
-          {
-            "field": "grow_min_women",
-            "label": "Size line",
-            "value": 20000
-          }
-        ],
-        "topic": "size"
-      },
-      {
-        "claim": "6 premium salons give 44 premium reviews per 1k women, 106 under the 150 line.",
-        "evidence": [
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 44.0921
-          },
-          {
-            "field": "premium_salons",
-            "label": "Premium salons",
-            "value": 6
-          },
-          {
-            "field": "saturation_gap",
-            "label": "Saturation gap",
-            "value": 105.9079
-          }
-        ],
-        "topic": "saturation"
-      },
-      {
-        "claim": "The nearest lounge, al-taif-mall, is 11.1 km away in a straight line, beyond a 15-min drive.",
-        "evidence": [
-          {
-            "field": "nearest_lounge_km",
-            "label": "Distance to nearest lounge",
-            "value": 11.0963
-          },
-          {
-            "field": "nearest_lounge_id",
-            "label": "Nearest lounge",
-            "value": "al-taif-mall"
-          }
-        ],
-        "topic": "reach"
-      }
-    ],
-    "so_what": "About 23,500 women 15+ beyond a 15-min drive of every lounge, 98% of them searched. Confidence is medium: the size headroom is thin.",
-    "source": "ai",
-    "subject_id": "kalba-sharjah",
-    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
-    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
-  },
   "1db6764b81f0134f": {
     "action": "WATCH",
     "headline": "WATCH: Shiab Al Ashkhar has little premium competition, but its 6,500 addressable women are 13,500 short of the 20,000 a lounge needs.",
@@ -702,6 +712,87 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
+  "26b14f44fc3c5daf": {
+    "action": "GROW",
+    "headline": "GROW: this Sharjah area has about 106,000 women and 73 premium reviews per 1k women, passing both tests with room to spare.",
+    "kind": "area",
+    "now_what": "Start a site search here: a shortlist for a site visit and lease search, verified on the ground before committing. It has 86,079 women of headroom and 77 reviews per 1k under the saturation line; the women are spread over 53 cells, so the site visit should find where they cluster.",
+    "reasons": [
+      {
+        "claim": "About 106,100 addressable women live here, 86,079 above the 20,000 line.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 106079.0591
+          },
+          {
+            "field": "grow_min_women",
+            "label": "Size line",
+            "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": 86079
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": true
+          }
+        ],
+        "topic": "size"
+      },
+      {
+        "claim": "26 premium salons give 73 premium reviews per 1k women, 77 under the 150 line.",
+        "evidence": [
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 72.9351
+          },
+          {
+            "field": "premium_salons",
+            "label": "Premium salons",
+            "value": 26
+          },
+          {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
+            "field": "saturation_gap",
+            "label": "Saturation gap",
+            "value": 77.0649
+          }
+        ],
+        "topic": "saturation"
+      },
+      {
+        "claim": "The nearest lounge, al-jada, is 9.7 km away in a straight line, beyond a 15-min drive.",
+        "evidence": [
+          {
+            "field": "nearest_lounge_km",
+            "label": "Distance to nearest lounge",
+            "value": 9.6915
+          },
+          {
+            "field": "nearest_lounge_id",
+            "label": "Nearest lounge",
+            "value": "al-jada"
+          }
+        ],
+        "topic": "reach"
+      }
+    ],
+    "so_what": "About 106,000 women 15+ no lounge reaches today, 97% of them searched, with 26 premium salons already competing for them; 11% of adults live in worker housing, well under the 50% cap. A lounge here would add to the network's market rather than split a sibling's. High confidence.",
+    "source": "ai",
+    "subject_id": "sharjah-sharjah",
+    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
+    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
   "2c4036473605ff84": {
     "action": "WATCH",
     "headline": "WATCH: Al Dhahir has little premium competition, but its 10,500 addressable women are 9,500 short of the 20,000 a lounge needs.",
@@ -875,6 +966,134 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
+  "34a149d7ef8b07d5": {
+    "action": "SUMMARY",
+    "headline": "Of 23 scored lounges, 3 are PROTECT, 15 HOLD and 5 SHRINK, and 5 of 413 growth areas pass both tests to GROW.",
+    "kind": "uae",
+    "now_what": "Investigate the 5 SHRINK lounges before their lease events, start site searches in the 5 GROW areas, and defend the 3 PROTECT lounges.",
+    "reasons": [
+      {
+        "claim": "5 lounges are SHRINK, to investigate before their lease events: delma, khaleej-al-arabi, mohammed-bin-zayed-city, noya-plaza and westyas, the strongest at 0.28.",
+        "evidence": [
+          {
+            "field": "shrink_count",
+            "label": "SHRINK",
+            "value": 5
+          },
+          {
+            "field": "shrink_lounges",
+            "label": "SHRINK lounges",
+            "value": "delma, khaleej-al-arabi, mohammed-bin-zayed-city, noya-plaza, westyas"
+          },
+          {
+            "field": "shrink_composite_max",
+            "label": "Strongest SHRINK composite",
+            "value": 0.2773
+          }
+        ],
+        "topic": "shrink"
+      },
+      {
+        "claim": "5 areas are GROW, with about 262,000 women 15+ between them, 9.7 to 43.8 km from the nearest lounge.",
+        "evidence": [
+          {
+            "field": "grow_count",
+            "label": "GROW",
+            "value": 5
+          },
+          {
+            "field": "grow_areas",
+            "label": "GROW areas",
+            "value": "al-dhaid-sharjah, al-jerf-ajman, kalba-sharjah, khor-fakkan-sharjah, sharjah-sharjah"
+          },
+          {
+            "field": "grow_women_total",
+            "label": "Women in GROW areas",
+            "value": 261797
+          },
+          {
+            "field": "grow_nearest_km_min",
+            "label": "Closest GROW area to a lounge",
+            "value": 9.6915
+          },
+          {
+            "field": "grow_nearest_km_max",
+            "label": "Furthest GROW area from a lounge",
+            "value": 43.7824
+          }
+        ],
+        "topic": "grow"
+      },
+      {
+        "claim": "3 lounges are PROTECT: al-ain, al-taif-mall and ras-al-khaimah, the weakest at 0.68.",
+        "evidence": [
+          {
+            "field": "protect_count",
+            "label": "PROTECT",
+            "value": 3
+          },
+          {
+            "field": "protect_lounges",
+            "label": "PROTECT lounges",
+            "value": "al-ain, al-taif-mall, ras-al-khaimah"
+          },
+          {
+            "field": "protect_composite_min",
+            "label": "Weakest PROTECT composite",
+            "value": 0.6762
+          }
+        ],
+        "topic": "protect"
+      },
+      {
+        "claim": "15 lounges sit in the HOLD band and 10 of the 23 calls are low confidence.",
+        "evidence": [
+          {
+            "field": "hold_count",
+            "label": "HOLD",
+            "value": 15
+          },
+          {
+            "field": "low_confidence_count",
+            "label": "Low-confidence calls",
+            "value": 10
+          },
+          {
+            "field": "lounges_scored",
+            "label": "Lounges scored",
+            "value": 23
+          }
+        ],
+        "topic": "confidence"
+      },
+      {
+        "claim": "There is no revenue or rent data, so these are location and market calls from 3,833 searched salons, not return-on-capital calls.",
+        "evidence": [
+          {
+            "field": "revenue_data_available",
+            "label": "Revenue data",
+            "value": false
+          },
+          {
+            "field": "rent_data_available",
+            "label": "Rent data",
+            "value": false
+          },
+          {
+            "field": "salons_total",
+            "label": "Salons searched",
+            "value": 3833
+          }
+        ],
+        "topic": "data_gaps"
+      }
+    ],
+    "so_what": "About 262,000 women live in the 5 GROW areas, beyond a 15-min drive of every lounge, while 5 lounges need a closer look; with 10 low-confidence calls, this is a shortlist to test, not a set of decisions.",
+    "source": "ai",
+    "subject_id": "uae",
+    "table_caption": "Lounge calls come from a fixed-scale scorecard of demand, cannibalisation, capture and rating; growth-area calls from two tests, size and premium saturation. Counts cover the 23 scored lounges; the airport lounge is not scored.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
   "37f34f7815408dc1": {
     "action": "PROTECT",
     "headline": "PROTECT: Al Ain shares none of its 102,000 catchment women with a sibling and holds 12% of premium reviews, for a composite of 0.77.",
@@ -956,6 +1175,87 @@
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
+  "3ba70a8ed4b71151": {
+    "action": "WATCH",
+    "headline": "WATCH: Zakhir has no premium salon in the cells we searched, but its 8,100 addressable women are 11,900 short of the 20,000 a lounge needs.",
+    "kind": "area",
+    "now_what": "Don't act now: revisit if the market grows by about 11,900 addressable women; competition is not what holds it back.",
+    "reasons": [
+      {
+        "claim": "About 8,100 addressable women live here, 11,900 short of the 20,000 line.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 8067.9576
+          },
+          {
+            "field": "grow_min_women",
+            "label": "Size line",
+            "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": -11932
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": false
+          }
+        ],
+        "topic": "size"
+      },
+      {
+        "claim": "No premium salon was found in the searched cells, so premium saturation is 0, 150 under the line.",
+        "evidence": [
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 0.0
+          },
+          {
+            "field": "premium_salons",
+            "label": "Premium salons",
+            "value": 0
+          },
+          {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
+            "field": "saturation_gap",
+            "label": "Saturation gap",
+            "value": 150.0
+          }
+        ],
+        "topic": "saturation"
+      },
+      {
+        "claim": "The nearest lounge, al-ain, is 11.8 km away in a straight line, beyond a 15-min drive.",
+        "evidence": [
+          {
+            "field": "nearest_lounge_km",
+            "label": "Distance to nearest lounge",
+            "value": 11.7851
+          },
+          {
+            "field": "nearest_lounge_id",
+            "label": "Nearest lounge",
+            "value": "al-ain"
+          }
+        ],
+        "topic": "reach"
+      }
+    ],
+    "so_what": "An empty premium market, 85% of it searched, but too few women to carry a lounge: opening here would leave a site underfilled.",
+    "source": "ai",
+    "subject_id": "zakhir-abu-dhabi",
+    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
+    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
   "40414595b55c2570": {
     "action": "WATCH",
     "headline": "WATCH: Al Ramlah has little premium competition, but its 12,700 addressable women are 7,300 short of the 20,000 a lounge needs.",
@@ -1027,40 +1327,126 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
-  "43fb4e97b36fddb9": {
+  "40ad630e6941c8b2": {
     "action": "WATCH",
-    "headline": "WATCH: Al Batayih has little premium competition, but its 5,300 addressable women are 14,700 short of the 20,000 a lounge needs.",
+    "headline": "WATCH: Al Bihouth has no premium salon in the cells we searched, but its 5,900 addressable women are 14,100 short of the 20,000 a lounge needs.",
     "kind": "area",
-    "now_what": "Don't act now: revisit if the market grows by about 14,700 addressable women.",
+    "now_what": "Don't act now: revisit if the market grows by about 14,100 addressable women; competition is not what holds it back.",
     "reasons": [
       {
-        "claim": "About 5,300 addressable women live here, 14,700 short of the 20,000 line.",
+        "claim": "About 5,900 addressable women live here, 14,100 short of the 20,000 line.",
         "evidence": [
           {
             "field": "addressable_women",
             "label": "Addressable women 15+",
-            "value": 5295.6553
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": -14704
+            "value": 5888.8564
           },
           {
             "field": "grow_min_women",
             "label": "Size line",
             "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": -14111
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": false
           }
         ],
         "topic": "size"
       },
       {
-        "claim": "1 premium salon gives 5.6 premium reviews per 1k women, 144 under the 150 line.",
+        "claim": "No premium salon was found in the searched cells, so premium saturation is 0, 150 under the line.",
         "evidence": [
           {
             "field": "premium_reviews_per_1k",
             "label": "Premium saturation",
-            "value": 5.581
+            "value": 0.0
+          },
+          {
+            "field": "premium_salons",
+            "label": "Premium salons",
+            "value": 0
+          },
+          {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
+            "field": "saturation_gap",
+            "label": "Saturation gap",
+            "value": 150.0
+          }
+        ],
+        "topic": "saturation"
+      },
+      {
+        "claim": "The nearest lounge, baniyas, is 12.1 km away in a straight line, beyond a 15-min drive.",
+        "evidence": [
+          {
+            "field": "nearest_lounge_km",
+            "label": "Distance to nearest lounge",
+            "value": 12.0536
+          },
+          {
+            "field": "nearest_lounge_id",
+            "label": "Nearest lounge",
+            "value": "baniyas"
+          }
+        ],
+        "topic": "reach"
+      }
+    ],
+    "so_what": "An empty premium market, 72% of it searched, but too few women to carry a lounge: opening here would leave a site underfilled.",
+    "source": "ai",
+    "subject_id": "al-bihouth-abu-dhabi",
+    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
+    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
+  "45268f8da77e45ba": {
+    "action": "WATCH",
+    "headline": "WATCH: Al Madam has about 39,000 women, but our salon search covered only 37% of them, too little to confirm it is unsaturated.",
+    "kind": "area",
+    "now_what": "Don't act now: revisit when the salon search covers at least 50% of its women; it is 13% short.",
+    "reasons": [
+      {
+        "claim": "About 39,000 addressable women live here, 18,980 above the 20,000 line.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 38980.1753
+          },
+          {
+            "field": "grow_min_women",
+            "label": "Size line",
+            "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": 18980
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": true
+          }
+        ],
+        "topic": "size"
+      },
+      {
+        "claim": "In the searched cells, 1 premium salon gives 1.1 premium reviews per 1k women, 149 under the 150 line.",
+        "evidence": [
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 1.0507
           },
           {
             "field": "premium_salons",
@@ -1068,36 +1454,41 @@
             "value": 1
           },
           {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
             "field": "saturation_gap",
             "label": "Saturation gap",
-            "value": 144.419
+            "value": 148.9493
           }
         ],
         "topic": "saturation"
       },
       {
-        "claim": "The nearest lounge, al-jada, is 23.6 km away in a straight line, beyond a 15-min drive.",
+        "claim": "The nearest lounge, mirdif-35, is 46.7 km away in a straight line, beyond a 15-min drive.",
         "evidence": [
           {
             "field": "nearest_lounge_km",
             "label": "Distance to nearest lounge",
-            "value": 23.5965
+            "value": 46.7161
           },
           {
             "field": "nearest_lounge_id",
             "label": "Nearest lounge",
-            "value": "al-jada"
+            "value": "mirdif-35"
           }
         ],
         "topic": "reach"
       },
       {
-        "claim": "Our salon search covered 30% of its women, 20% short of the 50% GROW needs.",
+        "claim": "Our salon search covered 37% of its women, 13% short of the 50% GROW needs.",
         "evidence": [
           {
             "field": "data_coverage",
             "label": "Competitor data coverage",
-            "value": 0.3045
+            "value": 0.3662
           },
           {
             "field": "min_coverage",
@@ -1107,15 +1498,15 @@
           {
             "field": "coverage_gap",
             "label": "Coverage gap",
-            "value": -0.1955
+            "value": -0.1338
           }
         ],
         "topic": "data_gap"
       }
     ],
-    "so_what": "About 5,300 women 15+, with 1 premium salon nearby: too few women to carry a lounge. Only 30% of them were searched, so confidence is low.",
+    "so_what": "A large market far from every lounge: if the unsearched cells are as empty as the searched ones it would pass both tests, but until they are searched a site search could walk into competition we cannot see.",
     "source": "ai",
-    "subject_id": "al-batayih-sharjah-2",
+    "subject_id": "al-madam-sharjah",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
@@ -1247,169 +1638,6 @@
     "so_what": "About 31,200 women 15+ with no lounge within a 15-min drive, 94% of them searched, and clear room under the saturation line: high confidence.",
     "source": "ai",
     "subject_id": "khor-fakkan-sharjah",
-    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
-    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
-  },
-  "49042cde078c5acc": {
-    "action": "WATCH",
-    "headline": "WATCH: Milehah has little premium competition, but its 12,000 addressable women are 8,000 short of the 20,000 a lounge needs.",
-    "kind": "area",
-    "now_what": "Don't act now: revisit if the market grows by about 8,000 addressable women.",
-    "reasons": [
-      {
-        "claim": "About 12,000 addressable women live here, 8,000 short of the 20,000 line.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 12043.0852
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": -7957
-          },
-          {
-            "field": "grow_min_women",
-            "label": "Size line",
-            "value": 20000
-          }
-        ],
-        "topic": "size"
-      },
-      {
-        "claim": "No premium salons were found in the searched cells, so premium saturation is 0, 150 under the line.",
-        "evidence": [
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 0.0
-          },
-          {
-            "field": "premium_salons",
-            "label": "Premium salons",
-            "value": 0
-          },
-          {
-            "field": "saturation_gap",
-            "label": "Saturation gap",
-            "value": 150.0
-          }
-        ],
-        "topic": "saturation"
-      },
-      {
-        "claim": "The nearest lounge, al-taif-mall, is 43.9 km away in a straight line, beyond a 15-min drive.",
-        "evidence": [
-          {
-            "field": "nearest_lounge_km",
-            "label": "Distance to nearest lounge",
-            "value": 43.8843
-          },
-          {
-            "field": "nearest_lounge_id",
-            "label": "Nearest lounge",
-            "value": "al-taif-mall"
-          }
-        ],
-        "topic": "reach"
-      }
-    ],
-    "so_what": "About 12,000 women 15+, with no premium salon found: too few women to carry a lounge.",
-    "source": "ai",
-    "subject_id": "milehah-sharjah",
-    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
-    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
-  },
-  "4aefef08e9862c1d": {
-    "action": "WATCH",
-    "headline": "WATCH: Al Madam has 33,700 women, but our salon search covered only 42% of them, too little to confirm it is unsaturated.",
-    "kind": "area",
-    "now_what": "Don't act now: revisit when the salon search covers at least 50% of its women; it is 8% short.",
-    "reasons": [
-      {
-        "claim": "About 33,700 addressable women live here, 13,700 above the 20,000 line.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 33678.5487
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": 13679
-          },
-          {
-            "field": "grow_min_women",
-            "label": "Size line",
-            "value": 20000
-          }
-        ],
-        "topic": "size"
-      },
-      {
-        "claim": "In the searched cells, 1 premium salon gives 1.1 premium reviews per 1k women, 149 under the 150 line.",
-        "evidence": [
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 1.0507
-          },
-          {
-            "field": "premium_salons",
-            "label": "Premium salons",
-            "value": 1
-          },
-          {
-            "field": "saturation_gap",
-            "label": "Saturation gap",
-            "value": 148.9493
-          }
-        ],
-        "topic": "saturation"
-      },
-      {
-        "claim": "The nearest lounge, mirdif-35, is 47.4 km away in a straight line, beyond a 15-min drive.",
-        "evidence": [
-          {
-            "field": "nearest_lounge_km",
-            "label": "Distance to nearest lounge",
-            "value": 47.3514
-          },
-          {
-            "field": "nearest_lounge_id",
-            "label": "Nearest lounge",
-            "value": "mirdif-35"
-          }
-        ],
-        "topic": "reach"
-      },
-      {
-        "claim": "Our salon search covered 42% of its women, 8% short of the 50% GROW needs.",
-        "evidence": [
-          {
-            "field": "data_coverage",
-            "label": "Competitor data coverage",
-            "value": 0.4239
-          },
-          {
-            "field": "min_coverage",
-            "label": "Coverage needed",
-            "value": 0.5
-          },
-          {
-            "field": "coverage_gap",
-            "label": "Coverage gap",
-            "value": -0.0761
-          }
-        ],
-        "topic": "data_gap"
-      }
-    ],
-    "so_what": "A large market 47.4 km from the nearest lounge: if the unsearched cells are as empty as the searched ones it would pass both tests, but confidence is low until they are searched.",
-    "source": "ai",
-    "subject_id": "al-madam-sharjah",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
@@ -1670,6 +1898,87 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
+  "5953462abcdea456": {
+    "action": "GROW",
+    "headline": "GROW: Kalba passes both tests, with about 27,600 women and 44 premium reviews per 1k women.",
+    "kind": "area",
+    "now_what": "Start a site search here: a shortlist for a site visit and lease search, verified on the ground before committing. It would drop to WATCH if addressable women fell by 7,638, or if premium saturation rose by 106 reviews per 1k women.",
+    "reasons": [
+      {
+        "claim": "About 27,600 addressable women live here, 7,638 above the 20,000 line.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 27637.5444
+          },
+          {
+            "field": "grow_min_women",
+            "label": "Size line",
+            "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": 7638
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": true
+          }
+        ],
+        "topic": "size"
+      },
+      {
+        "claim": "6 premium salons give 44 premium reviews per 1k women, 106 under the 150 line.",
+        "evidence": [
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 44.0921
+          },
+          {
+            "field": "premium_salons",
+            "label": "Premium salons",
+            "value": 6
+          },
+          {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
+            "field": "saturation_gap",
+            "label": "Saturation gap",
+            "value": 105.9079
+          }
+        ],
+        "topic": "saturation"
+      },
+      {
+        "claim": "The nearest lounge, al-taif-mall, is 12 km away in a straight line, beyond a 15-min drive.",
+        "evidence": [
+          {
+            "field": "nearest_lounge_km",
+            "label": "Distance to nearest lounge",
+            "value": 12.0006
+          },
+          {
+            "field": "nearest_lounge_id",
+            "label": "Nearest lounge",
+            "value": "al-taif-mall"
+          }
+        ],
+        "topic": "reach"
+      }
+    ],
+    "so_what": "About 27,600 women 15+ no lounge reaches today, 83% of them searched, with room under the saturation line: a lounge here would add to the network's market rather than split a sibling's. High confidence.",
+    "source": "ai",
+    "subject_id": "kalba-sharjah",
+    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
+    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
   "59939bb0ac73a2cd": {
     "action": "HOLD",
     "headline": "HOLD: Al Jada sits mid-band at 0.49, its 141,000 catchment women offset by 66% of them being shared with siblings.",
@@ -1922,6 +2231,108 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
+  "5fba13dcf8b12d42": {
+    "action": "WATCH",
+    "headline": "WATCH: Al Batayih clears the size line with about 21,200 women, but our salon search covered only 8% of them, too little to confirm it is unsaturated.",
+    "kind": "area",
+    "now_what": "Don't act now: revisit when the salon search covers at least 50% of its women (it is 42% short); a loss of 1,235 addressable women would also drop it below the size line.",
+    "reasons": [
+      {
+        "claim": "About 21,200 addressable women live here, 1,235 above the 20,000 line.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 21235.3756
+          },
+          {
+            "field": "grow_min_women",
+            "label": "Size line",
+            "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": 1235
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": true
+          }
+        ],
+        "topic": "size"
+      },
+      {
+        "claim": "In the searched cells, 1 premium salon gives 5.6 premium reviews per 1k women, 144 under the 150 line.",
+        "evidence": [
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 5.581
+          },
+          {
+            "field": "premium_salons",
+            "label": "Premium salons",
+            "value": 1
+          },
+          {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
+            "field": "saturation_gap",
+            "label": "Saturation gap",
+            "value": 144.419
+          }
+        ],
+        "topic": "saturation"
+      },
+      {
+        "claim": "The nearest lounge, al-jada, is 28.8 km away in a straight line, beyond a 15-min drive.",
+        "evidence": [
+          {
+            "field": "nearest_lounge_km",
+            "label": "Distance to nearest lounge",
+            "value": 28.8131
+          },
+          {
+            "field": "nearest_lounge_id",
+            "label": "Nearest lounge",
+            "value": "al-jada"
+          }
+        ],
+        "topic": "reach"
+      },
+      {
+        "claim": "Our salon search covered 8% of its women, 42% short of the 50% GROW needs.",
+        "evidence": [
+          {
+            "field": "data_coverage",
+            "label": "Competitor data coverage",
+            "value": 0.0759
+          },
+          {
+            "field": "min_coverage",
+            "label": "Coverage needed",
+            "value": 0.5
+          },
+          {
+            "field": "coverage_gap",
+            "label": "Coverage gap",
+            "value": -0.4241
+          }
+        ],
+        "topic": "data_gap"
+      }
+    ],
+    "so_what": "A market just big enough for a lounge, with almost no competition data: a site search now would rest on 8% of the picture, and the size headroom of 1,235 women leaves little margin. Confidence is low.",
+    "source": "ai",
+    "subject_id": "al-batayih-sharjah",
+    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
+    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
   "6037579c3e2f5a3a": {
     "action": "WATCH",
     "headline": "WATCH: Al Sarouj has little premium competition, but its 6,000 addressable women are 14,000 short of the 20,000 a lounge needs.",
@@ -1990,6 +2401,108 @@
     "so_what": "About 6,000 women 15+, with 1 premium salon nearby: too few women to carry a lounge.",
     "source": "ai",
     "subject_id": "al-sarouj-abu-dhabi",
+    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
+    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
+  "6112e19ae5d66447": {
+    "action": "WATCH",
+    "headline": "WATCH: Habshan has no premium salon found, but its 8,600 addressable women are 11,436 short of the size line and only 2% of them were searched.",
+    "kind": "area",
+    "now_what": "Don't act now: revisit only if the market grows by about 11,436 addressable women and the salon search reaches 50% of them (it is 48% short).",
+    "reasons": [
+      {
+        "claim": "About 8,600 addressable women live here, 11,436 short of the 20,000 line.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 8564.0461
+          },
+          {
+            "field": "grow_min_women",
+            "label": "Size line",
+            "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": -11436
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": false
+          }
+        ],
+        "topic": "size"
+      },
+      {
+        "claim": "No premium salon was found in the searched cells, so premium saturation is 0, 150 under the line.",
+        "evidence": [
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 0.0
+          },
+          {
+            "field": "premium_salons",
+            "label": "Premium salons",
+            "value": 0
+          },
+          {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
+            "field": "saturation_gap",
+            "label": "Saturation gap",
+            "value": 150.0
+          }
+        ],
+        "topic": "saturation"
+      },
+      {
+        "claim": "The nearest lounge, al-dhafra, is 22.6 km away in a straight line, beyond a 15-min drive.",
+        "evidence": [
+          {
+            "field": "nearest_lounge_km",
+            "label": "Distance to nearest lounge",
+            "value": 22.6397
+          },
+          {
+            "field": "nearest_lounge_id",
+            "label": "Nearest lounge",
+            "value": "al-dhafra"
+          }
+        ],
+        "topic": "reach"
+      },
+      {
+        "claim": "Our salon search covered 2% of its women, 48% short of the 50% GROW needs.",
+        "evidence": [
+          {
+            "field": "data_coverage",
+            "label": "Competitor data coverage",
+            "value": 0.0226
+          },
+          {
+            "field": "min_coverage",
+            "label": "Coverage needed",
+            "value": 0.5
+          },
+          {
+            "field": "coverage_gap",
+            "label": "Coverage gap",
+            "value": -0.4774
+          }
+        ],
+        "topic": "data_gap"
+      }
+    ],
+    "so_what": "Too few women to carry a lounge, and 44% of adults live in worker housing, so even that estimate is soft: there is no market case here yet. Confidence is low.",
+    "source": "ai",
+    "subject_id": "habshan-abu-dhabi",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
@@ -2068,77 +2581,6 @@
     "subject_id": "nad-al-sheba",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "6ad222ea18e4a864": {
-    "action": "WATCH",
-    "headline": "WATCH: This Sharjah area is under the saturation line, but its 8,400 addressable women are 11,600 short of the 20,000 a lounge needs.",
-    "kind": "area",
-    "now_what": "Don't act now: revisit if the market grows by about 11,600 addressable women.",
-    "reasons": [
-      {
-        "claim": "About 8,400 addressable women live here, 11,600 short of the 20,000 line.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 8406.0145
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": -11594
-          },
-          {
-            "field": "grow_min_women",
-            "label": "Size line",
-            "value": 20000
-          }
-        ],
-        "topic": "size"
-      },
-      {
-        "claim": "3 premium salons give 70 premium reviews per 1k women, 80 under the 150 line.",
-        "evidence": [
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 70.296
-          },
-          {
-            "field": "premium_salons",
-            "label": "Premium salons",
-            "value": 3
-          },
-          {
-            "field": "saturation_gap",
-            "label": "Saturation gap",
-            "value": 79.704
-          }
-        ],
-        "topic": "saturation"
-      },
-      {
-        "claim": "The nearest lounge, zawaya-walk, is 6.3 km away in a straight line, beyond a 15-min drive.",
-        "evidence": [
-          {
-            "field": "nearest_lounge_km",
-            "label": "Distance to nearest lounge",
-            "value": 6.3006
-          },
-          {
-            "field": "nearest_lounge_id",
-            "label": "Nearest lounge",
-            "value": "zawaya-walk"
-          }
-        ],
-        "topic": "reach"
-      }
-    ],
-    "so_what": "About 8,400 women 15+, with 3 premium salons nearby: too few women to carry a lounge.",
-    "source": "ai",
-    "subject_id": "sharjah-sharjah-2",
-    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
-    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
   "6d7820336e0c6e77": {
     "action": "HOLD",
@@ -2312,77 +2754,6 @@
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
-  "72aac766128198f0": {
-    "action": "WATCH",
-    "headline": "WATCH: Al Sad has little premium competition, but its 5,600 addressable women are 14,400 short of the 20,000 a lounge needs.",
-    "kind": "area",
-    "now_what": "Don't act now: revisit if the market grows by about 14,400 addressable women.",
-    "reasons": [
-      {
-        "claim": "About 5,600 addressable women live here, 14,400 short of the 20,000 line.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 5613.8542
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": -14386
-          },
-          {
-            "field": "grow_min_women",
-            "label": "Size line",
-            "value": 20000
-          }
-        ],
-        "topic": "size"
-      },
-      {
-        "claim": "No premium salons were found in the searched cells, so premium saturation is 0, 150 under the line.",
-        "evidence": [
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 0.0
-          },
-          {
-            "field": "premium_salons",
-            "label": "Premium salons",
-            "value": 0
-          },
-          {
-            "field": "saturation_gap",
-            "label": "Saturation gap",
-            "value": 150.0
-          }
-        ],
-        "topic": "saturation"
-      },
-      {
-        "claim": "The nearest lounge, al-ain, is 18.0 km away in a straight line, beyond a 15-min drive.",
-        "evidence": [
-          {
-            "field": "nearest_lounge_km",
-            "label": "Distance to nearest lounge",
-            "value": 17.9514
-          },
-          {
-            "field": "nearest_lounge_id",
-            "label": "Nearest lounge",
-            "value": "al-ain"
-          }
-        ],
-        "topic": "reach"
-      }
-    ],
-    "so_what": "About 5,600 women 15+, with no premium salon found: too few women to carry a lounge.",
-    "source": "ai",
-    "subject_id": "al-sad-abu-dhabi",
-    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
-    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
-  },
   "77dbfed0f0927d3e": {
     "action": "WATCH",
     "headline": "WATCH: Dibba Al Hisn is under the saturation line, but its 5,300 addressable women are 14,700 short of the 20,000 a lounge needs.",
@@ -2454,11 +2825,11 @@
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
-  "7fd7dbdcaae6964d": {
+  "8485d652aaaa4c12": {
     "action": "WATCH",
-    "headline": "WATCH: Al Bihouth has little premium competition, but its 5,300 addressable women are 14,700 short of the 20,000 a lounge needs.",
+    "headline": "WATCH: Zayed City has no premium salon in the cells we searched, but its 5,300 addressable women are 14,700 short of the 20,000 a lounge needs.",
     "kind": "area",
-    "now_what": "Don't act now: revisit if the market grows by about 14,700 addressable women.",
+    "now_what": "Don't act now: revisit if the market grows by about 14,700 addressable women; competition is not what holds it back.",
     "reasons": [
       {
         "claim": "About 5,300 addressable women live here, 14,700 short of the 20,000 line.",
@@ -2466,23 +2837,28 @@
           {
             "field": "addressable_women",
             "label": "Addressable women 15+",
-            "value": 5255.2347
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": -14745
+            "value": 5341.6259
           },
           {
             "field": "grow_min_women",
             "label": "Size line",
             "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": -14658
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": false
           }
         ],
         "topic": "size"
       },
       {
-        "claim": "No premium salons were found in the searched cells, so premium saturation is 0, 150 under the line.",
+        "claim": "No premium salon was found in the searched cells, so premium saturation is 0, 150 under the line.",
         "evidence": [
           {
             "field": "premium_reviews_per_1k",
@@ -2495,6 +2871,11 @@
             "value": 0
           },
           {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
             "field": "saturation_gap",
             "label": "Saturation gap",
             "value": 150.0
@@ -2503,25 +2884,25 @@
         "topic": "saturation"
       },
       {
-        "claim": "The nearest lounge, baniyas, is 10.4 km away in a straight line, beyond a 15-min drive.",
+        "claim": "The nearest lounge, al-dhafra, is only 2.5 km away in a straight line, yet beyond a 15-min drive by road.",
         "evidence": [
           {
             "field": "nearest_lounge_km",
             "label": "Distance to nearest lounge",
-            "value": 10.402
+            "value": 2.5002
           },
           {
             "field": "nearest_lounge_id",
             "label": "Nearest lounge",
-            "value": "baniyas"
+            "value": "al-dhafra"
           }
         ],
         "topic": "reach"
       }
     ],
-    "so_what": "About 5,300 women 15+, with no premium salon found: too few women to carry a lounge.",
+    "so_what": "An empty premium market, 100% of it searched, but too few women to carry a lounge: opening here would leave a site underfilled.",
     "source": "ai",
-    "subject_id": "al-bihouth-abu-dhabi",
+    "subject_id": "zayed-city-abu-dhabi",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
@@ -2786,6 +3167,87 @@
     "so_what": "About 7,500 women 15+, with no premium salon found: too few women to carry a lounge.",
     "source": "ai",
     "subject_id": "dubai-investments-park-dubai",
+    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
+    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
+  "8c3183111dfebf4f": {
+    "action": "WATCH",
+    "headline": "WATCH: Milehah has no premium salon in the cells we searched, but its 13,700 addressable women are 6,300 short of the 20,000 a lounge needs.",
+    "kind": "area",
+    "now_what": "Don't act now: revisit if the market grows by about 6,300 addressable women; competition is not what holds it back.",
+    "reasons": [
+      {
+        "claim": "About 13,700 addressable women live here, 6,300 short of the 20,000 line.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 13716.4054
+          },
+          {
+            "field": "grow_min_women",
+            "label": "Size line",
+            "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": -6284
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": false
+          }
+        ],
+        "topic": "size"
+      },
+      {
+        "claim": "No premium salon was found in the searched cells, so premium saturation is 0, 150 under the line.",
+        "evidence": [
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 0.0
+          },
+          {
+            "field": "premium_salons",
+            "label": "Premium salons",
+            "value": 0
+          },
+          {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
+            "field": "saturation_gap",
+            "label": "Saturation gap",
+            "value": 150.0
+          }
+        ],
+        "topic": "saturation"
+      },
+      {
+        "claim": "The nearest lounge, al-taif-mall, is 43.3 km away in a straight line, beyond a 15-min drive.",
+        "evidence": [
+          {
+            "field": "nearest_lounge_km",
+            "label": "Distance to nearest lounge",
+            "value": 43.2554
+          },
+          {
+            "field": "nearest_lounge_id",
+            "label": "Nearest lounge",
+            "value": "al-taif-mall"
+          }
+        ],
+        "topic": "reach"
+      }
+    ],
+    "so_what": "An empty premium market, 52% of it searched, but too few women to carry a lounge: opening here would leave a site underfilled.",
+    "source": "ai",
+    "subject_id": "milehah-sharjah",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
@@ -3189,35 +3651,40 @@
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
-  "9e495c4c0d6ffedb": {
+  "9d80001715acb81d": {
     "action": "WATCH",
-    "headline": "WATCH: This Dubai area has little premium competition, but its 5,100 addressable women are 14,900 short of the 20,000 a lounge needs.",
+    "headline": "WATCH: Al Aamerah has no premium salon in the cells we searched, but its 5,300 addressable women are 14,700 short of the 20,000 a lounge needs.",
     "kind": "area",
-    "now_what": "Don't act now: revisit if the market grows by about 14,900 addressable women.",
+    "now_what": "Don't act now: revisit if the market grows by about 14,700 addressable women; competition is not what holds it back.",
     "reasons": [
       {
-        "claim": "About 5,100 addressable women live here, 14,900 short of the 20,000 line.",
+        "claim": "About 5,300 addressable women live here, 14,700 short of the 20,000 line.",
         "evidence": [
           {
             "field": "addressable_women",
             "label": "Addressable women 15+",
-            "value": 5108.1128
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": -14892
+            "value": 5288.2316
           },
           {
             "field": "grow_min_women",
             "label": "Size line",
             "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": -14712
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": false
           }
         ],
         "topic": "size"
       },
       {
-        "claim": "No premium salons were found in the searched cells, so premium saturation is 0, 150 under the line.",
+        "claim": "No premium salon was found in the searched cells, so premium saturation is 0, 150 under the line.",
         "evidence": [
           {
             "field": "premium_reviews_per_1k",
@@ -3230,6 +3697,11 @@
             "value": 0
           },
           {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
             "field": "saturation_gap",
             "label": "Saturation gap",
             "value": 150.0
@@ -3238,25 +3710,25 @@
         "topic": "saturation"
       },
       {
-        "claim": "The nearest lounge, mirdif-35, is 12.5 km away in a straight line, beyond a 15-min drive.",
+        "claim": "The nearest lounge, al-ain, is 10.7 km away in a straight line, beyond a 15-min drive.",
         "evidence": [
           {
             "field": "nearest_lounge_km",
             "label": "Distance to nearest lounge",
-            "value": 12.5468
+            "value": 10.7499
           },
           {
             "field": "nearest_lounge_id",
             "label": "Nearest lounge",
-            "value": "mirdif-35"
+            "value": "al-ain"
           }
         ],
         "topic": "reach"
       }
     ],
-    "so_what": "About 5,100 women 15+, with no premium salon found: too few women to carry a lounge.",
+    "so_what": "An empty premium market, 91% of it searched, but too few women to carry a lounge: opening here would leave a site underfilled.",
     "source": "ai",
-    "subject_id": "dubai-dubai",
+    "subject_id": "al-aamerah-abu-dhabi",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
@@ -3553,6 +4025,87 @@
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
+  "ae4dee48207d1f71": {
+    "action": "WATCH",
+    "headline": "WATCH: Al Wathbah has no premium salon in the cells we searched, but its 11,600 addressable women are 8,400 short of the 20,000 a lounge needs.",
+    "kind": "area",
+    "now_what": "Don't act now: revisit if the market grows by about 8,400 addressable women; competition is not what holds it back.",
+    "reasons": [
+      {
+        "claim": "About 11,600 addressable women live here, 8,400 short of the 20,000 line.",
+        "evidence": [
+          {
+            "field": "addressable_women",
+            "label": "Addressable women 15+",
+            "value": 11635.1559
+          },
+          {
+            "field": "grow_min_women",
+            "label": "Size line",
+            "value": 20000
+          },
+          {
+            "field": "size_gap",
+            "label": "Size gap",
+            "value": -8365
+          },
+          {
+            "field": "big_enough",
+            "label": "Big enough",
+            "value": false
+          }
+        ],
+        "topic": "size"
+      },
+      {
+        "claim": "No premium salon was found in the searched cells, so premium saturation is 0, 150 under the line.",
+        "evidence": [
+          {
+            "field": "premium_reviews_per_1k",
+            "label": "Premium saturation",
+            "value": 0.0
+          },
+          {
+            "field": "premium_salons",
+            "label": "Premium salons",
+            "value": 0
+          },
+          {
+            "field": "unsaturated_per_1k",
+            "label": "Saturation line",
+            "value": 150.0
+          },
+          {
+            "field": "saturation_gap",
+            "label": "Saturation gap",
+            "value": 150.0
+          }
+        ],
+        "topic": "saturation"
+      },
+      {
+        "claim": "The nearest lounge, baniyas, is 11.7 km away in a straight line, beyond a 15-min drive.",
+        "evidence": [
+          {
+            "field": "nearest_lounge_km",
+            "label": "Distance to nearest lounge",
+            "value": 11.7127
+          },
+          {
+            "field": "nearest_lounge_id",
+            "label": "Nearest lounge",
+            "value": "baniyas"
+          }
+        ],
+        "topic": "reach"
+      }
+    ],
+    "so_what": "An empty premium market, 51% of it searched, but too few women to carry a lounge: opening here would leave a site underfilled.",
+    "source": "ai",
+    "subject_id": "al-wathbah-abu-dhabi",
+    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
+    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+  },
   "bb100138017939e4": {
     "action": "HOLD",
     "headline": "HOLD: Jumeirah Park's 173,000 addressable women keep it above the SHRINK line, though it holds about 1% of premium reviews.",
@@ -3628,77 +4181,6 @@
     "subject_id": "jumeirah-park",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "bda8380f628bf280": {
-    "action": "GROW",
-    "headline": "GROW: this Sharjah area has 90,600 women and 22 premium reviews per 1k women, passing both tests with room to spare.",
-    "kind": "area",
-    "now_what": "Start a site search here: a shortlist for a site visit and lease search, verified on the ground before committing. It has 70,600 women of headroom and 128 reviews per 1k under the saturation line; the women are spread over 50 cells, so the site visit should find where they cluster.",
-    "reasons": [
-      {
-        "claim": "About 90,600 addressable women live here, 70,600 above the 20,000 line.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 90605.7873
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": 70606
-          },
-          {
-            "field": "grow_min_women",
-            "label": "Size line",
-            "value": 20000
-          }
-        ],
-        "topic": "size"
-      },
-      {
-        "claim": "15 premium salons give 22 premium reviews per 1k women, 128 under the 150 line.",
-        "evidence": [
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 21.9345
-          },
-          {
-            "field": "premium_salons",
-            "label": "Premium salons",
-            "value": 15
-          },
-          {
-            "field": "saturation_gap",
-            "label": "Saturation gap",
-            "value": 128.0655
-          }
-        ],
-        "topic": "saturation"
-      },
-      {
-        "claim": "The nearest lounge, al-jada, is 13.3 km away in a straight line, beyond a 15-min drive.",
-        "evidence": [
-          {
-            "field": "nearest_lounge_km",
-            "label": "Distance to nearest lounge",
-            "value": 13.2622
-          },
-          {
-            "field": "nearest_lounge_id",
-            "label": "Nearest lounge",
-            "value": "al-jada"
-          }
-        ],
-        "topic": "reach"
-      }
-    ],
-    "so_what": "About 90,600 women 15+ beyond a 15-min drive of every lounge, 96% of them searched; 11% of adults live in worker housing, well under the 50% cap. High confidence.",
-    "source": "ai",
-    "subject_id": "sharjah-sharjah",
-    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
-    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
   "bfa1954ba2a3589b": {
     "action": "WATCH",
@@ -3789,77 +4271,6 @@
     "so_what": "About 5,100 women 15+, with no premium salon found: too few women to carry a lounge. Only 25% of them were searched, so confidence is low.",
     "source": "ai",
     "subject_id": "khatt-ras-al-khaimah",
-    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
-    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
-  },
-  "c33337537cefb26f": {
-    "action": "WATCH",
-    "headline": "WATCH: Al Wathbah has little premium competition, but its 9,200 addressable women are 10,800 short of the 20,000 a lounge needs.",
-    "kind": "area",
-    "now_what": "Don't act now: revisit if the market grows by about 10,800 addressable women.",
-    "reasons": [
-      {
-        "claim": "About 9,200 addressable women live here, 10,800 short of the 20,000 line.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 9178.7819
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": -10821
-          },
-          {
-            "field": "grow_min_women",
-            "label": "Size line",
-            "value": 20000
-          }
-        ],
-        "topic": "size"
-      },
-      {
-        "claim": "No premium salons were found in the searched cells, so premium saturation is 0, 150 under the line.",
-        "evidence": [
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 0.0
-          },
-          {
-            "field": "premium_salons",
-            "label": "Premium salons",
-            "value": 0
-          },
-          {
-            "field": "saturation_gap",
-            "label": "Saturation gap",
-            "value": 150.0
-          }
-        ],
-        "topic": "saturation"
-      },
-      {
-        "claim": "The nearest lounge, baniyas, is 10.7 km away in a straight line, beyond a 15-min drive.",
-        "evidence": [
-          {
-            "field": "nearest_lounge_km",
-            "label": "Distance to nearest lounge",
-            "value": 10.6726
-          },
-          {
-            "field": "nearest_lounge_id",
-            "label": "Nearest lounge",
-            "value": "baniyas"
-          }
-        ],
-        "topic": "reach"
-      }
-    ],
-    "so_what": "About 9,200 women 15+, with no premium salon found: too few women to carry a lounge.",
-    "source": "ai",
-    "subject_id": "al-wathbah-abu-dhabi",
     "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
     "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
@@ -4202,205 +4613,6 @@
     "subject_id": "city-walk",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "d36696994a2a6676": {
-    "action": "WATCH",
-    "headline": "WATCH: Zakhir has little premium competition, but its 7,700 addressable women are 12,300 short of the 20,000 a lounge needs.",
-    "kind": "area",
-    "now_what": "Don't act now: revisit if the market grows by about 12,300 addressable women.",
-    "reasons": [
-      {
-        "claim": "About 7,700 addressable women live here, 12,300 short of the 20,000 line.",
-        "evidence": [
-          {
-            "field": "addressable_women",
-            "label": "Addressable women 15+",
-            "value": 7721.7253
-          },
-          {
-            "field": "size_gap",
-            "label": "Size gap",
-            "value": -12278
-          },
-          {
-            "field": "grow_min_women",
-            "label": "Size line",
-            "value": 20000
-          }
-        ],
-        "topic": "size"
-      },
-      {
-        "claim": "No premium salons were found in the searched cells, so premium saturation is 0, 150 under the line.",
-        "evidence": [
-          {
-            "field": "premium_reviews_per_1k",
-            "label": "Premium saturation",
-            "value": 0.0
-          },
-          {
-            "field": "premium_salons",
-            "label": "Premium salons",
-            "value": 0
-          },
-          {
-            "field": "saturation_gap",
-            "label": "Saturation gap",
-            "value": 150.0
-          }
-        ],
-        "topic": "saturation"
-      },
-      {
-        "claim": "The nearest lounge, al-ain, is 11.6 km away in a straight line, beyond a 15-min drive.",
-        "evidence": [
-          {
-            "field": "nearest_lounge_km",
-            "label": "Distance to nearest lounge",
-            "value": 11.6064
-          },
-          {
-            "field": "nearest_lounge_id",
-            "label": "Nearest lounge",
-            "value": "al-ain"
-          }
-        ],
-        "topic": "reach"
-      }
-    ],
-    "so_what": "About 7,700 women 15+, with no premium salon found: too few women to carry a lounge.",
-    "source": "ai",
-    "subject_id": "zakhir-abu-dhabi",
-    "table_caption": "Size counts women 15+ living here, weighted by affluence where Dubai rents are known; competition counts premium-salon reviews per 1k women in the cells we searched. GROW needs a big enough market and an unsaturated one.",
-    "thresholds_note": "GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
-  },
-  "d52b6a065ba931c0": {
-    "action": "SUMMARY",
-    "headline": "Of 23 scored lounges, 3 are PROTECT, 15 HOLD and 5 SHRINK, and 5 growth areas pass both tests to GROW.",
-    "kind": "uae",
-    "now_what": "Investigate the 5 SHRINK lounges before their lease events, start site searches in the 5 GROW areas, and defend the 3 PROTECT lounges.",
-    "reasons": [
-      {
-        "claim": "5 lounges are SHRINK, to investigate before their lease events: delma, khaleej-al-arabi, mohammed-bin-zayed-city, noya-plaza and westyas, the strongest at 0.28.",
-        "evidence": [
-          {
-            "field": "shrink_count",
-            "label": "SHRINK",
-            "value": 5
-          },
-          {
-            "field": "shrink_lounges",
-            "label": "SHRINK lounges",
-            "value": "delma, khaleej-al-arabi, mohammed-bin-zayed-city, noya-plaza, westyas"
-          },
-          {
-            "field": "shrink_composite_max",
-            "label": "Strongest SHRINK composite",
-            "value": 0.2773
-          }
-        ],
-        "topic": "shrink"
-      },
-      {
-        "claim": "5 areas are GROW, with 242,151 women 15+ between them, 11.1 to 43.8 km from the nearest lounge.",
-        "evidence": [
-          {
-            "field": "grow_count",
-            "label": "GROW",
-            "value": 5
-          },
-          {
-            "field": "grow_areas",
-            "label": "GROW areas",
-            "value": "al-dhaid-sharjah, al-jerf-ajman, kalba-sharjah, khor-fakkan-sharjah, sharjah-sharjah"
-          },
-          {
-            "field": "grow_women_total",
-            "label": "Women in GROW areas",
-            "value": 242151
-          },
-          {
-            "field": "grow_nearest_km_min",
-            "label": "Closest GROW area to a lounge",
-            "value": 11.0963
-          },
-          {
-            "field": "grow_nearest_km_max",
-            "label": "Furthest GROW area from a lounge",
-            "value": 43.7824
-          }
-        ],
-        "topic": "grow"
-      },
-      {
-        "claim": "3 lounges are PROTECT: al-ain, al-taif-mall and ras-al-khaimah, the weakest at 0.68.",
-        "evidence": [
-          {
-            "field": "protect_count",
-            "label": "PROTECT",
-            "value": 3
-          },
-          {
-            "field": "protect_lounges",
-            "label": "PROTECT lounges",
-            "value": "al-ain, al-taif-mall, ras-al-khaimah"
-          },
-          {
-            "field": "protect_composite_min",
-            "label": "Weakest PROTECT composite",
-            "value": 0.6762
-          }
-        ],
-        "topic": "protect"
-      },
-      {
-        "claim": "15 lounges sit in the HOLD band and 10 of the 23 calls are low confidence.",
-        "evidence": [
-          {
-            "field": "hold_count",
-            "label": "HOLD",
-            "value": 15
-          },
-          {
-            "field": "low_confidence_count",
-            "label": "Low-confidence calls",
-            "value": 10
-          },
-          {
-            "field": "lounges_scored",
-            "label": "Lounges scored",
-            "value": 23
-          }
-        ],
-        "topic": "confidence"
-      },
-      {
-        "claim": "There is no revenue or rent data, so these are location and market calls from 3,833 searched salons, not return-on-capital calls.",
-        "evidence": [
-          {
-            "field": "revenue_data_available",
-            "label": "Revenue data",
-            "value": false
-          },
-          {
-            "field": "rent_data_available",
-            "label": "Rent data",
-            "value": false
-          },
-          {
-            "field": "salons_total",
-            "label": "Salons searched",
-            "value": 3833
-          }
-        ],
-        "topic": "data_gaps"
-      }
-    ],
-    "so_what": "About 242,000 women live in the 5 GROW areas, beyond a 15-min drive of every lounge, while 5 lounges need a closer look; with 10 low-confidence calls, this is a shortlist to test, not a set of decisions.",
-    "source": "ai",
-    "subject_id": "uae",
-    "table_caption": "Lounge calls come from a fixed-scale scorecard of demand, cannibalisation, capture and rating; growth-area calls from two tests, size and premium saturation. Counts cover the 23 scored lounges; the airport lounge is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
   "d88e98b64deb3e46": {
     "action": "WATCH",

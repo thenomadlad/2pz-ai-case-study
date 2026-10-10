@@ -183,6 +183,22 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 - **Still allowed.** Adding a competitor rated *below* the median can still raise a label slightly, through the rating gap. That's the signal working as designed: a weaker peer does improve relative standing. If it happens, it gets reported, not treated as a bug.
 - **Explanations.** Every lounge whose median moves gets a new fact sheet, so its cached explanation goes stale and is regenerated offline.
 
+## Run 4: growth area = named place (2026-10-10)
+
+**The change.** A growth area is now one area per OSM place name and emirate, contiguous or not. Cells that carry only their emirate's fallback name (no OSM boundary or place within 3 km) make no area at all. They still count in lounge catchments, overlap and population totals. That's 67 populated cells outside every catchment, about 33.8k women.
+
+**Expected outcome.** This was written *after* a local trial, so it isn't a blind prediction:
+- No lounge changes.
+- The GROW list is unchanged.
+- The fake `dubai-dubai` (scattered fallback cells) disappears.
+- A few small same-named pieces add up to WATCH.
+
+**Results:**
+- **SC2:** lounges are unchanged at 3 / 15 / 5 / 1. Areas go from 580 to **413**: 5 GROW (same list; sharjah-sharjah is one area, 106k women) / 36 WATCH / 372 SKIP. The dropdown lists 68.
+- **BT4:** unchanged. Every control is SKIP except Dubai Investments Park (explained).
+- **SC3:** no non-residential name gets past SKIP. **New explained caveat:** habshan is WATCH with 44% worker housing and pieces spanning 39 km. That's the cost of merging by name, disclosed in the limitations. Seven non-SKIP areas span more than 20 km, including the GROW areas sharjah-sharjah (33 km) and al-dhaid (23 km). These are large OSM admin units, so an area is a place, not a site (same as BT2/BT3).
+- **Everything else:** unchanged, since lounges didn't move. No unexplained failure.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
@@ -193,5 +209,7 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 | 2 | 2026-10-10 | Rubric pass 3, after the non-structural model fixes (A1–A4, B1–B4, D1) | 3/10 | BT2, BT3 explained fails (unit); BT4 partial, explained (DIP); BT5 explained fail (tilt reduced, not removed) | SC2, SC5 pass; SC1, SC3 partial; SC4 fails | **SC4: a new competitor flips al-maqta SHRINK → HOLD** (the coverage-k median bug) |
 
 | 3 | 2026-10-10 | The SC4 fix (rating median over the whole premium pool, 20+ reviews) | 3/10 | unchanged from run 2 (explained) | SC4 now partial, explained; others unchanged | **none.** Outcome vs expectation: only al-maqta changed label (SHRINK → HOLD, 0.341 → 0.353), one of the three predicted candidates; ras-al-khaimah moved within PROTECT and al-barsha didn't move. |
+
+| 4 | 2026-10-10 | Growth area = named OSM place; unnamed (emirate-fallback) cells make no area | 3/10 | unchanged (explained) | SC2 reported; SC3 one new explained caveat (habshan) | none |
 
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.

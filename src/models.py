@@ -145,7 +145,8 @@ class LoungeFeatures(BaseModel):
 
 
 class Area(BaseModel):
-    """A growth candidate: a contiguous piece of populated cells no open lounge reaches."""
+    """A growth candidate: the populated cells sharing an OSM place name that no open lounge reaches.
+    Unnamed cells (no OSM place within 3 km) make no area."""
     area_id: str
     name: str
     emirate: str

@@ -133,7 +133,7 @@ GLOSSARY: dict[str, Field] = {
     "area_name": Field("Area", "", "OpenStreetMap place name nearest the area's cells."),
     "emirate": Field("Emirate", "", "Emirate the area lies in."),
     "women": Field("Women 15+", "women", "Women aged 15+ living in the area's cells (raw)."),
-    "cells": Field("Cells", "count", "Populated ~2 km cells in the area (one contiguous piece)."),
+    "cells": Field("Cells", "count", "Populated ~2 km cells in the area (every unreached cell with this OSM place name)."),
     "worker_share": Field("Worker housing", "% of adults",
                           "Share of the area's adults living in worker housing (OSM industrial "
                           "land use).", pct=True),

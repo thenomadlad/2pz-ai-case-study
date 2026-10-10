@@ -246,12 +246,15 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
    combinations of the four assumption levels (travel time, coverage, worker-housing share,
    affluence elasticity). High confidence needs
    0.10 from both lines; medium is in between.
-8. **Growth areas** = populated cells beyond a 15-min drive of every open lounge, grouped by OSM
-   place name into contiguous pieces (`src/model/growth.py`). GROW = at least 20k addressable women 15+ (worker
-   housing under 50% of adults) **and** under 50 premium reviews per 1k women in the searched cells.
+8. **Growth areas** = populated cells beyond a 15-min drive of every open lounge, one area per OSM
+   place name and emirate, whether its cells touch or not; cells with no OSM place within 3 km
+   (named only by their emirate) make no area but still count in catchments and totals
+   (`src/features/lounges.py`, `src/model/growth.py`). GROW = at least 20k addressable women 15+ (worker
+   housing under 50% of adults) **and** under 150 premium reviews per 1k women in the searched cells.
    WATCH passes one test, or is big but under 50% searched, or is big only through the affluence
    weighting with rents observed for under 50% of its women, or big but mostly worker housing (≥ 50% of adults). SKIP passes neither, or has under 5k
-   women.
+   women, or is non-residential by name (industrial, free zone, military, airport, port), or is
+   small, unsaturated and mostly worker housing.
 
 **Excluded from market measures:** `zayed-international-airport` (serves travellers, not its
 catchment); kept in the data and labelled. `al-dhafra` and `al-falah` have under 10 premium salons:

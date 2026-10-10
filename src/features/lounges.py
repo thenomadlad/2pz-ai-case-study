@@ -64,26 +64,10 @@ def _prep(v3: V3) -> dict:
          "owns": {cid: np.flatnonzero(owns[:, j]) for j, cid in enumerate(ids) if cov[j]},
          "touch": {cid: np.flatnonzero(touch[:, j]) for j, cid in enumerate(ids) if cov[j]},
          "rc": {cid: tuple(map(int, re.match(r"r(\d+)c(\d+)", cid).groups())) for cid in ids},
-         "cell": c[["name", "emirate", "lat", "lng", "adults", "adults_worker"]].to_dict("index")}
+         "cell": c[["name", "emirate", "lat", "lng", "adults", "adults_worker"]
+                   + (["name_source"] if "name_source" in c else [])].to_dict("index")}
     _PREP[id(v3)] = (v3, p)
     return p
-
-
-def _pieces(cells: list[str], rc: dict) -> list[list[str]]:
-    """8-connected pieces of a set of grid cells."""
-    at = {rc[c]: c for c in cells}
-    left, out = set(at), []
-    while left:
-        stack, piece = [left.pop()], []
-        while stack:
-            r, c = stack.pop()
-            piece.append(at[(r, c)])
-            for nb in ((r + dr, c + dc) for dr in (-1, 0, 1) for dc in (-1, 0, 1)):
-                if nb in left:
-                    left.remove(nb)
-                    stack.append(nb)
-        out.append(sorted(piece, key=rc.get))
-    return out
 
 
 def haversine_km(lat, lng, lats, lngs):
@@ -164,16 +148,17 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     cell = p["cell"]
     groups = defaultdict(list)
     for c, x in w.items():
-        if x > 0 and c not in reach:
+        # Unnamed cells (only their emirate's name: no OSM place within 3 km) make no area: nobody can
+        # act on them yet. They still count in lounge catchments, overlap and population totals.
+        if x > 0 and c not in reach and cell[c].get("name_source") != "emirate":
             groups[(cell[c]["name"], cell[c]["emirate"])].append(c)
     lounges = [lo for lo in lounges if lo.branch_id not in NOT_SCORED]     # never an area's nearest lounge
     lats, lngs = np.array([lo.lat for lo in lounges]), np.array([lo.lng for lo in lounges])
     out = []
     for (name, emirate), cs in groups.items():
-        pieces = sorted(_pieces(cs, p["rc"]), key=lambda ps: -sum(w[c] for c in ps))
-        for i, piece in enumerate(pieces):
-            out.append(_area(f"{_slug(f'{name} {emirate}')}{f'-{i + 1}' if i else ''}", name, emirate,
-                             piece, w, aw, rents, p, a, lounges, lats, lngs))
+        # one area per OSM place name, contiguous or not
+        out.append(_area(_slug(f"{name} {emirate}"), name, emirate, sorted(cs, key=p["rc"].get),
+                         w, aw, rents, p, a, lounges, lats, lngs))
     return feats, sorted(out, key=lambda x: -x.women)
 
 

@@ -78,3 +78,4 @@ def test_overlap_layer_marks_shared_cells_and_all_substitutes_are_deduplicated()
     assert len(rows) == load_v3().catchment.query("level == 'medium'").cell_id.nunique()
     names = [s["name"] for s in layers["all-substitutes"].data]
     assert len(names) > 0 and list(layers)[:2] == ["overlap", "all-substitutes"]
+

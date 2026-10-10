@@ -99,13 +99,22 @@ def test_cells_only_a_closed_lounge_reached_become_growth_areas(tiny_v3):
     assert C3 in cells and C2 not in cells          # C2 is still a's
 
 
-def test_growth_areas_split_into_connected_pieces(tiny_v3):
+def test_one_growth_area_per_place_name_and_none_for_unnamed_cells(tiny_v3):
     _, areas = build(tiny_v3, ASSUMPTIONS, closed=frozenset({"b"}))
     town = [a for a in areas if a.name == "Town"]
-    assert [(a.area_id, a.cell_ids) for a in town] == [("town-dubai", [C3]), ("town-dubai-2", [C5])]
+    assert len(town) == 1 and set(town[0].cell_ids) == {C3, C5}    # not contiguous, one place: one area
     far = next(a for a in areas if a.name == "Far")
     assert far.area_id == "far-dubai" and far.nearest_lounge_id == "a"
     assert far.premium_salons is None and far.data_coverage == 0   # no search circle: no data
+    # cells with only their emirate's name make no area, but still count in a lounge's catchment
+    lone, inside = "r9c9", "r0c4"
+    unnamed = [{**_cell(c, 3000, name="Dubai"), "name_source": "emirate"} for c in (lone, inside)]
+    v = _v3(tiny_v3.lounges, [_cell(C1, 1000), _cell(C2, 3000), _cell(C3, 2000), *unnamed],
+            {"a": [C1, C2, inside], "b": [C2, C3]}, [], {})
+    f, areas = build(v, ASSUMPTIONS)
+    assert all(lone not in x.cell_ids for x in areas) and not areas
+    assert next(x for x in f if x.branch_id == "a").catchment_women == pytest.approx(
+        women(v, C1) + women(v, C2) + women(v, inside))
 
 
 def test_area_competition_over_covered_cells(tiny_v3):

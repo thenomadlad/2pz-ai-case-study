@@ -26,11 +26,11 @@ Open the [Overview](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.a
 COO's question, **"Where is my network under pressure, and where should we grow?"**, and answers it
 in the **Executive summary**:
 
-> **Of 23 scored lounges, 3 are PROTECT, 15 HOLD and 5 SHRINK, and 5 growth areas pass both tests
-> to GROW.**
+> **Of 23 scored lounges, 3 are PROTECT, 15 HOLD and 5 SHRINK, and 5 of 413 growth areas pass both
+> tests to GROW.**
 
 Five numbered arguments follow (where to investigate, where to grow, what to protect, how sure we
-are, what this can't see), each with its data underneath, then **So what** ("About 242,000 women
+are, what this can't see), each with its data underneath, then **So what** ("About 262,000 women
 live in the 5 GROW areas, beyond a 15-min drive of every lounge, while 5 lounges need a closer look;
 with 10 low-confidence calls, this is a shortlist to test, not a set of decisions.") and **Now what**.
 
@@ -40,7 +40,7 @@ Below it, three at-stake figures, counted in women because the model has no mone
 |---|---|---|
 | Under pressure: 5 SHRINK lounges | 233,883 women | women in their catchment cells that a sibling also reaches |
 | To defend: 3 PROTECT lounges | 203,096 women | women within a 15-min drive of al-ain, al-taif-mall, ras-al-khaimah |
-| To grow: 5 GROW areas | 242,151 women | addressable women beyond a 15-min drive of every lounge; 35 more areas on WATCH |
+| To grow: 5 GROW areas | 261,797 women | addressable women beyond a 15-min drive of every lounge; 36 more areas on WATCH |
 
 Then the **⚠️ Before you trust these calls** box (no money in the model, lifetime reviews, Dubai-only
 affluence, 10 of 23 calls low confidence, growth areas a first cut) and the
@@ -114,27 +114,27 @@ its siblings named and finance's P&L for each before anyone says "close".
 
 ## 4. One growth opportunity: Kalba (GROW)
 
-Back on the Overview, open the **Growth areas, ranked** tab: Kalba is rank 5 of 5 GROWs. Click its
+Back on the Overview, open the **Growth areas, ranked** tab: Kalba is rank 4 of 5 GROWs. Click its
 blue cells on the east coast, or open
 [`/area?area=kalba-sharjah`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah).
 
-> **GROW: Kalba passes both tests, with 23,500 women and 44 premium reviews per 1k women, though it
-> clears the size line by only 3,464.**
+> **GROW: Kalba passes both tests, with about 27,600 women and 44 premium reviews per 1k women.**
 
-Arguments: **Size** (23,464 addressable women, 3,464 above the 20,000 line), **Competition** (6
+Arguments: **Size** (about 27,600 addressable women, 7,638 above the 20,000 line), **Competition** (6
 premium salons, 44 premium reviews per 1k women, 106 under the 150 line), **Distance to a lounge**
-(al-taif-mall, 11.1 km in a straight line, beyond a 15-min drive).
+(al-taif-mall, 12 km in a straight line, beyond a 15-min drive).
 
-**So what.** "About 23,500 women 15+ beyond a 15-min drive of every lounge, 98% of them searched.
-Confidence is medium: the size headroom is thin."
+**So what.** "About 27,600 women 15+ no lounge reaches today, 83% of them searched, with room under
+the saturation line: a lounge here would add to the network's market rather than split a sibling's.
+High confidence."
 
 **Now what.** "Start a site search here: a shortlist for a site visit and lease search, verified on
-the ground before committing. It would drop to WATCH if addressable women fell by 3,464, or if
+the ground before committing. It would drop to WATCH if addressable women fell by 7,638, or if
 premium saturation rose by 106 reviews per 1k women."
 
 **How this call was made** shows the three tests as ✅ (big enough, unsaturated, enough of its women
-searched), and **What would change the call** gives both margins: the size one is thin, the
-saturation one isn't. The caveats: 98% of its women searched, no rents outside Dubai, a
+searched), and **What would change the call** gives both margins, both 20%+ clear of their lines
+(high confidence). The caveats: 83% of its women searched, no rents outside Dubai, a
 straight-line distance, and Bedashing's only Sharjah lounges (al-jada, zawaya-walk) are on the
 Dubai side, which is a business question the model can't answer.
 
@@ -163,7 +163,7 @@ data points each, so what, now what. It doesn't make or change calls.
   action, and nothing strays into in-branch advice (staffing, service quality).
 - What it can't check: adjectives. "Strong" or "modest" are unverified.
 
-**Offline, no API spend.** The 64 committed explanations in `data/explanations/cache.json` were
+**Offline, no API spend.** The 65 committed explanations in `data/explanations/cache.json` were
 written in a Claude Code session from the same prompts the API would get:
 `python -m src.explain prompts DIR` → write answers → `check DIR` → `ingest DIR`, which runs
 `verify` again and caches only grounded answers. `just explain` is the API route (needs a key).

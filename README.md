@@ -12,7 +12,7 @@ is checked against the data.
 
 1. **[Overview](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the COO's
    question, the executive summary and three at-stake figures (5 SHRINK lounges, 233,883 women in
-   shared cells; 5 GROW areas, 242,151 women).
+   shared cells; 5 GROW areas, 261,797 women).
 2. **Tick "All catchments (overlap)"** above the map: the red cells shared by 2+ lounges are the
    SHRINK story; the PROTECT lounges sit alone.
 3. **[delma](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=delma)
@@ -20,7 +20,8 @@ is checked against the data.
    siblings share its women, and *What would change the call* (shared catchment 98% → 55% makes it
    HOLD). High confidence: it holds in all 81 assumption combinations.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah)
-   (GROW):** 23,464 addressable women against a 20,000 line (thin), 44 premium reviews per 1k against 150.
+   (GROW):** 27,638 addressable women against a 20,000 line, 44 premium reviews per 1k against 150;
+   high confidence.
 5. **The fallback:** in the Overview's **🧪 What if…?** panel set travel time to 20 min and reopen
    mohammed-bin-zayed-city from its map panel: it turns HOLD (0.36) and the text switches to the
    labelled template.
@@ -116,7 +117,7 @@ housing, affluence elasticity 0.5):
   the top-k substitutes' median to the whole premium pool's (sanity check SC4); it is now HOLD by
   0.003 (composite 0.353), a knife-edge call flagged low confidence.
 - **Growth areas:** 5 GROW (Sharjah, Al Dhaid, Khor Fakkan and Kalba in Sharjah emirate, Al Jerf
-  in Ajman; 242k women between them), and 35 WATCH. The Sharjah four are beyond a 15-minute drive of Bedashing's two Sharjah
+  in Ajman; 262k women between them), and 36 WATCH, out of 413 growth areas. The Sharjah four are beyond a 15-minute drive of Bedashing's two Sharjah
   lounges (al-jada, zawaya-walk, both on the Dubai side); why the footprint is only two is a business
   question the model can't answer (licensing, brand fit, landlords). **Al Awir (Dubai)** is a WATCH
   whose size passes only on thin affluence data: 19.4k women, 20.1k addressable, from one DLD area
@@ -154,12 +155,14 @@ Four pages; the loop is **Overview → click a lounge or area → its page → b
    with toggles for growth areas (and SKIPs), Dubai rents, **all catchments (overlap)** and premium
    substitutes (selected lounge or every lounge); click a lounge or area for its short pyramid and
    caveats. **Compare** has a sortable **Lounges** table and a **Growth areas, ranked** table.
-2. **Lounges** (`/lounge?lounge=delma`): address and rating, the call with its pyramid and
-   caveats, raw vs addressable women, the four signals on their scales, premium substitutes, which
-   siblings share its women, *What would change the call*, and the factor table (value, threshold,
-   meaning, contribution to the composite) with its sources.
-3. **Areas** (`/area?area=kalba-sharjah`): the call against its tests, the margins that would move
-   it, a map of its cells, the nearest lounge and the factor table.
+2. **Lounges** (`/lounge?lounge=delma`): a picker filtered by emirate checkboxes (Abu Dhabi and
+   Dubai ticked; a link ticks its own emirate), then address and rating, the call with its pyramid
+   and caveats, raw vs addressable women, the four signals on their scales, premium substitutes,
+   which siblings share its women, *What would change the call*, and the factor table (value,
+   threshold, meaning, contribution to the composite) with its sources.
+3. **Areas** (`/area?area=kalba-sharjah`): a picker of the 68 areas with 5,000+ women, with the
+   same emirate checkboxes, then the call against its tests, the margins that would move it, a map
+   of its cells, the nearest lounge and the factor table.
 4. **How it works & limitations:** the ranked limitations, the market model, every assumption with
    its source, and every constant with why it was chosen.
 
@@ -206,7 +209,9 @@ its distance from 0.5), no rating gap, a call that changes in a third or more (2
 combinations of the four assumption levels, or one that changes when a signal weight moves ±25%.
 
 **Growth areas** (`src/model/growth.py`). Populated cells beyond a 15-min drive of every scored lounge,
-grouped by place name. **Big enough?** ≥ 20k addressable women, under 50% of adults in worker housing.
+one area per OSM place name, whether the cells touch or not. Cells with no OSM place within 3 km
+(about 34k women) stay in catchments and totals but make no area: nothing actionable is known about
+them. **Big enough?** ≥ 20k addressable women, under 50% of adults in worker housing.
 **Unsaturated?** Under 150 premium reviews per 1k women in the cells we searched (the lightest quarter
 of our own lounges' real premium markets, by a rule fixed in advance; lounge pages show the same
 measure). Both → GROW, one → WATCH, neither → SKIP; under 5k women is SKIP, as are areas named
@@ -243,7 +248,7 @@ supporting arguments, each backed by 2-5 data points from the fact sheet.
   hash of the exact numbers, so a stale one is never served; a what-if with changed numbers gets the
   template. The committed explanations were written in a Claude Code session from the same prompts
   the API would get, not by the API, for the current baseline (with the affluence weighting):
-  64 explanations, all passing the grounding check. NOT SCORED and SKIP always use the template.
+  65 explanations, all passing the grounding check. NOT SCORED and SKIP always use the template.
 - **Regenerate** after changing the model or data: `just explain` (API, needs `ANTHROPIC_API_KEY`),
   or offline with `python -m src.explain prompts DIR` → write the answers → `check DIR` → `ingest DIR`
   (see `justfile`).
@@ -323,10 +328,11 @@ Places) came only on 2026-10-08 to 09, and the model was rebuilt on it.
 
 **What we simplified.** Midday drive times with no distance decay; a cell is in a catchment if its
 centre is; lifetime reviews as each salon's draw; capture within the premium end only; Bedashing's
-price level assumed; affluence observed in Dubai only; one lounge format; no money and no capacity.
+price level assumed; affluence observed in Dubai only; one lounge format; no money and no capacity;
+growth areas merged by OSM place name, with cells that have no place within 3 km left out of them.
 
 **How we abstracted.** Space: ~2 km cells carrying women 15+, grouped into drive-time catchments
-and, outside them, into growth areas by place name. Lounges: four signals on fixed 0-1 scales,
+and, outside them, into growth areas by OSM place name (one per name, contiguous or not). Lounges: four signals on fixed 0-1 scales,
 weighted into one composite, cut at 0.35 and 0.65 into three labels. Areas: two yes/no tests
 (big enough, unsaturated) into three labels.
 
@@ -347,7 +353,7 @@ Every assumption with its source (table below), every constant with its reason (
 the limitations, ranked, first.
 
 **What we shipped, and what we didn't.** Shipped: the live app on all 24 lounges in five
-emirates, 64 grounded explanations, notebooks per stage, the ranked limitations. Not shipped: any
+emirates, 65 grounded explanations, notebooks per stage, the ranked limitations. Not shipped: any
 money or ROIC view, capacity, a free-text question box (the AI only explains precomputed calls),
 rush-hour catchments, a full competitor sweep, Bedashing's real price level.
 

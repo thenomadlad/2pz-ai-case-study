@@ -42,8 +42,11 @@ in numerator and denominator.
 _Avoid_: premium women, target market, weighted demand (unqualified)
 
 **Growth area**:
-A contiguous piece of populated cells beyond a 15-min drive of every open scored lounge, grouped by OSM
-place name. Labelled GROW / WATCH / SKIP.
+The populated cells beyond a 15-min drive of every open scored lounge that share an OSM place name
+(and emirate): one area per named place, whether its cells touch or not. Cells named only by their
+emirate (no OSM admin boundary or place within 3 km, `name_source == "emirate"`) make no area:
+nothing actionable is known about where they are. They still count in catchments, overlap and
+population totals. Labelled GROW / WATCH / SKIP.
 _Avoid_: opportunity area, whitespace, candidate site
 
 **Competitor**:
