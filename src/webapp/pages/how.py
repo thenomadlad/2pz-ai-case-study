@@ -5,7 +5,8 @@ import re
 import streamlit as st
 
 from src.config import REPO_ROOT
-from src.features.lounges import NOT_SCORED, THIN_MARKET
+from src.features.lounges import NOT_SCORED, NOT_SCORED_WHY
+from src.market import AFFLUENCE_CLIP, AFFLUENCE_CLIP_WHY
 from src.model import growth, scorecard
 from src.webapp import data
 from src.webapp.views import banner, wrapped_table
@@ -42,6 +43,10 @@ def _fmt(v) -> str:
     return ", ".join(v) if isinstance(v, list) else str(v)
 
 
+def _const(v) -> str:
+    return f"{v:g}" if isinstance(v, float) else f"{v:,}" if isinstance(v, int) else getattr(v, "pattern", str(v))
+
+
 def render() -> None:
     banner()
     st.title("How it works & limitations")
@@ -73,17 +78,19 @@ def render() -> None:
         {"Constant": "FLIP_LOW_SHARE", "Value": f"a third: {scorecard.FLIP_LOW} of {scorecard.COMBOS}",
          "Why": scorecard.FLIP_WHY},
         {"Constant": "NEUTRAL", "Value": f"{scorecard.NEUTRAL}",
-         "Why": "A missing rating gap, or capture in a thin market, scores neutral, never the worst."},
-        {"Constant": "THIN_MARKET", "Value": f"{THIN_MARKET} premium salons",
-         "Why": "Fewer premium salons than this: capture is a share of a tiny pool, so it is noise."},
+         "Why": "A missing rating gap scores neutral, never the worst; thin-market capture is pulled toward it."},
+        {"Constant": "THIN_MARKET", "Value": f"{scorecard.THIN_MARKET} premium salons",
+         "Why": scorecard.THIN_MARKET_WHY},
+        {"Constant": "WEIGHT_STEPS", "Value": " / ".join(f"×{x:g}" for x in scorecard.WEIGHT_STEPS),
+         "Why": scorecard.WEIGHT_WHY},
         {"Constant": "LOW_MARGIN / HIGH_MARGIN",
          "Value": f"low within {scorecard.LOW_MARGIN} of a line; high from {scorecard.HIGH_MARGIN}",
-         "Why": "Low also when the market is thin, the rating gap is missing, or the call flips "
-                f"{scorecard.FLIP_LOW}+ times."},
-        {"Constant": "NOT_SCORED", "Value": ", ".join(sorted(NOT_SCORED)),
-         "Why": "Serves travellers, not the women in its catchment."},
+         "Why": "Low also when the market is thin, the rating gap is missing, the call flips "
+                f"{scorecard.FLIP_LOW}+ times, or a signal weight ±25% changes it."},
+        {"Constant": "NOT_SCORED", "Value": ", ".join(sorted(NOT_SCORED)), "Why": NOT_SCORED_WHY},
+        {"Constant": "AFFLUENCE_CLIP (src/market.py)", "Value": f"{AFFLUENCE_CLIP[0]:g} to {AFFLUENCE_CLIP[1]:g}",
+         "Why": AFFLUENCE_CLIP_WHY},
     ])
 
     st.header("Growth areas (src/model/growth.py)")
-    wrapped_table([{"Constant": k, "Value": f"{getattr(growth, k):g}" if isinstance(getattr(growth, k), float)
-                    else f"{getattr(growth, k):,}", "Why": why} for k, why in growth.WHY.items()])
+    wrapped_table([{"Constant": k, "Value": _const(getattr(growth, k)), "Why": why} for k, why in growth.WHY.items()])

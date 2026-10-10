@@ -26,21 +26,21 @@ Open the [Overview](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.a
 COO's question, **"Where is my network under pressure, and where should we grow?"**, and answers it
 in the **Executive summary**:
 
-> **Of 23 scored lounges, 3 are PROTECT, 13 HOLD and 7 SHRINK; 4 growth areas, all in Sharjah
-> emirate, pass both tests to GROW.**
+> **Of 23 scored lounges, 3 are PROTECT, 14 HOLD and 6 SHRINK, and 5 growth areas pass both tests
+> to GROW.**
 
 Five numbered arguments follow (where to investigate, where to grow, what to protect, how sure we
-are, what this can't see), each with its data underneath, then **So what** ("The pressure is
-self-inflicted overlap: every SHRINK lounge shares most of its women with a sibling, while the three
-PROTECT lounges have their markets to themselves.") and **Now what**.
+are, what this can't see), each with its data underneath, then **So what** ("About 242,000 women
+live in the 5 GROW areas, beyond a 15-min drive of every lounge, while 6 lounges need a closer look;
+with 10 low-confidence calls, this is a shortlist to test, not a set of decisions.") and **Now what**.
 
 Below it, three at-stake figures, counted in women because the model has no money:
 
 | Metric | Value | Counts |
 |---|---|---|
-| Under pressure: 7 SHRINK lounges | 241,619 women | women in their catchment cells that a sibling also reaches |
+| Under pressure: 6 SHRINK lounges | 235,801 women | women in their catchment cells that a sibling also reaches |
 | To defend: 3 PROTECT lounges | 203,096 women | women within a 15-min drive of al-ain, al-taif-mall, ras-al-khaimah |
-| To grow: 4 GROW areas | 218,300 women | addressable women beyond a 15-min drive of every lounge; 37 more areas on WATCH |
+| To grow: 5 GROW areas | 242,151 women | addressable women beyond a 15-min drive of every lounge; 35 more areas on WATCH |
 
 Then the **⚠️ Before you trust these calls** box (no money in the model, lifetime reviews, Dubai-only
 affluence, 10 of 23 calls low confidence, growth areas a first cut) and the
@@ -54,89 +54,94 @@ alone. That is the whole SHRINK story in one picture. Untick it; the other toggl
 substitutes** (on) and **…of every lounge**. Hollow circles are low-confidence calls.
 
 **Compare.** At the bottom, the **Lounges** tab ranks every lounge by composite with its four
-signal scores, shared catchment, capture share, rating, reviews and confidence (filter by Call or
-Emirate; click a header to sort). The **Growth areas, ranked** tab lists GROW then WATCH by
-addressable women with a one-line *Why*.
+signal scores, shared catchment, capture share, premium reviews per 1k women (the growth areas'
+saturation measure, shown, not scored), rating, reviews and confidence (filter by Call or Emirate;
+click a header to sort). The **Growth areas, ranked** tab lists GROW then WATCH by addressable women
+with a one-line *Why* and a confidence.
 
-## 3. One lounge decision: shahama (SHRINK)
+## 3. One lounge decision: delma (SHRINK)
 
-Click the **shahama** flag north-east of Abu Dhabi island, or open
-[`?lounge=shahama`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/?lounge=shahama).
+Click the **delma** flag on Abu Dhabi island, or open
+[`?lounge=delma`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/?lounge=delma).
 The map draws its drive polygon, catchment cells and premium substitutes, and a panel opens under
-the legend with the short pyramid, **Top drivers:** cannibalisation 0.13 (weight 1) · rating 0.17
-(weight 0.5), and the caveats. Click **Open the lounge page →**
-([`/lounge?lounge=shahama`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=shahama)).
+the legend with the short pyramid, **Top drivers:** cannibalisation 0.02 (weight 1) · capture 0.14
+(weight 1), and the caveats. Click **Open the lounge page →**
+([`/lounge?lounge=delma`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=delma)).
 
-**What.** Deerfields Mall, Al Shahama Road, Abu Dhabi; 4.6★ from 757 Google reviews. *Composite 0.32
-· confidence low · the call changes in 63 of 81 assumption combinations.* The AI headline:
+**What.** Kim Tower, Delma Street, Al Nahyan, Abu Dhabi; 4.6★ from 676 Google reviews. *Composite
+0.23 · confidence high · the call changes in 0 of 81 assumption combinations.* The AI headline:
 
-> **SHRINK Shahama, to investigate: 87% of its 66,000 women are shared with siblings in a modest
-> market.**
+> **SHRINK: 98% of Delma's 93,200 catchment women are also reached by a sibling, and it holds 2% of
+> a crowded premium market.**
 
-Three arguments, in the order the code ranked them: **Cannibalisation** (87% shared, score 0.13),
-**Demand** (about 65,800 women, score 0.33), **Rating vs rivals** (4.6 against the substitutes' 4.8
-median).
+Two arguments, in the order the code ranked them: **Cannibalisation** ("98% of its catchment women
+live in cells another Bedashing lounge also reaches.") and **Capture** ("Against 29 premium
+substitutes in a pool of 114 it holds 2% of premium reviews, in a market with 587 premium reviews
+per 1k women.").
 
-**So what.** "It holds about 9% of premium reviews, roughly 5,600 customers by the review proxy, but
-most of its market is also within a sibling's reach. The call changes in 63 of 81 assumption
-combinations, so treat it as low confidence."
+**So what.** "About 1,900 women captured by the review proxy, almost all in cells a sibling also
+reaches, in a market far over the 150 premium reviews per 1k women a growth area must stay under.
+The call holds in all 81 assumption combinations."
 
 **Now what.** "Investigate, don't close: before the lease event, review whether to downsize or
-consolidate into the sibling that shares most of its catchment. It is just 0.03 below the HOLD
-line, which it would reach if shared catchment fell to 76%."
+consolidate into the sibling that shares most of its catchment. It is 0.12 below the HOLD line;
+only shared catchment falling to 55% would make it HOLD."
 
 **Drivers.** Scroll to the factor table at the bottom. The contribution rows sum to the composite:
-capture 0.16, demand 0.09, cannibalisation 0.04, rating 0.02, which is 0.32 before rounding each part. Capture is its best signal;
-overlap and a modest market drag it under 0.35.
+demand 0.13, rating 0.05, capture 0.04, cannibalisation 0.01, which is 0.23. Its market is
+mid-sized (93,190 women, demand score 0.47); almost all of it is shared and it holds a tiny slice of
+a very crowded one.
 
-**Counterfactual.** Above the table, **What would change the call**: "Composite 0.32 is 0.03 from
-the HOLD line. On its own, shared catchment would have to reach 76% of catchment women (now 87% of
+**Counterfactual.** Above the table, **What would change the call**: "Composite 0.23 is 0.12 from
+the HOLD line. On its own, shared catchment would have to reach 55% of catchment women (now 98% of
 catchment women) to make it HOLD."
 
-**Who it shares with.** The **Shared catchment** table names the siblings: khalifa-city-a reaches
-80% of shahama's women, noya-plaza 68%, westyas 59%. (The top row is the airport lounge at 85%; see
-section 6.)
+**Who it shares with.** The **Shared catchment** table names the siblings: khaleej-al-arabi reaches
+73% of delma's women, ministries-complex 69%, al-maqta 47%. khaleej-al-arabi is itself SHRINK, so
+the consolidation question is about the pair, not one lounge.
 
-**Caveats and confidence.** The yellow box beside the call: within 0.05 of the SHRINK line, flips in
-63 of 81 combinations, no observed rents outside Dubai, no revenue or footfall data. The 63 is
-real: shahama is SHRINK only at the 15-min drive. At 10 or 20 minutes it is HOLD. The sources
-caption under the table dates every input (Google Places 2026-10-08/09, WorldPop 2025, Mapbox
-midday traffic, DLD rents).
+**Caveats and confidence.** The blue box beside the call: confidence high, no observed rents
+outside Dubai, no revenue or footfall data. Unlike most calls near a line, this one doesn't move
+with the assumptions. The sources caption under the table dates every input (Google Places
+2026-10-08/09, WorldPop 2025, Mapbox midday traffic, DLD rents).
 
 **Contrast: khalifa-city-a (HOLD).**
 [`/lounge?lounge=khalifa-city-a`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=khalifa-city-a)
-is *more* overlapped (100% shared) but stays HOLD, at composite 0.41 with medium confidence:
-"a strong 12% share of premium reviews, but every one of its 91,000 women is also reached by a
-sibling." Capture contributes 0.23 of its 0.41. So the COO's lease-review list is shahama with
-khalifa-city-a named as the consolidation partner, and finance's P&L for both before anyone says
-"close".
+is just as overlapped (97% shared) but stays HOLD, at composite 0.43 with medium confidence:
+"Khalifa City A holds 13% of premium reviews, enough to offset 97% of its catchment being shared
+with siblings." Capture contributes 0.24 of its 0.43. So the COO's lease-review list is delma, with
+its siblings named and finance's P&L for each before anyone says "close".
 
 ## 4. One growth opportunity: Kalba (GROW)
 
-Back on the Overview, open the **Growth areas, ranked** tab: Kalba is rank 4 of 4 GROWs. Click its
+Back on the Overview, open the **Growth areas, ranked** tab: Kalba is rank 5 of 5 GROWs. Click its
 blue cells on the east coast, or open
 [`/area?area=kalba-sharjah`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah).
 
-> **GROW: Kalba has about 23,500 addressable women, 3,500 above the 20,000 line, and a premium
-> market under the saturation line (44 reviews per 1k women).**
+> **GROW: Kalba passes both tests, with 23,500 women and 44 premium reviews per 1k women, though it
+> clears the size line by only 3,464.**
 
-Arguments: **Size** (23,464 addressable women vs the 20,000 line), **Competition** (6 premium salons,
-44 reviews per 1k women, 5.9 under the line of 50), **Distance to a lounge** (al-taif-mall, 11.1 km
-in a straight line, beyond a 15-min drive).
+Arguments: **Size** (23,464 addressable women, 3,464 above the 20,000 line), **Competition** (6
+premium salons, 44 premium reviews per 1k women, 106 under the 150 line), **Distance to a lounge**
+(al-taif-mall, 11.1 km in a straight line, beyond a 15-min drive).
 
-**So what.** "About 23,500 women on the east coast are out of the network's reach, enough to carry a
-lounge, facing a premium market of only 6 salons; any lounge here would win customers no sibling
-already serves."
+**So what.** "About 23,500 women 15+ beyond a 15-min drive of every lounge, 98% of them searched.
+Confidence is medium: the size headroom is thin."
 
 **Now what.** "Start a site search here: a shortlist for a site visit and lease search, verified on
-the ground first. Both margins are thin: 3,500 fewer addressable women or 5.9 more premium reviews
-per 1k would drop it to WATCH."
+the ground before committing. It would drop to WATCH if addressable women fell by 3,464, or if
+premium saturation rose by 106 reviews per 1k women."
 
-**How this call was made** shows the three tests as ✅ (big enough, unsaturated, 98% of women
-searched), and **What would change the call** gives both margins. The caveats say it plainly: near
-the saturation line, which "was set from the data it judges"; no rents outside Dubai; and
-Bedashing's only Sharjah lounges (al-jada, zawaya-walk) are on the Dubai side, which is a business
-question the model can't answer.
+**How this call was made** shows the three tests as ✅ (big enough, unsaturated, enough of its women
+searched), and **What would change the call** gives both margins: the size one is thin, the
+saturation one isn't. The caveats: 98% of its women searched, no rents outside Dubai, a
+straight-line distance, and Bedashing's only Sharjah lounges (al-jada, zawaya-walk) are on the
+Dubai side, which is a business question the model can't answer.
+
+The newest GROW is
+[Al Jerf, Ajman](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=al-jerf-ajman): 23,851 addressable women and 11 premium salons at
+59 premium reviews per 1k women. It was a WATCH under the old saturation line of 50 and passes the
+recalibrated line of 150 (section 6).
 
 For a WATCH, compare
 [`/area?area=al-dhahir-abu-dhabi`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=al-dhahir-abu-dhabi):
@@ -150,15 +155,15 @@ data points each, so what, now what. It doesn't make or change calls.
 
 **How it's grounded** (`src/explain.py`):
 
-- `prioritize` decides which arguments appear and in what order (for shahama: cannibalisation,
-  demand, rating). The model can't pick its own.
+- `prioritize` decides which arguments appear and in what order (for delma: cannibalisation,
+  then capture). The model can't pick its own.
 - `verify` rejects an explanation unless the arguments are exactly the ranked ones, every cited value
   matches the fact sheet, every number in the prose is a fact or a published threshold (correctly
   rounded), the headline names the call before any other label, *now what* gives the call's
   action, and nothing strays into in-branch advice (staffing, service quality).
 - What it can't check: adjectives. "Strong" or "modest" are unverified.
 
-**Offline, no API spend.** The 65 committed explanations in `data/explanations/cache.json` were
+**Offline, no API spend.** The 64 committed explanations in `data/explanations/cache.json` were
 written in a Claude Code session from the same prompts the API would get:
 `python -m src.explain prompts DIR` → write answers → `check DIR` → `ingest DIR`, which runs
 `verify` again and caches only grounded answers. `just explain` is the API route (needs a key).
@@ -167,9 +172,10 @@ the data."*
 
 **Fallback.** The cache is keyed by a hash of the exact numbers. Change them and the cached text no
 longer applies, so a deterministic template takes over. Try it: in **🧪 What if…?** set **Travel
-time to a lounge** to **20 min (high)**, then click **Open the lounge page →** in shahama's panel
-(navigate inside the app: reloading the URL starts a fresh session at the baseline). A *What-if view* banner appears,
-shahama is now HOLD (composite 0.39), and its text is captioned *"Template — numbers changed by
+time to a lounge** to **20 min (high)**, then click the **al-maqta** flag (another SHRINK, low
+confidence) and **Open the lounge page →** in its panel (navigate inside the app: reloading the URL
+starts a fresh session at the baseline). A *What-if view* banner appears, al-maqta is now HOLD
+(composite 0.41), and its text is captioned *"Template — numbers changed by
 the what-if, so the cached AI text no longer applies."* **Reset to baseline** brings the AI text
 back. SKIP areas and the NOT SCORED airport lounge always use the template.
 
@@ -181,22 +187,23 @@ These matter more than the calls. The full ranked list is the **How it works & l
 - **No capacity, no money, no ROIC.** No chairs, hours, utilisation, revenue, rent or capex. The
   model can't tell a full lounge from an empty one or a profitable SHRINK from an unprofitable
   PROTECT. A SHRINK is a prompt to pull the P&L.
-- **SHRINK is driven by raw catchment overlap**, not by services that would be lost if a lounge
-  closed. 87% shared says shahama's women *could* reach a sibling, not that they would, or that
-  the sibling has room. The overlap also counts the **airport lounge**, which is NOT SCORED because
-  it serves travellers. It also counts as one of shahama's premium substitutes. Dropping it from the
-  overlap alone gives 82% shared, still above the 76% HOLD line. Removing it entirely (overlap
-  *and* substitutes) turns shahama into **HOLD** (0.32 → 0.38). So shahama's SHRINK partly rests on
-  a lounge that shouldn't be in the comparison. It's a known bug, and the airport shouldn't be
-  offered as a consolidation partner either.
-- **The growth saturation line sits below every operating lounge's market.** Kalba passes at 44
-  premium reviews per 1k women against a line of 50; the factor table notes that lounge catchments
-  run 88+. The back-test in `SANITY_CHECKS.md` (BT2) puts our own lounges at 88-629, so the growth
-  rule would refuse the markets Bedashing already operates in successfully, al-ain included. GROW
-  therefore favours places with almost no premium salons. It is a shortlist for site visits, not
-  evidence of a market.
-- **Calls move with assumptions.** 10 of 23 lounge calls are low confidence; shahama flips in 63 of 81
-  combinations.
+- **SHRINK is driven by raw catchment overlap** among the scored lounges, not by services that
+  would be lost if a lounge closed. 98% shared says delma's women *could* reach a sibling, not that
+  they would, or that the sibling has room.
+- **A fix changed a call.** shahama was SHRINK in the first version of this walkthrough (composite
+  0.32, 87% shared). Part of that was the NOT SCORED airport lounge, which still counted as its
+  sibling and as one of its premium substitutes. The sanity checks flagged it; taking the airport
+  out of every comparison made shahama a low-confidence **HOLD** (0.38, 82% shared, 0.03 above the
+  line). A call that rests on a modelling choice is exactly what this list is for.
+- **The growth saturation line is still calibrated on our own lounges.** It was 50 premium reviews
+  per 1k women, below every lounge market with 10+ premium salons (88+), so GROW only went to near-empty places.
+  A back-test (BT5 in `SANITY_CHECKS.md`) found that clustering doesn't hurt premium salons, so the
+  line moved to 150: the 25th percentile of the lounge catchments with a real premium market, by a
+  rule fixed before seeing the result. That added Al Jerf and narrowed the tilt toward empty areas
+  without removing it: the five GROWs run 5-59, and 150 is still judgement. GROW is a shortlist for
+  site visits, not evidence of a market.
+- **Calls move with assumptions.** 10 of 23 lounge calls are low confidence; mohammed-bin-zayed-city
+  flips in 54 of 81 combinations, al-maqta in 36.
 - **Capture rests on lifetime Google reviews**, so new lounges look weak. **Affluence is observed in
   Dubai only**: every lounge and area in this walkthrough is weighted neutral.
 - **Midday drive times, no distance decay**, and a competitor search that misses smaller salons where

@@ -22,6 +22,13 @@ Everything the app reads is committed in `data/seed/v3/`. Full method and caveat
 
 Not committed, re-fetchable: `data/raw/` (API caches, the DLD download, GHSL tiles, OSM).
 
+**Mapbox isochrones are a cache.** All the drive-time polygons are fetched once by
+`scripts/fetch_isochrones.py` and kept, so the model never calls Mapbox at run time (see the licence
+note above). `cell_isochrones.geojson` (per-cell 10/15/20-min polygons) is **not read by anything in
+`src/`** (only `notebooks/catchments.ipynb` loads it, for inspection): the model and app use `lounge_isochrones.geojson` and `catchment_cells.csv`. It is kept
+for the per-cell travel-time work (a Huff / served-demand model, `docs/limitations.md`), which
+would otherwise need ~810 Mapbox calls (one per cell) to rebuild.
+
 ## Gaps
 
 | Gap | Effect on the analysis | How to fill it | Cost |

@@ -109,15 +109,21 @@ def weighted_median(values, weights) -> float | None:
             return float(v)
 
 
+AFFLUENCE_CLIP = (0.25, 4.0)
+AFFLUENCE_CLIP_WHY = ("A cell's weight before rescaling stays between a quarter and four times the "
+                      "median-rent cell's: a few luxury or very cheap cells can't swamp a catchment's demand "
+                      "(final weights 0.44-2.54 at medium elasticity, CONTEXT.md).")
+
+
 def affluence_weight(rent, women, elasticity: float):
     """Per cell (pandas, same index): (rent / women-weighted median rent) ** elasticity, clipped (before rescaling) to
-    [0.25, 4] and rescaled so the women-weighted mean over cells with a rent is 1. Cells without an
+    AFFLUENCE_CLIP and rescaled so the women-weighted mean over cells with a rent is 1. Cells without an
     observed rent (NaN) get 1.0: affluence unknown, weighted neutral. Elasticity 0 turns it off."""
     out = rent.isna() * 0 + 1.0                # 1.0 everywhere, same index
     obs = rent.notna() & (women > 0)
     if not elasticity or not obs.any():
         return out
     w = (rent[obs] / weighted_median(rent[obs], women[obs])) ** elasticity
-    w = w.clip(0.25, 4)
+    w = w.clip(*AFFLUENCE_CLIP)
     out[obs] = w * women[obs].sum() / (w * women[obs]).sum()
     return out

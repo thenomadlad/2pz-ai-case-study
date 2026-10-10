@@ -28,14 +28,21 @@ review counts are **lifetime totals**, so:
   are new.
 - Chains probably push for reviews more than independents, which may inflate Bedashing.
 - Reviews are a proxy for customers, not a count of them.
+- **Tourist and visitor skew.** Salons in malls and tourist areas collect reviews from visitors
+  who don't live in the catchment. That inflates their review counts against the catchment's
+  resident women: a mall lounge's capture, and a mall-heavy area's premium reviews per 1k women
+  (saturation, see 8), both read high. Incentivised reviews push the same way, unevenly.
 
 Capture also falls as competition rises. Across lounges, catchment women and capture have a
 Spearman correlation of **−0.74**: big Dubai markets are crowded, so the lounge's share there is
 tiny (about 1%, 0.8-1.6%, at al-barsha, city-walk, jumeirah-park and nad-al-sheba). Demand and capture
 partly cancel, and a big crowded market tends to land in HOLD. We considered replacing both with
-one "estimated customers" signal and rejected it, because it turned four of the five Dubai
-lounges into SHRINK (`decisions.ipynb`, open question a).
+one "estimated customers" signal and rejected it, because, when tested on 2026-10-09, it turned four of the
+five Dubai lounges into SHRINK (`decisions.ipynb`, open question a). Rejecting a signal for its
+outcome is the tuning-to-taste the rubric warns about (MO7), so we name it here.
 
+- Capture is a **proxy of a proxy**: reviews stand in for customers, and customers stand in for
+  share of the premium market.
 - **Touches:** the capture signal (1 of 3.5 weight), and so every composite.
 - **Fix:** a better share-of-customers measure: booking-platform data, card-spend panels, or
   footfall (e.g. mobile location data). A Huff gravity model (each woman's spend split across
@@ -45,7 +52,7 @@ lounges into SHRINK (`decisions.ipynb`, open question a).
 
 Demand counts **addressable women**: each cell's women weighted by how its median household rent
 compares with the women-weighted median (`(rent / median) ^ elasticity`, clipped to 0.25-4 before
-rescaling to a mean of 1 over the observed cells; final weights 0.44-2.54 at medium, 0.18-2.68 at
+rescaling to a mean of 1 over the observed cells; final weights 0.44-2.53 at medium, 0.18-2.68 at
 strong).
 The rents are DLD Ejari contracts for one flat, villa or studio, registered 2026-07-10 to
 2026-10-09 (`affluence.ipynb`). This is the only affluence signal in the model, and it is thin:
@@ -81,7 +88,7 @@ The rents are DLD Ejari contracts for one flat, villa or studio, registered 2026
   observed cells, so affluence only reshuffles demand between Dubai cells; it can't say whether
   Dubai is richer than Abu Dhabi. Dubai lounges in above-average-rent catchments gain (al-barsha
   +18%), while an equally affluent Abu Dhabi catchment stays at 1, so Dubai lounges are inflated
-  relative to non-Dubai ones. All 7 SHRINKs are in Abu Dhabi, the part affluence can't see. The
+  relative to non-Dubai ones. All 6 SHRINKs are in Abu Dhabi, the part affluence can't see. The
   near-zero effect on the calls is partly this design, not evidence that affluence doesn't matter.
 - **Fix:** Abu Dhabi rents from ADREC (its public map's data service refuses queries, HTTP 403;
   the API needs a subscription); the Sharjah rental index when it is published; per-cell income or
@@ -95,9 +102,10 @@ roughly doubles most catchments compared with 15 (median ×1.86), and 10 min shr
 a third.
 
 - **10 of 23** scored lounges are **low confidence**: within 0.05 of a threshold, missing an input,
-  a thin market, or a call that changes in a third or more (27+) of the 81 level combinations.
-  shahama flips in 63 of 81, mohammed-bin-zayed-city in 54, al-maqta in 36, and al-barsha and
-  city-walk in 27. The affluence level moves no lounge on its own, so these are three times the
+  a thin market, a call that changes in a third or more (27+) of the 81 level combinations, or one
+  that changes when a single signal weight moves ±25% (in practice that only catches calls already
+  within 0.05 of a line). mohammed-bin-zayed-city flips in 54 of 81, al-maqta in 36, and al-barsha
+  and city-walk in 27. The affluence level moves no lounge on its own, so these are three times the
   counts over the other three levels.
 - The app's what-if panel switches the levels, so you can watch a lounge move.
 - **Fix:** evidence on how far UAE women actually travel to a salon (a customer postcode sample
@@ -126,6 +134,12 @@ error from 0.21 to 0.13.
 - There's no income, nationality or age mix. A premium lounge's real market is a slice of these
   women; observed Dubai rents weight them, and nothing else does (see 3).
 - Cell membership is decided by the cell's centre point, on a ~2 km grid.
+- **WorldPop is a modelled surface, not a count.** The 2025 release (R2025A, constrained) spreads
+  census-based totals, projected forward, onto 100 m built-up pixels with a dasymetric model driven
+  by covariates such as building footprints. Totals over big areas are anchored; a single ~2 km
+  cell is the model's allocation, so a small cell's women can be off by a lot (a new tower block
+  missing, or a district's people spread evenly across it). Trust areas and catchments more than any
+  one cell. Its age is the release year: neighbourhoods built since aren't in it.
 - **Fix:** Dubai/Abu Dhabi statistics-centre community data with the sex split (where published),
   and affluence data outside Dubai (see 3).
 
@@ -142,26 +156,42 @@ Competitors come from Google Places nearby searches on 1.8 km circles. Each sear
   level is assumed to be `expensive`.
 - Home-service salons are invisible. Budget salons and the long tail are left out on purpose:
   capture is a share of the premium end, not of the whole market.
-- **Thin markets:** al-dhafra and al-falah have under 10 premium salons, so their capture is
-  scored neutral (0.5) and their calls are low confidence.
+- **Thin markets:** al-dhafra (7 premium salons) and al-falah (6) have under 10, so their capture
+  score is pulled toward neutral (0.5) in proportion: with n salons it keeps n/10 of its distance from
+  0.5, a blend rather than a cliff. Their calls are low confidence.
 - **Fix:** a full sweep of the capped circles (~1,600-6,000 calls; free from 1 November, ~$54-210
   now; declined 2026-10-09), and Bedashing's real price level from its booking pages.
 
 ## 8. Growth areas are a first cut
 
-Growth areas are populated cells beyond a 15-min drive of every lounge, grouped by OSM place name
-and split into contiguous pieces.
+Growth areas are populated cells beyond a 15-min drive of every scored lounge, grouped by OSM place
+name and split into contiguous pieces.
 
 - **Competitor data is partial.** Cells outside the catchments were searched only where they hold
   2,000+ women. Areas with under 50% of their women searched are capped at WATCH, and their
-  saturation is computed over the searched cells only. 539 of 580 areas are SKIP; most are small.
-- **The saturation line (50 premium reviews per 1k women) was set from the data it judges.** It
-  sits well below the least crowded working catchment (88) and above most growth areas (median 5).
-  Al Jerf (59) and Kalba (44) sit near it.
+  saturation is computed over the searched cells only. 540 of 580 areas are SKIP; most are small.
+- **Non-residential places are skipped by name.** WorldPop puts people in industrial zones, free
+  zones, military bases, airports and ports; 29 areas with such names are SKIP before any test. Small,
+  unsaturated areas that are mostly worker housing are SKIP too. Camps without such a name get through
+  on their worker share alone. Dubai Investments Park stays WATCH at 4% worker housing (see 6), and we
+  accept that: it is mixed-use, with residential communities alongside the industrial plots, so it is
+  not a clear non-residential name. WATCH there means "revisit", not "open".
+- **Saturation reads high where visitors review** (malls, tourist strips; see 2): their reviews
+  count against resident women only.
+- **The saturation line (150 premium reviews per 1k women) is still set from our own lounges.** It
+  was 50, which sat below every lounge catchment with a real premium market (88+), so GROW only went to near-empty
+  places and would have refused the markets Bedashing already operates in. Back-test BT5
+  (`SANITY_CHECKS.md`) found clustering doesn't hurt: premium salons with 3+ neighbours within
+  1.5 km have a median of about 220 reviews against 126 for isolated ones. So the line was
+  recalibrated by a rule fixed before seeing the result: the 25th percentile of the 21 lounge
+  catchments with a real premium market (10+ premium salons; they run 88-630), 152.8, rounded to
+  150. The lounges' own catchments are measured the same way and shown on the lounge pages. The
+  tilt toward empty areas is reduced, not gone: the line is a quarter of the way up our markets,
+  and the five GROW areas run 5-59. It is still judgement, calibrated on the data it judges.
 - **Al Awir (Dubai) is a WATCH whose size passes only on thin affluence data** (see 3): 19.4k
   women, 20.1k addressable at medium, against a 20k line, with rents for 38% of its women.
-- **All 4 GROW areas are in Sharjah emirate** (Sharjah, Al Dhaid, Khor Fakkan, Kalba). All are beyond a
-  15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), both on the Dubai
+- **4 of the 5 GROW areas are in Sharjah emirate** (Sharjah, Al Dhaid, Khor Fakkan, Kalba); the
+  fifth is Al Jerf in Ajman. The Sharjah four are beyond a 15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), both on the Dubai
   side; the "Sharjah" area's centre is ~13 km from al-jada. The business question is why the
   Sharjah footprint is only two lounges. The model can't see licensing, brand fit,
   landlord terms or customer mix. "Sharjah" is one 91k-women area. It's contiguous, so it wasn't
@@ -173,7 +203,7 @@ and split into contiguous pieces.
 ## 9. The rating signal is weak
 
 Google ratings come in 0.1★ steps, and lounges span only 4.4-4.9★. The rating gap (lounge minus
-its substitutes' median) takes six values. It counts at **half weight**. Most lounges rate slightly
+its substitutes' median) takes only a handful of values. It counts at **half weight**. Most lounges rate slightly
 below their substitutes (the median gap is −0.1★); we checked, and this is not caused by the
 premium filter.
 
@@ -186,15 +216,23 @@ near the lines. That is why the low-confidence flag exists.
 
 ## 11. Cannibalisation is a symmetric share
 
-`shared_share` is the share of a lounge's catchment women that another lounge also reaches. It
+`shared_share` is the share of a lounge's catchment women that another scored lounge also reaches. It
 penalises both lounges in an overlap equally. It doesn't model where the customers would go if one
 closed. Closing a lounge in the what-if panel makes its neighbours look better, by construction.
-Abu Dhabi city lounges share 85-100% of their women.
+Abu Dhabi city lounges mostly share 82-100% of their women. SHRINK is
+driven by this raw overlap, not by services that would be lost if a lounge closed: the model has
+no capacity, no served demand and no ROIC (see 1).
 
 ## 12. Excluded and special cases
 
 - **zayed-international-airport** is NOT SCORED: it serves travellers, not the women around it. It
-  stays on the map, and its catchment still counts as "reached" for the growth areas.
+  stays on the map but is left out of every comparison: it is no lounge's sibling in the shared
+  catchment, no lounge's premium substitute, no area's nearest lounge, and its catchment cells are
+  open to growth areas. **This was a bug until 2026-10-10:** the airport counted as a sibling and as
+  a premium substitute, and that was part of why shahama was SHRINK (composite 0.32, 87% shared).
+  Removing it from both moved shahama to HOLD (0.38, 82% shared), and shifted al-maqta,
+  khalifa-city-a (100% → 97% shared), ministries-complex, noya-plaza and westyas slightly. The
+  sanity checks caught it, not the model's own tests.
 - **New lounges** (e.g. noya-plaza): see 2. Lifetime reviews understate them.
 
 ## 13. The explanations
@@ -211,3 +249,14 @@ Google data was fetched 2026-10-08/09. Google's terms allow storing only `place_
 the rest should be refreshed within 30 days. WorldPop is the 2025 release; OSM is a 2026-07-28
 snapshot. DLD rents are contracts registered 2026-07-10 to 2026-10-09, downloaded 2026-10-10;
 GHSL built form is 2018.
+
+## How this compares with standard retail-location methods
+
+| Method | What it does | What we do instead, and the gap |
+|---|---|---|
+| **Huff gravity** | Each customer's patronage split across stores by attractiveness ÷ distance^λ | **Not implemented.** It needs a λ calibrated on where customers actually come from (booking postcodes we don't have) and travel times from every cell to every salon. We use hard 15-min catchments plus a review share (capture), so there is no distance decay and no probabilistic split (see 2, 5). `cell_isochrones.geojson` is kept for this work |
+| **Voronoi / nearest-facility** | Each customer goes to the nearest store; trade areas never overlap | We use **drive-time isochrones**, which do overlap. The overlap is the point: `shared_share` measures exactly what a Voronoi split would hide. Women in an overlap count in full for every lounge that reaches them; `shared_share` flags that but doesn't split them (see 11) |
+| **Index of Retail Saturation** | Demand × spend ÷ supply | The growth areas' **premium reviews per 1k women** is an IRS-like supply ÷ demand ratio, inverted, with **no spend term**: reviews stand in for supply capacity, and it divides by raw women. The only nod to spend is the separate size test on addressable (rent-weighted) women, which works in Dubai only (see 3) |
+| **MCDA / weighted overlay** | Score sites on several criteria with stated weights | The lounge scorecard **is** one: four signals on fixed anchors, stated weights (1/1/1/½). The anchors and weights are judgement (see 10); the confidence flag tests the four assumption levels and each weight ±25% (which only catches calls already within 0.05 of a line), not the anchors |
+| **MCLP / location-allocation** | Pick the *set* of new sites that maximises coverage together | We score each growth area **independently**, so two GROW areas near each other could cannibalise each other, and a big area may hold more than one site (see 8) |
+| **Analog / sales regression** | Predict a site's sales from comparable stores' revenue | Needs per-lounge revenue, which we don't have. **This is the main reason the scorecard is a proxy** (see 1) |

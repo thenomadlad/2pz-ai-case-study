@@ -89,7 +89,9 @@ GLOSSARY: dict[str, Field] = {
         "missed). A proxy for share of premium customers.", pct=True),
     "thin_premium_market": Field(
         "Thin premium market", "yes/no",
-        "Fewer than 10 premium salons: capture of a tiny pool is noise, so it scores neutral."),
+        f"Fewer than {scorecard.THIN_MARKET} premium salons: capture of a tiny pool is noisy, so its "
+        f"score is pulled toward neutral (0.5), keeping premium salons ÷ {scorecard.THIN_MARKET} of its "
+        "distance from it."),
     "lounge_rating": Field("Google rating", "stars (of 5)", "The lounge's Google rating."),
     "lounge_reviews": Field("Google reviews", "count", "Reviews behind the lounge's rating."),
     "substitutes_median_rating": Field("Substitutes' median rating", "stars (of 5)",
@@ -140,11 +142,18 @@ GLOSSARY: dict[str, Field] = {
     "premium_reviews_per_1k": Field(
         "Premium saturation", "reviews per 1k women",
         "Premium salons' Google reviews (scaled up for missed salons) per 1,000 women in the "
-        "searched cells. Lounge catchments run 88+; empty areas under 10."),
+        "searched cells: the same measure for a lounge's catchment and a growth area. Scored "
+        "lounge catchments with 10+ premium salons run 88-630; empty areas under 10. Lounges: "
+        "shown, not scored."),
     "data_coverage": Field("Competitor data coverage", "% of women",
                            "Share of the area's women in cells our salon search covered.",
                            pct=True),
-    "nearest_lounge_id": Field("Nearest lounge", "", "Closest open Bedashing lounge."),
+    "nearest_lounge_id": Field("Nearest lounge", "", "Closest open, scored Bedashing lounge."),
+    "confidence": Field(
+        "Confidence", "",
+        f"Low within {growth.NEAR_LINE:.0%} of the size or saturation line, with saturation unknown, "
+        f"under {growth.MIN_COVERAGE:.0%} of the women searched, or big only on thin affluence data; "
+        f"high {growth.FAR_LINE:.0%}+ from both lines; else medium."),
     "nearest_lounge_km": Field("Distance to nearest lounge", "km",
                                "Straight-line distance; every area is beyond a 15-min drive."),
     "big_enough": Field("Big enough", "yes/no",
@@ -189,8 +198,8 @@ GLOSSARY: dict[str, Field] = {
                                   "Highest composite among SHRINK lounges."),
     "low_confidence_count": Field(
         "Low-confidence calls", "lounges",
-        "Calls within 0.05 of a threshold, with a missing input, or that flip across "
-        "assumption levels."),
+        "Calls within 0.05 of a threshold, with a missing input or a thin premium market, or "
+        "that flip across assumption levels or when a signal weight moves ±25%."),
     "growth_areas_total": Field("Growth areas", "count",
                                 "Populated areas beyond a 15-min drive of every lounge."),
     "grow_count": Field("GROW", "areas", "Areas passing both tests."),
@@ -288,7 +297,7 @@ THRESHOLDS: dict[str, str] = {
     **{f"score_{s.name}": f"Weight {s.weight:g} of {_TOTAL_WEIGHT:g}" for s in scorecard.SIGNALS},
     "composite": (f"PROTECT ≥ {scorecard.PROTECT_AT} · HOLD between · "
                   f"SHRINK ≤ {scorecard.SHRINK_AT}"),
-    "thin_premium_market": "Capture scores 0.5 when yes",
+    "thin_premium_market": f"When yes, capture's score is pulled toward 0.5 (pool ÷ {scorecard.THIN_MARKET})",
     "level_flips": f"Low confidence at {scorecard.FLIP_LOW} or more",
     "addressable_women": f"GROW needs {growth.GROW_MIN_WOMEN:,}",
     "women": f"SKIP under {growth.SKIP_UNDER_WOMEN:,}",
@@ -368,7 +377,7 @@ def _rounded(facts: dict) -> dict:
 # --- facts ------------------------------------------------------------------------------
 
 LOUNGE_TABLE = ("catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
-                "catchment_cells", "shared_share", "premium_pool",
+                "catchment_cells", "shared_share", "premium_pool", "premium_reviews_per_1k",
                 "substitutes_k", "capture", "thin_premium_market", "est_customers",
                 "lounge_rating", "lounge_reviews", "substitutes_median_rating", "rating_gap",
                 "level_flips", "composite", "score_demand", "score_cannibalisation",
@@ -377,7 +386,7 @@ LOUNGE_TABLE = ("catchment_women", "addressable_women", "affluence_rent", "afflu
                 "flip_value")
 AREA_TABLE = ("women", "addressable_women", "affluence_rent", "affluence_coverage", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
               "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
-              "unsaturated", "size_gap", "saturation_gap", "worker_gap", "coverage_gap")
+              "unsaturated", "confidence", "size_gap", "saturation_gap", "worker_gap", "coverage_gap")
 NOT_SCORED_ACTION = "NOT SCORED"
 
 
@@ -403,7 +412,7 @@ def _counterfactual(facts: dict, action: str) -> dict:
     for topic in prioritize("lounge", facts, action) + [s.name for s in scorecard.SIGNALS]:
         s = next(s for s in scorecard.SIGNALS if s.name == topic)
         if topic == "rating" or (topic == "capture" and facts.get("thin_premium_market")):
-            continue  # rating is not a portfolio lever (OB4); thin-market capture is fixed at neutral
+            continue  # rating is not a portfolio lever (OB4); thin-market capture is damped toward neutral, off its scale
         needed = facts[f"score_{topic}"] + sign * gap * _TOTAL_WEIGHT / s.weight
         if 0 <= needed <= 1:
             out.update(flip_driver=topic, flip_value=s.worst + needed * (s.best - s.worst))
@@ -414,7 +423,7 @@ def _counterfactual(facts: dict, action: str) -> dict:
 def area_facts(a: Area, d: AreaDecision) -> dict:
     facts = {k: getattr(a, k) for k in AREA_TABLE if hasattr(a, k)}
     facts.update(area_name=a.name, emirate=a.emirate, big_enough=d.big_enough,
-                 unsaturated=d.unsaturated, grow_min_women=growth.GROW_MIN_WOMEN,
+                 unsaturated=d.unsaturated, confidence=d.confidence, grow_min_women=growth.GROW_MIN_WOMEN,
                  skip_under_women=growth.SKIP_UNDER_WOMEN,
                  unsaturated_per_1k=growth.UNSATURATED_PER_1K, worker_cap=growth.WORKER_CAP,
                  min_coverage=growth.MIN_COVERAGE,
@@ -498,8 +507,8 @@ GROWTH_WHY = (
     f"reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not "
     f"searched enough to tell (under {growth.MIN_COVERAGE:.0%} of its women), or is big only "
     f"through the affluence weighting with rents observed for under {growth.MIN_COVERAGE:.0%} of its women. SKIP passes "
-    f"neither, or has under {growth.SKIP_UNDER_WOMEN:,} women. Every area is beyond a 15-min "
-    "drive of every lounge.")
+    f"neither, or has under {growth.SKIP_UNDER_WOMEN:,} women, or is non-residential by name. Every area "
+    "is beyond a 15-min drive of every scored lounge.")
 
 
 def _thresholds_note(kind: str) -> str:

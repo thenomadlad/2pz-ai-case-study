@@ -49,6 +49,8 @@ class Decision(BaseModel):
     composite: float = 0.0
     # Per-signal score on its fixed 0-1 scale (1 = good for the branch).
     scores: dict[str, float] = {}
+    # Signal-weight variants (×0.75 / ×1.25, one at a time) that change the call (scorecard.WEIGHT_STEPS).
+    weight_flips: list[str] = []
 
 
 
@@ -61,6 +63,7 @@ class AreaDecision(BaseModel):
     unsaturated: bool | None        # None: no competitor data
     rationale: str
     caveats: list[str]
+    confidence: Literal["low", "medium", "high"] = "medium"   # as for lounges (growth._confidence)
 
 
 class Evidence(BaseModel):
@@ -134,6 +137,7 @@ class LoungeFeatures(BaseModel):
     recall_multiplier: float
     premium_pool: int               # premium salons in its catchment
     thin_premium_market: bool       # premium_pool < THIN_MARKET
+    premium_reviews_per_1k: float | None = None   # catchment saturation, as for areas; display only, not scored
     substitutes_median_rating: float | None
     rating_gap: float | None        # rating - substitutes_median_rating
     est_customers: float            # capture x addressable_women (0 if not scored)

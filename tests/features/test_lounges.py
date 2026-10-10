@@ -128,12 +128,34 @@ def test_no_substitutes_and_no_ratings_never_nan(tiny_v3_empty):
     assert f.substitutes_k == 0 and f.premium_pool == 0 and f.est_customers == f.catchment_women
 
 
-def test_airport_is_not_scored_but_still_reaches(real_v3):
+def test_airport_is_not_scored_and_out_of_every_comparison(real_v3):
+    # Run-2 fix A1 (2026-10-10): the airport used to count as a sibling and a substitute (it decided
+    # shahama's SHRINK) and its catchment blocked growth areas. Now it is in no comparison.
+    from src.features.lounges import _candidates
     f, areas = build(real_v3, ASSUMPTIONS)
     air = by_id(f)["zayed-international-airport"]
     assert air.not_scored and air.est_customers == 0
-    reached = set(real_v3.catchment.query("level == 'medium' and branch_id == 'zayed-international-airport'").cell_id)
-    assert not reached & {c for a in areas for c in a.cell_ids}
+    pid = next(lo.place_id for lo in real_v3.lounges if lo.branch_id == "zayed-international-airport")
+    assert all(s["place_id"] != pid for lo in real_v3.lounges
+               for s in _candidates(real_v3, Levels(), frozenset(), lo.branch_id))
+    assert all(a.nearest_lounge_id != "zayed-international-airport" for a in areas)
+    # shared_share: the same as with the airport closed, for every scored lounge
+    closed = by_id(build(real_v3, ASSUMPTIONS, closed=frozenset({"zayed-international-airport"}), areas=False)[0])
+    assert all(x.shared_share == closed[x.branch_id].shared_share for x in f if not x.not_scored)
+
+
+def test_lounge_saturation_is_the_growth_area_measure(tiny_v3):
+    # Run-2 fix B1: one helper for both (rubric MO8). Lounge a's catchment [C1] scored as a lounge
+    # equals the growth area those same cells form once a is closed.
+    c = _cell(C1, 0)
+    circle = {"purpose": "growth", "lat": c["lat"], "lng": c["lng"], "radius_m": 500, "results": 20, "full": True}
+    v = _v3([_lounge("a", C1, 100), _lounge("far", FAR, 10)], [_cell(C1, 1000), _cell(FAR, 0)],
+            {"a": [C1], "far": []}, [_salon("s1", C1, 300), _salon("s2", C1, 50, price="moderate")], {}, [circle])
+    lounge = by_id(build(v, ASSUMPTIONS)[0])["a"]
+    area = build(v, ASSUMPTIONS, closed=frozenset({"a"}))[1][0]
+    assert area.cell_ids == [C1]
+    assert lounge.premium_reviews_per_1k == area.premium_reviews_per_1k == pytest.approx(
+        300 / ASSUMPTIONS.search_recall / (women(v, C1) / 1000))
 
 
 def test_every_level_combination_builds(real_v3):
@@ -150,15 +172,19 @@ def test_travel_level_changes_competition(real_v3):
     assert any(hi[b].premium_pool > lo[b].premium_pool for b in hi)
 
 
-# Composites and GROW areas at medium levels before affluence existed (commit f049b9b).
+# Composites and GROW areas at medium levels before affluence existed (commit f049b9b), updated for
+# the run-2 fixes (2026-10-10): A1 (airport out of shared catchments and substitute pools) moved
+# al-maqta, khalifa-city-a, ministries-complex, noya-plaza, shahama and westyas; A4 (thin-market
+# blend) moved al-dhafra 0.4851 -> 0.5851 and al-falah 0.4809 -> 0.5666; D1 (saturation line 50 ->
+# 150) added al-jerf-ajman to GROW. Affluence off must still reproduce the unweighted model.
 BEFORE_AFFLUENCE = {
-    "al-ain": 0.7619, "al-barsha": 0.3664, "al-dhafra": 0.4851, "al-falah": 0.4809, "al-jada": 0.4872,
-    "al-maqta": 0.3266, "al-taif-mall": 0.6933, "baniyas": 0.4224, "city-walk": 0.4074, "delma": 0.227,
-    "jumeirah-park": 0.4132, "khaleej-al-arabi": 0.2773, "khalifa-city-a": 0.4103,
-    "ministries-complex": 0.381, "mirdif-35": 0.4974, "mohammed-bin-zayed-city": 0.2769,
-    "nad-al-sheba": 0.4345, "noya-plaza": 0.2113, "ras-al-khaimah": 0.6643, "shahama": 0.3176,
-    "shakhbout-city": 0.4194, "westyas": 0.2177, "zawaya-walk": 0.5135}
-GROW_BEFORE = {"sharjah-sharjah", "al-dhaid-sharjah", "khor-fakkan-sharjah", "kalba-sharjah"}
+    "al-ain": 0.7619, "al-barsha": 0.3664, "al-dhafra": 0.5851, "al-falah": 0.5666, "al-jada": 0.4872,
+    "al-maqta": 0.3411, "al-taif-mall": 0.6933, "baniyas": 0.4224, "city-walk": 0.4074, "delma": 0.227,
+    "jumeirah-park": 0.4132, "khaleej-al-arabi": 0.2773, "khalifa-city-a": 0.4255,
+    "ministries-complex": 0.3831, "mirdif-35": 0.4974, "mohammed-bin-zayed-city": 0.2769,
+    "nad-al-sheba": 0.4345, "noya-plaza": 0.2156, "ras-al-khaimah": 0.6643, "shahama": 0.3828,
+    "shakhbout-city": 0.4194, "westyas": 0.2252, "zawaya-walk": 0.5135}
+GROW_BEFORE = {"sharjah-sharjah", "al-dhaid-sharjah", "khor-fakkan-sharjah", "kalba-sharjah", "al-jerf-ajman"}
 
 
 def test_affluence_off_reproduces_the_unweighted_model_exactly(real_v3):

@@ -204,8 +204,8 @@ not decisions.
   renders `docs/limitations.md`).
 - **Removed:** the old seed CSVs, `src/acquire`, `src/scenario`, the rubric / opportunity model,
   `data/processed`, `scripts/fetch_competitors.py` and the old explanation kinds.
-- **Baseline:** 3 PROTECT / 13 HOLD / 7 SHRINK, 1 NOT SCORED, 10 of 23 low confidence; 4 GROW (all
-  in Sharjah emirate), 37 WATCH.
+- **Baseline (at the time; superseded, see README):** 3 PROTECT / 13 HOLD / 7 SHRINK, 1 NOT SCORED,
+  10 of 23 low confidence; 4 GROW (all in Sharjah emirate), 37 WATCH.
 
 ### What's left
 - **The fix list is [`docs/limitations.md`](limitations.md)**, ranked by how much each could change

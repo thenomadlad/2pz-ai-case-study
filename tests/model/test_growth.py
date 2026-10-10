@@ -80,11 +80,56 @@ def test_mixed_area_saturation_ignores_uncovered_cells():
     assert small.premium_reviews_per_1k == pytest.approx(300 / ASSUMPTIONS.search_recall / (women(v, C1) / 1000))
 
 
-def test_airport_catchment_still_blocks_growth_areas():
-    air = _lounge("zayed-international-airport", C1, 10)
-    v = _v3([air], [_cell(C1, 100_000), _cell(C2, 100_000)], {"zayed-international-airport": [C1]}, [], {})
+def test_airport_catchment_is_open_to_growth_areas():
+    # Run-2 fix A1 (2026-10-10) reverses the old rule (its catchment blocked growth areas): the
+    # airport lounge serves travellers, so the women around it are not served. Not its nearest lounge either.
+    air, other = _lounge("zayed-international-airport", C1, 10), _lounge("b", "r9c9", 10)
+    v = _v3([air, other], [_cell(C1, 100_000), _cell(C2, 100_000), _cell("r9c9", 0)],
+            {"zayed-international-airport": [C1], "b": []}, [], {})
     _, areas = build(v, ASSUMPTIONS)
-    assert [a.cell_ids for a in areas] == [[C2]]
+    assert [a.cell_ids for a in areas] == [[C1, C2]] and areas[0].nearest_lounge_id == "b"
+
+
+def test_small_unsaturated_worker_housing_is_skip():
+    # Run-2 fix A2: the small-and-unsaturated WATCH branch never applied WORKER_CAP (BT4: JAFZ North WATCH).
+    small = {"women": GROW_MIN_WOMEN - 1, "per_1k": 0}
+    assert classify(_a(worker=WORKER_CAP - 0.01, **small)).action == "WATCH"
+    d = classify(_a(worker=WORKER_CAP, **small))
+    assert d.action == "SKIP" and "worker housing" in d.rationale
+
+
+@pytest.mark.parametrize(("name", "skip"), [
+    ("Jebel Ali North Free Zone", True), ("Al Qusais Industrial Area", True), ("Zayed Military City", True),
+    ("Sharjah International Airport", True), ("Jebel Ali Port", True), ("المنطقة الصناعية", True),
+    ("Port Saeed", False), ("Mina Al arab", False), ("Dubai Investments Park", False), ("Airportside", False)])
+def test_non_residential_names_skip_before_any_test(name, skip):
+    # Run-2 fix A3. A GROW-sized, empty area: only the name can make it SKIP.
+    d = classify(_a(per_1k=0).model_copy(update={"name": name}))
+    assert (d.action == "SKIP") == skip and (("Non-residential" in d.rationale) == skip)
+
+
+def test_saturation_line_is_the_p25_of_working_lounge_catchments():
+    # Run-2 fix D1(a): the rule fixed in advance, recomputed at baseline levels.
+    import numpy as np
+
+    from src.data_v3 import load_v3
+    from src.model.scorecard import THIN_MARKET
+    f, _ = build(load_v3(), ASSUMPTIONS)
+    per_1k = [x.premium_reviews_per_1k for x in f if x.premium_pool >= THIN_MARKET and not x.not_scored]
+    assert len(per_1k) == 21
+    assert round(float(np.percentile(per_1k, 25)), -1) == UNSATURATED_PER_1K
+
+
+def test_area_confidence():
+    # Run-2 fix B2: low near a line or on missing / thin data, high 20%+ from both lines.
+    assert classify(_a(women=50_000, per_1k=0)).confidence == "high"
+    assert classify(_a(women=GROW_MIN_WOMEN * 1.15, per_1k=0)).confidence == "medium"
+    d = classify(_a(women=GROW_MIN_WOMEN * 1.05, per_1k=0))
+    assert d.confidence == "low" and any("size line" in c for c in d.caveats)
+    d = classify(_a(per_1k=UNSATURATED_PER_1K * 0.95))
+    assert d.confidence == "low" and any("saturation line" in c for c in d.caveats)
+    assert classify(_a(per_1k=None)).confidence == "low"
+    assert classify(_a(per_1k=0, coverage=MIN_COVERAGE - 0.01)).confidence == "low"
 
 
 def test_size_passed_only_through_thin_affluence_data_caps_at_watch():

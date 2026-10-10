@@ -18,6 +18,8 @@ BADGE_COLORS = {"PROTECT": "green", "HOLD": "orange", "SHRINK": "red", "NOT SCOR
 AFFLUENCE_NAMES = {"low": "off", "medium": "medium", "high": "strong"}
 AFFLUENCE_KNOWN = 0.5   # under this share of women with an observed rent, affluence is mostly unknown
 FEW_REVIEWS = 300   # under this many lifetime reviews, capture understates a lounge (noya-plaza: 215)
+WORKER_NOTE = 0.25  # from this share of adults in worker housing, the women estimate leans on that assumption
+FULLY_SEARCHED = 0.99  # under this share of women in searched cells, say saturation covers only part of the area
 
 
 # --- what-if labels and banner ------------------------------------------------------------
@@ -179,11 +181,11 @@ def limitations_box(r: Run) -> None:
             "area outside Dubai is weighted neutral, so Dubai-vs-elsewhere comparisons mix weighted and "
             "unweighted demand. Rent is not income or salon spend.\n"
             f"4. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
-            "lounges are low confidence: near a threshold, a thin market, no rating gap (missing rating or no rated substitutes), or a call "
-            f"that changes in {scorecard.FLIP_LOW}+ of the {scorecard.COMBOS} assumption combinations. Try the what-if "
-            "panel below.\n"
+            "lounges are low confidence: near a threshold, a thin market, no rating gap (missing rating or no rated substitutes), a call "
+            f"that changes in {scorecard.FLIP_LOW}+ of the {scorecard.COMBOS} assumption combinations, or one that "
+            "changes when a signal weight moves ±25%. Try the what-if panel below.\n"
             f"5. **Growth areas are a first cut.** Competitor data is partial and the saturation line "
-            f"was set from the data it judges. {sharjah} of {len(grow)} GROW areas are in Sharjah "
+            f"is set from our own lounges' catchments (their lightest quarter). {sharjah} of {len(grow)} GROW areas are in Sharjah "
             "emirate but beyond a 15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), "
             "both on the Dubai side. Why the footprint there is only two lounges is a business question: "
             "the model can't see licensing, brand fit, landlord terms or customer mix.")
@@ -201,8 +203,9 @@ def near_threshold(d: Decision) -> str | None:
 def lounge_caveats(f: LoungeFeatures, d: Decision, flips: int | None) -> list[str]:
     """Everything that weakens this lounge's call, most specific first."""
     if d.action == "NOT SCORED":
-        return [d.rationale, ("It stays on the map, and its catchment still counts as reached for "
-                              "the growth areas.")]
+        return [d.rationale, ("It stays on the map but is left out of every comparison: it is no "
+                              "lounge's sibling or substitute, no area's nearest lounge, and its "
+                              "catchment is open to growth areas.")]
     out = [c for c in (near_threshold(d),) if c] + d.caveats[1:]
     if flips and flips < scorecard.FLIP_LOW:
         out.append(f"The call changes in {flips} of {scorecard.COMBOS} assumption combinations (low "
@@ -220,16 +223,12 @@ def lounge_caveats(f: LoungeFeatures, d: Decision, flips: int | None) -> list[st
 
 def area_caveats(a: Area, d: AreaDecision) -> list[str]:
     out = list(d.caveats)
-    if a.premium_reviews_per_1k is not None and growth.MIN_COVERAGE <= a.data_coverage < 0.99:
+    if a.premium_reviews_per_1k is not None and growth.MIN_COVERAGE <= a.data_coverage < FULLY_SEARCHED:
         out.append(f"Competitor data covers {a.data_coverage:.0%} of the women here; saturation is "
                    "computed over the searched cells only.")
-    if a.premium_reviews_per_1k is not None and abs(a.premium_reviews_per_1k - growth.UNSATURATED_PER_1K) < 10:
-        out.append(f"Near the saturation line ({a.premium_reviews_per_1k:.0f} vs "
-                   f"{growth.UNSATURATED_PER_1K:g} premium reviews per 1k women), and that line was "
-                   "set from the data it judges.")
     if a.affluence_coverage < AFFLUENCE_KNOWN and not any("Affluence" in c for c in out):
         out.append(affluence_caveat(a.affluence_coverage))
-    if a.worker_share >= 0.25:
+    if a.worker_share >= WORKER_NOTE:
         out.append(f"{a.worker_share:.0%} of adults live in worker housing: the women estimate rests "
                    "on the worker-housing female share assumption.")
     if a.emirate == "Sharjah":

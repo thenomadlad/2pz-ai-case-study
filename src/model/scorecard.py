@@ -31,14 +31,16 @@ SIGNALS: tuple[Signal, ...] = (
     Signal("cannibalisation", "shared_share", "Share of catchment women another lounge also reaches",
            1.0, 0.0,
            "Already a 0-100% share: 0% means no sibling reaches this lounge's women. Abu Dhabi "
-           "city lounges sit at 85-100%."),
+           "city lounges mostly sit at 82-100%."),
     Signal("capture", "capture", "Lounge reviews as a share of lounge + premium substitutes", 0, 0.15,
-           "Median 6.5% over the scored lounges; 15% is about the best reliable lounge (al-taif-mall, 14%). Thin premium "
-           "markets (under 10 premium salons) score 0.5: a share of a tiny pool is noise."),
+           "Median 6.5% over the scored lounges; 15% is about the best reliable lounge (al-taif-mall, 14%). In a thin "
+           "premium market (under 10 premium salons) a share of a tiny pool is noisy, so the score is pulled "
+           "toward 0.5 in proportion: with n premium salons it keeps n/10 of its distance from 0.5. A blend, "
+           "not a cliff, so one more salon can't swing the score."),
     Signal("rating", "rating_gap", "Rating minus the substitutes' median rating (stars)", -0.3, 0.3,
            "Gaps run -0.2 to +0.3, median -0.1: most lounges rate slightly below their premium "
            "substitutes; ±0.3 stars covers the whole range. Half weight: Google ratings come in "
-           "0.1 steps, so the gap takes only six values.", 0.5),
+           "0.1 steps, so the gap takes only a handful of values.", 0.5),
 )
 
 PROTECT_AT = 0.65
@@ -55,7 +57,16 @@ FLIP_LOW = round(FLIP_LOW_SHARE * COMBOS)        # 27 of 81
 FLIP_WHY = (f"A lounge whose action changes in {FLIP_LOW} or more (a third) of the {COMBOS} "
             "combinations of travel time, competitor coverage, worker-housing share and affluence "
             "weighting depends on the assumptions more than on the data, so its call is low confidence.")
-NEUTRAL = 0.5  # a missing rating gap, or capture in a thin market, never scores as the worst
+NEUTRAL = 0.5  # a missing rating gap never scores as the worst; thin-market capture is pulled toward it
+THIN_MARKET = 10
+THIN_MARKET_WHY = ("Under 10 premium salons, capture is a share of a tiny pool, so it is noisy: its score keeps "
+                   "only premium_pool / 10 of its distance from neutral (0 salons: neutral). A blend replaces "
+                   "the old cliff, where three 5-review salons swung al-dhafra by 0.14 (SANITY_CHECKS SC4). "
+                   "A thin market stays a low-confidence reason.")
+WEIGHT_STEPS = (0.75, 1.25)
+WEIGHT_WHY = ("The weights are a design choice, not data. Each signal's weight is moved ×0.75 and ×1.25, "
+              "one at a time (8 variants); a call that changes under any of them depends on the weighting, "
+              "so it is low confidence. The decision lines aren't varied: within 0.05 of one is already low.")
 NO_FINANCIALS = ("No revenue, rent or footfall data: this scores location and market position "
                  "only, not return on invested capital.")
 
@@ -77,6 +88,27 @@ def _confidence(composite: float, low: bool) -> str:
     return "high" if margin >= HIGH_MARGIN else "medium"
 
 
+def _action(composite: float) -> str:
+    return "PROTECT" if composite >= PROTECT_AT else "SHRINK" if composite <= SHRINK_AT else "HOLD"
+
+
+def _composite(scores: dict[str, float], weights: dict[str, float]) -> float:
+    return sum(weights[n] * scores[n] for n in weights) / sum(weights.values())
+
+
+def weight_flips(scores: dict[str, float]) -> list[str]:
+    """The weight variants (each signal ×0.75 or ×1.25, one at a time) that change the call."""
+    base = {s.name: s.weight for s in SIGNALS}
+    action = _action(_composite(scores, base))
+    out = []
+    for s in SIGNALS:
+        for step in WEIGHT_STEPS:
+            new = _action(_composite(scores, {**base, s.name: s.weight * step}))
+            if new != action:
+                out.append(f"{s.name} weight ×{step:g} → {new}")
+    return out
+
+
 def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
     if f.not_scored:
         return Decision(branch_id=f.branch_id, action="NOT SCORED", confidence="low",
@@ -84,20 +116,24 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
                         key_drivers=[], caveats=[])
     scores = {s.name: score(s, getattr(f, s.field)) for s in SIGNALS}
     if f.thin_premium_market:
-        scores["capture"] = NEUTRAL
-    composite = sum(s.weight * scores[s.name] for s in SIGNALS) / sum(s.weight for s in SIGNALS)
-    action = "PROTECT" if composite >= PROTECT_AT else "SHRINK" if composite <= SHRINK_AT else "HOLD"
+        scores["capture"] = NEUTRAL + (scores["capture"] - NEUTRAL) * min(1.0, f.premium_pool / THIN_MARKET)
+    composite = _composite(scores, {s.name: s.weight for s in SIGNALS})
+    action = _action(composite)
     caveats = [NO_FINANCIALS]
     if f.thin_premium_market:
-        caveats.append(f"Thin premium market ({f.premium_pool} premium salons): capture scored neutral.")
+        caveats.append(f"Thin premium market ({f.premium_pool} premium salons): capture's score pulled toward "
+                       f"neutral, keeping {f.premium_pool}/{THIN_MARKET} of its distance from 0.5.")
     if f.rating_gap is None:
         caveats.append("No rating gap (missing rating or no rated substitutes): scored neutral.")
     flippy = flips is not None and flips >= FLIP_LOW
     if flippy:
         caveats.append(f"The call changes in {flips} of {COMBOS} assumption combinations.")
+    wflips = weight_flips(scores)
+    if wflips:
+        caveats.append("The call depends on the signal weights: it changes with " + "; ".join(wflips) + ".")
     return Decision(
-        branch_id=f.branch_id, action=action,
-        confidence=_confidence(composite, f.thin_premium_market or f.rating_gap is None or flippy),
+        branch_id=f.branch_id, action=action, weight_flips=wflips,
+        confidence=_confidence(composite, f.thin_premium_market or f.rating_gap is None or flippy or bool(wflips)),
         rationale=(f"Composite {composite:.2f} across demand, cannibalisation, capture and rating "
                    f"(PROTECT ≥ {PROTECT_AT}, SHRINK ≤ {SHRINK_AT})."),
         key_drivers=sorted(scores, key=lambda n: abs(scores[n] - NEUTRAL), reverse=True)[:2],

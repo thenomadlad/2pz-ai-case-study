@@ -67,7 +67,8 @@ def render() -> None:
     with left:
         render_pyramid(exp)
     with right:
-        render_caveats("Caveats for this area", area_caveats(a, d), d.action != "SKIP")
+        render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
+                       d.action != "SKIP")
     _rule(a, d)
     affluence_metrics(a.women, a.addressable_women, a.affluence_rent, a.affluence_coverage)
 

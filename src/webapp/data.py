@@ -11,6 +11,7 @@ from src import explain
 from src.baseline import Run, run
 from src.config import REPO_ROOT, load_baseline_assumptions
 from src.data_v3 import V3, load_v3
+from src.features.lounges import NOT_SCORED
 from src.market import women_15plus
 from src.models import BaselineAssumptions, Levels
 
@@ -83,9 +84,9 @@ def catchment(levels: Levels, branch_id: str) -> list[str]:
 
 
 def reached(levels: Levels, closed: frozenset[str]) -> dict[str, list[str]]:
-    """Cell -> the open lounges whose catchment reaches it."""
+    """Cell -> the open, scored lounges whose catchment reaches it (as shared_share counts them)."""
     c = v3().catchment
-    c = c[(c.level == levels.travel) & ~c.branch_id.isin(closed)]
+    c = c[(c.level == levels.travel) & ~c.branch_id.isin(closed) & ~c.branch_id.isin(NOT_SCORED)]
     return c.groupby("cell_id").branch_id.agg(list).to_dict()
 
 

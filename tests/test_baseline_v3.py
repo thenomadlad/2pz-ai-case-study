@@ -26,9 +26,10 @@ def test_closing_al_barsha_moves_neighbours_and_opens_no_core_area():
     # capture moves only where the closed lounge was among the substitutes (city-walk, not jumeirah-park)
     assert a["city-walk"].capture != b["city-walk"].capture
     d = diff(base, after)
-    # small fringe areas do open up (al-sufouh, mudon...), but none is worth growing into
+    # small fringe areas do open up (al-sufouh, mudon...), but none is worth growing into. Since run-2
+    # fix D1 (saturation line 50 -> 150) one is a small, unsaturated WATCH (wadi-al-safa-7, 8k women).
     acts = {x.area_id: x.action for x in after.area_decisions}
-    assert d.areas_appeared and all(acts[i] == "SKIP" for i in d.areas_appeared)
+    assert d.areas_appeared and all(acts[i] in ("SKIP", "WATCH") for i in d.areas_appeared)
     assert all(x.women < 10_000 for x in after.areas if x.area_id in d.areas_appeared)
     assert {c.branch_id for c in d.lounges} >= {"al-barsha", "jumeirah-park", "city-walk"}
     assert next(c for c in d.lounges if c.branch_id == "al-barsha").new_action is None

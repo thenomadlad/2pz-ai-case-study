@@ -19,6 +19,7 @@ Anything else is **NO-GO**, and the audit log records which condition failed.
 |---|---|---|---|---|---|---|
 | 1 | 2026-10-10 | 37/80 | 17/40 | 5/26 | **NO-GO**: 43 `[brief]` items open, nothing parked, sanity checks not yet run as a set | Brief coverage is solid on data, explainability and the AI layer. The model has no capacity, served-demand or ROIC concept (OB1–OB5), so 1.4, 2.5, 3.6, E6, US4/US5/US7 fail together, and the back-test shows the growth rule calls our own lounges saturated (MO5). There's no demo or walkthrough, and the docs are stale. |
 | 2 | 2026-10-10 | 69/80 | 30/40 | 5/26 | **NO-GO**: 11 `[brief]` open (2.5, 4.4, L3, A3, B1, B3, C3, C6, E4, P1, J7); sanity run 1 has unexplained fails | Every non-model gap is closed: docs, UI, explanations (what / so what / now what, enforced) and the walkthrough. What's left is the model: capacity, served demand and ROIC (OB1–OB5), the growth rule (WORKER_CAP bug, a saturation penalty against BT5's clustering evidence) and the airport-in-comparison bug. |
+| 3 | 2026-10-10 | 74/80 | 33/40 | 9/26 | **NO-GO**: 6 `[brief]` open (2.5, A3, B1, C3, P1, J7), all structural model items except P1/J7 (pending a live click-through); sanity run 2 has one unexplained fail (SC4 al-maqta) | The non-structural model fixes landed: the airport is out of comparisons (shahama SHRINK → HOLD), name and worker-cap SKIP rules, the thin-market blend, lounge saturation, a 150 line by a pre-fixed rule (+al-jerf GROW), area confidence and weight sensitivity. What's left is the structural model work: capacity, served demand and ROIC (OB1–OB5), plus the coverage-k median bug. |
 
 
 ---
@@ -33,17 +34,15 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 - [x] `[ours]` **1.2 Labels mean an action.** Each label is defined as what leadership should *do*, e.g. "SHRINK = reduce footprint/staff or consolidate into X". A score band alone isn't a definition.
 - [x] `[ours]` **1.3 The inputs combine all four lenses:** branch health (Q4), local competition (Q4), self-overlap (Q3) and catchment demand (Layer 2).
 - [ ] `[ours]` **1.4 Overlap affects labels only through cannibalization (3.6).** Overlap on its own is never a penalty. A branch moves toward SHRINK only when its capacity exceeds the demand it can reach once shared with our other branches. Overlap that's drawn on the map but has no defined effect on labels fails this item.
-- [ ] `[ours]` **1.5 Thresholds are justified.** Every cut-off and weight has a written reason: data-driven, a business rule, or an explicitly stated judgement call.
+- [x] `[ours]` **1.5 Thresholds are justified.** Every cut-off and weight has a written reason: data-driven, a business rule, or an explicitly stated judgement call.
 - [x] `[ours]` **1.6 The distribution makes sense.** The label counts are reported. If one label dominates, there's an explanation, and the model isn't simply defaulting to HOLD.
-- [ ] `[ours]` **1.7 Stability is checked.** We know which branches flip labels under reasonable changes to weights or thresholds, and borderline cases are flagged as such.
+- [x] `[ours]` **1.7 Stability is checked.** We know which branches flip labels under reasonable changes to weights or thresholds, and borderline cases are flagged as such.
 - [x] `[brief]` **1.8 Branch-level drill-down.** From any branch you can see its label, the drivers behind it, its raw inputs and its caveats (see E1–E4).
 
 *To improve:*
 
-- 1.4 *(model)*: SHRINK is still driven by raw `shared_share` overlap and takes no account of capacity. Blocked on OB3.
-- 1.5: the equal 1/1/1 weights and the 0.65/0.35 lines get only a one-line rationale and are never tested against alternatives.
-- 1.7 *(model)*: sensitivity covers only the 81 combinations of assumption levels, and weights and thresholds are never varied. The new distance-to-line counterfactual helps but doesn't replace this.
-- New *(model)*: the NOT SCORED airport lounge still counts as a sibling (shahama's biggest overlap: 55,620 of 65,769 women) and as a premium substitute for 6 Abu Dhabi lounges. Removing it entirely flips shahama from SHRINK to HOLD (0.318 → 0.383), and the SHRINK action "consolidate into the sibling that shares most" points shahama at the airport. This is disclosed in the README and walkthrough, but not fixed.
+- 1.4 *(model)*: the cannibalisation signal is still raw `shared_share` among scored lounges, with no capacity or demand test. Blocked on OB3.
+- New, an unexplained bug (SC4): adding one 4.9★ competitor *raises* al-maqta from SHRINK to HOLD (0.341 → 0.351). The rating gap uses the median rating of the top-k substitutes, where k comes from `coverage_k`; the extra salon raises k from 20 to 21 and moves the median. A non-structural fix is to take the median over a fixed set (the whole premium pool, or a fixed k). That changes some composites, so the explanations would need regenerating. Not fixed yet.
 
 ### Q2. Where should we consider opening new branches?
 
@@ -55,13 +54,12 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 - [x] `[ours]` **2.6 SKIP actually happens.** The model rules areas out with a stated reason. A model that only says GROW or WATCH is hedging.
 - [x] `[ours]` **2.7 WATCH has a meaning.** It says what would move an area to GROW or SKIP, e.g. "rent data missing" or "demand is OK but saturation is borderline".
 - [x] `[ours]` **2.8 Ranking.** Within GROW, candidates are ordered so leadership has a top N, not just a set.
-- [ ] `[ours]` **2.9 Geographic realism.** Candidates are reachable, inhabited places. Desert, sea, industrial zones and airports are not proposed unless that's intended and justified.
+- [x] `[ours]` **2.9 Geographic realism.** Candidates are reachable, inhabited places. Desert, sea, industrial zones and airports are not proposed unless that's intended and justified.
 
 *To improve:*
 
-- 2.3 *(model/data)*: affluence is still Dubai-only, and there's no target-customer signal elsewhere.
-- 2.5 *(model)*: areas are still only cells no lounge reaches, so under-served demand inside the footprint can't be GROW.
-- 2.9 *(model)*: this is a bug. The small-and-unsaturated WATCH branch (growth.py:62-64) never applies WORKER_CAP, so 7 industrial, military or free-zone areas come out WATCH (BT4, SC3).
+- 2.3 *(model/data)*: affluence is Dubai-only, and there's no target-customer signal elsewhere.
+- 2.5 *(model)*: areas are still only cells no lounge reaches, so whitespace isn't unserved demand.
 
 ### Q3. Where are we overlapping with ourselves?
 
@@ -74,22 +72,21 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 
 *To improve:*
 
-- 3.5, 3.6 *(model)*: overlap is never compared with demand or capacity. Q2 drops reached cells instead of netting out capacity. Blocked on OB2/OB3.
+- 3.5, 3.6 *(model)*: overlap is never weighed against demand or capacity. Blocked on OB2/OB3.
 
 ### Q4. How strong or weak is each branch relative to local competition?
 
 - [x] `[brief]` **4.1 Branch health signals:** ratings, review volume, review recency or trend, or other performance proxies. Each one names its source and date.
 - [x] `[brief]` **4.2 Relative, not absolute.** Each branch is compared with the competitors in *its* catchment (e.g. rating percentile among local salons), not only with a network-wide average.
 - [x] `[brief]` **4.3 Competitive density indicators:** a count and/or per-capita measure of competitors in each catchment.
-- [ ] `[brief]` **4.4 Saturation indicator:** a supply-vs-demand measure such as salons per 10k population or per unit of spend.
+- [x] `[brief]` **4.4 Saturation indicator:** a supply-vs-demand measure such as salons per 10k population or per unit of spend.
 - [x] `[ours]` **4.5 Competitor definition.** What counts as a competitor (category, tier, minimum review count) is written down, and noise like barbers or nail-only shops is handled deliberately.
 - [ ] `[ours]` **4.6 Small-sample handling.** A 5.0 rating from 3 reviews is not treated as equal to 4.6 from 900. We use shrinkage, a minimum-n rule or a flag.
 - [x] `[brief]` **4.7 A comparison method.** There's a side-by-side view, a ranking or a scorecard across branches on common axes.
 
 *To improve:*
 
-- 4.4 *(model)*: lounges have no per-capita saturation figure. It's cheap: reuse the areas' premium reviews per 1k women over the catchment.
-- 4.6: the substitutes' median rating has no minimum-n rule and no shrinkage.
+- 4.6: the thin-market cliff is gone (now a blend), but the substitutes' median rating still has no minimum-n rule; the smallest substitute in use has 26 reviews (al-dhafra). Related to the SC4 bug in Q1.
 
 ### Q5. How can decision-makers explore these answers visually and interactively?
 
@@ -103,7 +100,7 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 
 *To improve:*
 
-- 5.5 *(model)*: the what-if can't change weights or thresholds. That needs the model to accept weights as an input.
+- 5.5 *(model)*: weight sensitivity is shown passively, but weights and thresholds can't be changed in the what-if.
 
 ---
 
@@ -113,13 +110,13 @@ The brief lists these as the minimum content of the product. Most of the substan
 
 - [x] `[brief]` **L1. Current branch network:** branch locations ✔ branch-level detail (address, rating, reviews, services or tier, label) ✔ → see Q1.8, Q5.2
 - [x] `[brief]` **L2. Catchment / coverage:** catchment areas or service radii ✔ overlap between branches in the same competitive set ✔ → see Q3
-- [ ] `[brief]` **L3. Competition:** nearby competitors ✔ density or saturation indicators ✔ → see Q4.3–4.5
+- [x] `[brief]` **L3. Competition:** nearby competitors ✔ density or saturation indicators ✔ → see Q4.3–4.5
 - [x] `[brief]` **L4. Performance / health:** quality or performance indicators ✔ a method for comparing branches ✔ → see Q4.1, 4.2, 4.6, 4.7
 - [x] `[brief]` **L5. Decision layer:** model for existing branches ✔ model for whitespace ✔ → see Q1, Q2
 
 *To improve:*
 
-- L3 *(model/data)*: lounges have no saturation figure (see 4.4), and non-premium salons are never mapped.
+- (none open)
 
 ---
 
@@ -137,7 +134,7 @@ The brief lists these as the minimum content of the product. Most of the substan
 
 *To improve:*
 
-- A3 *(model)*: the north star and its proxy (`est_customers`) are now named, but the proxy drives no label, and the signals aren't tied to services delivered.
+- A3 *(model)*: the north star and its proxy are named, but `est_customers` drives no label.
 
 ### B. Recommendation logic
 
@@ -145,15 +142,14 @@ The brief says it must be **coherent, explainable, defensible**. It does not hav
 
 - [ ] `[brief]` **B1. Coherent:** the same inputs give the same outputs, labels are mutually exclusive, there are no contradictions (e.g. the best-rated, least-overlapped branch marked SHRINK without a stated reason), and the branch and whitespace models share their definitions (same catchment, same competitor set).
 - [x] `[brief]` **B2. Explainable:** the logic fits on one page (rules, score formula, decision tree) and a non-technical reader could follow it.
-- [ ] `[brief]` **B3. Defensible:** every weight and threshold has a rationale (see 1.5), the method choice is justified against at least one alternative we considered, and we've sanity-checked the output against local knowledge or spot checks.
+- [x] `[brief]` **B3. Defensible:** every weight and threshold has a rationale (see 1.5), the method choice is justified against at least one alternative we considered, and we've sanity-checked the output against local knowledge or spot checks.
 - [x] `[brief]` **B4. Covers both populations:** existing branches *and* opportunity areas.
 - [x] `[ours]` **B5. Tested:** unit tests pin the classification rules, and a regression check catches unintended label changes.
 - [x] `[ours]` **B6. Reproducible:** one command rebuilds the scores and labels from the sourced data.
 
 *To improve:*
 
-- B1 *(model)*: the lounge and growth models use different units, and the growth line sits below every lounge market (BT3 shows no agreement). The airport bug is in 1.4.
-- B3: the equal weights are still never argued (see 1.5).
+- B1 *(model)*: the airport is out, and the PROTECT markets (122/113/145 per 1k) now pass the 150 line. But a growth area is a place-name group of cells, not a candidate site's catchment, so BT3 still shows no agreement on unit.
 
 ### C. Geographic reasoning
 
@@ -164,15 +160,14 @@ The brief asks us to use geography *meaningfully*. Each item below should both e
 - [ ] `[brief]` **C3. Overlap:** see Q3.
 - [x] `[brief]` **C4. Coverage gaps:** populated areas outside our catchments are identified, and that feeds Q2.
 - [x] `[brief]` **C5. Competitor density:** see Q4.3.
-- [ ] `[brief]` **C6. Market saturation:** see Q4.4.
+- [x] `[brief]` **C6. Market saturation:** see Q4.4.
 - [x] `[brief]` **C7. Travel-time logic,** with the drive-time mode and minute threshold stated and justified for UAE car-centric travel.
 - [x] `[ours]` **C8. Spatial unit and CRS are sound:** areas are computed in a metric projection, not raw degrees, and the cell size is justified.
 - [x] `[brief]` **C9. Geography changes outcomes.** At least one example shows a label that is *because of* a spatial factor (overlap, gap, saturation).
 
 *To improve:*
 
-- C3 *(model)*: overlap is now on the map, but it's never weighed against demand or capacity (see 3.6).
-- C6 *(model)*: lounge catchments have no supply-vs-demand figure (see 4.4).
+- C3 *(model)*: overlap is still raw shared women, never weighed against capacity or the services that would be lost.
 
 ### D. AI-relevant design
 
@@ -189,8 +184,7 @@ The brief says the AI layer must be practical, not gimmicky.
 
 *To improve:*
 
-- D3 (passes): a cache hit at runtime is still served without re-verifying. The committed-cache test guards the cache instead. Acceptable.
-- D2/E5 (passes, known `verify()` gaps): number words aren't grounded, only the headline's first label word is checked, and over-vs-short wording isn't checked. A pass-2 overclaim in al-dhahir's so-what had to be fixed by hand.
+- D2/E5 (passes, known `verify()` gaps): number words and adjectives ("modest market", "strong demand") aren't checked. This is stated in limitations §13.
 
 ### E. Explainability
 
@@ -199,9 +193,9 @@ From the reviewer's seat, each question below should be answerable **for any sin
 - [x] `[brief]` **E1. "Why did this branch get this recommendation?"** Per-branch rationale: which rule or threshold fired, and the input values that triggered it.
 - [x] `[brief]` **E2. "Why is this area attractive or unattractive?"** Per-area rationale, both its demand and its supply side, including why it's *not* GROW when it's WATCH or SKIP.
 - [x] `[brief]` **E3. "Which inputs most influenced the outcome?"** Per-entity input attribution: contribution breakdown, rank of drivers, or a counterfactual ("would be GROW if saturation < X"). Saying which rule fired doesn't answer this. We need magnitudes or ordering.
-- [ ] `[brief]` **E4. "Where should we trust the model, and where should we be careful?"**
+- [x] `[brief]` **E4. "Where should we trust the model, and where should we be careful?"**
   - [x] Global: a limitations doc covering data gaps, proxies, biases and staleness.
-  - [ ] Per entity: confidence or caveat flags on the specific recommendation (missing data, low review count, imputed values, borderline score).
+  - [x] Per entity: confidence or caveat flags on the specific recommendation (missing data, low review count, imputed values, borderline score).
   - [x] Known failure cases are named, with examples.
 - [x] `[ours]` **E5. Consistency:** the explanation and the label never disagree, and an automated test enforces it.
 - [ ] `[ours]` **E6. What / so what / now what.** Every recommendation, whether in the generated text, the UI or the demo, answers all three:
@@ -213,8 +207,7 @@ From the reviewer's seat, each question below should be answerable **for any sin
 
 *To improve:*
 
-- E4-entity: areas still have no confidence grade, and nothing flags an area near the size line (al-awir is 78 women over, kalba 3,464). Small-n ratings aren't flagged.
-- E6 *(model)*: what / so what / now what now holds for all 65 explanations, but no so-what can address the ROIC gate (OB5).
+- E6 *(model)*: every explanation has what / so what / now what, but none can address the ROIC gate. Some so-whats only restate figures, e.g. jumeirah-park, mirdif-35, zawaya-walk and hili: "About N women captured…; X% shared", with no stated consequence. Tighten these on the next regeneration.
 
 ---
 
@@ -273,7 +266,7 @@ The brief says to source inputs from public sources and lists some combination o
 
 *To improve:*
 
-- P1: the live app redeploys from `main` and hasn't been clicked through since these changes; recheck it after the push. A local visual check passed on 2026-10-10: the overview at 1280 px and the shahama page at 800 px, with no overflow and no exceptions.
+- P1: the live app deploys from `main`. Click through the live link after this push; the walkthrough describes the new model.
 
 ---
 
@@ -312,7 +305,7 @@ Each should have a one-paragraph answer somewhere a reviewer will find it, such 
 *To improve:*
 
 - J7: follows P1.
-- Hygiene: untracked files at the repo root (`ai-associate-case-study.docx`, `transactions-2026-10-10.csv`, `.ropeproject/`, `.superpowers/`). Keep them out of commits, or gitignore or move them.
+- Hygiene: untracked root files (`ai-associate-case-study.docx`, `transactions-2026-10-10.csv`, `.ropeproject/`, `.superpowers/`). Keep them out of commits.
 
 ---
 
@@ -337,8 +330,8 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 *To improve:*
 
-- OB1–OB3, OB5 *(model)*: unchanged. There's no capacity, no served vs. unserved demand and no ROIC. The README now admits all of this (README:72-77, "No money in the model").
-- OB4: in-branch advice is now banned and enforced by `verify()` (0 of 65 hits). Remaining gap *(model)*: rating is still a half-weight health signal in the composite, not an attractiveness term.
+- OB1–OB3, OB5 *(model)*: unchanged. There's no capacity, no served vs. unserved demand and no ROIC.
+- OB4 *(model)*: in-branch advice is banned and enforced. Rating is still a half-weight health signal, not an attractiveness term.
 
 ### Data: sourced, thorough, and detailed enough for the model
 
@@ -348,25 +341,22 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
   - [ ] Competitors: coverage is checked per emirate or area, so gaps from query limits or category filters are known, not assumed away.
   - [x] Context layers (population, affluence, rent): the share of cells with real vs. imputed or missing values is reported.
 - [ ] **DA3. Resolution matches the model.** Each dataset is at least as fine as the spatial unit it feeds. Where coarser data is spread or assigned onto cells (e.g. area-level rent → cells), the method and its error are stated.
-- [ ] **DA4. Sufficient for the questions.** For each of Q1–Q4 we can name the signals it needs and the dataset that supplies each one. A question answered with no data behind it, or only by a proxy of a proxy, gets flagged.
+- [x] **DA4. Sufficient for the questions.** For each of Q1–Q4 we can name the signals it needs and the dataset that supplies each one. A question answered with no data behind it, or only by a proxy of a proxy, gets flagged.
 - [ ] **DA5. Quality checks run.** Deduplication, points that fall on UAE land, category filtering and outlier review are all done, and tests guard against regressions.
 - [ ] **DA6. Missing ≠ zero.** Missing values are explicit, imputation is flagged, and both flow through to per-entity confidence (E4).
-- [ ] **DA7. Known biases are named:** Google-review skew (tourists, incentivised reviews), OSM/Places coverage gaps, listing-rent vs. actual-rent bias, and population-raster age.
+- [x] **DA7. Known biases are named:** Google-review skew (tourists, incentivised reviews), OSM/Places coverage gaps, listing-rent vs. actual-rent bias, and population-raster age.
 - [x] **DA8. Freshness is consistent.** Snapshot dates are close enough to be compared, and any big gap is stated.
 - [x] **DA9. One current dataset version.** The model and app read a single data version (v3 plus fresh sources). Old seed data isn't mixed in.
-- [ ] **DA10. Every dataset earns its place.** Each dataset feeds a model input or a displayed fact. Unused data gets dropped or explained.
+- [x] **DA10. Every dataset earns its place.** Each dataset feeds a model input or a displayed fact. Unused data gets dropped or explained.
 
 *To improve:*
 
-- DA1 *(model/data)*: the DLD rents were still downloaded by hand with no script, and search_recall 0.66 and the 0.25–4 clip have no committed source.
-- DA2-competitors *(model/data)*: recall still isn't tracked per emirate, and the correction still rests on one tile.
-- DA3 *(model/data)*: there's no error estimate for the rent area→cell assignment.
-- DA4 (a cheap doc fix): there's still no Q1–Q4 → signal → dataset table, and capture is a proxy of a proxy.
+- DA1 *(model/data)*: the DLD download is manual, and search_recall rests on one tile (the clip range now has a WHY).
+- DA2-competitors *(model/data)*: recall isn't tracked per emirate.
+- DA3 *(model/data)*: the 139 of 241 rent cells that borrow the nearest area's rent have no error estimate.
 - DA5 *(model/data)*: there's no on-land check, and outlier review is informal.
-- DA6 *(model)*: a missing review_count becomes 0, and areas have no confidence.
-- DA7 (a cheap doc fix): tourist review skew is never named, and WorldPop is never called modelled.
-- DA10: cell_isochrones.geojson is listed as an input, but src/ never reads it.
-- SC1 *(model/data)*: the Dubai Marina cell sits outside every catchment as a SKIP area with 2,052 women; it's probably a grid or centre-point artefact.
+- DA6 *(model)*: a missing review_count still becomes 0. Areas now have a confidence grade.
+- SC1 *(model/data)*: the Dubai Marina cell is an unreached SKIP with 2,052 women; probably a grid artefact.
 
 ### Modeling: simple, explainable, answers the questions, holds up against standard methods
 
@@ -377,13 +367,13 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
   - [ ] **Huff gravity model:** patronage probability ∝ attractiveness / distance^λ, shared across competing stores. *Do we cover it?* Distance decay (isochrones), attractiveness (rating/reviews), competitive share. *Gap to account for:* no calibrated λ, no probabilistic split of demand between stores, and hard catchment edges instead of decay.
   - [ ] **Thiessen / Voronoi / nearest-facility trade areas:** each customer goes to the nearest store. Do our catchments and overlaps behave better than this baseline, and do we know where they differ?
   - [x] **Ring / drive-time analysis:** probably our core method. The mode, minutes and choice of isochrone provider are justified.
-  - [ ] **Index of Retail Saturation (IRS):** demand × spend ÷ supply. How our saturation measure relates to it, and what we use as stand-ins for spend and supply capacity.
+  - [x] **Index of Retail Saturation (IRS):** demand × spend ÷ supply. How our saturation measure relates to it, and what we use as stand-ins for spend and supply capacity.
   - [ ] **Multi-criteria suitability / weighted overlay (MCDA, AHP):** likely what our whitespace model really is. Weights are justified the way MCDA requires (stated, sensitivity-tested), not just picked.
-  - [ ] **Location-allocation / maximal coverage (MCLP):** picks the *set* of new sites that maximises coverage. We score cells one by one, so two adjacent GROW cells could cannibalise each other. Stated, or handled.
-  - [ ] **Analog / sales-regression models:** these need revenue we don't have. Stated as the main reason our health score is a proxy.
+  - [x] **Location-allocation / maximal coverage (MCLP):** picks the *set* of new sites that maximises coverage. We score cells one by one, so two adjacent GROW cells could cannibalise each other. Stated, or handled.
+  - [x] **Analog / sales-regression models:** these need revenue we don't have. Stated as the main reason our health score is a proxy.
 - [ ] **MO5. Validated against reality.** The latest run of [`SANITY_CHECKS.md`](SANITY_CHECKS.md) (back-tests BT1–BT5, sanity checks SC1–SC6) has no unexplained failure, and each expected outcome was written down before the check ran.
 - [ ] **MO6. Sensitivity is known** (see 1.7). We report which labels flip under reasonable changes to weights and thresholds. Labels that sit near a boundary are presented as borderline, not as confident calls.
-- [ ] **MO7. Not tuned to taste.** Weights and thresholds weren't adjusted until the label mix "looked right". Where we did tune them, we say so and give the target.
+- [x] **MO7. Not tuned to taste.** Weights and thresholds weren't adjusted until the label mix "looked right". Where we did tune them, we say so and give the target.
 - [ ] **MO8. Branch and whitespace models are consistent** (see B1). They use the same catchment, competitor definition and demand measure, so a branch's cell scored by the whitespace model gives an answer that fits with its branch label.
 - [ ] **MO9. Parameters live in one place.** Every weight, threshold and radius lives in config with its rationale. No magic numbers scattered through the code.
 - [x] **MO10. Failure modes are named with examples,** feeding E4: where the model is known to be wrong or blind, with real cells or branches as illustrations.
@@ -391,16 +381,14 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 *To improve:*
 
-- MO1 *(model)*: the affluence layer "changes no call" but is kept.
-- MO4: Huff is named as given up, with a reason. Voronoi, IRS, MCDA, MCLP and analog are never named; one paragraph in limitations would fix that cheaply.
-- MO5: NO-GO. See SANITY_CHECKS run 1: BT2, BT3, BT4, SC3 and BT5 fail.
-- MO6, MO7 *(model)*: there's no sensitivity to weights or thresholds, and areas have no confidence.
-- MO8 *(model)*: BT3 shows no relationship between a lounge's label and the growth label of its own site.
-- MO9 *(model)*: constants are still scattered (lounges.py:23-24, market.py:121, growth.py:17-21, scripts).
-- MO11 *(model)*: BT5 says clustering helps a little and never hurts. Isolated premium salons have a median of 126 reviews, against about 220 for those with 3+ premium neighbours within 1.5 km. But saturation is a pure penalty: 0 of 123 GROW cells sit next to a premium cluster.
-- New *(model)* (SC4 bugs):
-  - The THIN_MARKET=10 cliff: three 5-review salons lift al-dhafra from 0.485 to 0.628, close to PROTECT.
-  - The median-based premium test isn't monotone: adding a popular mid-market salon lowers measured saturation in 32 areas.
+- MO1 *(model)*: the affluence layer still "changes no call", but is kept.
+- MO4: the methods table is in limitations. Two gaps remain: Huff is not implemented, and there's no "where our catchments differ from a Voronoi split" comparison.
+- MO5: NO-GO. See SANITY_CHECKS run 2. The one *unexplained* failure left is the SC4 al-maqta flip; the rest are explained and documented.
+- MO6: lounges are covered (weights ±25%, assumption levels, margin). Growth areas get near-line confidence, but no assumption-level flips.
+- MO8 *(model)*: same saturation helper for both models now, but BT3 still disagrees on unit.
+- MO9: constants are module-level with a WHY and shown on the How page, but spread over 4 modules plus baseline.yaml; views.py and explain.py still have a few bare presentation numbers.
+- MO11 *(model)*: the 150 line reduced the empty-area tilt, but didn't remove it. Every GROW is still at or under 59 per 1k, 0 of 128 GROW cells sit next to a premium cluster, and the size rule (20k) is the constraint that binds.
+- Median-based premium test *(model)*: still not monotone (adding a mid-market salon lowers measured saturation in 32 areas). Deliberately deferred: fixing it re-bases every capture figure.
 
 ---
 

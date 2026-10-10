@@ -194,7 +194,7 @@ def test_overview_opens_on_the_question_and_whats_at_stake():
     s, r = stake(run()), run()
     shrink = [f for f in r.features if next(d for d in r.decisions if d.branch_id == f.branch_id).action == "SHRINK"]
     assert 0 < s["SHRINK"][1] <= sum(f.shared_share * f.catchment_women for f in shrink) + 1  # each cell once
-    assert s["GROW"][0] == 4
+    assert s["GROW"][0] == 5     # run-2 fix D1 (saturation line 50 -> 150) added al-jerf-ajman
     labels = {m.label: m.value for m in at.metric}
     assert labels[f"Under pressure: {s['SHRINK'][0]} SHRINK lounges"] == f"{s['SHRINK'][1]:,.0f} women"
 
@@ -202,7 +202,9 @@ def test_overview_opens_on_the_question_and_whats_at_stake():
 def test_overview_compares_lounges_and_ranks_growth_areas_with_filters():
     at = _page("overview")
     lounges, areas = at.dataframe[0].value, at.dataframe[1].value
-    assert len(lounges) == 24 and {"Composite", "Demand", "Shared catchment", "Confidence"} <= set(lounges.columns)
+    assert len(lounges) == 24 and {"Composite", "Demand", "Shared catchment", "Confidence",
+                                   "Premium reviews per 1k women"} <= set(lounges.columns)
+    assert "Confidence" in areas.columns
     assert list(areas.Call) == sorted(areas.Call) and set(areas.Call) == {"GROW", "WATCH"}   # GROW first
     grow = areas[areas.Call == "GROW"]["Addressable women"]
     assert list(grow) == sorted(grow, reverse=True) and areas.Why.str.len().min() > 0

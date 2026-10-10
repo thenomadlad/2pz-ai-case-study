@@ -18,10 +18,13 @@ from src.market import (
     weighted_median,
     women_15plus,
 )
+from src.model.scorecard import THIN_MARKET
 from src.models import Area, BaselineAssumptions, Levels, LoungeFeatures
 
-NOT_SCORED = {"zayed-international-airport"}   # serves travellers, not its catchment
-THIN_MARKET = 10                               # fewer premium salons than this: capture is noisy
+NOT_SCORED = {"zayed-international-airport"}
+NOT_SCORED_WHY = ("Serves travellers, not the women in its catchment, so it gets no call and is left out "
+                  "of every comparison: it is no lounge's sibling (shared catchment) or premium substitute, "
+                  "no area's nearest lounge, and its catchment cells are open to growth areas.")
 _PREP: dict[int, tuple[V3, dict]] = {}
 
 
@@ -89,7 +92,7 @@ def _slug(s: str) -> str:
 
 
 def _candidates(v3: V3, levels: Levels, closed: frozenset[str], branch_id: str) -> list[dict]:
-    gone = {lo.place_id for lo in v3.lounges if lo.branch_id in closed}
+    gone = {lo.place_id for lo in v3.lounges if lo.branch_id in closed or lo.branch_id in NOT_SCORED}
     return [s for s in v3.candidates[(branch_id, levels.travel)] if s["place_id"] not in gone]
 
 
@@ -124,7 +127,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     aw = (women * affluence_weight(rent, women, a.affluence_elasticity[levels.affluence])).to_dict()
     lounges = [lo for lo in v3.lounges if lo.branch_id not in closed]
     catch = {lo.branch_id: p["catch"].get(levels.travel, {}).get(lo.branch_id, []) for lo in lounges}
-    reach = Counter(c for cs in catch.values() for c in cs)
+    reach = Counter(c for b, cs in catch.items() if b not in NOT_SCORED for c in cs)   # scored lounges only
 
     feats = []
     for lo in lounges:
@@ -136,13 +139,16 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
         cap, k = capture_by_coverage(lo.review_count, prem, a.competitor_coverage[levels.coverage], mult)
         rated = [float(s["rating"]) for s in prem[:k] if s.get("rating") is not None]
         med = statistics.median(rated) if rated else None
+        sat = _saturation(cs, w, p, a)
         feats.append(LoungeFeatures(
             branch_id=b, name=lo.name, emirate=lo.emirate, lat=lo.lat, lng=lo.lng, rating=lo.rating,
             review_count=lo.review_count, catchment_women=women_, addressable_women=addressable,
             **_affluence(cs, w, rents, women_), catchment_cells=len(cs),
-            shared_share=sum(w[c] for c in cs if reach[c] > 1) / women_ if women_ else 0.0,
+            # cells another scored lounge also reaches (reach counts this one too, unless it isn't scored)
+            shared_share=sum(w[c] for c in cs if reach[c] > (b not in NOT_SCORED)) / women_ if women_ else 0.0,
             capture=cap, substitutes_k=k, recall_multiplier=mult, premium_pool=len(prem),
-            thin_premium_market=len(prem) < THIN_MARKET, substitutes_median_rating=med,
+            thin_premium_market=len(prem) < THIN_MARKET, premium_reviews_per_1k=sat["per_1k"],
+            substitutes_median_rating=med,
             rating_gap=lo.rating - med if lo.rating is not None and med is not None else None,
             est_customers=0.0 if b in NOT_SCORED else cap * addressable, not_scored=b in NOT_SCORED))
     if not areas:
@@ -153,6 +159,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     for c, x in w.items():
         if x > 0 and c not in reach:
             groups[(cell[c]["name"], cell[c]["emirate"])].append(c)
+    lounges = [lo for lo in lounges if lo.branch_id not in NOT_SCORED]     # never an area's nearest lounge
     lats, lngs = np.array([lo.lat for lo in lounges]), np.array([lo.lng for lo in lounges])
     out = []
     for (name, emirate), cs in groups.items():
@@ -170,25 +177,33 @@ def _affluence(cs: list[str], w: dict, rents: dict, women: float) -> dict:
             "affluence_coverage": sum(w[c] for c in obs) / women if women else 0.0}
 
 
+def _saturation(cells: list[str], w: dict, p: dict, a: BaselineAssumptions) -> dict:
+    """Premium saturation over the searched ones of these cells: premium salons, their reviews (scaled
+    up by the recall correction) per 1k women in those cells, the share of their circles that came back
+    full, and those cells' women. One method for growth areas and lounge catchments (rubric MO8)."""
+    covered = [c for c in cells if p["covered"][c]]
+    cw = sum(w[c] for c in covered)
+    if not covered:
+        return {"n": None, "per_1k": None, "fcs": None, "cw": cw}
+    cands = [s for c in covered for s in p["salons"][c]]
+    prem = premium_substitutes(cands, len(cands), a.premium_min_rating, a.comparable_price_levels)
+    circ = set().union(*(p["owns"][c] for c in covered)) or set().union(*(p["touch"][c] for c in covered))
+    fcs = float(np.mean(p["full"][sorted(circ)]))
+    per_1k = sum(_reviews(s) for s in prem) * recall_multiplier(fcs, a.search_recall) / (cw / 1000) if cw else None
+    return {"n": len(prem), "per_1k": per_1k, "fcs": fcs, "cw": cw}
+
+
 def _area(area_id, name, emirate, piece, w, aw, rents, p, a, lounges, lats, lngs) -> Area:
     cell, women = p["cell"], sum(w[c] for c in piece)
     lat = sum(w[c] * cell[c]["lat"] for c in piece) / women
     lng = sum(w[c] * cell[c]["lng"] for c in piece) / women
-    covered = [c for c in piece if p["covered"][c]]
-    cw = sum(w[c] for c in covered)
-    n = per_1k = fcs = None
-    if covered:
-        cands = [s for c in covered for s in p["salons"][c]]
-        prem = premium_substitutes(cands, len(cands), a.premium_min_rating, a.comparable_price_levels)
-        circ = set().union(*(p["owns"][c] for c in covered)) or set().union(*(p["touch"][c] for c in covered))
-        fcs = float(np.mean(p["full"][sorted(circ)]))
-        n, per_1k = len(prem), sum(_reviews(s) for s in prem) * recall_multiplier(fcs, a.search_recall) / (cw / 1000)
+    sat = _saturation(piece, w, p, a)
     d = haversine_km(lat, lng, lats, lngs)
     j = int(d.argmin()) if len(d) else None
     return Area(area_id=area_id, name=name, emirate=emirate, lat=lat, lng=lng, women=women,
                 addressable_women=sum(aw[c] for c in piece), **_affluence(piece, w, rents, women), cells=len(piece),
                 worker_share=sum(cell[c]["adults_worker"] for c in piece) / sum(cell[c]["adults"] for c in piece),
-                premium_salons=n, premium_reviews_per_1k=per_1k, full_circle_share=fcs,
-                data_coverage=cw / women, cell_ids=piece,
+                premium_salons=sat["n"], premium_reviews_per_1k=sat["per_1k"], full_circle_share=sat["fcs"],
+                data_coverage=sat["cw"] / women, cell_ids=piece,
                 nearest_lounge_id=lounges[j].branch_id if j is not None else "",
                 nearest_lounge_km=float(d[j]) if j is not None else float("nan"))

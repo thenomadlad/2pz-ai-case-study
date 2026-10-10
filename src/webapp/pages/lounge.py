@@ -4,7 +4,7 @@ lounges it shares women with."""
 import streamlit as st
 
 from src import explain
-from src.features.lounges import substitutes
+from src.features.lounges import NOT_SCORED, substitutes
 from src.model import scorecard
 from src.webapp import data, nav
 from src.webapp.map import (
@@ -39,7 +39,8 @@ def _signals(f, d) -> None:
         score = d.scores[s.name]
         st.progress(score, text=f"**{s.label}:** {val(s.field, getattr(f, s.field))} → score "
                                 f"{score:.2f} (weight {s.weight:g})")
-        note = (" Thin premium market: scored neutral." if s.name == "capture" and f.thin_premium_market
+        note = (f" Thin premium market ({f.premium_pool} premium salons): score pulled toward 0.5, keeping "
+                f"{f.premium_pool}/{scorecard.THIN_MARKET} of its distance." if s.name == "capture" and f.thin_premium_market
                 else " Missing: scored neutral." if getattr(f, s.field) is None else "")
         st.caption(f"Scale: {val(s.field, s.worst)} → 0, {val(s.field, s.best)} → 1. {s.why}{note}")
     verdict = (f"Composite **{d.composite:.2f}** → **{d.action}** (PROTECT at {scorecard.PROTECT_AT} "
@@ -49,16 +50,16 @@ def _signals(f, d) -> None:
 
 
 def _shared(r, b: str) -> None:
-    """Which other open lounges reach this lounge's catchment cells, and how many women."""
+    """Which other open, scored lounges reach this lounge's catchment cells, and how many women."""
     w, mine = data.women(r.levels.worker_share), set(data.catchment(r.levels, b))
     c = data.v3().catchment
     c = c[(c.level == r.levels.travel) & c.cell_id.isin(mine) & (c.branch_id != b)
-          & ~c.branch_id.isin(r.closed)]
+          & ~c.branch_id.isin(r.closed) & ~c.branch_id.isin(NOT_SCORED)]
     rows = sorted(((o, sum(w[x] for x in g.cell_id)) for o, g in c.groupby("branch_id")), key=lambda t: -t[1])
     total = sum(w[x] for x in mine)
     st.markdown("##### Shared catchment")
     if not rows:
-        st.caption("No other open lounge reaches any of its catchment cells.")
+        st.caption("No other open, scored lounge reaches any of its catchment cells.")
         return
     wrapped_table([{"Lounge": o, "Women in shared cells": f"{x:,.0f}",
                     "Share of this catchment": f"{x / total:.0%}" if total else "—"} for o, x in rows])
@@ -92,7 +93,7 @@ def render() -> None:
     d = next(d for d in r.decisions if d.branch_id == b)
     flips = r.flips.get(b)
     exp, facts = explanation_for(r, "lounge", b)
-    st.header(f"Lounge: {f.name}")
+    st.header(f"Lounge: {b.replace('-', ' ').title()}")   # some Google names are just "Bedashing Beauty Lounge"
     st.caption(f"📍 {data.address(b)} · {f.emirate} · {f.rating or 'no'}★ from {f.review_count:,} Google "
                "reviews. Services offered and price tier per lounge aren't in the data.")
     badge(d.action)

@@ -55,10 +55,14 @@ def test_composite_is_the_weighted_mean_and_thresholds_split_actions():
     assert SHRINK_AT < PROTECT_AT
 
 
-def test_thin_market_scores_capture_neutral_and_confidence_low():
+def test_thin_market_blends_capture_toward_neutral_and_confidence_low():
+    # Run-2 fix A4 (2026-10-10) replaced the cliff (capture scored exactly 0.5 under 10 premium salons):
+    # with 5 of THIN_MARKET premium salons, a capture score of 1 keeps half its distance from 0.5.
     d = decide([_f(women=200_000, shared=0, capture=0.9, gap=0.3, thin=True)])[0]
-    assert d.scores["capture"] == 0.5 and d.confidence == "low"
+    assert d.scores["capture"] == pytest.approx(0.75) and d.confidence == "low"
     assert any("thin" in c.lower() for c in d.caveats)
+    empty = _f(capture=0.9, thin=True).model_copy(update={"premium_pool": 0})
+    assert decide([empty])[0].scores["capture"] == 0.5
 
 
 def test_missing_rating_gap_scores_neutral():
@@ -105,6 +109,17 @@ def test_level_flips_on_real_data():
     flips = level_flips(load_v3(), a, Levels())
     assert len(flips) == 24 and all(0 <= n <= 80 for n in flips.values())
     assert flips["zayed-international-airport"] == 0
+
+
+def test_a_call_that_flips_with_a_signal_weight_is_low_confidence():
+    # Run-2 fix B3: each weight ×0.75 / ×1.25, one at a time. Demand 1, the rest 0.5:
+    # (1 + 0.5 + 0.5 + 0.25) / 3.5 = 0.643 HOLD; demand ×1.25 gives 2.5 / 3.75 = 0.667 PROTECT.
+    d = decide([_f(women=200_000, shared=0.5, capture=0.075, gap=0.0)])[0]
+    assert d.action == "HOLD" and d.weight_flips == [
+        "demand weight ×1.25 → PROTECT", "cannibalisation weight ×0.75 → PROTECT", "capture weight ×0.75 → PROTECT"]
+    assert d.confidence == "low" and any("signal weights" in c for c in d.caveats)
+    far = decide([_f()])[0]
+    assert far.weight_flips == [] and far.confidence == "high"
 
 
 def test_flip_line_is_a_third_of_the_81_combinations():

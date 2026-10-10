@@ -32,7 +32,7 @@ _Avoid_: income, wealth, spend, affluence score (unqualified)
 
 **Addressable women**:
 Women 15+ x the cell's affluence weight, `(rent / women-weighted median rent) ^ elasticity`, clipped
-to 0.25-4 before rescaling to a mean of 1 over the observed cells (final weights 0.44-2.54 at
+to 0.25-4 before rescaling to a mean of 1 over the observed cells (final weights 0.44-2.53 at
 medium); 1 where no rent is observed.
 Elasticity off 0 / medium 0.5 / strong 1. The demand signal and the growth size test use it;
 catchment women and an area's women stay raw. Cannibalisation (`shared_share`) and growth
@@ -42,7 +42,7 @@ in numerator and denominator.
 _Avoid_: premium women, target market, weighted demand (unqualified)
 
 **Growth area**:
-A contiguous piece of populated cells beyond a 15-min drive of every open lounge, grouped by OSM
+A contiguous piece of populated cells beyond a 15-min drive of every open scored lounge, grouped by OSM
 place name. Labelled GROW / WATCH / SKIP.
 _Avoid_: opportunity area, whitespace, candidate site
 
@@ -57,7 +57,8 @@ _Avoid_: rival, POI
 A premium salon in a lounge's catchment that a Bedashing customer would compare it with. Premium =
 Google price expensive or above, or, without a price, at least the catchment's median reviews and
 rated 4.3+. The substitutes are the most-reviewed premium salons that together hold the coverage
-share of the catchment's premium reviews. Other Bedashing lounges count too.
+share of the catchment's premium reviews. Other Bedashing lounges count too, except the NOT SCORED
+airport lounge.
 _Avoid_: competitor (when the premium set is meant), top-k
 
 **Coverage**:
@@ -77,7 +78,8 @@ cap bites.
 _Avoid_: coverage (a different thing)
 
 **Cannibalisation**:
-The share of a lounge's catchment women that another open lounge also reaches (`shared_share`).
+The share of a lounge's catchment women that another open scored lounge also reaches (`shared_share`);
+the NOT SCORED airport lounge is never a sibling.
 _Avoid_: contested share, overlap (unqualified)
 
 ### Decisions
@@ -99,12 +101,17 @@ GROW, WATCH or SKIP, assigned to a growth area. What each one asks the COO to do
   verified on the ground before committing.
 - **WATCH**: don't act now. Revisit when the named failing test changes (e.g. salon coverage
   improves or the market thins).
-- **SKIP**: no action. The area is too small or already crowded.
+- **SKIP**: no action. The area is too small, already crowded, mostly worker housing (and small), or
+  non-residential by name (industrial, free zone, military, airport, port).
 
 **Low confidence**:
 A lounge call within 0.05 of a threshold, with a missing input (thin premium market, no rating gap),
 or that **flips**: changes in a third or more (27+) of the 81 combinations of the four assumption
-levels (travel time, coverage, worker-housing female share, affluence elasticity).
+levels (travel time, coverage, worker-housing female share, affluence elasticity), or under any
+single signal weight moved ±25% (in practice that only catches calls already within 0.05 of a line).
+For a growth area, low / medium / high: low within 10% of the size or saturation line, with
+saturation unknown, under half its women searched, or size passed only on thin affluence data;
+high when 20%+ clear of both lines.
 _Avoid_: uncertain, borderline (unqualified)
 
 ### Retired terms (the old Dubai model)
