@@ -128,4 +128,4 @@ def test_level_flips_iterates_81_combinations_fast():
         took = time.perf_counter() - start
     finally:
         lounges.build = real
-    assert len(set(seen)) == 81 and took < 2
+    assert len(set(seen)) == 81 and took < 4     # ~1 s here; slack for slower machines

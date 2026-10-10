@@ -145,7 +145,7 @@ def limitations_box(r: Run) -> None:
             "(noya-plaza, 215 reviews) look weak partly because they are new. Reviews are a proxy for "
             "customers, not a count.\n"
             "3. **Affluence is observed in Dubai only.** Demand weights each woman by her cell's median "
-            "household rent (DLD, 3 months), and only 241 Dubai cells have one: every lounge and growth "
+            f"household rent (DLD, 3 months), and only {len(data.rents())} Dubai cells have one: every lounge and growth "
             "area outside Dubai is weighted neutral, so Dubai-vs-elsewhere comparisons mix weighted and "
             "unweighted demand. Rent is not income or salon spend.\n"
             f"4. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
@@ -197,7 +197,7 @@ def area_caveats(a: Area, d: AreaDecision) -> list[str]:
         out.append(f"Near the saturation line ({a.premium_reviews_per_1k:.0f} vs "
                    f"{growth.UNSATURATED_PER_1K:g} premium reviews per 1k women), and that line was "
                    "set from the data it judges.")
-    if a.affluence_coverage < AFFLUENCE_KNOWN:
+    if a.affluence_coverage < AFFLUENCE_KNOWN and not any("Affluence" in c for c in out):
         out.append(affluence_caveat(a.affluence_coverage))
     if a.worker_share >= 0.25:
         out.append(f"{a.worker_share:.0%} of adults live in worker housing: the women estimate rests "
@@ -213,9 +213,11 @@ def area_caveats(a: Area, d: AreaDecision) -> list[str]:
 
 
 def affluence_caveat(coverage: float) -> str:
+    if not coverage:
+        return "No observed rents outside Dubai: weighted neutral."
     return (f"Affluence unknown here: weighted neutral. Only {coverage:.0%} of these women live in "
-            "cells with an observed rent (DLD rents cover 241 Dubai cells; nowhere else), so the "
-            "rest count as average.")
+            f"cells with an observed rent (DLD rents cover {len(data.rents())} Dubai cells; nowhere else), "
+            "so the rest count as average.")
 
 
 def affluence_metrics(raw: float, addressable: float, rent: float | None, coverage: float) -> None:

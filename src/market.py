@@ -110,7 +110,7 @@ def weighted_median(values, weights) -> float | None:
 
 
 def affluence_weight(rent, women, elasticity: float):
-    """Per cell (pandas, same index): (rent / women-weighted median rent) ** elasticity, clipped to
+    """Per cell (pandas, same index): (rent / women-weighted median rent) ** elasticity, clipped (before rescaling) to
     [0.25, 4] and rescaled so the women-weighted mean over cells with a rent is 1. Cells without an
     observed rent (NaN) get 1.0: affluence unknown, weighted neutral. Elasticity 0 turns it off."""
     out = rent.isna() * 0 + 1.0                # 1.0 everywhere, same index

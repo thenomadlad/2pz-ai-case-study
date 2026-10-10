@@ -40,14 +40,16 @@ housing, affluence elasticity 0.5):
   mohammed-bin-zayed-city, noya-plaza, shahama, westyas): 87-100% of their women are also reached by
   a sibling, and capture is middling to low. Three of them (shahama, mohammed-bin-zayed-city,
   al-maqta) flip to HOLD in 36-63 of the 81 assumption combinations. Investigate, don't cut.
-- **Growth areas:** 5 GROW and 36 WATCH. Four GROWs are in Sharjah emirate (Sharjah, Al Dhaid,
-  Khor Fakkan, Kalba; 218k women between them), all beyond a 15-minute drive of Bedashing's two
-  Sharjah lounges (al-jada, zawaya-walk, both on the Dubai side); why the footprint is only two is a
-  business question the model can't answer (licensing, brand fit, landlords). The fifth, **Al Awir
-  (Dubai)**, has 19.4k women and passes the 20k size line only through the affluence weighting
-  (20.1k addressable): a knife-edge call.
-- **Affluence changes no lounge call:** the Dubai lounges it weights sit above the demand anchor
-  either way. With it off, the calls are the earlier 3 / 13 / 7 and 4 GROW.
+- **Growth areas:** 4 GROW, all in Sharjah emirate (Sharjah, Al Dhaid, Khor Fakkan, Kalba; 218k
+  women between them), and 37 WATCH. All are beyond a 15-minute drive of Bedashing's two Sharjah
+  lounges (al-jada, zawaya-walk, both on the Dubai side); why the footprint is only two is a business
+  question the model can't answer (licensing, brand fit, landlords). **Al Awir (Dubai)** is a WATCH
+  whose size passes only on thin affluence data: 19.4k women, 20.1k addressable, from one DLD area
+  (65 villa-heavy contracts) covering 38% of its women, so it is capped at WATCH.
+- **Affluence changes no call at medium or strong.** The four big Dubai lounges sit above the 200k
+  demand anchor either way; jumeirah-park and zawaya-walk move by under 0.02 and neither crosses a
+  line. That is partly by design (see limitations 3): the weighting only reshuffles demand inside
+  Dubai, and all 7 SHRINKs are in Abu Dhabi, where it sees nothing.
 
 Treat these as the places to look first, not as answers.
 
@@ -59,7 +61,7 @@ uv run streamlit run streamlit_app.py     # http://localhost:8501  (or: just app
 ```
 
 No API key needed: the app computes everything in memory from the committed `data/seed/v3/` and
-serves the committed AI explanations. `just test` runs the 134 tests. `just notebook` opens the
+serves the committed AI explanations. `just test` runs the 135 tests. `just notebook` opens the
 notebooks (start with `decisions.ipynb`).
 
 ## Using the app
@@ -97,7 +99,8 @@ Links carry the selection, so any page can be shared directly.
 
 **Market.** Women aged 15+ per ~2 km grid cell (WorldPop 2025 adults, rebalanced so worker housing
 counts few women). **Addressable women** weight each cell's women by its median household rent
-relative to the women-weighted median (`(rent / median) ^ 0.5` at medium, clipped, mean 1); only
+relative to the women-weighted median (`(rent / median) ^ 0.5` at medium, clipped before
+rescaling to a mean of 1 over the observed cells; final weights 0.44-2.54); only
 241 Dubai cells have a rent (DLD Ejari), so every other cell weighs 1. A lounge's **catchment** is the cells within a 15-min drive (Mapbox, typical
 midday traffic). Its **premium substitutes** are the most-reviewed premium salons in the catchment
 that together hold 60% of its premium reviews. **Capture** = the lounge's Google reviews ÷ (its own
@@ -121,7 +124,8 @@ changes in a third or more (27+) of the 81 combinations of the four assumption l
 **Growth areas** (`src/model/growth.py`). Populated cells beyond a 15-min drive of every lounge,
 grouped by place name. **Big enough?** ≥ 20k addressable women, under 50% of adults in worker housing.
 **Unsaturated?** Under 50 premium reviews per 1k women in the cells we searched. Both → GROW, one →
-WATCH, neither → SKIP; under 5k women is SKIP, and under half the women searched caps at WATCH.
+WATCH, neither → SKIP; under 5k women is SKIP, and under half the women searched caps at WATCH, as does passing the
+size test only through the affluence weighting with rents for under half the women.
 
 Every anchor, with why it was chosen, is on the app's How page and in `notebooks/decisions.ipynb`.
 
@@ -207,6 +211,6 @@ be replaced with better data.
 | 13 | **Female share in worker housing** | Adults in OSM industrial land use are 5.5% female (low 1% / high 15%); every other cell is rebalanced so each emirate's female total is unchanged | Dubai Statistics Center 2022: 13 labour-camp communities are 0.1-27% female (5.5% population-weighted), residential ones 43-54%. Against 21 measured communities, error falls from 0.21 (WorldPop's flat 33.6%) to 0.13. Camps not mapped as industrial in OSM are missed (DIP, very likely Sonapur), so Mirdif-35's market is overstated | in data |
 | 14 | **Search recall (estimate)** | Where our search hit Google's 20-result cap, it found **66%** of premium reviews; substitutes' reviews are scaled by 1 + (share of full circles) x (1/0.66 − 1), from 1.03 to 1.39 | Calibrated on one fully swept ~8 km tile around Al Barsha (28.6k of 43.7k premium reviews found). An upper bound (that sweep missed salons too), and it assumes other dense areas behave like Al Barsha. Splitting the full circles instead was costed at ~$54-210 and declined. To be replaced if a full sweep is run | estimate |
 | 15 | **Affluence = median household rent** | DLD Ejari contracts for one flat, villa or studio (labour camps, staff housing and bulk leases out), median per DLD area, mapped to cells by name; observed for 241 Dubai cells, neutral (1) everywhere else | Free, official and recent; rent is housing cost, not income or salon spend, and covers 3 months of registrations. A UAE-wide proxy from 2018 built form failed (CV R² −0.10). Abu Dhabi's ADREC data refused queries (HTTP 403); Sharjah publishes none | in data (Dubai only) |
-| 16 | **How strongly demand follows rent** | Elasticity 0 (off) / **0.5** / 1: weight = (rent / women-weighted median) ^ e, clipped to 0.25-4, rescaled to a mean of 1 over observed cells | No data ties salon spend to rent; 0.5 says a cell with 4x the median rent counts 2x the women. Off reproduces the unweighted model exactly | set |
+| 16 | **How strongly demand follows rent** | Elasticity 0 (off) / **0.5** / 1: weight = (rent / women-weighted median) ^ e, clipped to 0.25-4 before rescaling to a mean of 1 over observed cells (final weights 0.44-2.54 at 0.5, 0.18-2.68 at 1) | No data ties salon spend to rent; 0.5 says a cell with 4x the median rent counts 2x the women of a median-rent cell, before the rescale that keeps Dubai's observed total. Off reproduces the unweighted model exactly | set |
 
 What these assumptions miss, ranked: [`docs/limitations.md`](docs/limitations.md).

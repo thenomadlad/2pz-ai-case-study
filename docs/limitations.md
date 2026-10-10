@@ -44,7 +44,9 @@ lounges into SHRINK (`decisions.ipynb`, open question a).
 ## 3. Affluence is observed in Dubai only
 
 Demand counts **addressable women**: each cell's women weighted by how its median household rent
-compares with the women-weighted median (`(rent / median) ^ elasticity`, clipped to 0.25-4, mean 1).
+compares with the women-weighted median (`(rent / median) ^ elasticity`, clipped to 0.25-4 before
+rescaling to a mean of 1 over the observed cells; final weights 0.44-2.54 at medium, 0.18-2.68 at
+strong).
 The rents are DLD Ejari contracts for one flat, villa or studio, registered 2026-07-10 to
 2026-10-09 (`affluence.ipynb`). This is the only affluence signal in the model, and it is thin:
 
@@ -61,17 +63,26 @@ The rents are DLD Ejari contracts for one flat, villa or studio, registered 2026
 - **Three months of registrations.** DLD's open-data site serves at most 3 months and sits behind
   a captcha, so the CSV was downloaded by hand. New and renewed contracts only.
 - **Area medians hide people.** A cell's rent is the median of the DLD areas whose point falls in
-  it (else the nearest within 2.5 km): a rich woman in a cheap cell is invisible, and a few cells
-  borrow a neighbouring area's rent.
+  it (else the nearest within 2.5 km): a rich woman in a cheap cell is invisible. Only **102 of the
+  241** cells contain a DLD area point; the other **139 borrow the nearest area's rent**
+  (`assignment` in `cell_affluence.csv`).
 - **Name matching.** DLD land-registry names were matched to OSM names: 168 of 173 areas (99% of
   contracts) located, 7 of them by a hand-written alias (Marsa Dubai, Burj Khalifa, Palm Jumeirah…).
 - **The elasticity is an assumption** (off 0 / medium 0.5 / strong 1). No data ties salon spend to
   rent.
 - **Touches:** demand for the five Dubai lounges and zawaya-walk (3% observed), and the size test
-  of the 43 growth areas with any observed rent, all in Dubai. **No lounge call changes** at any
-  elasticity: the four big Dubai lounges sit above the 200k demand anchor weighted or not.
-  **One growth call does: al-awir-dubai** (19.4k women) becomes GROW at medium and strong, on 38%
-  observed rent. Treat it as a WATCH that tipped.
+  of the 43 growth areas with any observed rent, all in Dubai. **No call changes** at any
+  elasticity: the four big Dubai lounges sit above the 200k demand anchor weighted or not, and
+  jumeirah-park and zawaya-walk move by under 0.02. **al-awir-dubai** (19.4k women, 20.1k
+  addressable at medium) passes the size line only through the weighting, on one DLD area (Al
+  Aweer First, 65 villa-heavy contracts) covering 38% of its women; the growth rule caps such an
+  area at WATCH.
+- **Bias: Dubai lounges look better than the rest.** The weights average 1 within Dubai's
+  observed cells, so affluence only reshuffles demand between Dubai cells; it can't say whether
+  Dubai is richer than Abu Dhabi. Dubai lounges in above-average-rent catchments gain (al-barsha
+  +18%), while an equally affluent Abu Dhabi catchment stays at 1, so Dubai lounges are inflated
+  relative to non-Dubai ones. All 7 SHRINKs are in Abu Dhabi, the part affluence can't see. The
+  near-zero effect on the calls is partly this design, not evidence that affluence doesn't matter.
 - **Fix:** Abu Dhabi rents from ADREC (its public map's data service refuses queries, HTTP 403;
   the API needs a subscription); the Sharjah rental index when it is published; per-cell income or
   card-spend data, which would replace rent altogether.
@@ -147,9 +158,9 @@ and split into contiguous pieces.
 - **The saturation line (50 premium reviews per 1k women) was set from the data it judges.** It
   sits well below the least crowded working catchment (88) and above most growth areas (median 5).
   Al Jerf (59) and Kalba (44) sit near it.
-- **Al Awir (Dubai) is GROW only through the affluence weighting** (see 3): 19.4k women, 20.1k
-  addressable at medium, against a 20k line.
-- **4 of the 5 GROW areas are in Sharjah emirate** (Sharjah, Al Dhaid, Khor Fakkan, Kalba). All are beyond a
+- **Al Awir (Dubai) is a WATCH whose size passes only on thin affluence data** (see 3): 19.4k
+  women, 20.1k addressable at medium, against a 20k line, with rents for 38% of its women.
+- **All 4 GROW areas are in Sharjah emirate** (Sharjah, Al Dhaid, Khor Fakkan, Kalba). All are beyond a
   15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), both on the Dubai
   side; the "Sharjah" area's centre is ~13 km from al-jada. The business question is why the
   Sharjah footprint is only two lounges. The model can't see licensing, brand fit,

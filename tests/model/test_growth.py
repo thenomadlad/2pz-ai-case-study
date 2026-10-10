@@ -85,3 +85,14 @@ def test_airport_catchment_still_blocks_growth_areas():
     v = _v3([air], [_cell(C1, 100_000), _cell(C2, 100_000)], {"zayed-international-airport": [C1]}, [], {})
     _, areas = build(v, ASSUMPTIONS)
     assert [a.cell_ids for a in areas] == [[C2]]
+
+
+def test_size_passed_only_through_thin_affluence_data_caps_at_watch():
+    thin = _a(women=GROW_MIN_WOMEN - 1, addressable=GROW_MIN_WOMEN, per_1k=0)
+    thin = thin.model_copy(update={"affluence_coverage": MIN_COVERAGE - 0.01})
+    d = classify(thin)
+    assert d.action == "WATCH" and d.big_enough and "affluence weighting" in d.rationale
+    assert any("Affluence data covers only 49%" in c and "19,999 women before weighting" in c for c in d.caveats)
+    assert classify(thin.model_copy(update={"affluence_coverage": MIN_COVERAGE})).action == "GROW"
+    # raw women already over the line: the weighting isn't what passes it
+    assert classify(_a(women=GROW_MIN_WOMEN, addressable=GROW_MIN_WOMEN + 5, per_1k=0)).action == "GROW"

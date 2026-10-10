@@ -68,6 +68,11 @@ def women(worker_level: str) -> pd.Series:
     return women_15plus(d.cells, d.emirates, assumptions().worker_housing_female_share[worker_level])
 
 
+def rents() -> pd.Series:
+    """Observed median household rent per cell (AED/yr), only where DLD data exists (Dubai)."""
+    return v3().cells.rent_observed.dropna()
+
+
 def minutes(levels: Levels) -> int:
     return assumptions().travel_time_minutes[levels.travel]
 

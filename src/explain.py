@@ -382,7 +382,8 @@ GROWTH_WHY = (
     f"GROW needs both tests: at least {growth.GROW_MIN_WOMEN:,} addressable (affluence-weighted) women 15+ (worker housing under "
     f"{growth.WORKER_CAP:.0%} of adults), and fewer than {growth.UNSATURATED_PER_1K:g} premium "
     f"reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not "
-    f"searched enough to tell (under {growth.MIN_COVERAGE:.0%} of its women). SKIP passes "
+    f"searched enough to tell (under {growth.MIN_COVERAGE:.0%} of its women), or is big only "
+    f"through the affluence weighting with rents observed for under {growth.MIN_COVERAGE:.0%} of its women. SKIP passes "
     f"neither, or has under {growth.SKIP_UNDER_WOMEN:,} women. Every area is beyond a 15-min "
     "drive of every lounge.")
 

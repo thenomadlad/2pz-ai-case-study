@@ -32,9 +32,13 @@ _Avoid_: income, wealth, spend, affluence score (unqualified)
 
 **Addressable women**:
 Women 15+ x the cell's affluence weight, `(rent / women-weighted median rent) ^ elasticity`, clipped
-to 0.25-4 and rescaled to a mean of 1 over the observed cells; 1 where no rent is observed.
+to 0.25-4 before rescaling to a mean of 1 over the observed cells (final weights 0.44-2.54 at
+medium); 1 where no rent is observed.
 Elasticity off 0 / medium 0.5 / strong 1. The demand signal and the growth size test use it;
-catchment women and an area's women stay raw.
+catchment women and an area's women stay raw. Cannibalisation (`shared_share`) and growth
+saturation (premium reviews per 1k women) also use raw women: they measure overlap and crowding
+of everyone a lounge or salon serves, and weighting them would count the same women differently
+in numerator and denominator.
 _Avoid_: premium women, target market, weighted demand (unqualified)
 
 **Growth area**:

@@ -187,7 +187,8 @@ row per Ejari rental contract. Free, no licence terms beyond the site's.
 - **Areas → cells:** DLD land-registry names matched by normalised name to OSM admin-10 centroids,
   OSM place points or `cells.csv` names, else 7 hand aliases: 168 of 173 areas, 99.0% of contracts.
   A cell's rent = the contract-weighted median of the area medians whose point is inside it, else
-  the nearest within 2.5 km; areas under 20 contracts left out. **241 Dubai cells observed**; every
+  the nearest within 2.5 km (102 cells inside, 139 nearest: column `assignment`); areas under 20
+  contracts left out. **241 Dubai cells observed**; every
   other cell `none` (weighted neutral).
 - **Caveats:** housing cost, not income or salon spend; new and renewed registrations over one
   quarter; area medians hide the spread inside an area.
@@ -220,7 +221,7 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
 1. **Market size:** women aged 15+ per ~2 km cell (WorldPop 2025 adults; female share 5.5% in
    worker housing, `worker_housing_female_share`, the rest rebalanced per emirate).
    **Addressable women** = those women x an affluence weight, (cell rent / women-weighted median
-   rent) ^ `affluence_elasticity` (0 / **0.5** / 1), clipped to 0.25-4 and rescaled to a mean of 1
+   rent) ^ `affluence_elasticity` (0 / **0.5** / 1), clipped to 0.25-4 before rescaling to a mean of 1 (final weights 0.44-2.54 at medium)
    over the 241 Dubai cells with an observed DLD rent; 1 (neutral) everywhere else.
 2. **Catchment:** the cells within a 15-min drive of the lounge (`travel_time_minutes`: 10/15/20;
    Mapbox typical traffic at `isochrone_depart_at`, weekday 12:00). Catchment market = the sum of
@@ -248,7 +249,8 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
 8. **Growth areas** = populated cells beyond a 15-min drive of every open lounge, grouped by OSM
    place name into contiguous pieces (`src/model/growth.py`). GROW = at least 20k addressable women 15+ (worker
    housing under 50% of adults) **and** under 50 premium reviews per 1k women in the searched cells.
-   WATCH passes one test, or is big but under 50% searched, or big but mostly worker housing (≥ 50% of adults). SKIP passes neither, or has under 5k
+   WATCH passes one test, or is big but under 50% searched, or is big only through the affluence
+   weighting with rents observed for under 50% of its women, or big but mostly worker housing (≥ 50% of adults). SKIP passes neither, or has under 5k
    women.
 
 **Excluded from market measures:** `zayed-international-airport` (serves travellers, not its

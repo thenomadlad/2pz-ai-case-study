@@ -1,4 +1,7 @@
-"""One-off: an affluence index per ~2 km cell from Dubai rents, extended to the UAE by built form.
+"""One-off: an affluence index per ~2 km cell from observed Dubai rents (Dubai only).
+
+Built-form proxy: NO-GO (CV R2 -0.10 < MIN_R2 0.3), so nothing is predicted outside Dubai;
+rent_predicted is kept in the CSV for the record and unused.
 
 1. Rents: DLD Ejari residential contracts for one unit (flats, villas, studios; labour camps,
    staff housing and bulk leases of many units left out: they aren't a household's rent), downloaded by hand from dubailand.gov.ae Open Data
@@ -11,11 +14,12 @@
    point lies inside the cell; with none inside, the nearest area point within RADIUS_KM. Areas
    with fewer than MIN_CONTRACTS contracts are left out.
 4. Built form (data/seed/v3/cell_built_form.csv, scripts/fetch_ghsl.py) -> log rent, a plain
-   linear fit on the observed cells, cross-validated by name group; R2 reported. Predicted for
-   every cell with residential built form if the CV R2 >= MIN_R2, else not used.
+   linear fit on the observed cells, cross-validated by name group. Would be used for every cell
+   with residential built form if the CV R2 >= MIN_R2; it came out at -0.10, so it is not used.
 
 Outputs (data/seed/v3/): dubai_rents_by_area.csv, cell_affluence.csv
-(cell_id, rent_observed, rent_predicted, affluence_rent, source: observed | predicted | none).
+(cell_id, rent_observed, rent_predicted (unused), affluence_rent, source: observed | none
+(predicted only if the proxy passed), assignment: inside | nearest | blank).
 Analysis and plots: notebooks/affluence.ipynb.
 
 Run: uv run --extra notebook python scripts/build_affluence.py
@@ -121,23 +125,23 @@ def locate(areas: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([areas.reset_index(drop=True), found], axis=1)
 
 
-def observed(cells: pd.DataFrame, areas: pd.DataFrame) -> pd.Series:
+def observed(cells: pd.DataFrame, areas: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     """Per Dubai cell: contract-weighted median of the areas whose point is inside it, else the
-    nearest area point within RADIUS_KM."""
+    nearest area point within RADIUS_KM. Also how each was assigned (inside | nearest)."""
     a = areas.dropna(subset=["lat"])
     a = a[a.contracts >= MIN_CONTRACTS]
-    out = {}
+    out, how = {}, {}
     for cid, c in cells[cells.emirate == "Dubai"].iterrows():
         inside = a[(a.lat >= c.south) & (a.lat < c.north) & (a.lng >= c.west) & (a.lng < c.east)]
         if len(inside):
             inside = inside.sort_values("median_rent")
             cum = inside.contracts.cumsum()
-            out[cid] = float(inside.median_rent[cum >= cum.iloc[-1] / 2].iloc[0])
+            out[cid], how[cid] = float(inside.median_rent[cum >= cum.iloc[-1] / 2].iloc[0]), "inside"
             continue
         d = haversine_km(c.lat, c.lng, a.lat.values, a.lng.values)
         if d.min() <= RADIUS_KM:
-            out[cid] = float(a.median_rent.iloc[d.argmin()])
-    return pd.Series(out, name="rent_observed")
+            out[cid], how[cid] = float(a.median_rent.iloc[d.argmin()]), "nearest"
+    return pd.Series(out, name="rent_observed"), pd.Series(how, name="assignment")
 
 
 def fit(X: pd.DataFrame, y: pd.Series, groups: pd.Series, folds: int = 5) -> tuple[np.ndarray, float]:
@@ -166,7 +170,7 @@ def main() -> None:
 
     cells = pd.read_csv(V3 / "cells.csv").set_index("cell_id")
     form = pd.read_csv(V3 / "cell_built_form.csv").set_index("cell_id")
-    obs = observed(cells, areas)
+    obs, how = observed(cells, areas)
     train = form.loc[obs.index, FEATURES].dropna()
     beta, r2 = fit(train, obs[train.index], cells.loc[train.index, "name"])
     print(f"observed rent for {len(obs)} Dubai cells; built-form fit on {len(train)}: CV R2 = {r2:.2f}")
@@ -179,9 +183,10 @@ def main() -> None:
     out["affluence_rent"] = out.rent_observed.fillna(out.rent_predicted if use_pred else np.nan)
     out["source"] = np.where(out.rent_observed.notna(), "observed",
                              np.where(use_pred & out.rent_predicted.notna(), "predicted", "none"))
+    out["assignment"] = how.reindex(form.index)
     out.index.name = "cell_id"
     out.to_csv(V3 / "cell_affluence.csv")
-    print(out.source.value_counts().to_dict(), "| proxy used" if use_pred else f"| proxy NOT used (R2 < {MIN_R2})")
+    print(out.source.value_counts().to_dict(), out.assignment.value_counts().to_dict(), "| proxy used" if use_pred else f"| proxy NOT used (R2 < {MIN_R2})")
 
 
 if __name__ == "__main__":

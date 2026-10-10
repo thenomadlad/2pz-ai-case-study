@@ -8,7 +8,8 @@ catchment, 15 min at baseline, of every open lounge, by construction in src/feat
 
   both -> GROW, one -> WATCH (also: big but mostly worker housing), neither -> SKIP; under
   SKIP_UNDER_WOMEN women (raw) -> SKIP. Unknown saturation, or under MIN_COVERAGE of the women searched,
-  caps at WATCH. Thresholds reviewed by the user on 2026-10-09 (notebooks/decisions.ipynb).
+  caps at WATCH, and so does a size test passed only through the affluence weighting (raw women
+  under GROW_MIN_WOMEN) when under MIN_COVERAGE of the women have an observed rent. Thresholds reviewed by the user on 2026-10-09 (notebooks/decisions.ipynb).
 """
 from src.models import Area, AreaDecision
 
@@ -22,7 +23,9 @@ WHY = {
     "GROW_MIN_WOMEN": "Just under the smallest lounge catchment (23k women at medium levels): the least a lounge runs on today.",
     "SKIP_UNDER_WOMEN": "Under 5,000 women an area can't carry a lounge whatever the competition.",
     "WORKER_CAP": "Where most adults live in worker housing, the women estimate rests on the worker-housing female share.",
-    "MIN_COVERAGE": "Under half the women in searched cells, the saturation figure describes the minority.",
+    "MIN_COVERAGE": ("Under half the women in searched cells, the saturation figure describes the minority. "
+                     "Likewise an area big enough only through the affluence weighting, with rents "
+                     "observed for under half its women, caps at WATCH."),
     "UNSATURATED_PER_1K": (
         "Signed off by the user on 2026-10-09. Every lounge catchment with a real premium market "
         "(10+ premium salons) has 88+ premium reviews per 1k women (al-jada 88, median 220); the two "
@@ -40,11 +43,19 @@ def classify(a: Area) -> AreaDecision:
         caveats.append("No competitor data: none of this area's cells were searched, so saturation is unknown.")
     elif a.data_coverage < MIN_COVERAGE:
         caveats.append(f"Competitor data covers only {a.data_coverage:.0%} of the women here.")
+    # Big only because the weighting lifted it over the line, on rents for under half its women.
+    thin_affluence = (big and a.women < GROW_MIN_WOMEN and a.affluence_coverage < MIN_COVERAGE)
+    if thin_affluence:
+        caveats.append(f"Affluence data covers only {a.affluence_coverage:.0%} of the women here, and the "
+                       f"size test passes only through it ({a.women:,.0f} women before weighting).")
 
     if a.women < SKIP_UNDER_WOMEN:
         action, why = "SKIP", f"Only {a.women:,.0f} women 15+, under the {SKIP_UNDER_WOMEN:,} floor."
-    elif big and unsat and a.data_coverage >= MIN_COVERAGE:
+    elif big and unsat and a.data_coverage >= MIN_COVERAGE and not thin_affluence:
         action, why = "GROW", "Big enough and not saturated with premium salons."
+    elif big and unsat and a.data_coverage >= MIN_COVERAGE:
+        action, why = "WATCH", ("Looks unsaturated, but big enough only through the affluence weighting, "
+                                "on rents observed for too few of its women to be sure.")
     elif big and unsat:
         action, why = "WATCH", "Big enough and looks unsaturated, but too little of it was searched to be sure."
     elif big and unsat is None:

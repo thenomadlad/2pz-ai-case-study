@@ -73,14 +73,17 @@ def _legend(r, lounge: str | None, show_affluence: bool) -> None:
                "no rating gap (missing rating or no rated substitutes), or the call changes in "
                f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations.")
     st.markdown(f"**Growth areas** (cells beyond a {data.minutes(r.levels)}-min drive of every lounge)")
-    st.markdown(f"🔵 **GROW**: ≥ {growth.GROW_MIN_WOMEN:,} women, worker housing under "
+    st.markdown(f"🔵 **GROW**: ≥ {growth.GROW_MIN_WOMEN:,} addressable women, worker housing under "
                 f"{growth.WORKER_CAP:.0%}, *and* under {growth.UNSATURATED_PER_1K:g} premium reviews per "
                 f"1k women, with ≥ {growth.MIN_COVERAGE:.0%} of women searched  \n"
-                "🟣 **WATCH**: one of the two, too little searched, or big but mostly worker housing  \n"
+                "🟣 **WATCH**: one of the two, too little searched, big only on thin affluence data, or big "
+                "but mostly worker housing  \n"
                 f"⚪ **SKIP**: neither, or under {growth.SKIP_UNDER_WOMEN:,} women")
     if show_affluence:
-        st.markdown("**Affluence**: 🟧 observed median household rent per cell, pale = cheap (~22k AED/yr), "
-                    "deep orange = dear (~710k). Dubai only (DLD rents); **uncoloured cells have no data** "
+        rent = data.rents()
+        st.markdown(f"**Affluence**: 🟧 observed median household rent per cell, pale = cheap "
+                    f"({rent.min() / 1000:,.0f}k AED/yr), deep orange = dear ({rent.max() / 1000:,.0f}k), "
+                    f"{len(rent)} Dubai cells only (DLD rents); **uncoloured cells have no data** "
                     "and are weighted neutral.")
     if lounge:
         st.markdown(f"**{lounge}**: its {data.minutes(r.levels)}-min drive polygon, catchment cells "

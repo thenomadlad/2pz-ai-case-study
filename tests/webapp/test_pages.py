@@ -159,7 +159,7 @@ def test_affluence_selector_switches_the_weighting_and_reports_what_changed():
     assert not at.exception
     assert at.session_state["what_if"]["levels"] == Levels(affluence="low")
     assert any("affluence weighting off (low)" in w.value for w in at.warning)
-    assert "**al-awir-dubai**: GROW → WATCH" in _text(at)        # the one call affluence moves
+    assert "0 lounge call(s) changed, 2 more lounge(s) moved within their call" in _text(at)   # jumeirah-park, zawaya-walk
 
 
 def test_lounge_and_area_pages_show_raw_and_addressable_women():
@@ -169,10 +169,11 @@ def test_lounge_and_area_pages_show_raw_and_addressable_women():
     assert labels["Affluence rent (median, AED/yr)"] == "115,000"
     assert "Affluence unknown here" not in _text(at)
     abu = _page("lounge", lounge="al-ain")
-    assert "Affluence unknown here: weighted neutral" in _text(abu)
+    assert "No observed rents outside Dubai: weighted neutral." in _text(abu)
     assert {m.label: m.value for m in abu.metric}["Affluence rent (median, AED/yr)"] == "no data"
     awir = _text(_page("area", area="al-awir-dubai"))
-    assert "Affluence unknown here: weighted neutral. Only 38%" in awir
+    assert "Affluence data covers only 38% of the women here" in awir and "Affluence unknown" not in awir
+    assert "No observed rents outside Dubai: weighted neutral." in _text(_page("area", area="kalba-sharjah"))
 
 
 def test_overview_affluence_toggle_adds_the_layer_and_its_legend():
