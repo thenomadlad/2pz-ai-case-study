@@ -31,8 +31,8 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts.build_cells import _polygons  # noqa: E402
-from src.features.lounges import haversine_km  # noqa: E402
+from scripts.build_cells import _polygons
+from src.features.lounges import haversine_km
 
 V3 = ROOT / "data" / "seed" / "v3"
 RAW = ROOT / "data" / "raw"
