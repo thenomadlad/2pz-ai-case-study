@@ -1,4 +1,4 @@
-"""The what-if panel (Overview): three assumption levels, search recall and closed lounges. Widgets
+"""The what-if panel (Overview): four assumption levels, search recall and closed lounges. Widgets
 write into data.what_if() on change; everything recomputes through baseline.run()."""
 import streamlit as st
 
@@ -9,13 +9,13 @@ from src.webapp.views import level_label
 
 LEVELS = ("low", "medium", "high")
 _AXES = (("travel", "Travel time to a lounge"), ("coverage", "Competitor coverage"),
-         ("worker_share", "Women in worker housing"))
+         ("worker_share", "Women in worker housing"), ("affluence", "Affluence weighting (Dubai rents)"))
 
 
 def _sync() -> None:
     s = st.session_state
     recall = s["wi-recall"]
-    w = {"levels": Levels(s["wi-travel"], s["wi-coverage"], s["wi-worker_share"]),
+    w = {"levels": Levels(*(s[f"wi-{axis}"] for axis, _ in _AXES)),
          "closed": frozenset(s["wi-closed"]),
          "recall": None if abs(recall - data.assumptions().search_recall) < 1e-9 else recall}
     try:
@@ -43,7 +43,7 @@ def render_panel() -> None:
     with st.expander("🧪 What if…? Change the assumptions or close lounges", expanded=data.active()):
         if "wi-error" in st.session_state:
             st.error(f"Not applied: {st.session_state['wi-error']}")
-        cols = st.columns(3)
+        cols = st.columns(len(_AXES))
         for col, (axis, label) in zip(cols, _AXES):
             col.selectbox(label, LEVELS, key=f"wi-{axis}", on_change=_sync,
                           format_func=lambda lv, a=axis: level_label(a, lv))

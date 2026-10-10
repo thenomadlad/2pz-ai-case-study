@@ -19,7 +19,7 @@ def test_loads_the_v3_tables():
 def test_salons_have_no_nan_in_market_fields():
     s = load_v3().salons
     assert s.review_count.dtype.kind == "i"
-    assert not s.rating.map(lambda x: isinstance(x, float) and x != x).any()
+    assert not s.rating.map(lambda x: isinstance(x, float) and pd.isna(x)).any()
     assert s.price_level.eq(s.price_level.fillna("")).all() and not s.price_level.isna().any()
     assert not s.excluded_reason.isna().any()
     assert all(not pd.isna(c["review_count"]) for cs in load_v3().candidates.values() for c in cs)
@@ -51,3 +51,11 @@ def test_full_share_at_15_min_matches_the_saturation_record():
 
 def test_load_v3_accepts_explicit_settings():
     assert load_v3(Settings()) is load_v3()
+
+
+def test_cells_carry_observed_dubai_rents_and_nothing_else():
+    c = load_v3().cells
+    obs = c.affluence_source == "observed"
+    assert obs.sum() == 241 and set(c.affluence_source) == {"observed", "none"}
+    assert c.rent_observed[obs].notna().all() and c.rent_observed[~obs].isna().all()
+    assert (c.emirate[obs] == "Dubai").all() and (c.rent_observed[obs] > 0).all()

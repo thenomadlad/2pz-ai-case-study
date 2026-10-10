@@ -17,6 +17,7 @@ from src.webapp.map import (
     view_at,
 )
 from src.webapp.views import (
+    affluence_metrics,
     badge,
     banner,
     explanation_for,
@@ -95,7 +96,7 @@ def render() -> None:
     badge(d.action)
     if d.action != "NOT SCORED":
         st.caption(f"Composite {d.composite:.2f} · confidence {d.confidence} · the call changes in "
-                   f"{flips} of 27 assumption combinations")
+                   f"{flips} of {scorecard.COMBOS} assumption combinations")
     left, right = st.columns([3, 2])
     with left:
         render_pyramid(exp)
@@ -113,6 +114,8 @@ def render() -> None:
     st.caption(f"Its {minutes}-min drive polygon (midday traffic), catchment cells (darker = more "
                "women), premium substitutes (grey, sized by reviews) and every lounge. Hover for data.")
 
+    st.markdown("##### Demand: raw and affluence-weighted")
+    affluence_metrics(f.catchment_women, f.addressable_women, f.affluence_rent, f.affluence_coverage)
     if d.action != "NOT SCORED":
         _signals(f, d)
     _substitutes(subs, f, data.assumptions().competitor_coverage[r.levels.coverage])

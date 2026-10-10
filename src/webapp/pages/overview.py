@@ -6,6 +6,7 @@ from src.features.lounges import substitutes
 from src.model import growth, scorecard
 from src.webapp import data, nav
 from src.webapp.map import (
+    affluence_layer,
     area_cells_layer,
     build_deck,
     catchment_cells_layer,
@@ -40,10 +41,13 @@ def _selection(map_state) -> tuple[str | None, str | None]:
     return st.query_params.get("lounge"), st.query_params.get("area")
 
 
-def map_layers(r, lounge: str | None, show_areas: bool, show_skip: bool, show_subs: bool) -> list:
-    """Bottom to top: growth areas, the selected lounge's catchment cells, polygon and substitutes,
-    then every lounge and its flag."""
+def map_layers(r, lounge: str | None, show_areas: bool, show_skip: bool, show_subs: bool,
+               show_affluence: bool = False) -> list:
+    """Bottom to top: affluence, growth areas, the selected lounge's catchment cells, polygon and
+    substitutes, then every lounge and its flag."""
     v3, layers = data.v3(), []
+    if show_affluence:
+        layers.append(affluence_layer(v3.cells))
     if show_areas:
         layers.append(area_cells_layer(v3.cells, r.areas, r.area_decisions, show_skip))
     if lounge:
@@ -57,7 +61,7 @@ def map_layers(r, lounge: str | None, show_areas: bool, show_skip: bool, show_su
     return layers + [lounge_layer(r.features, r.decisions), flag_layer(r.features)]
 
 
-def _legend(r, lounge: str | None) -> None:
+def _legend(r, lounge: str | None, show_affluence: bool) -> None:
     st.markdown("**Lounges** (flag; circle sized by women in catchment)")
     st.markdown(f"🟢 **PROTECT**: composite ≥ {scorecard.PROTECT_AT}  \n"
                 f"🟠 **HOLD**: between {scorecard.SHRINK_AT} and {scorecard.PROTECT_AT}  \n"
@@ -67,13 +71,17 @@ def _legend(r, lounge: str | None) -> None:
     st.caption("Composite: demand, cannibalisation, capture (weight 1 each) and rating (½), each "
                f"0-1 on a fixed scale. Low confidence: within {scorecard.LOW_MARGIN} of a line, thin market, "
                "no rating gap (missing rating or no rated substitutes), or the call changes in "
-               f"{scorecard.FLIP_LOW}+ of 27 assumption combinations.")
+               f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations.")
     st.markdown(f"**Growth areas** (cells beyond a {data.minutes(r.levels)}-min drive of every lounge)")
     st.markdown(f"🔵 **GROW**: ≥ {growth.GROW_MIN_WOMEN:,} women, worker housing under "
                 f"{growth.WORKER_CAP:.0%}, *and* under {growth.UNSATURATED_PER_1K:g} premium reviews per "
                 f"1k women, with ≥ {growth.MIN_COVERAGE:.0%} of women searched  \n"
                 "🟣 **WATCH**: one of the two, too little searched, or big but mostly worker housing  \n"
                 f"⚪ **SKIP**: neither, or under {growth.SKIP_UNDER_WOMEN:,} women")
+    if show_affluence:
+        st.markdown("**Affluence**: 🟧 observed median household rent per cell, pale = cheap (~22k AED/yr), "
+                    "deep orange = dear (~710k). Dubai only (DLD rents); **uncoloured cells have no data** "
+                    "and are weighted neutral.")
     if lounge:
         st.markdown(f"**{lounge}**: its {data.minutes(r.levels)}-min drive polygon, catchment cells "
                     "(darker = more women) and premium substitutes (grey, sized by reviews).")
@@ -135,16 +143,18 @@ def render() -> None:
         show_areas = st.checkbox("Growth areas", value=True)
         show_skip = st.checkbox("…including SKIP areas", value=False, disabled=not show_areas)
         show_subs = st.checkbox("Selected lounge's premium substitutes", value=True)
+        show_affluence = st.checkbox("Affluence (Dubai rents)", value=False)
         # Not "Clear selection": the map's own toolbar has that button, which clears only the widget.
         if (lounge or area_id) and st.button("Deselect"):
             st.query_params.pop("lounge", None)
             st.query_params.pop("area", None)
             st.session_state["map_nonce"] = st.session_state.get("map_nonce", 0) + 1
             st.rerun()
-        _legend(r, lounge)
+        _legend(r, lounge, show_affluence)
     with map_col:
         open_ = {f.branch_id for f in r.features}
-        layers = map_layers(r, lounge if lounge in open_ else None, show_areas, show_skip, show_subs)
+        layers = map_layers(r, lounge if lounge in open_ else None, show_areas, show_skip, show_subs,
+                            show_affluence)
         st.pydeck_chart(build_deck(layers), on_select="rerun", selection_mode="single-object", key=map_key)
     if lounge:
         _lounge_panel(r, lounge)

@@ -17,7 +17,7 @@ class Run(BaseModel):
     decisions: list[Decision]
     areas: list[Area]
     area_decisions: list[AreaDecision]
-    flips: dict[str, int]           # per lounge: level combinations (of 27) that change its action
+    flips: dict[str, int]           # per lounge: level combinations (of 81) that change its action
 
 
 @lru_cache(maxsize=64)

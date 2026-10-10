@@ -13,25 +13,31 @@ from src.webapp import data
 
 BADGE_COLORS = {"PROTECT": "green", "HOLD": "orange", "SHRINK": "red", "NOT SCORED": "gray",
                 "GROW": "blue", "WATCH": "violet", "SKIP": "gray"}
+AFFLUENCE_NAMES = {"low": "off", "medium": "medium", "high": "strong"}
+AFFLUENCE_KNOWN = 0.5   # under this share of women with an observed rent, affluence is mostly unknown
 FEW_REVIEWS = 300   # under this many lifetime reviews, capture understates a lounge (noya-plaza: 215)
 
 
 # --- what-if labels and banner ------------------------------------------------------------
 
 def level_label(axis: str, level: str) -> str:
-    """"15 min (medium)", "60% of premium reviews (medium)", "5.5% women (medium)"."""
+    """"15 min (medium)", "60% of premium reviews (medium)", "5.5% women (medium)",
+    "medium: rent^0.5 (medium)"."""
     a = data.assumptions()
     if axis == "travel":
         return f"{a.travel_time_minutes[level]} min ({level})"
     if axis == "coverage":
         return f"{a.competitor_coverage[level]:.0%} of premium reviews ({level})"
+    if axis == "affluence":
+        e = a.affluence_elasticity[level]
+        return f"{AFFLUENCE_NAMES[level]}" + (f": rent^{e:g}" if e else "") + f" ({level})"
     return f"{a.worker_housing_female_share[level]:.1%} women ({level})"
 
 
 def what_if_summary() -> str:
     w, base, parts = data.what_if(), Levels(), []
     for axis, name in (("travel", "travel time"), ("coverage", "competitor coverage"),
-                       ("worker_share", "worker-housing women")):
+                       ("worker_share", "worker-housing women"), ("affluence", "affluence weighting")):
         if getattr(w["levels"], axis) != getattr(base, axis):
             parts.append(f"{name} {level_label(axis, getattr(w['levels'], axis))}")
     if w["recall"] is not None:
@@ -138,11 +144,15 @@ def limitations_box(r: Run) -> None:
             "2. **Capture comes from lifetime Google reviews.** Older salons look bigger, so new lounges "
             "(noya-plaza, 215 reviews) look weak partly because they are new. Reviews are a proxy for "
             "customers, not a count.\n"
-            f"3. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
+            "3. **Affluence is observed in Dubai only.** Demand weights each woman by her cell's median "
+            "household rent (DLD, 3 months), and only 241 Dubai cells have one: every lounge and growth "
+            "area outside Dubai is weighted neutral, so Dubai-vs-elsewhere comparisons mix weighted and "
+            "unweighted demand. Rent is not income or salon spend.\n"
+            f"4. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
             "lounges are low confidence: near a threshold, a thin market, no rating gap (missing rating or no rated substitutes), or a call "
-            f"that changes in {scorecard.FLIP_LOW}+ of the 27 assumption combinations. Try the what-if "
+            f"that changes in {scorecard.FLIP_LOW}+ of the {scorecard.COMBOS} assumption combinations. Try the what-if "
             "panel below.\n"
-            f"4. **Growth areas are a first cut.** Competitor data is partial and the saturation line "
+            f"5. **Growth areas are a first cut.** Competitor data is partial and the saturation line "
             f"was set from the data it judges. {sharjah} of {len(grow)} GROW areas are in Sharjah "
             "emirate but beyond a 15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), "
             "both on the Dubai side. Why the footprint there is only two lounges is a business question: "
@@ -165,8 +175,10 @@ def lounge_caveats(f: LoungeFeatures, d: Decision, flips: int | None) -> list[st
                               "the growth areas.")]
     out = [c for c in (near_threshold(d),) if c] + d.caveats[1:]
     if flips and flips < scorecard.FLIP_LOW:
-        out.append(f"The call changes in {flips} of 27 assumption combinations (low confidence "
-                   f"from {scorecard.FLIP_LOW}).")
+        out.append(f"The call changes in {flips} of {scorecard.COMBOS} assumption combinations (low "
+                   f"confidence from {scorecard.FLIP_LOW}).")
+    if f.affluence_coverage < AFFLUENCE_KNOWN:
+        out.append(affluence_caveat(f.affluence_coverage))
     if f.review_count < FEW_REVIEWS:
         out.append(f"Only {f.review_count:,} lifetime Google reviews. Capture uses lifetime reviews, "
                    "so a newer lounge looks weaker than it is.")
@@ -185,6 +197,8 @@ def area_caveats(a: Area, d: AreaDecision) -> list[str]:
         out.append(f"Near the saturation line ({a.premium_reviews_per_1k:.0f} vs "
                    f"{growth.UNSATURATED_PER_1K:g} premium reviews per 1k women), and that line was "
                    "set from the data it judges.")
+    if a.affluence_coverage < AFFLUENCE_KNOWN:
+        out.append(affluence_caveat(a.affluence_coverage))
     if a.worker_share >= 0.25:
         out.append(f"{a.worker_share:.0%} of adults live in worker housing: the women estimate rests "
                    "on the worker-housing female share assumption.")
@@ -196,6 +210,24 @@ def area_caveats(a: Area, d: AreaDecision) -> list[str]:
     out.append(f"Distance to the nearest lounge ({a.nearest_lounge_km:.1f} km to {a.nearest_lounge_id}) "
                "is a straight line, not a drive.")
     return out
+
+
+def affluence_caveat(coverage: float) -> str:
+    return (f"Affluence unknown here: weighted neutral. Only {coverage:.0%} of these women live in "
+            "cells with an observed rent (DLD rents cover 241 Dubai cells; nowhere else), so the "
+            "rest count as average.")
+
+
+def affluence_metrics(raw: float, addressable: float, rent: float | None, coverage: float) -> None:
+    """Raw vs addressable women, the affluence rent and how much of it is observed."""
+    cols = st.columns(3)
+    cols[0].metric("Women 15+ (raw)", f"{raw:,.0f}")
+    cols[1].metric("Addressable women", f"{addressable:,.0f}", f"{addressable / raw - 1:+.0%}" if raw else None,
+                   delta_color="off")
+    cols[1].caption("Weighted by affluence: the demand that counts.")
+    cols[2].metric("Affluence rent (median, AED/yr)", "no data" if rent is None else f"{rent:,.0f}")
+    cols[2].caption(f"{coverage:.0%} of the women live in cells with an observed Dubai rent; "
+                    "the rest are weighted neutral.")
 
 
 def render_caveats(title: str, items: list[str], strong: bool) -> None:

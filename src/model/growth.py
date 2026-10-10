@@ -1,12 +1,13 @@
 """Growth areas: GROW / WATCH / SKIP from two questions (every area is already beyond the current travel-time
 catchment, 15 min at baseline, of every open lounge, by construction in src/features/lounges.py).
 
-  Big enough?   at least GROW_MIN_WOMEN women 15+, and worker housing under WORKER_CAP of adults.
+  Big enough?   at least GROW_MIN_WOMEN addressable women 15+ (affluence-weighted), and worker
+                housing under WORKER_CAP of adults.
   Unsaturated?  premium-salon reviews per 1k women (over the cells we searched) under
                 UNSATURATED_PER_1K; None when no cell was searched.
 
   both -> GROW, one -> WATCH (also: big but mostly worker housing), neither -> SKIP; under
-  SKIP_UNDER_WOMEN -> SKIP. Unknown saturation, or under MIN_COVERAGE of the women searched,
+  SKIP_UNDER_WOMEN women (raw) -> SKIP. Unknown saturation, or under MIN_COVERAGE of the women searched,
   caps at WATCH. Thresholds reviewed by the user on 2026-10-09 (notebooks/decisions.ipynb).
 """
 from src.models import Area, AreaDecision
@@ -32,7 +33,7 @@ WHY = {
 
 
 def classify(a: Area) -> AreaDecision:
-    big = a.women >= GROW_MIN_WOMEN and a.worker_share < WORKER_CAP
+    big = a.addressable_women >= GROW_MIN_WOMEN and a.worker_share < WORKER_CAP
     unsat = None if a.premium_reviews_per_1k is None else a.premium_reviews_per_1k < UNSATURATED_PER_1K
     caveats = []
     if unsat is None:
@@ -50,12 +51,13 @@ def classify(a: Area) -> AreaDecision:
         action, why = "WATCH", "Big enough; saturation unknown (no competitor data)."
     elif big:
         action, why = "WATCH", "Big enough, but already served by premium salons."
-    elif a.women >= GROW_MIN_WOMEN:
+    elif a.addressable_women >= GROW_MIN_WOMEN:
         action, why = "WATCH", f"Big, but mostly worker housing ({a.worker_share:.0%} of adults)."
     elif unsat:
-        action, why = "WATCH", f"Few premium salons, but only {a.women:,.0f} women (GROW needs {GROW_MIN_WOMEN:,})."
+        action, why = "WATCH", (f"Few premium salons, but only {a.addressable_women:,.0f} addressable women "
+                                 f"(GROW needs {GROW_MIN_WOMEN:,}).")
     else:
-        action, why = "SKIP", f"Under {GROW_MIN_WOMEN:,} women and not clearly unsaturated."
+        action, why = "SKIP", f"Under {GROW_MIN_WOMEN:,} addressable women and not clearly unsaturated."
     why += f" Nearest lounge: {a.nearest_lounge_id}, {a.nearest_lounge_km:.1f} km in a straight line."
     return AreaDecision(area_id=a.area_id, action=action, big_enough=big, unsaturated=unsat,
                         rationale=why, caveats=caveats)

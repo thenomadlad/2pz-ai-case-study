@@ -57,7 +57,7 @@ def render() -> None:
     st.markdown(section(SOURCES.read_text(), "Market model"))
 
     st.header("Every assumption (data/scenarios/baseline.yaml)")
-    st.caption("The what-if panel on the Overview switches the three levelled assumptions and the "
+    st.caption("The what-if panel on the Overview switches the four levelled assumptions and the "
                "search recall.")
     notes = yaml_notes(data.BASELINE_YAML.read_text())
     wrapped_table([{"Assumption": k, "Value (levels)": _fmt(v),
@@ -70,7 +70,8 @@ def render() -> None:
     wrapped_table([
         {"Constant": "PROTECT_AT / SHRINK_AT", "Value": f"{scorecard.PROTECT_AT} / {scorecard.SHRINK_AT}",
          "Why": scorecard.THRESHOLDS_WHY},
-        {"Constant": "FLIP_LOW", "Value": f"{scorecard.FLIP_LOW} of 27", "Why": scorecard.FLIP_WHY},
+        {"Constant": "FLIP_LOW_SHARE", "Value": f"a third: {scorecard.FLIP_LOW} of {scorecard.COMBOS}",
+         "Why": scorecard.FLIP_WHY},
         {"Constant": "NEUTRAL", "Value": f"{scorecard.NEUTRAL}",
          "Why": "A missing rating gap, or capture in a thin market, scores neutral, never the worst."},
         {"Constant": "THIN_MARKET", "Value": f"{THIN_MARKET} premium salons",

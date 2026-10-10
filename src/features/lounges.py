@@ -10,10 +10,12 @@ import numpy as np
 from src.data_v3 import V3
 from src.market import (
     _reviews,
+    affluence_weight,
     capture_by_coverage,
     coverage_k,
     premium_substitutes,
     recall_multiplier,
+    weighted_median,
     women_15plus,
 )
 from src.models import Area, BaselineAssumptions, Levels, LoungeFeatures
@@ -112,10 +114,14 @@ def substitutes(v3: V3, a: BaselineAssumptions, levels: Levels, closed: frozense
 
 
 def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  # noqa: B008 (frozen)
-          closed: frozenset[str] = frozenset()) -> tuple[list[LoungeFeatures], list[Area]]:
-    """Features of every open lounge, and the growth areas no open lounge reaches."""
+          closed: frozenset[str] = frozenset(), areas: bool = True) -> tuple[list[LoungeFeatures], list[Area]]:
+    """Features of every open lounge, and the growth areas no open lounge reaches (`areas=False`
+    skips them: level_flips needs only the lounges)."""
     a, p = assumptions, _prep(v3)
-    w = women_15plus(v3.cells, v3.emirates, a.worker_housing_female_share[levels.worker_share]).to_dict()
+    women = women_15plus(v3.cells, v3.emirates, a.worker_housing_female_share[levels.worker_share])
+    rent = v3.cells.rent_observed
+    w, rents = women.to_dict(), rent.to_dict()
+    aw = (women * affluence_weight(rent, women, a.affluence_elasticity[levels.affluence])).to_dict()
     lounges = [lo for lo in v3.lounges if lo.branch_id not in closed]
     catch = {lo.branch_id: p["catch"].get(levels.travel, {}).get(lo.branch_id, []) for lo in lounges}
     reach = Counter(c for cs in catch.values() for c in cs)
@@ -123,7 +129,8 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     feats = []
     for lo in lounges:
         b, cs = lo.branch_id, catch[lo.branch_id]
-        women = sum(w[c] for c in cs)
+        women_ = sum(w[c] for c in cs)
+        addressable = sum(aw[c] for c in cs)
         prem = premium_pool(v3, a, levels, closed, b)
         mult = recall_multiplier(v3.full_share[(b, levels.travel)], a.search_recall)
         cap, k = capture_by_coverage(lo.review_count, prem, a.competitor_coverage[levels.coverage], mult)
@@ -131,12 +138,15 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
         med = statistics.median(rated) if rated else None
         feats.append(LoungeFeatures(
             branch_id=b, name=lo.name, emirate=lo.emirate, lat=lo.lat, lng=lo.lng, rating=lo.rating,
-            review_count=lo.review_count, catchment_women=women, catchment_cells=len(cs),
-            shared_share=sum(w[c] for c in cs if reach[c] > 1) / women if women else 0.0,
+            review_count=lo.review_count, catchment_women=women_, addressable_women=addressable,
+            **_affluence(cs, w, rents, women_), catchment_cells=len(cs),
+            shared_share=sum(w[c] for c in cs if reach[c] > 1) / women_ if women_ else 0.0,
             capture=cap, substitutes_k=k, recall_multiplier=mult, premium_pool=len(prem),
             thin_premium_market=len(prem) < THIN_MARKET, substitutes_median_rating=med,
             rating_gap=lo.rating - med if lo.rating is not None and med is not None else None,
-            est_customers=0.0 if b in NOT_SCORED else cap * women, not_scored=b in NOT_SCORED))
+            est_customers=0.0 if b in NOT_SCORED else cap * addressable, not_scored=b in NOT_SCORED))
+    if not areas:
+        return feats, []
 
     cell = p["cell"]
     groups = defaultdict(list)
@@ -144,16 +154,23 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
         if x > 0 and c not in reach:
             groups[(cell[c]["name"], cell[c]["emirate"])].append(c)
     lats, lngs = np.array([lo.lat for lo in lounges]), np.array([lo.lng for lo in lounges])
-    areas = []
+    out = []
     for (name, emirate), cs in groups.items():
         pieces = sorted(_pieces(cs, p["rc"]), key=lambda ps: -sum(w[c] for c in ps))
         for i, piece in enumerate(pieces):
-            areas.append(_area(f"{_slug(f'{name} {emirate}')}{f'-{i + 1}' if i else ''}", name, emirate,
-                               piece, w, p, a, lounges, lats, lngs))
-    return feats, sorted(areas, key=lambda x: -x.women)
+            out.append(_area(f"{_slug(f'{name} {emirate}')}{f'-{i + 1}' if i else ''}", name, emirate,
+                             piece, w, aw, rents, p, a, lounges, lats, lngs))
+    return feats, sorted(out, key=lambda x: -x.women)
 
 
-def _area(area_id, name, emirate, piece, w, p, a, lounges, lats, lngs) -> Area:
+def _affluence(cs: list[str], w: dict, rents: dict, women: float) -> dict:
+    """Women-weighted median observed rent over these cells, and the share of women it covers."""
+    obs = [c for c in cs if not np.isnan(rents[c])]
+    return {"affluence_rent": weighted_median([rents[c] for c in obs], [w[c] for c in obs]),
+            "affluence_coverage": sum(w[c] for c in obs) / women if women else 0.0}
+
+
+def _area(area_id, name, emirate, piece, w, aw, rents, p, a, lounges, lats, lngs) -> Area:
     cell, women = p["cell"], sum(w[c] for c in piece)
     lat = sum(w[c] * cell[c]["lat"] for c in piece) / women
     lng = sum(w[c] * cell[c]["lng"] for c in piece) / women
@@ -168,7 +185,8 @@ def _area(area_id, name, emirate, piece, w, p, a, lounges, lats, lngs) -> Area:
         n, per_1k = len(prem), sum(_reviews(s) for s in prem) * recall_multiplier(fcs, a.search_recall) / (cw / 1000)
     d = haversine_km(lat, lng, lats, lngs)
     j = int(d.argmin()) if len(d) else None
-    return Area(area_id=area_id, name=name, emirate=emirate, lat=lat, lng=lng, women=women, cells=len(piece),
+    return Area(area_id=area_id, name=name, emirate=emirate, lat=lat, lng=lng, women=women,
+                addressable_women=sum(aw[c] for c in piece), **_affluence(piece, w, rents, women), cells=len(piece),
                 worker_share=sum(cell[c]["adults_worker"] for c in piece) / sum(cell[c]["adults"] for c in piece),
                 premium_salons=n, premium_reviews_per_1k=per_1k, full_circle_share=fcs,
                 data_coverage=cw / women, cell_ids=piece,

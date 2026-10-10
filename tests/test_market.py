@@ -1,5 +1,14 @@
-from src.market import (capture, capture_by_coverage, coverage_k, excluded_reason, market_women,
-                        premium_substitutes, recall_multiplier, residential_share, women_15plus)
+from src.market import (
+    capture,
+    capture_by_coverage,
+    coverage_k,
+    excluded_reason,
+    market_women,
+    premium_substitutes,
+    recall_multiplier,
+    residential_share,
+    women_15plus,
+)
 
 
 def cand(pid, reviews, rating=4.6, price=""):
@@ -97,3 +106,43 @@ def test_capture_by_coverage_applies_multiplier():
     cap, k = capture_by_coverage(100, premium, coverage=0.6, multiplier=1.5)
     assert k == 1 and cap == 100 / (100 + 900)
     assert capture_by_coverage(100, [], 0.6, 1.3) == (1.0, 0)
+
+
+def _aff():
+    import pandas as pd
+    rent = pd.Series([50_000, 100_000, 200_000, 4_000_000, float("nan")], index=list("abcde"))
+    women = pd.Series([1000, 2000, 1000, 10, 5000], index=list("abcde"))
+    return rent, women
+
+
+def test_affluence_weight_normalises_to_women_weighted_mean_one():
+    from src.market import affluence_weight
+    rent, women = _aff()
+    for e in (0.5, 1.0):
+        w = affluence_weight(rent, women, e)
+        obs = rent.notna()
+        assert abs((w[obs] * women[obs]).sum() / women[obs].sum() - 1) < 1e-12
+        assert w["a"] < w["b"] < w["c"]                     # richer cells weigh more
+
+
+def test_affluence_weight_clips_before_rescaling():
+    from src.market import affluence_weight
+    rent, women = _aff()
+    w = affluence_weight(rent, women, 1.0)
+    # median 100k: d's ratio 40 clips to 4, so after rescaling d / b == 4 exactly
+    assert abs(w["d"] / w["b"] - 4) < 1e-12 and abs(w["a"] / w["b"] - 0.5) < 1e-12
+
+
+def test_affluence_weight_neutral_without_rent_or_elasticity():
+    from src.market import affluence_weight
+    rent, women = _aff()
+    assert affluence_weight(rent, women, 1.0)["e"] == 1.0  # no observed rent: neutral
+    off = affluence_weight(rent, women, 0)
+    assert (off == 1.0).all() and list(off.index) == list(rent.index)
+
+
+def test_weighted_median():
+    from src.market import weighted_median
+    assert weighted_median([1, 2, 3], [1, 1, 5]) == 3
+    assert weighted_median([1, 2, 3], [5, 1, 1]) == 1
+    assert weighted_median([float("nan")], [1]) is None and weighted_median([], []) is None

@@ -5,7 +5,8 @@ from src.models import Evidence, Explanation, Reason
 
 # A HOLD lounge. Weighted distance of each score from neutral (0.5): capture 0.5, demand 0.22,
 # rating 0.2 (half weight), cannibalisation 0.17 -> all four are arguments, in that order.
-FACTS = {"catchment_women": 42648, "catchment_cells": 3, "shared_share": 0.334,
+FACTS = {"catchment_women": 42648, "addressable_women": 56864, "affluence_rent": 75000.0,
+         "affluence_coverage": 1.0, "catchment_cells": 3, "shared_share": 0.334,
          "premium_pool": 69, "substitutes_k": 12, "capture": 0.0, "thin_premium_market": False,
          "est_customers": 0, "lounge_rating": 4.7,
          "lounge_reviews": 396, "substitutes_median_rating": 4.8, "rating_gap": -0.1,
@@ -14,7 +15,7 @@ FACTS = {"catchment_women": 42648, "catchment_cells": 3, "shared_share": 0.334,
 TOPICS = ["capture", "demand", "rating", "cannibalisation"]
 EVIDENCE = {
     "capture": [("capture", 0.0), ("premium_pool", 69)],
-    "demand": [("catchment_women", 42648), ("catchment_cells", 3)],
+    "demand": [("addressable_women", 56864), ("catchment_women", 42648)],
     "rating": [("lounge_rating", 4.7), ("lounge_reviews", 396)],
     "cannibalisation": [("shared_share", 0.334), ("score_cannibalisation", 0.666)],
 }
@@ -87,7 +88,7 @@ def test_verify_rejects_wrong_order_or_missing_argument():
 
 
 def test_verify_bounds_data_points_and_requires_own_topic():
-    one = {**EVIDENCE, "demand": [("catchment_women", 42648)]}
+    one = {**EVIDENCE, "demand": [("addressable_women", 56864)]}
     assert any("1 data points" in e for e in explain.verify(_exp(evidence=one), FACTS, "lounge"))
     six = {**EVIDENCE, "demand": EVIDENCE["demand"] * 3}
     assert any("6 data points" in e for e in explain.verify(_exp(evidence=six), FACTS, "lounge"))

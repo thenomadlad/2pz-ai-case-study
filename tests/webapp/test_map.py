@@ -56,3 +56,14 @@ def test_pixel_units_serialise_as_literals_not_accessors():
         assert layers[lid]["radiusUnits"] == "pixels", lid
     assert layers["lounges"]["lineWidthUnits"] == "pixels"
     assert layers["lounge-flags"]["sizeUnits"] == "pixels"
+
+
+def test_affluence_layer_shades_only_observed_cells_and_is_a_toggle():
+    from src.webapp.map import affluence_layer
+    cells = load_v3().cells
+    rows = affluence_layer(cells).data
+    assert len(rows) == 241 == cells.rent_observed.notna().sum()
+    dear = min(rows, key=lambda r: r["color"][1])                 # deepest orange
+    assert "710,000 AED/yr" in dear["detail"]
+    ids = [x.id for x in map_layers(run(), None, True, False, True, True)]
+    assert ids[0] == "affluence" and "affluence" not in [x.id for x in map_layers(run(), None, True, False, True)]

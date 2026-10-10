@@ -3,7 +3,7 @@
 Candidates and full shares are precomputed per level by `scripts/fetch_salons.py pool`."""
 import json
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 
 import pandas as pd
@@ -18,7 +18,7 @@ LEVELS = ("low", "medium", "high")
 @dataclass(frozen=True)
 class V3:
     lounges: list[Lounge]
-    cells: pd.DataFrame                      # indexed by cell_id
+    cells: pd.DataFrame                      # indexed by cell_id; with rent_observed, affluence_source
     emirates: pd.DataFrame                   # indexed by emirate
     catchment: pd.DataFrame                  # cell_id, level, branch_id
     salons: pd.DataFrame                     # the full pool, indexed by place_id; no NaN in market fields
@@ -43,15 +43,25 @@ def _lounges(path) -> list[Lounge]:
     return [Lounge(**r) for r in df[list(Lounge.model_fields)].to_dict("records")]
 
 
+def _cells(d: Path) -> pd.DataFrame:
+    """cells.csv joined with cell_affluence.csv: rent_observed (AED/yr, NaN outside the observed
+    Dubai cells) and affluence_source (observed | none)."""
+    aff = pd.read_csv(d / "cell_affluence.csv").set_index("cell_id")
+    cells = pd.read_csv(d / "cells.csv").set_index("cell_id")
+    cells = cells.join(aff[["rent_observed"]]).join(aff.source.rename("affluence_source"))
+    cells["affluence_source"] = cells.affluence_source.fillna("none")
+    return cells
+
+
 def load_v3(settings: Settings | None = None) -> V3:
     return _load((settings or default_settings).v3_dir)
 
 
-@lru_cache(maxsize=None)
+@cache
 def _load(d: Path) -> V3:       # cached on the directory: Settings is unhashable
     lounges = _lounges(d / "branches.csv")
     polygons = {(f["properties"]["branch_id"], f["properties"]["minutes"]): f["geometry"]
-                for f in json.load(open(d / "lounge_isochrones.geojson"))["features"]}
+                for f in json.loads((d / "lounge_isochrones.geojson").read_text())["features"]}
     salons = _salons(d / "salons.csv")
     rows = salons.reset_index().set_index("place_id", drop=False).to_dict("index")
     candidates = {(lo.branch_id, lv): [] for lo in lounges for lv in LEVELS}
@@ -59,6 +69,6 @@ def _load(d: Path) -> V3:       # cached on the directory: Settings is unhashabl
         candidates[(r.branch_id, r.level)].append(rows[r.place_id])
     sat = pd.read_csv(d / "lounge_search_saturation_by_level.csv")
     full_share = {(r.branch_id, r.level): float(r.full_share) for r in sat.itertuples()}
-    return V3(lounges, pd.read_csv(d / "cells.csv").set_index("cell_id"),
+    return V3(lounges, _cells(d),
               pd.read_csv(d / "emirates.csv").set_index("emirate"), pd.read_csv(d / "catchment_cells.csv"),
               salons, pd.read_csv(d / "search_circles.csv"), polygons, candidates, full_share)

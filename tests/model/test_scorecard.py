@@ -1,7 +1,17 @@
 import pytest
 
 from src.config import REPO_ROOT
-from src.model.scorecard import FLIP_LOW, PROTECT_AT, SHRINK_AT, SIGNALS, counts, decide, score
+from src.model.scorecard import (
+    COMBOS,
+    FLIP_LOW,
+    FLIP_LOW_SHARE,
+    PROTECT_AT,
+    SHRINK_AT,
+    SIGNALS,
+    counts,
+    decide,
+    score,
+)
 from src.models import LoungeFeatures
 
 SIG = {s.name: s for s in SIGNALS}
@@ -10,7 +20,8 @@ SIG = {s.name: s for s in SIGNALS}
 def _f(b="a", women=100_000.0, shared=0.5, capture=0.075, gap=0.0, thin=False, not_scored=False):
     return LoungeFeatures(
         branch_id=b, name=b, emirate="Dubai", lat=25.0, lng=55.0, rating=4.5, review_count=100,
-        catchment_women=women, catchment_cells=10, shared_share=shared, capture=capture,
+        catchment_women=women, addressable_women=women, affluence_rent=None, affluence_coverage=0.0,
+        catchment_cells=10, shared_share=shared, capture=capture,
         substitutes_k=5, recall_multiplier=1.0, premium_pool=5 if thin else 50,
         thin_premium_market=thin, substitutes_median_rating=4.5, rating_gap=gap,
         est_customers=capture * women, not_scored=not_scored)
@@ -28,7 +39,7 @@ def test_scores_on_the_anchors_and_clipped(name):
 
 def test_drafted_anchors():
     assert [(s.field, s.worst, s.best) for s in SIGNALS] == [
-        ("catchment_women", 0, 200_000), ("shared_share", 1.0, 0.0),
+        ("addressable_women", 0, 200_000), ("shared_share", 1.0, 0.0),
         ("capture", 0, 0.15), ("rating_gap", -0.3, 0.3)]
     assert all(s.why for s in SIGNALS)
 
@@ -82,15 +93,39 @@ def test_lounges_that_flip_often_are_low_confidence():
     strong = _f(women=200_000, shared=0, capture=0.15, gap=0.3)
     assert decide([strong], flips={"a": FLIP_LOW - 1})[0].confidence == "high"
     d = decide([strong], flips={"a": FLIP_LOW})[0]
-    assert d.confidence == "low" and any("27" in c for c in d.caveats)
+    assert d.confidence == "low" and any("of 81" in c for c in d.caveats)
 
 
 def test_level_flips_on_real_data():
     from src.config import load_baseline_assumptions
     from src.data_v3 import load_v3
-    from src.models import Levels
     from src.model.scorecard import level_flips
+    from src.models import Levels
     a = load_baseline_assumptions(REPO_ROOT / "data" / "scenarios" / "baseline.yaml")
     flips = level_flips(load_v3(), a, Levels())
-    assert len(flips) == 24 and all(0 <= n <= 26 for n in flips.values())
+    assert len(flips) == 24 and all(0 <= n <= 80 for n in flips.values())
     assert flips["zayed-international-airport"] == 0
+
+
+def test_flip_line_is_a_third_of_the_81_combinations():
+    assert COMBOS == 81 and FLIP_LOW_SHARE == 1 / 3 and FLIP_LOW == 27
+
+
+def test_level_flips_iterates_81_combinations_fast():
+    import time
+
+    from src.config import load_baseline_assumptions
+    from src.data_v3 import load_v3
+    from src.features import lounges
+    from src.model.scorecard import level_flips
+    from src.models import Levels
+    a = load_baseline_assumptions(REPO_ROOT / "data" / "scenarios" / "baseline.yaml")
+    v3, seen, real = load_v3(), [], lounges.build
+    lounges.build = lambda *args, **kw: seen.append(args[2]) or real(*args, **kw)
+    try:
+        start = time.perf_counter()
+        level_flips(v3, a, Levels())
+        took = time.perf_counter() - start
+    finally:
+        lounges.build = real
+    assert len(set(seen)) == 81 and took < 2

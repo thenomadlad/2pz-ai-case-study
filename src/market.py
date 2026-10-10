@@ -1,4 +1,5 @@
 """The market model: women 15+ per cell, premium substitutes, and a lounge's capture against them."""
+import math
 import re
 import statistics
 
@@ -93,3 +94,30 @@ def capture(lounge_reviews: int, substitutes: list[dict]) -> float:
         return 1.0
     total = lounge_reviews + sum(_reviews(s) for s in substitutes)
     return lounge_reviews / total if total else 0.0
+
+
+def weighted_median(values, weights) -> float | None:
+    """Median of `values` with each counted `weights` times; None when there is nothing to weigh."""
+    pairs = sorted((v, w) for v, w in zip(values, weights) if w > 0 and not math.isnan(v))
+    total = sum(w for _, w in pairs)
+    if not total:
+        return None
+    run = 0.0
+    for v, w in pairs:
+        run += w
+        if run >= total / 2:
+            return float(v)
+
+
+def affluence_weight(rent, women, elasticity: float):
+    """Per cell (pandas, same index): (rent / women-weighted median rent) ** elasticity, clipped to
+    [0.25, 4] and rescaled so the women-weighted mean over cells with a rent is 1. Cells without an
+    observed rent (NaN) get 1.0: affluence unknown, weighted neutral. Elasticity 0 turns it off."""
+    out = rent.isna() * 0 + 1.0                # 1.0 everywhere, same index
+    obs = rent.notna() & (women > 0)
+    if not elasticity or not obs.any():
+        return out
+    w = (rent[obs] / weighted_median(rent[obs], women[obs])) ** elasticity
+    w = w.clip(0.25, 4)
+    out[obs] = w * women[obs].sum() / (w * women[obs]).sum()
+    return out

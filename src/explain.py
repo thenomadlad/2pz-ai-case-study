@@ -53,7 +53,20 @@ GLOSSARY: dict[str, Field] = {
     "catchment_women": Field(
         "Women 15+ in catchment", "women",
         "Women aged 15+ living in the ~2 km cells within a 15-min drive (typical midday traffic). "
-        "WorldPop adults, rebalanced so worker housing counts few women."),
+        "WorldPop adults, rebalanced so worker housing counts few women. Raw: not affluence-weighted."),
+    "addressable_women": Field(
+        "Addressable women 15+", "women",
+        "Catchment women weighted by how affluent their cell is (observed median rent vs the "
+        "women-weighted median, to the affluence elasticity; mean weight 1): the demand signal. "
+        "Dubai rents only; elsewhere neutral (weight 1)."),
+    "affluence_rent": Field(
+        "Affluence rent", "AED/yr",
+        "Median annual household rent (DLD Ejari contracts, Jul-Oct 2026), weighted by women, over "
+        "the cells with an observed rent. Dubai rents only; elsewhere neutral, so n/a."),
+    "affluence_coverage": Field(
+        "Affluence coverage", "% of women",
+        "Share of the women here living in cells with an observed rent. The rest are weighted "
+        "neutral: affluence unknown. Dubai rents only; elsewhere neutral.", pct=True),
     "catchment_cells": Field("Cells in catchment", "count",
                              "Populated ~2 km grid cells whose centre is within the drive time."),
     "shared_share": Field(
@@ -82,11 +95,11 @@ GLOSSARY: dict[str, Field] = {
     "rating_gap": Field("Rating gap", "stars",
                         "Lounge rating minus its substitutes' median rating."),
     "est_customers": Field("Women captured (est.)", "women",
-                           "Capture × catchment women: a rough size of the lounge's share."),
+                           "Capture × addressable women: a rough size of the lounge's share."),
     "level_flips": Field(
-        "Assumption sensitivity", "of 27 combinations",
-        "How many of the 27 combinations of travel time, competitor coverage and worker-housing "
-        "share change this lounge's call."),
+        "Assumption sensitivity", f"of {scorecard.COMBOS} combinations",
+        f"How many of the {scorecard.COMBOS} combinations of travel time, competitor coverage, "
+        "worker-housing share and affluence weighting change this lounge's call."),
     "composite": Field(
         "Composite score", "0-1",
         "Weighted average of the signal scores below (weights in the Threshold column). "
@@ -99,7 +112,7 @@ GLOSSARY: dict[str, Field] = {
     # --- growth area ---
     "area_name": Field("Area", "", "OpenStreetMap place name nearest the area's cells."),
     "emirate": Field("Emirate", "", "Emirate the area lies in."),
-    "women": Field("Women 15+", "women", "Women aged 15+ living in the area's cells."),
+    "women": Field("Women 15+", "women", "Women aged 15+ living in the area's cells (raw)."),
     "cells": Field("Cells", "count", "Populated ~2 km cells in the area (one contiguous piece)."),
     "worker_share": Field("Worker housing", "% of adults",
                           "Share of the area's adults living in worker housing (OSM industrial "
@@ -117,7 +130,7 @@ GLOSSARY: dict[str, Field] = {
     "nearest_lounge_km": Field("Distance to nearest lounge", "km",
                                "Straight-line distance; every area is beyond a 15-min drive."),
     "big_enough": Field("Big enough", "yes/no",
-                        f"At least {growth.GROW_MIN_WOMEN:,} women and worker housing under "
+                        f"At least {growth.GROW_MIN_WOMEN:,} addressable women and worker housing under "
                         f"{growth.WORKER_CAP:.0%} of adults."),
     "unsaturated": Field("Unsaturated", "yes/no",
                          f"Fewer than {growth.UNSATURATED_PER_1K:g} premium reviews per 1k women "
@@ -171,7 +184,8 @@ GLOSSARY: dict[str, Field] = {
 # which apply and orders them; every reason must cite at least one of its topic's fields.
 TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     "lounge": {
-        "demand": ("catchment_women", "catchment_cells", "score_demand", "est_customers"),
+        "demand": ("addressable_women", "catchment_women", "affluence_coverage", "score_demand",
+                   "est_customers", "affluence_rent", "catchment_cells"),
         "cannibalisation": ("shared_share", "score_cannibalisation"),
         "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market",
                     "score_capture"),
@@ -179,7 +193,8 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
                    "score_rating"),
     },
     "area": {
-        "size": ("women", "grow_min_women", "big_enough", "skip_under_women"),
+        "size": ("addressable_women", "women", "grow_min_women", "big_enough", "affluence_coverage",
+                 "affluence_rent", "skip_under_women"),
         "saturation": ("premium_reviews_per_1k", "premium_salons", "unsaturated",
                        "unsaturated_per_1k"),
         "reach": ("nearest_lounge_km", "nearest_lounge_id"),
@@ -245,7 +260,9 @@ THRESHOLDS: dict[str, str] = {
                   f"SHRINK ≤ {scorecard.SHRINK_AT}"),
     "thin_premium_market": "Capture scores 0.5 when yes",
     "level_flips": f"Low confidence at {scorecard.FLIP_LOW} or more",
-    "women": (f"GROW needs {growth.GROW_MIN_WOMEN:,}; SKIP under {growth.SKIP_UNDER_WOMEN:,}"),
+    "addressable_women": f"GROW needs {growth.GROW_MIN_WOMEN:,}",
+    "women": f"SKIP under {growth.SKIP_UNDER_WOMEN:,}",
+    "affluence_coverage": "Under 50%: affluence mostly unknown, weighted neutral",
     "worker_share": f"GROW needs under {growth.WORKER_CAP:.0%}",
     "premium_reviews_per_1k": f"Unsaturated under {growth.UNSATURATED_PER_1K:g}",
     "data_coverage": f"GROW needs {growth.MIN_COVERAGE:.0%}",
@@ -267,12 +284,13 @@ def _rounded(facts: dict) -> dict:
 
 # --- facts ------------------------------------------------------------------------------
 
-LOUNGE_TABLE = ("catchment_women", "catchment_cells", "shared_share", "premium_pool",
+LOUNGE_TABLE = ("catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
+                "catchment_cells", "shared_share", "premium_pool",
                 "substitutes_k", "capture", "thin_premium_market", "est_customers",
                 "lounge_rating", "lounge_reviews", "substitutes_median_rating", "rating_gap",
                 "level_flips", "composite", "score_demand", "score_cannibalisation",
                 "score_capture", "score_rating")
-AREA_TABLE = ("women", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
+AREA_TABLE = ("women", "addressable_women", "affluence_rent", "affluence_coverage", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
               "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
               "unsaturated")
 NOT_SCORED_ACTION = "NOT SCORED"
@@ -361,7 +379,7 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
 
 
 GROWTH_WHY = (
-    f"GROW needs both tests: at least {growth.GROW_MIN_WOMEN:,} women 15+ (worker housing under "
+    f"GROW needs both tests: at least {growth.GROW_MIN_WOMEN:,} addressable (affluence-weighted) women 15+ (worker housing under "
     f"{growth.WORKER_CAP:.0%} of adults), and fewer than {growth.UNSATURATED_PER_1K:g} premium "
     f"reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not "
     f"searched enough to tell (under {growth.MIN_COVERAGE:.0%} of its women). SKIP passes "
@@ -395,7 +413,8 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
     if kind == "area":
         sat = f["premium_reviews_per_1k"]
         return {
-            "size": (f"About {fmt('women', f['women'])} women 15+ live here (GROW needs "
+            "size": (f"About {fmt('addressable_women', f['addressable_women'])} addressable women 15+ "
+                     f"live here, {fmt('women', f['women'])} before affluence weighting (GROW needs "
                      f"{fmt('grow_min_women', f['grow_min_women'])})."),
             "saturation": (f"{fmt('premium_reviews_per_1k', sat)} premium reviews per 1k women, "
                            f"{'under' if f['unsaturated'] else 'over'} the "
@@ -439,7 +458,7 @@ def _template_headline(kind: str, action: str, f: dict) -> str:
 _TEMPLATE_CAPTIONS = {
     "lounge": ("Each signal is scored 0-1 on a fixed scale, where 1 is good for the lounge, and "
                "the composite is their weighted average. Demand counts women within a 15-min "
-               "drive, cannibalisation how many of them another lounge also reaches, capture the "
+               "drive, weighted by affluence where Dubai rents are known, cannibalisation how many of them another lounge also reaches, capture the "
                "lounge's share of premium-salon reviews nearby, and rating its Google rating "
                "against those rivals."),
     "area": ("An area is big enough when enough women live there, and unsaturated when few "
@@ -473,7 +492,7 @@ def _allowed_numbers(facts: dict) -> list[float]:
             if isinstance(v, (int, float)) and not isinstance(v, bool)]
     nums += [v * 100 for v in nums if 0 <= v <= 1]  # shares and scores quoted as %
     nums += [4, 0, 1]
-    nums += [scorecard.PROTECT_AT, scorecard.SHRINK_AT, scorecard.FLIP_LOW, 27, 15, 60, 1_000]
+    nums += [scorecard.PROTECT_AT, scorecard.SHRINK_AT, scorecard.FLIP_LOW, scorecard.COMBOS, 15, 60, 1_000]
     nums += [x for s in scorecard.SIGNALS for x in (s.worst, s.best, s.weight)]
     nums += [growth.GROW_MIN_WOMEN, growth.SKIP_UNDER_WOMEN, growth.UNSATURATED_PER_1K,
              growth.WORKER_CAP * 100, growth.MIN_COVERAGE * 100]

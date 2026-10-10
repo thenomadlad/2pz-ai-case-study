@@ -8,6 +8,7 @@ from src.model import growth
 from src.webapp import data, nav
 from src.webapp.map import area_cells_layer, build_deck, flag_layer, lounge_layer, view_at
 from src.webapp.views import (
+    affluence_metrics,
     area_caveats,
     badge,
     banner,
@@ -28,8 +29,8 @@ def _check(ok: bool | None) -> str:
 def _rule(a, d) -> None:
     st.markdown("##### How this call was made")
     cols = st.columns(3)
-    cols[0].metric("Women 15+", f"{a.women:,.0f}")
-    cols[0].caption(f"{_check(d.big_enough)} Big enough: ≥ {growth.GROW_MIN_WOMEN:,} women and worker "
+    cols[0].metric("Addressable women 15+", f"{a.addressable_women:,.0f}")
+    cols[0].caption(f"{_check(d.big_enough)} Big enough: ≥ {growth.GROW_MIN_WOMEN:,} addressable women and worker "
                     f"housing under {growth.WORKER_CAP:.0%} (here {a.worker_share:.0%})")
     per_1k = "no data" if a.premium_reviews_per_1k is None else f"{a.premium_reviews_per_1k:,.0f}"
     cols[1].metric("Premium reviews per 1k women", per_1k)
@@ -66,6 +67,7 @@ def render() -> None:
     with right:
         render_caveats("Caveats for this area", area_caveats(a, d), d.action != "SKIP")
     _rule(a, d)
+    affluence_metrics(a.women, a.addressable_women, a.affluence_rent, a.affluence_coverage)
 
     layers = [area_cells_layer(data.v3().cells, r.areas, r.area_decisions, only=area_id),
               lounge_layer(r.features, r.decisions), flag_layer(r.features)]

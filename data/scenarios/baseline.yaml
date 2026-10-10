@@ -35,3 +35,12 @@ assumptions:
     low: 0.01     # the near-all-male camps (Jebel Ali Industrial 1-2, Muhaisnah 2: 0.1-0.9%)
     medium: 0.055
     high: 0.15    # mixed industrial areas (Al Quoz Industrial 2: 14%, DIP 1: 12%)
+  # Affluence: a premium lounge's market is the women who can afford it. Each cell's women are
+  # weighted by (its median annual household rent / the women-weighted median rent) ^ elasticity,
+  # clipped to 0.25-4 and rescaled to a mean of 1. Rents are DLD Ejari contracts (Jul-Oct 2026),
+  # so only 241 Dubai cells have one; every other cell is weighted 1 (neutral). An assumption:
+  # no data ties salon spend to rent. Sources: data/seed/v3/SOURCES.md, "Affluence".
+  affluence_elasticity:
+    low: 0.0      # off: every woman counts the same (the model before rents)
+    medium: 0.5   # demand rises with the square root of relative rent (4x the rent: 2x the women)
+    high: 1.0     # proportional: 2x the rent, 2x the addressable women

@@ -21,7 +21,7 @@ def _cell(cid, adults, name="Town"):
     lat, lng = 25 + row * 0.02, 55 + col * 0.02
     return {"cell_id": cid, "lat": lat, "lng": lng, "south": lat - 0.01, "west": lng - 0.01,
             "north": lat + 0.01, "east": lng + 0.01, "emirate": "Dubai", "name": name,
-            "adults": adults, "adults_worker": 0}
+            "adults": adults, "adults_worker": 0, "rent_observed": float("nan")}
 
 
 def _lounge(b, cid, reviews, rating=4.8):
@@ -137,8 +137,8 @@ def test_airport_is_not_scored_but_still_reaches(real_v3):
 
 
 def test_every_level_combination_builds(real_v3):
-    for t, c, w in itertools.product(LEVELS, repeat=3):
-        f, a = build(real_v3, ASSUMPTIONS, Levels(t, c, w))
+    for lv in itertools.product(LEVELS, repeat=4):
+        f, a = build(real_v3, ASSUMPTIONS, Levels(*lv))
         assert len(f) == 24 and all(x.catchment_women > 0 for x in f)
         assert a and all(x.women > 0 for x in a)
         assert len({x.area_id for x in a}) == len(a)       # Arabic-only names must not collide
@@ -148,3 +148,42 @@ def test_travel_level_changes_competition(real_v3):
     lo, hi = (by_id(build(real_v3, ASSUMPTIONS, Levels(travel=t))[0]) for t in ("low", "high"))
     assert all(hi[b].premium_pool >= lo[b].premium_pool for b in hi)
     assert any(hi[b].premium_pool > lo[b].premium_pool for b in hi)
+
+
+# Composites and GROW areas at medium levels before affluence existed (commit f049b9b).
+BEFORE_AFFLUENCE = {
+    "al-ain": 0.7619, "al-barsha": 0.3664, "al-dhafra": 0.4851, "al-falah": 0.4809, "al-jada": 0.4872,
+    "al-maqta": 0.3266, "al-taif-mall": 0.6933, "baniyas": 0.4224, "city-walk": 0.4074, "delma": 0.227,
+    "jumeirah-park": 0.4132, "khaleej-al-arabi": 0.2773, "khalifa-city-a": 0.4103,
+    "ministries-complex": 0.381, "mirdif-35": 0.4974, "mohammed-bin-zayed-city": 0.2769,
+    "nad-al-sheba": 0.4345, "noya-plaza": 0.2113, "ras-al-khaimah": 0.6643, "shahama": 0.3176,
+    "shakhbout-city": 0.4194, "westyas": 0.2177, "zawaya-walk": 0.5135}
+GROW_BEFORE = {"sharjah-sharjah", "al-dhaid-sharjah", "khor-fakkan-sharjah", "kalba-sharjah"}
+
+
+def test_affluence_off_reproduces_the_unweighted_model_exactly(real_v3):
+    from src.model import growth, scorecard
+    off = Levels(affluence="low")
+    f, areas = build(real_v3, ASSUMPTIONS, off)
+    assert all(x.addressable_women == x.catchment_women for x in f)
+    assert all(x.est_customers == (0.0 if x.not_scored else x.capture * x.catchment_women) for x in f)
+    assert all(a.addressable_women == a.women for a in areas)
+    got = {d.branch_id: d.composite for d in scorecard.decide(f) if d.action != "NOT SCORED"}
+    assert got == BEFORE_AFFLUENCE
+    assert {d.area_id for d in growth.classify_all(areas) if d.action == "GROW"} == GROW_BEFORE
+    # and every other number is untouched by the affluence level
+    med = build(real_v3, ASSUMPTIONS)
+    strip = lambda x: x.model_dump(exclude={"addressable_women", "est_customers"})
+    assert [strip(x) for x in f] == [strip(x) for x in med[0]]
+    assert [strip(x) for x in areas] == [strip(x) for x in med[1]]
+
+
+def test_every_lounge_and_area_has_an_affluence_source(real_v3):
+    f, areas = build(real_v3, ASSUMPTIONS)
+    for x in [*f, *areas]:
+        assert 0 <= x.affluence_coverage <= 1
+        assert (x.affluence_rent is None) == (x.affluence_coverage == 0), x
+    dubai = {x.branch_id: x for x in f if x.emirate == "Dubai"}
+    assert all(x.affluence_coverage > 0.5 for x in dubai.values())
+    assert all(x.affluence_rent is None and x.addressable_women == x.catchment_women
+               for x in f if x.emirate in ("Abu Dhabi", "Ras Al Khaimah"))

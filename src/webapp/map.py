@@ -84,6 +84,24 @@ def catchment_cells_layer(cells: pd.DataFrame, cell_ids: list[str], women: pd.Se
                      stroked=False, pickable=True, id="catchment-cells")
 
 
+AFFLUENCE_LOW, AFFLUENCE_HIGH = [255, 243, 224], [191, 54, 12]   # pale to deep orange, cheap to dear
+
+
+def affluence_layer(cells: pd.DataFrame) -> pdk.Layer:
+    """Cells with an observed median rent (Dubai only), shaded on a log scale; every other cell
+    is left uncoloured: no data, weighted neutral."""
+    obs = cells[cells.rent_observed.notna()]
+    lo, hi = math.log(obs.rent_observed.min()), math.log(obs.rent_observed.max())
+    rows = []
+    for cid, c in obs.iterrows():
+        t = (math.log(c.rent_observed) - lo) / ((hi - lo) or 1)
+        rows.append({"polygon": _box(cells, cid), "name": f"{c['name']} ({cid})",
+                     "detail": f"Median household rent {c.rent_observed:,.0f} AED/yr (DLD, Jul-Oct 2026)",
+                     "color": [round(a + t * (b - a)) for a, b in zip(AFFLUENCE_LOW, AFFLUENCE_HIGH)] + [170]})
+    return pdk.Layer("PolygonLayer", data=rows, get_polygon="polygon", get_fill_color="color",
+                     stroked=False, pickable=True, id="affluence")
+
+
 def area_cells_layer(cells: pd.DataFrame, areas: list[Area], decisions: list[AreaDecision],
                      show_skip: bool = False, only: str | None = None) -> pdk.Layer:
     """Growth areas as their grid cells, coloured GROW / WATCH / SKIP. `only`: one area."""

@@ -13,8 +13,10 @@ from src.models import Area
 from tests.features.test_lounges import ASSUMPTIONS, C1, C2, _cell, _lounge, _salon, _v3, women
 
 
-def _a(women=50_000.0, worker=0.1, per_1k=0.0, coverage=1.0):
-    return Area(area_id="x", name="X", emirate="Dubai", lat=25, lng=55, women=women, cells=3,
+def _a(women=50_000.0, worker=0.1, per_1k=0.0, coverage=1.0, addressable=None):
+    return Area(area_id="x", name="X", emirate="Dubai", lat=25, lng=55, women=women,
+                addressable_women=women if addressable is None else addressable,
+                affluence_rent=None, affluence_coverage=0.0, cells=3,
                 worker_share=worker, premium_salons=None if per_1k is None else 1,
                 premium_reviews_per_1k=per_1k, full_circle_share=None if per_1k is None else 0.5,
                 data_coverage=0.0 if per_1k is None else coverage, cell_ids=["r0c0"],
