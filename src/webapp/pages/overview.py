@@ -62,23 +62,11 @@ def map_layers(r, lounge: str | None, show_areas: bool, show_skip: bool, show_su
 
 
 def _legend(r, lounge: str | None, show_affluence: bool) -> None:
-    st.markdown("**Lounges** (flag; circle sized by women in catchment)")
-    st.markdown(f"🟢 **PROTECT**: composite ≥ {scorecard.PROTECT_AT}  \n"
-                f"🟠 **HOLD**: between {scorecard.SHRINK_AT} and {scorecard.PROTECT_AT}  \n"
-                f"🔴 **SHRINK**: composite ≤ {scorecard.SHRINK_AT}  \n"
-                "⚪ **NOT SCORED**: the airport lounge  \n"
-                "◯ **Hollow** = low confidence")
-    st.caption("Composite: demand, cannibalisation, capture (weight 1 each) and rating (½), each "
-               f"0-1 on a fixed scale. Low confidence: within {scorecard.LOW_MARGIN} of a line, thin market, "
-               "no rating gap (missing rating or no rated substitutes), or the call changes in "
-               f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations.")
-    st.markdown(f"**Growth areas** (cells beyond a {data.minutes(r.levels)}-min drive of every lounge)")
-    st.markdown(f"🔵 **GROW**: ≥ {growth.GROW_MIN_WOMEN:,} addressable women, worker housing under "
-                f"{growth.WORKER_CAP:.0%}, *and* under {growth.UNSATURATED_PER_1K:g} premium reviews per "
-                f"1k women, with ≥ {growth.MIN_COVERAGE:.0%} of women searched  \n"
-                "🟣 **WATCH**: one of the two, too little searched, big only on thin affluence data, or big "
-                "but mostly worker housing  \n"
-                f"⚪ **SKIP**: neither, or under {growth.SKIP_UNDER_WOMEN:,} women")
+    lounges, areas = st.columns(2)
+    with lounges:
+        _lounge_legend()
+    with areas:
+        _area_legend(r)
     if show_affluence:
         rent = data.rents()
         st.markdown(f"**Affluence**: 🟧 observed median household rent per cell, pale = cheap "
@@ -90,6 +78,29 @@ def _legend(r, lounge: str | None, show_affluence: bool) -> None:
                     "(darker = more women) and premium substitutes (grey, sized by reviews).")
     else:
         st.caption("Click a lounge for its catchment, or an area for its call.")
+
+
+def _lounge_legend() -> None:
+    st.markdown("**Lounges** (flag; circle sized by women in catchment)")
+    st.markdown(f"🟢 **PROTECT**: composite ≥ {scorecard.PROTECT_AT}  \n"
+                f"🟠 **HOLD**: between {scorecard.SHRINK_AT} and {scorecard.PROTECT_AT}  \n"
+                f"🔴 **SHRINK**: composite ≤ {scorecard.SHRINK_AT}  \n"
+                "⚪ **NOT SCORED**: the airport lounge  \n"
+                "◯ **Hollow** = low confidence")
+    st.caption("Composite: demand, cannibalisation, capture (weight 1 each) and rating (½), each "
+               f"0-1 on a fixed scale. Low confidence: within {scorecard.LOW_MARGIN} of a line, thin market, "
+               "no rating gap (missing rating or no rated substitutes), or the call changes in "
+               f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations.")
+
+
+def _area_legend(r) -> None:
+    st.markdown(f"**Growth areas** (cells beyond a {data.minutes(r.levels)}-min drive of every lounge)")
+    st.markdown(f"🔵 **GROW**: ≥ {growth.GROW_MIN_WOMEN:,} addressable women, worker housing under "
+                f"{growth.WORKER_CAP:.0%}, *and* under {growth.UNSATURATED_PER_1K:g} premium reviews per "
+                f"1k women, with ≥ {growth.MIN_COVERAGE:.0%} of women searched  \n"
+                "🟣 **WATCH**: one of the two, too little searched, big only on thin affluence data, or big "
+                "but mostly worker housing  \n"
+                f"⚪ **SKIP**: neither, or under {growth.SKIP_UNDER_WOMEN:,} women")
 
 
 def _lounge_panel(r, b: str) -> None:
@@ -141,24 +152,23 @@ def render() -> None:
     st.subheader("The map — click a lounge or an area")
     map_key = f"uae-map-{st.session_state.get('map_nonce', 0)}"
     lounge, area_id = _selection(st.session_state.get(map_key))
-    map_col, side = st.columns([3, 1])
-    with side:
-        show_areas = st.checkbox("Growth areas", value=True)
-        show_skip = st.checkbox("…including SKIP areas", value=False, disabled=not show_areas)
-        show_subs = st.checkbox("Selected lounge's premium substitutes", value=True)
-        show_affluence = st.checkbox("Affluence (Dubai rents)", value=False)
-        # Not "Clear selection": the map's own toolbar has that button, which clears only the widget.
-        if (lounge or area_id) and st.button("Deselect"):
-            st.query_params.pop("lounge", None)
-            st.query_params.pop("area", None)
-            st.session_state["map_nonce"] = st.session_state.get("map_nonce", 0) + 1
-            st.rerun()
-        _legend(r, lounge, show_affluence)
-    with map_col:
-        open_ = {f.branch_id for f in r.features}
-        layers = map_layers(r, lounge if lounge in open_ else None, show_areas, show_skip, show_subs,
-                            show_affluence)
-        st.pydeck_chart(build_deck(layers), on_select="rerun", selection_mode="single-object", key=map_key)
+    # Controls above the map and the legend below it, so the map keeps its width on narrow screens.
+    c1, c2, c3, c4, c5 = st.columns(5)
+    show_areas = c1.checkbox("Growth areas", value=True)
+    show_skip = c2.checkbox("…including SKIP areas", value=False, disabled=not show_areas)
+    show_subs = c3.checkbox("Premium substitutes", value=True)
+    show_affluence = c4.checkbox("Affluence (Dubai rents)", value=False)
+    # Not "Clear selection": the map's own toolbar has that button, which clears only the widget.
+    if (lounge or area_id) and c5.button("Deselect"):
+        st.query_params.pop("lounge", None)
+        st.query_params.pop("area", None)
+        st.session_state["map_nonce"] = st.session_state.get("map_nonce", 0) + 1
+        st.rerun()
+    open_ = {f.branch_id for f in r.features}
+    layers = map_layers(r, lounge if lounge in open_ else None, show_areas, show_skip, show_subs,
+                        show_affluence)
+    st.pydeck_chart(build_deck(layers), on_select="rerun", selection_mode="single-object", key=map_key)
+    _legend(r, lounge, show_affluence)
     if lounge:
         _lounge_panel(r, lounge)
     elif area_id:
