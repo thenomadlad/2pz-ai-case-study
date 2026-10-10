@@ -1,3 +1,5 @@
+> **Historical:** a build log and decision register from the v1/v2 models through the v3 integration. Several sections describe models that no longer exist; the current model, scope and limitations are in the [README](../README.md) and [`limitations.md`](limitations.md). Open work is tracked in [`RUBRIC.md`](../RUBRIC.md).
+
 # Case study gap analysis: what's done, what's missing
 
 Each requirement in `ai-associate-case-study.docx` is checked against the code at `1006f6b`.
@@ -35,7 +37,7 @@ Status: ✅ addressed · 🟡 partial · ❌ missing.
 |---|---|---|
 | Working product | ✅ | Streamlit app, live on Community Cloud, works with zero config |
 | Technical README | 🟡 | Very thorough, but **37 KB, with `> _Fill:_` template prompts and `TODO`s left visible**. The brief says the reviewers are short on time |
-| Demo (video, or live link + written walkthrough) | 🟡 | The live link exists. No video and no short written walkthrough |
+| Demo (video, or live link + written walkthrough) | ✅ | Live link plus [docs/walkthrough.md](walkthrough.md) (2026-10-10) |
 | Fallback when there's no key | ✅ | Falls back to the rubric automatically |
 
 ## Critique beyond the checklist
@@ -72,14 +74,14 @@ Status: ✅ addressed · 🟡 partial · ❌ missing.
 - [x] **AI explanations generated.** 59/59 pass grounding on Opus 5.5 (`data/explanations/cache.json`). First run: 56/59. Two of the three failures were the checker rejecting correctly rounded numbers ("3.1" for 3.06), so it now compares at the precision the text uses. The third was a malformed answer that passed on a re-run, which only fills gaps. Known limit: the check verifies numbers, not adjectives (one explanation calls a 4.6★ rating "strong").
 - [x] **Committed and pushed to `main`.** Check that Streamlit Community Cloud redeployed and that the live app shows "7 are GROW" in the headline.
 - [ ] **Click through the live app in a browser.** Panels were verified headlessly (AppTest), not visually: the browser extension wasn't connected.
-- [ ] **Demo:** a 5–10 min recording, or a written walkthrough. Suggested arc: headline → al-safa-2 SHRINK and why → a Deira GROW area → the scenario that moves al-safa-2 into Deira → the "where not to trust it" section.
+- [x] **Demo:** done as a written walkthrough, [docs/walkthrough.md](walkthrough.md) (2026-10-10). The arc suggested here was for the old Dubai model.
 - [ ] **Capture model:** fair-share capture treats every salon as equally attractive. A Huff gravity model (each area's women split across all salons by attractiveness ÷ distance) is the credible upgrade. It would also replace winner-take-all catchments.
 - [ ] **Equal-weight weakness:** nad-al-sheba (about 3k women) scores HOLD. Consider a guard rule ("demand score < 0.1 caps the branch at HOLD → flags for review") or keep it and leave the caveat in the README. A judgement call for you.
 - [ ] **Optional:** a toggle to shade communities by competitors per 10k (competitor points exist; the choropleth wasn't built).
 - [ ] **Optional tidy-up:** the unticked checkboxes in `docs/designs/v1-plan.md` and the Streamlit plan; set the spec status line to implemented.
 
 ### Out of scope (deliberate)
-Travel time and isochrones · expanding to all 23 UAE branches · analyst chat with tools · per-scenario re-acquire · a side-by-side comparison view · a "flips at ±X" sensitivity readout.
+Superseded: travel time and all 24 lounges were later built (v3). The current out-of-scope list is in the README, "Out of scope, and why".
 
 ## Decisions
 
@@ -107,8 +109,7 @@ Settled in a grilling session on 2026-10-07.
 ## Data refresh (v3), 2026-10-08 to 10-09
 
 The hand-curated seed listed 9 Dubai "branches", 4 of which don't exist. `data/seed/v3/` replaces
-it with data fetched once and committed (branch `data-refresh`). **The live app still runs on the
-old seed** until the integration plan below is done. Plan:
+it with data fetched once and committed (branch `data-refresh`; that work is now on `main` and the live app runs on v3). Plan:
 `docs/superpowers/plans/2026-10-08-data-refresh.md`; sources and caveats: `data/seed/v3/SOURCES.md`
 (its "Market model" section is written for the app); assumptions for reviewers: README, bottom.
 
@@ -119,7 +120,7 @@ old seed** until the integration plan below is done. Plan:
 | `../lounges.json`, `branches.csv` | 24 UAE lounges (Bedashing's store locator) with Google pin, rating, reviews | `scripts/fetch_branches.py` |
 | `cells.csv`, `emirates.csv`, `dubai_community_gender.csv` | 2,373 ~2 km cells: adults, worker-housing adults, names; emirate totals; DSC calibration | `scripts/build_cells.py` |
 | `lounge_isochrones.geojson`, `catchment_cells.csv`, `cell_isochrones.geojson` | 10/15/20/30/40-min drive polygons per lounge; catchment cells; 10/15/20-min polygons per catchment cell | `scripts/fetch_isochrones.py` (Mapbox) |
-| `salons.csv`, `lounge_candidates.csv`, `lounge_search_saturation.csv` | 4,237 salons (2,824 candidates); lounge x candidate pairs; search saturation per lounge | `scripts/fetch_salons.py` (Google Places) |
+| `salons.csv`, `lounge_candidates.csv`, `lounge_search_saturation.csv` | 4,237 salons (2,824 candidates) at the time; later pooled to 5,924 (see `docs/data-inventory.md`); lounge x candidate pairs; search saturation per lounge | `scripts/fetch_salons.py` (Google Places) |
 
 ### Open findings, by notebook
 - **`branches.ipynb`:** all 24 lounges matched Google; Bedashing's own store-locator pins are off by
@@ -192,7 +193,7 @@ not decisions.
 - **Affluence (2026-10-10):** observed DLD rents for 241 Dubai cells weight demand (addressable
   women; elasticity off / 0.5 / 1); the built-form proxy for the rest of the UAE failed (CV R²
   −0.10), so everything outside those cells is neutral (`notebooks/affluence.ipynb`,
-  `docs/limitations.md` 3). The cached explanations predate it and need regenerating.
+  `docs/limitations.md` 3). The cached explanations were regenerated for it on 2026-10-10.
 - **What-ifs in memory** (`src/baseline.py`): levels, search recall and closed lounges; no
   processed-JSON pipeline.
 - **Explanations** for the lounge / area / uae kinds. All 65 baseline explanations (23 lounges, 41
@@ -211,6 +212,5 @@ not decisions.
   the calls: no money in the model, lifetime-review capture, assumption sensitivity, midday drive
   times with no decay, the coarse market estimate, the competitor search's gaps, first-cut growth
   areas.
-- Merge `data-refresh` into `main` so the live deploy runs v3 (plan, Task 10).
 - Earlier follow-ups still open: a full sweep to replace `search_recall`, Bedashing's real price
   level, rush-hour isochrones.

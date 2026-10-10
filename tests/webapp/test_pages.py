@@ -52,10 +52,6 @@ def test_overview_full_app_leads_with_summary_then_limitations():
     assert "Affluence is observed in Dubai only" in body and "27+ of the 81" in body
 
 
-# Affluence changed every fact sheet on 2026-10-10; the cache is regenerated offline afterwards
-# (justfile, "Offline path"). Until then the app shows templates. Drop this mark once it is.
-
-
 def test_overview_shows_cached_ai_summary():
     at = AppTest.from_file(APP, default_timeout=30).run()
     assert any(c.value.startswith("AI-written (cached)") for c in at.caption)
@@ -188,3 +184,45 @@ def test_untrusted_url_ids_never_reach_markdown():
         assert not at.exception
         shown = [e.value for kind in ("markdown", "caption", "info") for e in getattr(at, kind)]
         assert not any("evil.example" in str(v) for v in shown), (page, key)
+
+
+def test_overview_opens_on_the_question_and_whats_at_stake():
+    from src.baseline import run
+    from src.webapp.pages.overview import QUESTION, stake
+    at = _page("overview")
+    assert at.markdown[0].value == f"#### {QUESTION}"
+    s, r = stake(run()), run()
+    shrink = [f for f in r.features if next(d for d in r.decisions if d.branch_id == f.branch_id).action == "SHRINK"]
+    assert 0 < s["SHRINK"][1] <= sum(f.shared_share * f.catchment_women for f in shrink) + 1  # each cell once
+    assert s["GROW"][0] == 4
+    labels = {m.label: m.value for m in at.metric}
+    assert labels[f"Under pressure: {s['SHRINK'][0]} SHRINK lounges"] == f"{s['SHRINK'][1]:,.0f} women"
+
+
+def test_overview_compares_lounges_and_ranks_growth_areas_with_filters():
+    at = _page("overview")
+    lounges, areas = at.dataframe[0].value, at.dataframe[1].value
+    assert len(lounges) == 24 and {"Composite", "Demand", "Shared catchment", "Confidence"} <= set(lounges.columns)
+    assert list(areas.Call) == sorted(areas.Call) and set(areas.Call) == {"GROW", "WATCH"}   # GROW first
+    grow = areas[areas.Call == "GROW"]["Addressable women"]
+    assert list(grow) == sorted(grow, reverse=True) and areas.Why.str.len().min() > 0
+    at.multiselect(key="cmp-call").set_value(["SHRINK"]).run()
+    at.multiselect(key="cmp-area-emirate").set_value(["Sharjah"]).run()
+    assert not at.exception
+    assert set(at.dataframe[0].value.Call) == {"SHRINK"} and set(at.dataframe[1].value.Emirate) == {"Sharjah"}
+
+
+def test_overview_panels_show_top_drivers_and_area_tests():
+    assert "**Top drivers:** demand 1.00 (weight 1)" in _text(_page("overview", lounge="al-barsha"))
+    assert "**The tests:** ✅ big enough" in _text(_page("overview", area="sharjah-sharjah"))
+
+
+def test_lounge_page_shows_address_and_says_services_are_missing():
+    text = _text(_page("lounge", lounge="al-barsha"))
+    assert "Umm Suqeim St" in text and "Services offered and price tier" in text
+
+
+def test_overview_overlap_toggle_adds_its_legend():
+    at = _page("overview")
+    next(c for c in at.checkbox if c.label == "All catchments (overlap)").check().run()
+    assert not at.exception and "shared** by 2+ lounges" in _text(at)

@@ -83,6 +83,9 @@ class Explanation(BaseModel):
     # The answer, in one sentence: the top of the pyramid.
     headline: str = ""
     reasons: list[Reason]
+    # What it means for the COO (so what) and what to do about it (now what).
+    so_what: str = ""
+    now_what: str = ""
     # Plain-language caption for the factor table shown next to this decision.
     table_caption: str
     thresholds_note: str

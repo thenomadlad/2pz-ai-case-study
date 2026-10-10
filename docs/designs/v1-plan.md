@@ -1,3 +1,5 @@
+> **Historical: describes the v1 model; the current model is in the [README](../../README.md).**
+
 # Bedashing V1 Implementation Plan: The Perturbation Loop
 
 > **Executed.** Checkboxes were never ticked. Tasks 10–11 (FastAPI/Leaflet diff mode) were later removed by the Streamlit rebuild, and the LLM backend by v2.

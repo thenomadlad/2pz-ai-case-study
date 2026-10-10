@@ -121,7 +121,18 @@ def area_cells_layer(cells: pd.DataFrame, areas: list[Area], decisions: list[Are
                      pickable=True, id="areas")
 
 
-def substitutes_layer(subs: list[dict]) -> pdk.Layer:
+def overlap_layer(cells: pd.DataFrame, reached: dict[str, list[str]], women: pd.Series) -> pdk.Layer:
+    """Every open lounge's catchment cells at once (`reached`: cell -> lounges reaching it). Cells
+    reached by one lounge are faint teal; shared cells (2+ lounges) are red, deeper with more."""
+    rows = [{"polygon": _box(cells, c), "name": f"{cells.at[c, 'name']} ({c})",
+             "detail": f"Reached by {len(bs)} lounge(s): {', '.join(sorted(bs))}<br/>{women[c]:,.0f} women 15+",
+             "color": [0, 121, 107, 50] if len(bs) == 1 else [211, 47, 47, min(220, 60 + 40 * len(bs))]}
+            for c, bs in reached.items()]
+    return pdk.Layer("PolygonLayer", data=rows, get_polygon="polygon", get_fill_color="color",
+                     stroked=False, pickable=True, id="overlap")
+
+
+def substitutes_layer(subs: list[dict], layer_id: str = "substitutes") -> pdk.Layer:
     """A lounge's premium substitutes, sized by Google reviews."""
     rows = [{"name": s["name"], "lat": s["lat"], "lng": s["lng"],
              "radius": max(3.0, min(16.0, math.sqrt(s["review_count"]) / 4)),
@@ -130,7 +141,7 @@ def substitutes_layer(subs: list[dict]) -> pdk.Layer:
             for s in subs]
     return pdk.Layer("ScatterplotLayer", data=rows, get_position=["lng", "lat"], get_radius="radius",
                      radius_units=_PIXELS, get_fill_color=[66, 66, 66, 170], get_line_color=[255, 255, 255],
-                     stroked=True, line_width_min_pixels=1, pickable=True, id="substitutes")
+                     stroked=True, line_width_min_pixels=1, pickable=True, id=layer_id)
 
 
 def view_at(lat: float, lng: float, zoom: float = 11) -> pdk.ViewState:

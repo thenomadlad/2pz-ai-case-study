@@ -93,6 +93,8 @@ def render() -> None:
     flips = r.flips.get(b)
     exp, facts = explanation_for(r, "lounge", b)
     st.header(f"Lounge: {f.name}")
+    st.caption(f"📍 {data.address(b)} · {f.emirate} · {f.rating or 'no'}★ from {f.review_count:,} Google "
+               "reviews. Services offered and price tier per lounge aren't in the data.")
     badge(d.action)
     if d.action != "NOT SCORED":
         st.caption(f"Composite {d.composite:.2f} · confidence {d.confidence} · the call changes in "

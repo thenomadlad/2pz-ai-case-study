@@ -67,3 +67,14 @@ def test_affluence_layer_shades_only_observed_cells_and_is_a_toggle():
     assert "710,000 AED/yr" in dear["detail"]
     ids = [x.id for x in map_layers(run(), None, True, False, True, True)]
     assert ids[0] == "affluence" and "affluence" not in [x.id for x in map_layers(run(), None, True, False, True)]
+
+
+def test_overlap_layer_marks_shared_cells_and_all_substitutes_are_deduplicated():
+    r = run()
+    layers = {x.id: x for x in map_layers(r, None, False, False, False, show_overlap=True, show_all_subs=True)}
+    rows = layers["overlap"].data
+    shared = [x for x in rows if "Reached by 1 " not in x["detail"]]
+    assert shared and all(x["color"][0] == 211 for x in shared)
+    assert len(rows) == load_v3().catchment.query("level == 'medium'").cell_id.nunique()
+    names = [s["name"] for s in layers["all-substitutes"].data]
+    assert len(names) > 0 and list(layers)[:2] == ["overlap", "all-substitutes"]

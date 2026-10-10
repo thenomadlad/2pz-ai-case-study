@@ -1,5 +1,6 @@
 """Rendering pieces shared by the pages: the what-if banner, explanations, tables, caveats and the
 "before you trust these calls" box."""
+import re
 from functools import cache
 
 import pandas as pd
@@ -7,6 +8,7 @@ import streamlit as st
 
 from src import explain
 from src.baseline import Run
+from src.config import settings
 from src.model import growth, scorecard
 from src.models import Area, AreaDecision, Decision, Explanation, Levels, LoungeFeatures
 from src.webapp import data
@@ -90,6 +92,10 @@ def render_pyramid(exp: Explanation) -> None:
         label = explain.TOPIC_LABELS.get(reason.topic, reason.topic)
         st.markdown(f"{i}. **{label}.** {reason.claim}")
         st.caption(" · ".join(f"{e.label}: {explain.fmt(e.field, e.value)}" for e in reason.evidence))
+    if getattr(exp, "so_what", ""):
+        st.markdown(f"**So what.** {exp.so_what}")
+    if getattr(exp, "now_what", ""):
+        st.markdown(f"**Now what.** {exp.now_what}")
     st.caption(source_note(exp))
 
 
@@ -106,9 +112,33 @@ def wrapped_table(rows: list[dict]) -> None:
     st.table(df.set_index(df.columns[0]))
 
 
+def _fetched(csv: str) -> str:
+    """The snapshot date(s) in a seed table's fetched_at column ("2026-10-09")."""
+    days = sorted(pd.read_csv(settings.v3_dir / csv, usecols=["fetched_at"]).fetched_at.str[:10].unique())
+    return days[0] if len(days) == 1 else f"{days[0]} to {days[-1]}"
+
+
+@cache
+def provenance(kind: str) -> str:
+    """Where the factor table's numbers come from, with snapshot dates read from the data (S7)."""
+    rents = re.search(r"registered (\d{4}-\d\d-\d\d) to (\d{4}-\d\d-\d\d)",
+                      (settings.v3_dir / "SOURCES.md").read_text())
+    parts = [f"competitors: Google Places, fetched {_fetched('salons.csv')}",
+             "women 15+: WorldPop 2025 (R2025A), rebalanced for OSM worker housing",
+             f"drive times: Mapbox isochrones, typical traffic at {data.assumptions().isochrone_depart_at.replace('T', ' ')}",
+             "rents: DLD Ejari contracts" + (f" registered {rents[1]} to {rents[2]}" if rents else "")]
+    if kind == "lounge":
+        parts.insert(0, f"lounge rating and reviews: Google Places, fetched {_fetched('branches.csv')}")
+    return "Sources: " + "; ".join(parts) + ". Details in data/seed/v3/SOURCES.md."
+
+
 def render_factor_table(exp: Explanation, fields: tuple[str, ...], facts: dict) -> None:
     st.caption(exp.table_caption)
+    changes = explain.what_would_change(exp.kind, facts)
+    if changes:
+        st.markdown("**What would change the call.** " + " ".join(changes))
     wrapped_table(explain.table_rows(fields, facts))
+    st.caption(provenance(exp.kind))
 
 
 def url_picker(label: str, param: str, options: list[str], format_func, key: str) -> str:

@@ -83,11 +83,23 @@ _Avoid_: contested share, overlap (unqualified)
 ### Decisions
 
 **Lounge action**:
-PROTECT, HOLD or SHRINK from the scorecard; NOT SCORED for the airport lounge. SHRINK means
-"investigate", not "close": the model has no revenue or rent.
+PROTECT, HOLD or SHRINK from the scorecard; NOT SCORED for the airport lounge. What each one asks
+the COO to do:
+- **PROTECT**: keep and defend the site. Renew at the lease event, don't relocate, and treat a
+  competitor opening nearby as a threat to respond to.
+- **HOLD**: no portfolio action this cycle. Revisit at the next lease event, or sooner if a signal
+  crosses a line (the lounge page names which one is closest).
+- **SHRINK**: investigate, don't close. Before the lease event, review whether to downsize or
+  consolidate into the sibling that shares most of its catchment. The model has no revenue or rent,
+  so it can only raise the question.
 
 **Growth action**:
-GROW, WATCH or SKIP, assigned to a growth area.
+GROW, WATCH or SKIP, assigned to a growth area. What each one asks the COO to do:
+- **GROW**: start a site search here. It's a shortlist for a site visit and lease search, to be
+  verified on the ground before committing.
+- **WATCH**: don't act now. Revisit when the named failing test changes (e.g. salon coverage
+  improves or the market thins).
+- **SKIP**: no action. The area is too small or already crowded.
 
 **Low confidence**:
 A lounge call within 0.05 of a threshold, with a missing input (thin premium market, no rating gap),

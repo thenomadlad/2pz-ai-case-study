@@ -80,3 +80,14 @@ def minutes(levels: Levels) -> int:
 def catchment(levels: Levels, branch_id: str) -> list[str]:
     c = v3().catchment
     return c[(c.level == levels.travel) & (c.branch_id == branch_id)].cell_id.tolist()
+
+
+def reached(levels: Levels, closed: frozenset[str]) -> dict[str, list[str]]:
+    """Cell -> the open lounges whose catchment reaches it."""
+    c = v3().catchment
+    c = c[(c.level == levels.travel) & ~c.branch_id.isin(closed)]
+    return c.groupby("cell_id").branch_id.agg(list).to_dict()
+
+
+def address(branch_id: str) -> str:
+    return next(lo.address for lo in v3().lounges if lo.branch_id == branch_id)

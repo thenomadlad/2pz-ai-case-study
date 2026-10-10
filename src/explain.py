@@ -36,7 +36,9 @@ from src.models import (
 logger = logging.getLogger(__name__)
 
 CACHE_PATH = REPO_ROOT / "data" / "explanations" / "cache.json"
-PROMPT_VERSION = "v3"
+PROMPT_VERSION = "v4"
+
+
 MIN_ITEMS, MAX_ITEMS = 2, 5  # per pyramid level: enough to support, few enough to read
 
 
@@ -109,6 +111,22 @@ GLOSSARY: dict[str, Field] = {
         f"{s.label}, converted to a fixed 0-1 score where 1 is best for the lounge "
         "(scale in the Threshold column).")
        for s in scorecard.SIGNALS},
+    **{f"contrib_{s.name}": Field(
+        f"{s.name.capitalize()} contribution", "0-1",
+        f"What the {s.name} score adds to the composite: weight × score ÷ total weight. The "
+        "four contributions sum to the composite.")
+       for s in scorecard.SIGNALS},
+    "next_call": Field("Nearest other call", "",
+                       "The call this lounge would get if its composite crossed the nearest line."),
+    "line_gap": Field("Distance to that line", "0-1",
+                      "How far the composite would have to move to reach the nearest other call."),
+    "flip_driver": Field("Driver that could flip it", "",
+                         "The highest-ranked location or market signal that, moving alone, could "
+                         "carry the composite across that line (rating is left out: it is not a "
+                         "portfolio lever). n/a when none can."),
+    "flip_value": Field("Value that flips it", "",
+                        "The value of that driver's input (in its own unit) at which the call "
+                        "changes, all else equal."),
     # --- growth area ---
     "area_name": Field("Area", "", "OpenStreetMap place name nearest the area's cells."),
     "emirate": Field("Emirate", "", "Emirate the area lies in."),
@@ -143,6 +161,18 @@ GLOSSARY: dict[str, Field] = {
                         "Above this the women estimate is too uncertain to GROW.", pct=True),
     "min_coverage": Field("Coverage needed", "% of women",
                           "Less competitor data than this caps the call at WATCH.", pct=True),
+    "size_gap": Field("Size gap", "women",
+                      "Addressable women minus the size line: positive is headroom above it, "
+                      "negative is how many more the area needs."),
+    "saturation_gap": Field("Saturation gap", "reviews per 1k women",
+                            "Saturation line minus premium saturation: positive is room under the "
+                            "line, negative is how far over it the area is. n/a when unsearched."),
+    "worker_gap": Field("Worker-housing gap", "% of adults",
+                        "Worker-housing cap minus worker share: negative means over the cap.",
+                        pct=True),
+    "coverage_gap": Field("Coverage gap", "% of women",
+                          "Competitor data coverage minus the coverage needed: negative means "
+                          "too little was searched to GROW.", pct=True),
     # --- uae (network summary) ---
     "lounges_scored": Field("Lounges scored", "count", "UAE lounges given a call."),
     "not_scored_count": Field("Not scored", "lounges",
@@ -185,21 +215,21 @@ GLOSSARY: dict[str, Field] = {
 TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     "lounge": {
         "demand": ("addressable_women", "catchment_women", "affluence_coverage", "score_demand",
-                   "est_customers", "affluence_rent", "catchment_cells"),
-        "cannibalisation": ("shared_share", "score_cannibalisation"),
+                   "est_customers", "affluence_rent", "catchment_cells", "contrib_demand"),
+        "cannibalisation": ("shared_share", "score_cannibalisation", "contrib_cannibalisation"),
         "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market",
-                    "score_capture"),
+                    "score_capture", "contrib_capture"),
         "rating": ("rating_gap", "lounge_rating", "substitutes_median_rating", "lounge_reviews",
-                   "score_rating"),
+                   "score_rating", "contrib_rating"),
     },
     "area": {
         "size": ("addressable_women", "women", "grow_min_women", "big_enough", "affluence_coverage",
-                 "affluence_rent", "skip_under_women"),
+                 "affluence_rent", "skip_under_women", "size_gap"),
         "saturation": ("premium_reviews_per_1k", "premium_salons", "unsaturated",
-                       "unsaturated_per_1k"),
+                       "unsaturated_per_1k", "saturation_gap"),
         "reach": ("nearest_lounge_km", "nearest_lounge_id"),
-        "worker_housing": ("worker_share", "worker_cap"),
-        "data_gap": ("data_coverage", "min_coverage", "unsaturated"),
+        "worker_housing": ("worker_share", "worker_cap", "worker_gap"),
+        "data_gap": ("data_coverage", "min_coverage", "unsaturated", "coverage_gap"),
     },
     "uae": {
         "shrink": ("shrink_count", "shrink_lounges", "shrink_composite_max"),
@@ -268,11 +298,64 @@ THRESHOLDS: dict[str, str] = {
     "data_coverage": f"GROW needs {growth.MIN_COVERAGE:.0%}",
     "big_enough": "GROW needs both tests, WATCH one, SKIP neither",
     "unsaturated": "GROW needs both tests, WATCH one, SKIP neither",
+    **{f"contrib_{s.name}": f"Sums to the composite (max {s.weight / _TOTAL_WEIGHT:.2f})"
+       for s in scorecard.SIGNALS},
+    "size_gap": f"GROW needs 0 or more (line {growth.GROW_MIN_WOMEN:,})",
+    "saturation_gap": f"GROW needs above 0 (line {growth.UNSATURATED_PER_1K:g})",
+    "worker_gap": f"GROW needs above 0 (cap {growth.WORKER_CAP:.0%})",
+    "coverage_gap": f"GROW needs 0 or more (needs {growth.MIN_COVERAGE:.0%})",
 }
 
 
+def _in_unit(field: str, value) -> str:
+    """A signal input with its full unit ("38,123 women", "47% of catchment women")."""
+    f, text = GLOSSARY[field], fmt(field, value)
+    return text + (f.unit[1:] if f.pct else f" {f.unit}")
+
+
+def _flip_text(facts: dict) -> str:
+    """flip_value in its driver's own unit."""
+    sig = next(s for s in scorecard.SIGNALS if s.name == facts["flip_driver"])
+    return _in_unit(sig.field, facts["flip_value"])
+
+
+def what_would_change(kind: str, facts: dict) -> list[str]:
+    """The distance to each line that matters, in words (E3): the nearest other call and the value
+    that would flip a lounge; for an area, the gap to each test."""
+    if kind == "lounge":
+        if "next_call" not in facts:
+            return []
+        out = [(f"Composite {facts['composite']:.2f} is {facts['line_gap']:.2f} from the "
+                f"{facts['next_call']} line.")]
+        if facts["flip_driver"]:
+            sig = next(s for s in scorecard.SIGNALS if s.name == facts["flip_driver"])
+            out.append(f"On its own, {GLOSSARY[sig.field].label.lower()} would have to reach "
+                       f"{_flip_text(facts)} (now {_in_unit(sig.field, facts[sig.field])}) to make "
+                       f"it {facts['next_call']}.")
+        else:
+            out.append("No single market signal could move it there on its own.")
+        return out
+    if kind != "area":
+        return []
+    gap = facts["size_gap"]
+    out = [f"Size: {fmt('size_gap', abs(gap))} addressable women "
+           + ("above the line." if gap >= 0 else "short of the line.")]
+    sat = facts["saturation_gap"]
+    if sat is not None:
+        out.append(f"Competition: {fmt('saturation_gap', abs(sat))} premium reviews per 1k women "
+                   + ("under the line." if sat > 0 else "over the line."))
+    if facts["worker_gap"] <= 0:
+        out.append(f"Worker housing: {fmt('worker_gap', -facts['worker_gap'])} of adults over the cap.")
+    if facts["coverage_gap"] < 0:
+        out.append(f"Search coverage: {fmt('coverage_gap', -facts['coverage_gap'])} of women short "
+                   "of what GROW needs.")
+    return out
+
+
 def table_rows(fields: tuple[str, ...], facts: dict) -> list[dict]:
-    return [{"Factor": GLOSSARY[k].label, "Value": fmt(k, facts.get(k)),
+    return [{"Factor": GLOSSARY[k].label,
+             "Value": _flip_text(facts) if k == "flip_value" and facts.get("flip_driver")
+             else fmt(k, facts.get(k)),
              "Unit": GLOSSARY[k].unit, "Threshold": THRESHOLDS.get(k, "—"),
              "What it means": GLOSSARY[k].meaning}
             for k in fields]
@@ -289,10 +372,12 @@ LOUNGE_TABLE = ("catchment_women", "addressable_women", "affluence_rent", "afflu
                 "substitutes_k", "capture", "thin_premium_market", "est_customers",
                 "lounge_rating", "lounge_reviews", "substitutes_median_rating", "rating_gap",
                 "level_flips", "composite", "score_demand", "score_cannibalisation",
-                "score_capture", "score_rating")
+                "score_capture", "score_rating", "contrib_demand", "contrib_cannibalisation",
+                "contrib_capture", "contrib_rating", "next_call", "line_gap", "flip_driver",
+                "flip_value")
 AREA_TABLE = ("women", "addressable_women", "affluence_rent", "affluence_coverage", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
               "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
-              "unsaturated")
+              "unsaturated", "size_gap", "saturation_gap", "worker_gap", "coverage_gap")
 NOT_SCORED_ACTION = "NOT SCORED"
 
 
@@ -300,7 +385,30 @@ def lounge_facts(f: LoungeFeatures, d: Decision, flips: int | None = None) -> di
     facts = {k: getattr(f, k) for k in LOUNGE_TABLE if hasattr(f, k)}
     facts.update(lounge_rating=f.rating, lounge_reviews=f.review_count, level_flips=flips,
                  composite=d.composite, **{f"score_{k}": v for k, v in d.scores.items()})
+    if d.action != NOT_SCORED_ACTION:
+        facts.update(_counterfactual(facts, d.action))
     return _rounded(facts)
+
+
+def _counterfactual(facts: dict, action: str) -> dict:
+    """Each signal's share of the composite, the nearest other call and how far away it is, and the
+    value of the top-ranked market signal that would flip the call on its own (E3). Derived from
+    the scorecard's own weights and anchors; changes no call."""
+    c, w = facts["composite"], {s.name: s.weight for s in scorecard.SIGNALS}
+    out = {f"contrib_{n}": w[n] * facts[f"score_{n}"] / _TOTAL_WEIGHT for n in w}
+    up, down = scorecard.PROTECT_AT - c, c - scorecard.SHRINK_AT
+    nxt, gap, sign = {"PROTECT": ("HOLD", -up, -1), "SHRINK": ("HOLD", -down, 1)}.get(
+        action, ("PROTECT", up, 1) if up <= down else ("SHRINK", down, -1))
+    out.update(next_call=nxt, line_gap=gap, flip_driver=None, flip_value=None)
+    for topic in prioritize("lounge", facts, action) + [s.name for s in scorecard.SIGNALS]:
+        s = next(s for s in scorecard.SIGNALS if s.name == topic)
+        if topic == "rating" or (topic == "capture" and facts.get("thin_premium_market")):
+            continue  # rating is not a portfolio lever (OB4); thin-market capture is fixed at neutral
+        needed = facts[f"score_{topic}"] + sign * gap * _TOTAL_WEIGHT / s.weight
+        if 0 <= needed <= 1:
+            out.update(flip_driver=topic, flip_value=s.worst + needed * (s.best - s.worst))
+            break
+    return out
 
 
 def area_facts(a: Area, d: AreaDecision) -> dict:
@@ -309,7 +417,13 @@ def area_facts(a: Area, d: AreaDecision) -> dict:
                  unsaturated=d.unsaturated, grow_min_women=growth.GROW_MIN_WOMEN,
                  skip_under_women=growth.SKIP_UNDER_WOMEN,
                  unsaturated_per_1k=growth.UNSATURATED_PER_1K, worker_cap=growth.WORKER_CAP,
-                 min_coverage=growth.MIN_COVERAGE)
+                 min_coverage=growth.MIN_COVERAGE,
+                 # Gap to each test's line (E3): positive passes, negative is the shortfall.
+                 size_gap=round(a.addressable_women - growth.GROW_MIN_WOMEN),
+                 saturation_gap=None if a.premium_reviews_per_1k is None
+                 else growth.UNSATURATED_PER_1K - a.premium_reviews_per_1k,
+                 worker_gap=growth.WORKER_CAP - a.worker_share,
+                 coverage_gap=a.data_coverage - growth.MIN_COVERAGE)
     return _rounded(facts)
 
 
@@ -470,15 +584,59 @@ _TEMPLATE_CAPTIONS = {
 }
 
 
+# What each call asks the COO to do (CONTEXT.md, Decisions). verify() requires the phrase in now_what.
+ACTIONS = {
+    "PROTECT": ("defend", ("Keep and defend the site: renew at the lease event, don't relocate, "
+                           "and treat a competitor opening nearby as a threat to respond to.")),
+    "HOLD": ("no portfolio action", ("No portfolio action this cycle: revisit at the next lease "
+                                     "event, or sooner if a signal crosses a line.")),
+    "SHRINK": ("investigate", ("Investigate, don't close: before the lease event, review whether "
+                               "to downsize or consolidate into the sibling that shares most of "
+                               "its catchment.")),
+    "GROW": ("site search", ("Start a site search here: a shortlist for a site visit and lease "
+                             "search, verified on the ground before committing.")),
+    "WATCH": ("revisit", "Don't act now: revisit when the failing test changes."),
+    "SKIP": ("no action", "No action: the area is too small or already crowded."),
+}
+LABELS = {"lounge": ("PROTECT", "HOLD", "SHRINK"), "area": ("GROW", "WATCH", "SKIP")}
+# In-branch advice (ratings, staffing, service quality) is out of scope (rubric OB4).
+IN_BRANCH = re.compile(
+    r"\b(improv|rais|boost|lift|fix|lever)\w*\b[^.;]{0,40}\b(rating|service|staff|quality)"
+    r"|\b(rating|service)\b[^.;]{0,40}\blever|\bstaff(ing)?\b|\btraining\b|service quality",
+    re.IGNORECASE)
+
+
+def _template_so_what(kind: str, action: str, f: dict) -> str:
+    if kind == "lounge":
+        if action == NOT_SCORED_ACTION:
+            return "Its customers are travellers, so the catchment says nothing about its market."
+        return (f"{fmt('catchment_women', f['catchment_women'])} women live within a 15-min drive; "
+                f"{fmt('shared_share', f['shared_share'])} of them are also reached by another lounge.")
+    if kind == "area":
+        return (f"{fmt('women', f['women'])} women 15+ live here, beyond a 15-min drive of every "
+                f"lounge (nearest: {f['nearest_lounge_id']}).")
+    return (f"{fmt('grow_women_total', f['grow_women_total'])} women live in the {f['grow_count']} "
+            f"GROW areas; {f['shrink_count']} lounges need a closer look.")
+
+
+def _template_now_what(kind: str, action: str, f: dict) -> str:
+    if action not in ACTIONS:
+        return ("No portfolio call from this model." if kind == "lounge" else
+                "Investigate the SHRINK lounges and start site searches in the GROW areas.")
+    return " ".join([ACTIONS[action][1], *what_would_change(kind, f)])
+
+
 def template_explanation(kind: str, subject_id: str, action: str, facts: dict) -> Explanation:
     topics = prioritize(kind, facts, action)
     reasons = [Reason(topic=t, claim=_template_claim(kind, t, facts),
                       evidence=[_ev(k, facts) for k in TOPICS[kind][t][:MAX_ITEMS]
-                                if not (kind == "lounge" and k.startswith("score_")
-                                        and facts.get(k) is None)])
+                                if k in facts and not (kind == "lounge" and k.startswith("score_")
+                                                       and facts[k] is None)])
                for t in topics]
     return Explanation(subject_id=subject_id, kind=kind, action=action,
                        headline=_template_headline(kind, action, facts), reasons=reasons,
+                       so_what=_template_so_what(kind, action, facts),
+                       now_what=_template_now_what(kind, action, facts),
                        table_caption=_TEMPLATE_CAPTIONS[kind],
                        thresholds_note=_thresholds_note(kind), source="template")
 
@@ -491,6 +649,7 @@ _NUMBER = re.compile(r"(?<![\w.])-?\d[\d,]*\.?\d*")  # "0-1" is a range, not -1
 def _allowed_numbers(facts: dict) -> list[float]:
     nums = [float(v) for v in facts.values()
             if isinstance(v, (int, float)) and not isinstance(v, bool)]
+    nums += [abs(v) for v in nums if v < 0]  # gaps quoted as "2,100 short" / "0.2 stars below"
     nums += [v * 100 for v in nums if 0 <= v <= 1]  # shares and scores quoted as %
     nums += [4, 0, 1]
     nums += [scorecard.PROTECT_AT, scorecard.SHRINK_AT, scorecard.FLIP_LOW, scorecard.COMBOS, 15, 60, 1_000]
@@ -521,6 +680,21 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
     got = [r.topic for r in exp.reasons]
     if got != topics:
         errors.append(f"arguments must be exactly {topics}, in that order; got {got}")
+    for name in ("so_what", "now_what"):
+        if not getattr(exp, name, "").strip():
+            errors.append(f"{name} is required")
+    if exp.action in LABELS.get(kind, ()):  # E5: the text names the decision's own label
+        first = re.search(r"\b(" + "|".join(LABELS[kind]) + r")\b", exp.headline)
+        if not first or first.group() != exp.action:
+            errors.append(f"headline must name the call {exp.action} before any other label")
+        if ACTIONS[exp.action][0] not in getattr(exp, "now_what", "").lower():
+            errors.append(f"now_what must give the {exp.action} action "
+                          f"({ACTIONS[exp.action][0]!r}): {ACTIONS[exp.action][1]}")
+    texts = [exp.headline, exp.table_caption, getattr(exp, "so_what", ""),
+             getattr(exp, "now_what", "")] + [r.claim for r in exp.reasons]
+    if any(IN_BRANCH.search(t) for t in texts):
+        errors.append("in-branch advice (rating, staffing, service quality) is out of scope: "
+                      "explain where capacity sits, never how to run a branch")
     allowed = _allowed_numbers(facts)
     for r in exp.reasons:
         if not MIN_ITEMS <= len(r.evidence) <= MAX_ITEMS:
@@ -537,7 +711,7 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
     # Ids like "mirdif-35" are cited verbatim; drop them so their digits aren't read as data.
     ids = sorted({part for v in facts.values() if isinstance(v, str) for part in v.split(", ")}
                  | {exp.subject_id}, key=len, reverse=True)
-    for text in [exp.headline, exp.table_caption] + [r.claim for r in exp.reasons]:
+    for text in texts:
         for ident in ids:
             text = re.sub(re.escape(ident), "", text, flags=re.IGNORECASE)
         for raw in _NUMBER.findall(text):
@@ -558,13 +732,23 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
 
 SYSTEM_PROMPT = (
     "You explain retail network decisions for Bedashing Beauty Lounge's portfolio team, who "
-    "will defend them to the COO and a private-equity board. The decision is already made by "
-    "a rule-based model; you explain it, you never change it. Write a pyramid: a one-sentence "
-    "answer (headline), then the supporting arguments you are given, in the order given, each "
-    "a one-sentence claim backed by 2-5 data points copied from the fact sheet. Use only the "
-    "fact sheet. Every number you write must appear in the fact sheet or the thresholds; "
-    "round sensibly. Write like a board memo: short, concrete claims. Never mention revenue, "
-    "rent or profit figures (none exist). Always answer by calling the submit_explanation tool."
+    "will defend them to the COO (accountable for lounge operations and return on capital) and "
+    "a private-equity board. The decision is already made by a rule-based model; you explain "
+    "it, you never change it. Answer what / so what / now what. What: a pyramid, a one-sentence "
+    "answer (headline) that names the call in capitals (e.g. HOLD) before any other call, then "
+    "the supporting arguments you are given, in the order given, each a one-sentence claim "
+    "backed by 2-5 data points copied from the fact sheet. So what: 1-2 sentences on the "
+    "business consequence in the COO's terms: women and customers at stake, the competitive "
+    "position, what is shared with sibling lounges. Now what: 1-2 sentences giving the action "
+    "the call asks for (the action_definition you are given, in your own words but keeping its "
+    "key phrase) and what would change the call, citing the distance-to-line facts "
+    "(line_gap, next_call, flip_driver, flip_value; for areas size_gap, saturation_gap, "
+    "worker_gap, coverage_gap). Our scope ends at the site: never advise on anything inside a "
+    "branch (ratings, reviews to chase, staffing, service quality, operations); rating is "
+    "context, not a lever. Use only the fact sheet. Every number you write must appear in the "
+    "fact sheet or the thresholds; round sensibly. Write like a board memo: short, concrete "
+    "claims. Never mention revenue, rent or profit figures (none exist). Always answer by "
+    "calling the submit_explanation tool."
 )
 # Server-side refusal fallback: a declined request is re-run on Anthropic's recommended
 # substitute model inside the same call.
@@ -612,6 +796,18 @@ EXPLAIN_TOOL = {
                     "additionalProperties": False,
                 },
             },
+            "so_what": {
+                "type": "string",
+                "description": "1-2 sentences: the business consequence for the COO (women and "
+                               "customers at stake, competitive position, overlap with sibling "
+                               "lounges). No money: the model has none.",
+            },
+            "now_what": {
+                "type": "string",
+                "description": "1-2 sentences: the action this call asks for (keep the "
+                               "action_definition's key phrase) and what would change the call, "
+                               "citing the distance-to-line facts. Nothing inside a branch.",
+            },
             "table_caption": {
                 "type": "string",
                 "description": "2-3 sentences explaining, for a non-technical executive, what "
@@ -619,7 +815,7 @@ EXPLAIN_TOOL = {
                                "area or the UAE network.",
             },
         },
-        "required": ["headline", "reasons", "table_caption"],
+        "required": ["headline", "reasons", "so_what", "now_what", "table_caption"],
         "additionalProperties": False,
     },
 }
@@ -629,6 +825,8 @@ def _user_message(kind: str, subject_id: str, action: str, facts: dict, errors: 
     msg = {
         "subject": f"{kind} {subject_id}",
         "decision": action,
+        "action_definition": ACTIONS[action][1] if action in ACTIONS else None,
+        "what_would_change": what_would_change(kind, facts),
         "arguments_in_order": [
             {"topic": t, "label": TOPIC_LABELS[t], "cite_at_least_one_of": TOPICS[kind][t]}
             for t in prioritize(kind, facts, action)],
@@ -652,6 +850,7 @@ def _parse(raw: dict, kind: str, subject_id: str, action: str) -> Explanation:
                         evidence=[Evidence(field=e["field"], label=label(e["field"]),
                                            value=e.get("value")) for e in r["evidence"]])
                  for r in raw["reasons"]],
+        so_what=raw.get("so_what", ""), now_what=raw.get("now_what", ""),
         table_caption=raw["table_caption"], thresholds_note=_thresholds_note(kind),
         source="ai")
 
@@ -772,8 +971,11 @@ def ingest_answers(out_dir, write: bool = True) -> tuple[int, dict[str, list[str
     Returns (grounded, errors by file)."""
     from pathlib import Path
     answers = Path(out_dir) / "answers"
-    cache, ok, failed = load_cache(), 0, {}
-    for kind, sid, action, facts in v3_subjects():
+    subjects = v3_subjects()
+    current = {cache_key(*s) for s in subjects}  # drop entries for numbers that no longer exist
+    cache = {k: v for k, v in load_cache().items() if k in current}
+    ok, failed = 0, {}
+    for kind, sid, action, facts in subjects:
         path = answers / f"{kind}__{sid}.json"
         if not path.exists():
             continue

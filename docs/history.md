@@ -1,4 +1,6 @@
-> **Historical record.** This was the README through v1 (rank-into-thirds rubric, no competitor data, an optional LLM decision backend). The current model is described in the top-level README; this file is kept for the development story, data-source research and decision register.
+> **Historical: describes the v0/v1 model; the current model is in the [README](../README.md).** The `_Fill:_` prompts and `TODO`s below are left as they were and are not open work.
+>
+> This was the README through v1 (rank-into-thirds rubric, no competitor data, an optional LLM decision backend). The current model is described in the top-level README; this file is kept for the development story, data-source research and decision register.
 
 # Bedashing branch right-sizing
 
@@ -36,7 +38,7 @@ The Product page loads with a headline stating a PROTECT/HOLD/SHRINK count acros
 
 The live deployment: **https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/**
 
-> _Fill:_ a recorded walkthrough (2-3 min) would be a stronger escape hatch than the live link alone — TODO, not yet recorded.
+The written walkthrough is in [docs/walkthrough.md](walkthrough.md). No video was recorded.
 
 ---
 

@@ -19,3 +19,7 @@ notebook:
 
 test:
     uv run --extra dev --extra notebook pytest
+
+# Print every lounge and growth-area call at the baseline as CSV (e.g. just labels > labels.csv)
+labels:
+    @uv run python -c "import csv, sys; from src.baseline import run; r = run(); w = csv.writer(sys.stdout); w.writerow(['kind', 'id', 'action', 'confidence', 'composite']); w.writerows(('lounge', d.branch_id, d.action, d.confidence, round(d.composite, 3)) for d in r.decisions); w.writerows(('area', d.area_id, d.action, '', '') for d in r.area_decisions)"

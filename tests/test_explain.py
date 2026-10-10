@@ -1,7 +1,9 @@
+import json
 from types import SimpleNamespace
 
 from src import explain
-from src.models import Evidence, Explanation, Reason
+from src.models import Explanation
+from src.models import Evidence, Reason
 
 # A HOLD lounge. Weighted distance of each score from neutral (0.5): capture 0.5, demand 0.22,
 # rating 0.2 (half weight), cannibalisation 0.17 -> all four are arguments, in that order.
@@ -23,12 +25,16 @@ CLAIMS = {"capture": "Capture is 0% against 69 premium salons.",
           "demand": "About 42,600 women live within a 15-min drive.",
           "rating": "Rated 4.7 from 396 reviews.",
           "cannibalisation": "33% of the catchment is shared."}
+SO_WHAT = "About 42,600 women live in reach, and 33% of them are shared with a sibling."
+NOW_WHAT = "No portfolio action this cycle; revisit at the next lease event."
 
 
-def _exp(topics=TOPICS, claims=None, evidence=None, headline="HOLD: composite 0.41."):
+def _exp(topics=TOPICS, claims=None, evidence=None, headline="HOLD: composite 0.41.",
+         so_what=SO_WHAT, now_what=NOW_WHAT):
     claims, evidence = claims or CLAIMS, evidence or EVIDENCE
     return Explanation(
-        subject_id="b", kind="lounge", action="HOLD", headline=headline,
+        subject_id="b", kind="lounge", action="HOLD", headline=headline, so_what=so_what,
+        now_what=now_what,
         reasons=[Reason(topic=t, claim=claims[t],
                         evidence=[Evidence(field=f, label=f, value=v) for f, v in evidence[t]])
                  for t in topics],
@@ -123,13 +129,39 @@ def test_verify_accepts_numbers_rounded_to_the_precision_written():
                                                     "lounge"))
 
 
+def test_verify_requires_so_what_and_now_what():
+    assert any("so_what" in e for e in explain.verify(_exp(so_what=""), FACTS, "lounge"))
+    assert any("now_what" in e for e in explain.verify(_exp(now_what=" "), FACTS, "lounge"))
+
+
+def test_verify_checks_numbers_in_so_what_and_now_what():
+    errors = explain.verify(_exp(now_what="No portfolio action; 77 women would flip it."), FACTS,
+                            "lounge")
+    assert any("77" in e for e in errors)
+
+
+def test_verify_rejects_a_mismatched_label():
+    assert any("headline must name the call HOLD" in e
+               for e in explain.verify(_exp(headline="SHRINK: composite 0.41."), FACTS, "lounge"))
+    # Another label may follow the call ("0.06 above the SHRINK line"), never lead it.
+    assert explain.verify(_exp(headline="HOLD: composite 0.41, above the SHRINK line."), FACTS,
+                          "lounge") == []
+    assert any("now_what must give the HOLD action" in e
+               for e in explain.verify(_exp(now_what="Investigate a downsize."), FACTS, "lounge"))
+
+
+def test_verify_rejects_in_branch_advice():
+    advice = "No portfolio action. Improving its rating is the lever to watch."
+    assert any("in-branch" in e for e in explain.verify(_exp(now_what=advice), FACTS, "lounge"))
+
+
 def test_verify_ignores_digits_inside_ids():
     facts = {"nearest_lounge_id": "mirdif-35", "nearest_lounge_km": 2.0, "women": 1,
              "skip_under_women": 10}
     exp = Explanation(subject_id="a", kind="area", action="SKIP", headline="",
                       reasons=[], table_caption="Nearest is Mirdif-35.", thresholds_note="",
                       source="ai")
-    assert not [e for e in explain.verify(exp, facts, "area") if "number" in e]
+    assert not [e for e in explain.verify(exp, facts, "area") if "number in" in e]
 
 
 # --- templates ------------------------------------------------------------------------
@@ -154,6 +186,7 @@ def _client(payloads, stop_reason="tool_use"):
 def _payload(demand_claim=CLAIMS["demand"]):
     claims = {**CLAIMS, "demand": demand_claim}
     return {"headline": "HOLD: composite 0.41.", "table_caption": "Scored 0 to 1.",
+            "so_what": SO_WHAT, "now_what": NOW_WHAT,
             "reasons": [{"topic": t, "claim": claims[t],
                          "evidence": [{"field": f, "value": v} for f, v in EVIDENCE[t]]}
                         for t in TOPICS]}
@@ -174,6 +207,29 @@ def test_explain_uses_ai_when_grounded_and_caches_it():
     assert len(cache) == 1
     # Cache hit: no client needed the second time.
     assert explain.explain("lounge", "b", "HOLD", FACTS, cache=cache).source == "ai"
+
+
+def test_explain_through_the_real_sdk_with_a_mocked_transport():
+    """K2: the paid path end to end through anthropic.Anthropic, with no network."""
+    import anthropic
+    import httpx2 as httpx  # the SDK's own HTTP client package
+
+    sent = []
+
+    def handler(request):
+        sent.append(json.loads(request.content))
+        return httpx.Response(200, json={
+            "id": "msg_1", "type": "message", "role": "assistant", "model": "m",
+            "stop_reason": "tool_use", "stop_sequence": None,
+            "usage": {"input_tokens": 1, "output_tokens": 1},
+            "content": [{"type": "tool_use", "id": "t1", "name": "submit_explanation",
+                         "input": _payload()}]})
+
+    client = anthropic.Anthropic(api_key="test", max_retries=0,
+                                 http_client=httpx.Client(transport=httpx.MockTransport(handler)))
+    exp = explain.explain("lounge", "b", "HOLD", FACTS, cache={}, client=client)
+    assert exp.source == "ai" and exp.now_what == NOW_WHAT and len(sent) == 1
+    assert sent[0]["tools"][0]["name"] == "submit_explanation"
 
 
 def test_explain_falls_back_to_template_on_refusal():
@@ -241,3 +297,39 @@ def test_not_scored_lounge_never_goes_to_the_llm():
 
     exp = explain(kind, sid, action, facts, cache={}, client=Boom())
     assert exp.source == "template" and exp.headline.startswith("Not scored")
+
+
+def test_lounge_contributions_sum_and_flip_value_reaches_the_line():
+    from src.model import scorecard
+    for kind, sid, action, f in explain.v3_subjects():
+        if kind != "lounge" or action == "NOT SCORED":
+            continue
+        contribs = sum(f[f"contrib_{s.name}"] for s in scorecard.SIGNALS)
+        assert abs(contribs - f["composite"]) < 1e-3, sid
+        assert f["line_gap"] >= 0 and f["next_call"] != action, sid
+        if f["flip_driver"]:
+            sig = next(s for s in scorecard.SIGNALS if s.name == f["flip_driver"])
+            moved = f["composite"] + sig.weight * (scorecard.score(sig, f["flip_value"])
+                                                   - f[f"score_{sig.name}"]) / 3.5
+            line = {"PROTECT": scorecard.PROTECT_AT, "SHRINK": scorecard.SHRINK_AT}.get(
+                action, {"PROTECT": scorecard.PROTECT_AT}.get(f["next_call"], scorecard.SHRINK_AT))
+            assert abs(moved - line) < 1e-3, sid
+
+
+def test_area_gaps_agree_with_the_tests():
+    for kind, sid, _action, f in explain.v3_subjects():
+        if kind != "area":
+            continue
+        assert (f["size_gap"] >= 0 and f["worker_gap"] > 0) == f["big_enough"], sid
+        if f["unsaturated"] is not None:
+            assert (f["saturation_gap"] > 0) == f["unsaturated"], sid
+
+
+def test_every_committed_cache_entry_is_current_and_grounded():
+    """D3/E5: the committed cache holds exactly today's AI subjects, and each passes verify()."""
+    cache = explain.load_cache()
+    subjects = [s for s in explain.v3_subjects() if explain.needs_ai(s[2])]
+    keys = {explain.cache_key(*s): s for s in subjects}
+    assert set(cache) == set(keys)
+    for key, (kind, sid, _action, facts) in keys.items():
+        assert explain.verify(Explanation(**cache[key]), facts, kind) == [], sid
