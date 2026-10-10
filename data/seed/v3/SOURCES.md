@@ -168,6 +168,50 @@ Script: `scripts/fetch_salons.py`. Notebook: `notebooks/competitors.ipynb`.
   al-falah have only 6-7 premium salons, so their capture is unreliable.
 - Google terms: only `place_id` may be stored indefinitely; refresh the rest within 30 days.
 
+## Affluence (`dubai_rents_by_area.csv`, `cell_affluence.csv`, `cell_built_form.csv`, built 2026-10-10)
+
+Scripts: `scripts/build_affluence.py` (method in its docstring), `scripts/fetch_ghsl.py`. Notebook:
+`notebooks/affluence.ipynb`. Weighting: `src.market.affluence_weight`, `affluence_elasticity` in
+`baseline.yaml`.
+
+**DLD rents (used).** Dubai Land Department open data (dubailand.gov.ae, Open Data, "Rents"): one
+row per Ejari rental contract. Free, no licence terms beyond the site's.
+- **Downloaded by hand on 2026-10-10** to `data/raw/dld/rents-2026-10-10.csv` (gitignored, 75 MB):
+  the page is captcha-gated, so no script fetches it, and it serves **at most 3 months** per
+  download. Window: contracts **registered 2026-07-10 to 2026-10-09**, 311,146 contracts, 189 areas.
+- **Columns used:** `REGISTRATION_DATE`, `AREA_EN`, `USAGE_EN`, `PROP_SUB_TYPE_EN`,
+  `TOTAL_PROPERTIES`, `ANNUAL_AMOUNT`, `ACTUAL_AREA` (for the AED/m² column only).
+- **Filters:** residential usage; sub-type flat, villa or studio (labour camps, staff accommodation,
+  whole buildings and the like are out: not a household's rent); one property per contract; annual
+  amount > 0. Median annual rent per DLD area (`dubai_rents_by_area.csv`).
+- **Areas → cells:** DLD land-registry names matched by normalised name to OSM admin-10 centroids,
+  OSM place points or `cells.csv` names, else 7 hand aliases: 168 of 173 areas, 99.0% of contracts.
+  A cell's rent = the contract-weighted median of the area medians whose point is inside it, else
+  the nearest within 2.5 km; areas under 20 contracts left out. **241 Dubai cells observed**; every
+  other cell `none` (weighted neutral).
+- **Caveats:** housing cost, not income or salon spend; new and renewed registrations over one
+  quarter; area medians hide the spread inside an area.
+
+**GHSL built form (fetched, tested, not used).** EU Joint Research Centre, Global Human Settlement
+Layer R2023A, epoch 2018: GHS-BUILT-C MSZ (10 m morphological settlement zone) and GHS-BUILT-H ANBH
+(100 m average net building height), tiles R6_C23, R6_C24, R7_C23, R7_C24 (Mollweide, EPSG:54009),
+from `https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/` (`GHS_BUILT_C_GLOBE_R2023A/...` and
+`GHS_BUILT_H_GLOBE_R2023A/...`; full paths in the script). Free with acknowledgement of the
+source (European Commission, JRC). Cached in `data/raw/ghsl/` (~160 MB). Per cell: residential,
+villa (≤ 6 m), tower (> 15 m) and green shares, mean height (`cell_built_form.csv`). **Rejected as
+a rent proxy:** fitted to log rent on the 241 observed cells, cross-validated by name group,
+**R² = −0.10** (go needed ≥ 0.3); villa share's Spearman correlation with rent is 0.01, the best
+feature's 0.20. `rent_predicted` stays in `cell_affluence.csv` for the record and is not used.
+
+**Tried and dropped:**
+- **ADREC (Abu Dhabi) rental index:** the public interactive map's ArcGIS service refuses data
+  queries (HTTP 403); the data needs an API subscription. Skipped: Abu Dhabi is neutral.
+- **DLD Transactions (sales):** 95% freehold and 70% off-plan, with no sales at all in the old
+  districts (Barsha 1, Satwa, Karama, Mirdif, Jumeira, Umm Suqeim, Qusais, Warqa, Hor Al Anz): it
+  prices new towers, not where people live.
+- **Sharjah rental index:** announced, not published. **Meta Relative Wealth Index:** no UAE.
+  **Bayut / Property Finder:** scraping is against their terms. **Night lights:** everything is lit.
+
 ## Market model (how the pieces fit; for the app's "how it works")
 
 Notebooks: `market_size.ipynb` (structure, market size), `catchments.ipynb`, `competitors.ipynb`.
@@ -175,9 +219,12 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
 
 1. **Market size:** women aged 15+ per ~2 km cell (WorldPop 2025 adults; female share 5.5% in
    worker housing, `worker_housing_female_share`, the rest rebalanced per emirate).
+   **Addressable women** = those women x an affluence weight, (cell rent / women-weighted median
+   rent) ^ `affluence_elasticity` (0 / **0.5** / 1), clipped to 0.25-4 and rescaled to a mean of 1
+   over the 241 Dubai cells with an observed DLD rent; 1 (neutral) everywhere else.
 2. **Catchment:** the cells within a 15-min drive of the lounge (`travel_time_minutes`: 10/15/20;
    Mapbox typical traffic at `isochrone_depart_at`, weekday 12:00). Catchment market = the sum of
-   its cells' women.
+   its cells' addressable women (raw women shown beside it).
 3. **Competitors:** women's beauty, hair and nail salons inside the catchment; other Bedashing
    lounges count too (so overlapping lounges split demand). **Premium** = Google price expensive or
    very expensive, or, without a price, reviews ≥ the catchment median and rating ≥ 4.3.
@@ -188,17 +235,18 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
    (1 / `search_recall` − 1), with `search_recall` = 0.66 (an estimate).
 5. **Estimated customers** = capture x catchment market (shown, not scored).
 6. **Lounge scorecard** (`src/model/scorecard.py`): four signals, each on a fixed 0-1 scale.
-   Demand = catchment women (0 → 200k). Cannibalisation = share of them another open lounge also
+   Demand = catchment addressable women (0 → 200k). Cannibalisation = share of them another open lounge also
    reaches (100% → 0%). Capture (0 → 15%). Rating gap = lounge rating − substitutes' median rating
    (−0.3 → +0.3★), at **half weight** (weights 1 / 1 / 1 / 0.5). Composite ≥ 0.65 is PROTECT,
    ≤ 0.35 is SHRINK, HOLD between. A thin premium market scores capture 0.5; a missing rating gap
    scores 0.5.
 7. **Low confidence** when the composite is within 0.05 of a line, an input is missing (thin
-   premium market, no rating gap), or the call **flips** in 9 or more of the 27 combinations of the
-   three assumption levels (travel time, coverage, worker-housing share). High confidence needs
+   premium market, no rating gap), or the call **flips** in a third or more (27+) of the 81
+   combinations of the four assumption levels (travel time, coverage, worker-housing share,
+   affluence elasticity). High confidence needs
    0.10 from both lines; medium is in between.
 8. **Growth areas** = populated cells beyond a 15-min drive of every open lounge, grouped by OSM
-   place name into contiguous pieces (`src/model/growth.py`). GROW = at least 20k women 15+ (worker
+   place name into contiguous pieces (`src/model/growth.py`). GROW = at least 20k addressable women 15+ (worker
    housing under 50% of adults) **and** under 50 premium reviews per 1k women in the searched cells.
    WATCH passes one test, or is big but under 50% searched, or big but mostly worker housing (≥ 50% of adults). SKIP passes neither, or has under 5k
    women.
@@ -217,8 +265,10 @@ their capture is a share of a tiny pool and is flagged `thin_premium_market`.
 - No distance decay inside the 15 minutes; travel times are typical midday, not rush hour.
 - Worker housing not mapped as industrial in OSM is missed (DIP, very likely Sonapur): Mirdif-35's
   market is overstated.
-- Home-service salons are invisible; income and nationality mix are ignored; mall lounges draw from
-  further than 15 minutes.
+- Home-service salons are invisible; nationality mix is ignored; mall lounges draw from further
+  than 15 minutes.
+- Affluence is observed only in Dubai (241 cells, rent, one quarter); every other emirate is
+  weighted neutral, so Dubai and the rest are not compared like for like.
 - Nothing here measures revenue, rent or capital: no return-on-capital view.
 
 ## Competitors around growth cells (`growth_salons.csv`, `search_circles.csv`, fetched 2026-10-09)

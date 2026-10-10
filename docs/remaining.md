@@ -185,10 +185,14 @@ not decisions.
   `src/data_v3.py` (one loader), `src/features/lounges.py` (catchments at every travel level,
   lounge features, growth areas).
 - **Calls:** `src/model/scorecard.py` (demand, cannibalisation, capture, rating gap at half weight;
-  PROTECT ≥ 0.65, SHRINK ≤ 0.35; low confidence near a line, on a missing input, or at 9+ flips of
-  27 level combinations) and `src/model/growth.py` (GROW / WATCH / SKIP, unsaturated line 50
+  PROTECT ≥ 0.65, SHRINK ≤ 0.35; low confidence near a line, on a missing input, or at a third or
+  more flips of the level combinations: 27 of 81 since affluence became the fourth level) and `src/model/growth.py` (GROW / WATCH / SKIP, unsaturated line 50
   premium reviews per 1k women). Anchors signed off by the user 2026-10-09
   (`notebooks/decisions.ipynb`); an "estimated customers" signal was considered and rejected.
+- **Affluence (2026-10-10):** observed DLD rents for 241 Dubai cells weight demand (addressable
+  women; elasticity off / 0.5 / 1); the built-form proxy for the rest of the UAE failed (CV R²
+  −0.10), so everything outside those cells is neutral (`notebooks/affluence.ipynb`,
+  `docs/limitations.md` 3). The cached explanations predate it and need regenerating.
 - **What-ifs in memory** (`src/baseline.py`): levels, search recall and closed lounges; no
   processed-JSON pipeline.
 - **Explanations** for the lounge / area / uae kinds. All 65 baseline explanations (23 lounges, 41

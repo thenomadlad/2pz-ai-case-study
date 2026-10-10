@@ -23,6 +23,20 @@ The cells whose centre is within a 15-min drive of a lounge (10 / 20 min as sens
 Mapbox isochrones at typical weekday-midday traffic. Catchment women = the sum of its cells' women.
 _Avoid_: service area, trade area, radius, nearest-branch catchment
 
+**Affluence (rent) index**:
+A cell's median annual household rent (AED): DLD Ejari contracts for one flat, villa or studio,
+registered 2026-07-10 to 2026-10-09, median per DLD area, mapped to cells. Observed for 241 Dubai
+cells only (`rent_observed`, `affluence_source`); every other cell has none and is weighted neutral.
+Housing cost, not income or salon spend.
+_Avoid_: income, wealth, spend, affluence score (unqualified)
+
+**Addressable women**:
+Women 15+ x the cell's affluence weight, `(rent / women-weighted median rent) ^ elasticity`, clipped
+to 0.25-4 and rescaled to a mean of 1 over the observed cells; 1 where no rent is observed.
+Elasticity off 0 / medium 0.5 / strong 1. The demand signal and the growth size test use it;
+catchment women and an area's women stay raw.
+_Avoid_: premium women, target market, weighted demand (unqualified)
+
 **Growth area**:
 A contiguous piece of populated cells beyond a 15-min drive of every open lounge, grouped by OSM
 place name. Labelled GROW / WATCH / SKIP.
@@ -73,8 +87,8 @@ GROW, WATCH or SKIP, assigned to a growth area.
 
 **Low confidence**:
 A lounge call within 0.05 of a threshold, with a missing input (thin premium market, no rating gap),
-or that **flips**: changes in 9 or more of the 27 combinations of the three assumption levels
-(travel time, coverage, worker-housing female share).
+or that **flips**: changes in a third or more (27+) of the 81 combinations of the four assumption
+levels (travel time, coverage, worker-housing female share, affluence elasticity).
 _Avoid_: uncertain, borderline (unqualified)
 
 ### Retired terms (the old Dubai model)
