@@ -210,6 +210,17 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
   - Outside Dubai (after Task 3): no expected direction. PROTECT lounges win on exclusivity and capture, not on cost. Report the ranking, and don't tune anything to it.
 - **Coverage.** Dubai shop rent covers most of the 5 Dubai lounge sites. Outside Dubai, coverage is the band table only.
 
+**Run 5 results:**
+- **Labels: met.** No label changed: lounges 3 / 15 / 5 / 1, areas 5 / 36 / 372. A test pins it.
+- **SC7: partly met.**
+  - 170 located shop areas, median AED 2,040/m²; across the 136 with 10+ contracts, IQR 1,538–2,491. Only 1.2% fall outside 300–10,000. Within the expected range.
+  - **Not met:** prime areas don't sit above 3,500. Downtown (Burj Khalifa) is 2,256, Business Bay 2,071 and Marsa Dubai 2,260, against JLL's prime super-regional mall rent of about 8,900/m².
+  - **Explained:** a DLD area median mixes street shops with mall units and washes out the mall premium, so mall lounges' rent is understated (limitations 15).
+- **BT6: as expected, no direction.** Women per AED 1k (150 m² assumed):
+  - Dubai: al-barsha 898, nad-al-sheba 891, city-walk 822, mirdif-35 790, jumeirah-park 545 (all HOLD).
+  - Abu Dhabi bands: noya-plaza 250 and westyas 235 (both SHRINK), shahama 151 and al-dhafra 127 (both HOLD). The two SHRINKs reach *more* women per dirham than the two HOLDs.
+- **Coverage: met for Dubai** (5 of 5). Elsewhere only the 4 banded Abu Dhabi lounges (mall or plaza), so 9 of 23 scored lounges in total.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
@@ -222,5 +233,7 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 | 3 | 2026-10-10 | The SC4 fix (rating median over the whole premium pool, 20+ reviews) | 3/10 | unchanged from run 2 (explained) | SC4 now partial, explained; others unchanged | **none.** Outcome vs expectation: only al-maqta changed label (SHRINK → HOLD, 0.341 → 0.353), one of the three predicted candidates; ras-al-khaimah moved within PROTECT and al-barsha didn't move. |
 
 | 4 | 2026-10-10 | Growth area = named OSM place; unnamed (emirate-fallback) cells make no area | 3/10 | unchanged (explained) | SC2 reported; SC3 one new explained caveat (habshan) | none |
+
+| 5 | 2026-10-10 | Commercial (shop) rent and women per AED 1k of rent, display only | unchanged | BT6 run, no direction (as expected) | SC7 partly met: area medians wash out mall premiums (explained) | none |
 
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.

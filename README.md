@@ -231,6 +231,7 @@ Field names are as in `src/features/lounges.py`; files are in `data/seed/v3/`.
 | **Q1** protect / hold / shrink a lounge | the composite of the four signals below (`addressable_women`, `shared_share`, `capture`, `rating_gap`) | all of the files below | **Indirect.** Health is a market-position score; there is no revenue or rent (limitations 1) |
 | **Q2** where to open | `addressable_women` and `worker_share` per area (big enough?); `premium_reviews_per_1k` (unsaturated?) | `cells.csv` + `emirates.csv` (WorldPop, OSM worker housing), `cell_affluence.csv` (DLD rents, Dubai only), `catchment_cells.csv` (what's already reached), `salons.csv` + `search_circles.csv` (Places) | **Proxy.** Modelled women stand in for customers; premium reviews stand in for competing supply |
 | **Q3** overlap with ourselves | `shared_share`: share of a lounge's catchment women another lounge also reaches | `catchment_cells.csv`, `lounge_isochrones.geojson` (Mapbox), `cells.csv` | **Fairly direct** for geography; it can't say where customers would go if a lounge closed (limitations 11) |
+| *Cost* (shown, not scored; for the ROIC gate later) | `site_rent_m2`, `women_per_rent_k` (addressable women per AED 1k of annual rent, 150 m² unit assumed) | `cell_shop_rent.csv` (DLD shop contracts, Dubai), `retail_rent_bands.csv` + `lounge_site_class.csv` (JLL, 4 Abu Dhabi lounges) | **Partial.** 9 of 23 scored lounges have a rent. Area medians mix mall and street shops (limitations 15) |
 | **Q4** strength vs local competition | `capture` (lounge reviews ÷ lounge + premium substitutes), `rating_gap` (rating − median of the catchment's premium salons with 20+ reviews) | `branches.csv` (lounge reviews, rating), `salons.csv`, `lounge_candidates_by_level.csv`, `lounge_search_saturation_by_level.csv` (recall correction) | **Proxy of a proxy** for capture: lifetime Google reviews stand in for customers, which stand in for market share. Rating is direct but coarse (0.1★ steps) |
 
 ## The AI layer
@@ -282,6 +283,7 @@ filling each gap would cost: [`docs/data-inventory.md`](docs/data-inventory.md).
 | 2,373 ~2 km cells: adults, worker-housing adults | WorldPop 2025, OSM industrial land, Dubai Statistics Center (calibration) | `cells.csv`, `emirates.csv`, `dubai_community_gender.csv` |
 | Drive-time catchments, 10/15/20 min | Mapbox isochrones | `lounge_isochrones.geojson`, `catchment_cells.csv`, `cell_isochrones.geojson` |
 | Median household rent per DLD area, mapped to 241 Dubai cells (Ejari contracts registered 2026-07-10 to 2026-10-09) | Dubai Land Department open data, downloaded by hand 2026-10-10 (captcha, 3-month cap) | `dubai_rents_by_area.csv`, `cell_affluence.csv` |
+| Shop rent: median AED/m²/yr per DLD area over 13,772 single-unit shop contracts (243 Dubai cells), plus published Abu Dhabi mall-class bands for 4 lounges | DLD open data (same download); JLL UAE Retail Market Dynamics Q2 2025 | `dubai_shop_rents_by_area.csv`, `cell_shop_rent.csv`, `retail_rent_bands.csv`, `lounge_site_class.csv` |
 | Built form per cell (residential, villa, tower, green shares; height), 2018: tested as a UAE-wide rent proxy and rejected (CV R² −0.10) | EU JRC GHSL R2023A | `cell_built_form.csv` |
 | 5,924 salons found (3,833 women's salons kept) around lounges and growth cells | Google Places nearby search | `salons.csv`, `lounge_candidates*.csv`, `growth_salons.csv`, `search_circles.csv` |
 
@@ -328,7 +330,7 @@ Places) came only on 2026-10-08 to 09, and the model was rebuilt on it.
 
 **What we simplified.** Midday drive times with no distance decay; a cell is in a catchment if its
 centre is; lifetime reviews as each salon's draw; capture within the premium end only; Bedashing's
-price level assumed; affluence observed in Dubai only; one lounge format; no money and no capacity;
+price level assumed; affluence observed in Dubai only; one lounge format; no revenue and no capacity, and shop rent shown but not scored (Dubai area medians, Abu Dhabi mall bands, an assumed 150 m² unit);
 growth areas merged by OSM place name, with cells that have no place within 3 km left out of them.
 
 **How we abstracted.** Space: ~2 km cells carrying women 15+, grouped into drive-time catchments

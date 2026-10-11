@@ -28,6 +28,18 @@ A cell's median annual household rent (AED): DLD Ejari contracts for one flat, v
 registered 2026-07-10 to 2026-10-09, median per DLD area, mapped to cells. Observed for 241 Dubai
 cells only (`rent_observed`, `affluence_source`); every other cell has none and is weighted neutral.
 Housing cost, not income or salon spend.
+
+**Shop rent**:
+Commercial rent per m² a year (AED) at a lounge's site (`site_rent_m2`), or over a catchment or area. It is **our cost**, not customer affluence.
+- **Dubai:** DLD Ejari shop contracts.
+- **Elsewhere:** a published band for the site's mall class (JLL; Abu Dhabi malls and plazas only).
+- **Everywhere else:** none.
+
+It is display only, not scored.
+_Avoid_: rent (unqualified); it's ambiguous with the affluence rent.
+
+**Women per rent**:
+Addressable women per AED 1,000 of a site's annual shop rent, for an assumed 150 m² unit (`women_per_rent_k`). The unit size sets the level, never the ranking.
 _Avoid_: income, wealth, spend, affluence score (unqualified)
 
 **Addressable women**:

@@ -11,7 +11,7 @@ Data sources and their own caveats: `data/seed/v3/SOURCES.md`. The notebooks sho
 
 ## 1. No money in the model
 
-There is no revenue, rent, capex, staffing or lease data. The model scores **location and market
+There is no revenue, capex, staffing or lease data. Shop rent is now *shown* for 9 lounges, but it isn't scored (see 15). The model scores **location and market
 position** only. SHRINK means "weak on most market signals, investigate", not "loses money". A
 lounge can be SHRINK and profitable (low rent, loyal clients), and PROTECT and unprofitable.
 
@@ -264,6 +264,23 @@ Google data was fetched 2026-10-08/09. Google's terms allow storing only `place_
 the rest should be refreshed within 30 days. WorldPop is the 2025 release; OSM is a 2026-07-28
 snapshot. DLD rents are contracts registered 2026-07-10 to 2026-10-09, downloaded 2026-10-10;
 GHSL built form is 2018.
+
+## 15. Shop rent is partial, coarse and display only
+
+Each lounge shows a shop rent (AED/m²/yr) and the women it reaches per AED 1,000 of annual rent, but neither moves a call.
+
+- **Coverage is thin where the calls are.**
+  - All 5 Dubai lounges are covered (DLD shop contracts), but they are all HOLD.
+  - In Abu Dhabi only the four mall and plaza lounges have a published band. JLL publishes mall classes only, so the 10 villa and street lounges have none.
+  - Sharjah, Ras Al Khaimah and Fujairah have no citable source.
+  - So 9 of 23 scored lounges have a rent, including 2 of the 5 SHRINKs.
+- **Area medians understate mall rents.** A DLD area median mixes street shops with mall units.
+  - Downtown (the Burj Khalifa area) reads AED 2,256/m², against JLL's prime super-regional mall rent of about AED 8,900/m² (826/sqft).
+  - So a mall lounge's real rent can be several times the figure shown (sanity check SC7).
+- **Bands are class averages,** read off a chart (±100). They aren't the lounge's lease.
+- **The 150 m² unit is assumed.** It sets the level of women per rent, never its ranking.
+- **Why display only:** shop rent tracks footfall and affluence, i.e. revenue, as well as cost. Women per rent alone would mark down exactly the prime sites a premium salon wants. Its place is the ROIC gate, next to a revenue assumption.
+- **Fix:** the actual leases (rent and floor area per lounge), or Abu Dhabi street-retail rents (DARI / ADREC transactions).
 
 ## How this compares with standard retail-location methods
 
