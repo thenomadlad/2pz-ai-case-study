@@ -1,0 +1,750 @@
+cell_id,emirate,listing_rent_m2,n_used,fallback
+r31c198,Ajman,920.3,10,False
+r31c199,Ajman,807.3,10,False
+r31c200,Ajman,807.3,10,False
+r31c201,Ajman,913.3,10,False
+r31c202,Ajman,630.5,10,False
+r32c196,Ajman,740.0,10,False
+r32c197,Ajman,920.3,10,False
+r32c198,Ajman,850.4,10,False
+r32c199,Ajman,634.6,10,False
+r32c200,Ajman,710.0,10,False
+r32c201,Ajman,752.6,10,False
+r32c202,Ajman,565.1,10,False
+r32c203,Ajman,709.8,10,False
+r32c204,Ajman,862.0,10,False
+r32c205,Ajman,919.0,10,False
+r33c196,Ajman,771.6,10,False
+r33c197,Ajman,1303.2,10,False
+r33c198,Ajman,484.1,10,False
+r33c199,Ajman,604.8,10,False
+r33c200,Ajman,752.6,10,False
+r33c201,Ajman,853.4,10,False
+r33c202,Ajman,419.6,10,False
+r33c203,Ajman,795.4,10,False
+r33c204,Ajman,1428.3,10,False
+r33c205,Ajman,1182.9,10,False
+r34c198,Ajman,807.3,10,False
+r34c199,Ajman,880.7,10,False
+r34c200,Ajman,861.1,10,False
+r34c201,Ajman,705.3,10,False
+r34c202,Ajman,476.3,10,False
+r34c203,Ajman,971.3,10,False
+r34c204,Ajman,1118.0,10,False
+r35c200,Ajman,806.8,10,False
+r36c223,Ajman,807.3,0,True
+r36c224,Ajman,807.3,0,True
+r36c225,Ajman,807.3,0,True
+r36c226,Ajman,807.3,0,True
+r37c224,Ajman,807.3,0,True
+r37c225,Ajman,807.3,0,True
+r59c224,Ajman,807.3,0,True
+r60c225,Ajman,807.3,1,True
+r60c226,Ajman,807.3,1,True
+r60c227,Ajman,807.3,1,True
+r61c225,Ajman,807.3,1,True
+r61c226,Ajman,807.3,1,True
+r61c227,Ajman,807.3,1,True
+r61c228,Ajman,807.3,1,True
+r62c226,Ajman,807.3,1,True
+r62c227,Ajman,807.3,1,True
+r62c228,Ajman,807.3,0,True
+r62c229,Ajman,807.3,0,True
+r63c227,Ajman,807.3,0,True
+r22c239,Fujairah,480.6,0,True
+r23c236,Fujairah,480.6,0,True
+r23c237,Fujairah,480.6,0,True
+r23c238,Fujairah,480.6,0,True
+r23c239,Fujairah,480.6,0,True
+r23c240,Fujairah,480.6,0,True
+r23c241,Fujairah,480.6,0,True
+r23c242,Fujairah,480.6,0,True
+r24c224,Fujairah,480.6,0,True
+r24c228,Fujairah,480.6,0,True
+r24c236,Fujairah,480.6,0,True
+r24c237,Fujairah,480.6,0,True
+r24c238,Fujairah,480.6,0,True
+r25c224,Fujairah,480.6,0,True
+r25c228,Fujairah,480.6,0,True
+r25c229,Fujairah,480.6,0,True
+r25c234,Fujairah,480.6,0,True
+r25c235,Fujairah,480.6,0,True
+r25c236,Fujairah,480.6,0,True
+r25c242,Fujairah,480.6,0,True
+r26c224,Fujairah,480.6,0,True
+r26c226,Fujairah,480.6,0,True
+r26c228,Fujairah,480.6,0,True
+r26c236,Fujairah,480.6,0,True
+r26c241,Fujairah,480.6,0,True
+r26c242,Fujairah,480.6,0,True
+r26c243,Fujairah,480.6,0,True
+r27c225,Fujairah,480.6,0,True
+r27c228,Fujairah,480.6,0,True
+r27c229,Fujairah,480.6,0,True
+r27c230,Fujairah,480.6,0,True
+r27c234,Fujairah,480.6,0,True
+r27c241,Fujairah,480.6,0,True
+r27c242,Fujairah,480.6,0,True
+r27c243,Fujairah,480.6,0,True
+r28c226,Fujairah,480.6,0,True
+r28c227,Fujairah,480.6,0,True
+r28c228,Fujairah,480.6,0,True
+r28c242,Fujairah,480.6,0,True
+r28c243,Fujairah,480.6,0,True
+r29c225,Fujairah,480.6,0,True
+r29c233,Fujairah,480.6,0,True
+r29c234,Fujairah,480.6,0,True
+r29c242,Fujairah,480.6,0,True
+r30c234,Fujairah,480.6,0,True
+r31c231,Fujairah,480.6,0,True
+r31c241,Fujairah,480.6,0,True
+r31c242,Fujairah,480.6,0,True
+r32c232,Fujairah,480.6,0,True
+r32c233,Fujairah,480.6,0,True
+r32c234,Fujairah,480.6,0,True
+r32c241,Fujairah,480.6,0,True
+r32c242,Fujairah,480.6,0,True
+r33c228,Fujairah,480.6,0,True
+r33c232,Fujairah,480.6,0,True
+r33c233,Fujairah,480.6,0,True
+r33c241,Fujairah,480.6,0,True
+r34c233,Fujairah,480.6,0,True
+r36c233,Fujairah,480.6,0,True
+r37c231,Fujairah,480.6,0,True
+r37c233,Fujairah,480.6,0,True
+r37c243,Fujairah,480.6,0,True
+r38c225,Fujairah,480.6,0,True
+r38c226,Fujairah,480.6,0,True
+r38c227,Fujairah,480.6,0,True
+r38c228,Fujairah,480.6,0,True
+r38c230,Fujairah,480.6,0,True
+r38c231,Fujairah,480.6,0,True
+r38c232,Fujairah,480.6,0,True
+r38c233,Fujairah,480.6,0,True
+r38c242,Fujairah,480.6,0,True
+r38c243,Fujairah,480.6,0,True
+r39c225,Fujairah,480.6,0,True
+r39c226,Fujairah,480.6,0,True
+r39c227,Fujairah,480.6,0,True
+r39c230,Fujairah,480.6,0,True
+r39c233,Fujairah,480.6,0,True
+r39c234,Fujairah,480.6,0,True
+r39c242,Fujairah,480.6,0,True
+r39c243,Fujairah,480.6,0,True
+r40c226,Fujairah,480.6,0,True
+r40c227,Fujairah,480.6,0,True
+r40c228,Fujairah,480.6,0,True
+r40c229,Fujairah,480.6,0,True
+r40c230,Fujairah,480.6,0,True
+r40c233,Fujairah,480.6,0,True
+r40c242,Fujairah,480.6,0,True
+r40c243,Fujairah,480.6,0,True
+r41c225,Fujairah,480.6,0,True
+r41c228,Fujairah,480.6,0,True
+r41c229,Fujairah,480.6,0,True
+r41c230,Fujairah,480.6,0,True
+r41c242,Fujairah,480.6,0,True
+r41c243,Fujairah,480.6,0,True
+r42c226,Fujairah,480.6,0,True
+r42c235,Fujairah,480.6,0,True
+r42c241,Fujairah,480.6,0,True
+r42c242,Fujairah,480.6,1,True
+r43c236,Fujairah,480.6,0,True
+r43c242,Fujairah,480.6,1,True
+r43c243,Fujairah,480.6,1,True
+r44c236,Fujairah,480.6,0,True
+r44c241,Fujairah,480.6,2,True
+r44c242,Fujairah,480.6,3,True
+r44c243,Fujairah,480.6,3,True
+r45c237,Fujairah,480.6,0,True
+r45c238,Fujairah,480.6,0,True
+r45c241,Fujairah,745.2,6,False
+r45c242,Fujairah,745.2,6,False
+r46c236,Fujairah,480.6,0,True
+r46c237,Fujairah,480.6,0,True
+r46c238,Fujairah,446.0,8,False
+r46c239,Fujairah,461.3,9,False
+r46c240,Fujairah,461.3,10,False
+r46c241,Fujairah,745.2,6,False
+r46c242,Fujairah,745.2,6,False
+r47c238,Fujairah,446.0,8,False
+r47c239,Fujairah,461.3,9,False
+r47c240,Fujairah,461.3,10,False
+r47c241,Fujairah,480.6,10,False
+r47c242,Fujairah,745.2,5,False
+r48c237,Fujairah,446.0,8,False
+r48c238,Fujairah,446.0,8,False
+r48c239,Fujairah,446.0,8,False
+r48c240,Fujairah,461.3,9,False
+r49c238,Fujairah,446.0,8,False
+r49c239,Fujairah,446.0,8,False
+r49c240,Fujairah,446.0,8,False
+r50c240,Fujairah,480.6,0,True
+r51c240,Fujairah,480.6,0,True
+r52c240,Fujairah,480.6,0,True
+r1c229,Ras Al Khaimah,672.8,0,True
+r1c230,Ras Al Khaimah,672.8,0,True
+r1c231,Ras Al Khaimah,672.8,0,True
+r1c232,Ras Al Khaimah,672.8,0,True
+r2c229,Ras Al Khaimah,672.8,0,True
+r2c230,Ras Al Khaimah,672.8,0,True
+r2c231,Ras Al Khaimah,672.8,0,True
+r3c228,Ras Al Khaimah,672.8,0,True
+r3c229,Ras Al Khaimah,672.8,0,True
+r4c227,Ras Al Khaimah,672.8,0,True
+r4c228,Ras Al Khaimah,672.8,0,True
+r4c229,Ras Al Khaimah,672.8,0,True
+r4c230,Ras Al Khaimah,672.8,0,True
+r4c231,Ras Al Khaimah,672.8,0,True
+r5c227,Ras Al Khaimah,672.8,0,True
+r5c228,Ras Al Khaimah,672.8,0,True
+r5c230,Ras Al Khaimah,672.8,0,True
+r6c227,Ras Al Khaimah,672.8,0,True
+r6c228,Ras Al Khaimah,672.8,0,True
+r7c227,Ras Al Khaimah,672.8,1,True
+r7c228,Ras Al Khaimah,672.8,0,True
+r8c227,Ras Al Khaimah,672.8,2,True
+r8c228,Ras Al Khaimah,672.8,1,True
+r9c225,Ras Al Khaimah,672.8,4,True
+r9c226,Ras Al Khaimah,672.8,2,True
+r9c227,Ras Al Khaimah,672.8,2,True
+r9c228,Ras Al Khaimah,672.8,1,True
+r10c225,Ras Al Khaimah,363.2,10,False
+r10c226,Ras Al Khaimah,363.2,10,False
+r11c224,Ras Al Khaimah,363.2,10,False
+r11c225,Ras Al Khaimah,349.8,10,False
+r11c226,Ras Al Khaimah,349.8,10,False
+r12c223,Ras Al Khaimah,586.1,10,False
+r12c224,Ras Al Khaimah,380.5,10,False
+r12c225,Ras Al Khaimah,349.8,10,False
+r12c226,Ras Al Khaimah,349.8,10,False
+r12c227,Ras Al Khaimah,349.8,10,False
+r12c228,Ras Al Khaimah,672.8,4,True
+r13c222,Ras Al Khaimah,717.6,10,False
+r13c223,Ras Al Khaimah,538.2,10,False
+r13c224,Ras Al Khaimah,394.0,10,False
+r13c225,Ras Al Khaimah,349.8,10,False
+r13c226,Ras Al Khaimah,349.8,10,False
+r13c227,Ras Al Khaimah,349.8,9,False
+r14c221,Ras Al Khaimah,841.2,10,False
+r14c222,Ras Al Khaimah,679.5,10,False
+r14c223,Ras Al Khaimah,370.0,10,False
+r14c224,Ras Al Khaimah,394.0,10,False
+r14c225,Ras Al Khaimah,394.0,10,False
+r14c226,Ras Al Khaimah,349.8,5,False
+r14c227,Ras Al Khaimah,672.8,1,True
+r15c220,Ras Al Khaimah,1102.2,10,False
+r15c221,Ras Al Khaimah,1121.0,10,False
+r15c222,Ras Al Khaimah,717.6,10,False
+r15c223,Ras Al Khaimah,522.6,10,False
+r15c224,Ras Al Khaimah,522.6,10,False
+r15c225,Ras Al Khaimah,554.0,10,False
+r15c226,Ras Al Khaimah,672.8,1,True
+r16c219,Ras Al Khaimah,1172.0,10,False
+r16c220,Ras Al Khaimah,1032.8,10,False
+r16c221,Ras Al Khaimah,1032.8,10,False
+r16c222,Ras Al Khaimah,928.6,10,False
+r16c223,Ras Al Khaimah,447.4,10,False
+r16c224,Ras Al Khaimah,540.9,10,False
+r16c225,Ras Al Khaimah,540.9,10,False
+r16c226,Ras Al Khaimah,672.8,0,True
+r17c214,Ras Al Khaimah,1291.7,7,False
+r17c215,Ras Al Khaimah,939.8,10,False
+r17c216,Ras Al Khaimah,1291.1,10,False
+r17c217,Ras Al Khaimah,1291.1,10,False
+r17c218,Ras Al Khaimah,1291.1,10,False
+r17c219,Ras Al Khaimah,1172.0,10,False
+r17c220,Ras Al Khaimah,928.6,8,False
+r17c221,Ras Al Khaimah,852.6,9,False
+r17c222,Ras Al Khaimah,818.7,10,False
+r17c223,Ras Al Khaimah,732.2,10,False
+r17c224,Ras Al Khaimah,540.9,10,False
+r17c225,Ras Al Khaimah,447.4,6,False
+r17c226,Ras Al Khaimah,672.8,2,True
+r18c214,Ras Al Khaimah,910.8,5,False
+r18c215,Ras Al Khaimah,939.8,10,False
+r18c216,Ras Al Khaimah,1291.1,10,False
+r18c217,Ras Al Khaimah,1291.1,10,False
+r18c218,Ras Al Khaimah,1291.1,10,False
+r18c219,Ras Al Khaimah,1133.1,7,False
+r18c220,Ras Al Khaimah,835.7,6,False
+r18c221,Ras Al Khaimah,835.7,6,False
+r18c222,Ras Al Khaimah,818.7,9,False
+r18c223,Ras Al Khaimah,818.7,5,False
+r18c224,Ras Al Khaimah,672.8,3,True
+r18c225,Ras Al Khaimah,672.8,3,True
+r18c226,Ras Al Khaimah,672.8,0,True
+r19c213,Ras Al Khaimah,1550.7,7,False
+r19c214,Ras Al Khaimah,672.8,4,True
+r19c215,Ras Al Khaimah,939.8,10,False
+r19c217,Ras Al Khaimah,1211.8,10,False
+r19c218,Ras Al Khaimah,1133.1,7,False
+r19c219,Ras Al Khaimah,672.8,0,True
+r19c220,Ras Al Khaimah,672.8,0,True
+r19c221,Ras Al Khaimah,672.8,0,True
+r19c222,Ras Al Khaimah,672.8,0,True
+r19c223,Ras Al Khaimah,672.8,0,True
+r19c224,Ras Al Khaimah,672.8,0,True
+r19c225,Ras Al Khaimah,672.8,0,True
+r19c226,Ras Al Khaimah,672.8,0,True
+r20c212,Ras Al Khaimah,1556.6,5,False
+r20c213,Ras Al Khaimah,1553.7,6,False
+r20c214,Ras Al Khaimah,672.8,2,True
+r20c215,Ras Al Khaimah,672.8,2,True
+r20c218,Ras Al Khaimah,672.8,0,True
+r20c219,Ras Al Khaimah,672.8,0,True
+r20c220,Ras Al Khaimah,672.8,0,True
+r20c221,Ras Al Khaimah,672.8,0,True
+r20c222,Ras Al Khaimah,672.8,0,True
+r20c223,Ras Al Khaimah,672.8,0,True
+r20c224,Ras Al Khaimah,672.8,0,True
+r20c225,Ras Al Khaimah,672.8,2,True
+r21c214,Ras Al Khaimah,672.8,1,True
+r21c219,Ras Al Khaimah,672.8,0,True
+r21c220,Ras Al Khaimah,672.8,0,True
+r21c221,Ras Al Khaimah,672.8,0,True
+r21c222,Ras Al Khaimah,672.8,0,True
+r21c223,Ras Al Khaimah,672.8,2,True
+r21c224,Ras Al Khaimah,672.8,2,True
+r21c225,Ras Al Khaimah,672.8,2,True
+r21c226,Ras Al Khaimah,672.8,2,True
+r22c217,Ras Al Khaimah,672.8,0,True
+r22c219,Ras Al Khaimah,672.8,0,True
+r22c220,Ras Al Khaimah,672.8,0,True
+r22c221,Ras Al Khaimah,672.8,0,True
+r22c222,Ras Al Khaimah,672.8,0,True
+r22c223,Ras Al Khaimah,672.8,2,True
+r22c224,Ras Al Khaimah,672.8,2,True
+r22c225,Ras Al Khaimah,672.8,2,True
+r23c221,Ras Al Khaimah,672.8,0,True
+r23c222,Ras Al Khaimah,672.8,0,True
+r23c223,Ras Al Khaimah,672.8,2,True
+r23c224,Ras Al Khaimah,672.8,2,True
+r23c225,Ras Al Khaimah,672.8,2,True
+r24c221,Ras Al Khaimah,672.8,0,True
+r24c222,Ras Al Khaimah,672.8,0,True
+r24c223,Ras Al Khaimah,672.8,0,True
+r25c221,Ras Al Khaimah,672.8,0,True
+r25c222,Ras Al Khaimah,672.8,0,True
+r25c223,Ras Al Khaimah,672.8,0,True
+r26c223,Ras Al Khaimah,672.8,0,True
+r27c220,Ras Al Khaimah,672.8,0,True
+r29c223,Ras Al Khaimah,672.8,0,True
+r29c224,Ras Al Khaimah,672.8,0,True
+r29c228,Ras Al Khaimah,672.8,0,True
+r29c229,Ras Al Khaimah,672.8,0,True
+r30c223,Ras Al Khaimah,672.8,0,True
+r30c224,Ras Al Khaimah,672.8,0,True
+r30c225,Ras Al Khaimah,672.8,0,True
+r30c226,Ras Al Khaimah,672.8,0,True
+r30c227,Ras Al Khaimah,672.8,0,True
+r31c224,Ras Al Khaimah,672.8,0,True
+r31c227,Ras Al Khaimah,672.8,0,True
+r31c228,Ras Al Khaimah,672.8,0,True
+r32c224,Ras Al Khaimah,672.8,0,True
+r32c225,Ras Al Khaimah,672.8,0,True
+r32c226,Ras Al Khaimah,672.8,0,True
+r32c227,Ras Al Khaimah,672.8,0,True
+r33c223,Ras Al Khaimah,672.8,0,True
+r33c224,Ras Al Khaimah,672.8,0,True
+r33c227,Ras Al Khaimah,672.8,0,True
+r34c223,Ras Al Khaimah,672.8,0,True
+r35c219,Ras Al Khaimah,672.8,0,True
+r35c226,Ras Al Khaimah,672.8,0,True
+r37c226,Ras Al Khaimah,672.8,0,True
+r43c225,Ras Al Khaimah,672.8,0,True
+r44c225,Ras Al Khaimah,672.8,0,True
+r44c229,Ras Al Khaimah,672.8,0,True
+r44c230,Ras Al Khaimah,672.8,0,True
+r45c226,Ras Al Khaimah,672.8,0,True
+r45c230,Ras Al Khaimah,672.8,0,True
+r45c231,Ras Al Khaimah,672.8,0,True
+r46c225,Ras Al Khaimah,672.8,0,True
+r47c226,Ras Al Khaimah,672.8,0,True
+r48c225,Ras Al Khaimah,672.8,0,True
+r48c226,Ras Al Khaimah,672.8,0,True
+r49c225,Ras Al Khaimah,672.8,0,True
+r49c226,Ras Al Khaimah,672.8,0,True
+r54c231,Ras Al Khaimah,672.8,0,True
+r55c232,Ras Al Khaimah,672.8,0,True
+r56c232,Ras Al Khaimah,672.8,0,True
+r56c233,Ras Al Khaimah,672.8,0,True
+r57c229,Ras Al Khaimah,672.8,0,True
+r57c230,Ras Al Khaimah,672.8,0,True
+r57c231,Ras Al Khaimah,672.8,0,True
+r57c233,Ras Al Khaimah,672.8,0,True
+r58c229,Ras Al Khaimah,672.8,0,True
+r58c233,Ras Al Khaimah,672.8,0,True
+r59c233,Ras Al Khaimah,672.8,0,True
+r59c235,Ras Al Khaimah,672.8,0,True
+r22c238,Sharjah,1070.8,1,True
+r28c201,Sharjah,897.0,5,False
+r29c199,Sharjah,1070.8,3,True
+r29c200,Sharjah,897.0,5,False
+r29c201,Sharjah,897.0,5,False
+r29c202,Sharjah,897.0,5,False
+r30c198,Sharjah,1070.8,0,True
+r30c199,Sharjah,1070.8,1,True
+r30c200,Sharjah,1070.8,1,True
+r30c201,Sharjah,897.0,5,False
+r30c202,Sharjah,1070.8,3,True
+r30c203,Sharjah,1070.8,1,True
+r30c204,Sharjah,1070.8,0,True
+r31c203,Sharjah,1070.8,0,True
+r31c204,Sharjah,1070.8,0,True
+r31c205,Sharjah,1070.8,0,True
+r32c206,Sharjah,1070.8,0,True
+r32c207,Sharjah,1070.8,0,True
+r32c208,Sharjah,1070.8,0,True
+r32c243,Sharjah,1070.8,0,True
+r33c206,Sharjah,1070.8,0,True
+r33c207,Sharjah,1070.8,0,True
+r33c242,Sharjah,1070.8,0,True
+r33c243,Sharjah,1070.8,0,True
+r34c194,Sharjah,632.9,10,False
+r34c195,Sharjah,699.7,10,False
+r34c196,Sharjah,1069.3,10,False
+r34c197,Sharjah,1072.8,10,False
+r34c205,Sharjah,1148.2,7,False
+r34c206,Sharjah,1070.8,1,True
+r34c207,Sharjah,1070.8,2,True
+r34c208,Sharjah,1070.8,0,True
+r34c209,Sharjah,1070.8,0,True
+r34c214,Sharjah,1070.8,0,True
+r34c224,Sharjah,1070.8,0,True
+r34c240,Sharjah,1070.8,0,True
+r34c241,Sharjah,1070.8,0,True
+r34c242,Sharjah,1070.8,0,True
+r34c243,Sharjah,1070.8,0,True
+r35c193,Sharjah,876.0,10,False
+r35c194,Sharjah,876.0,10,False
+r35c195,Sharjah,1069.3,10,False
+r35c196,Sharjah,1069.3,10,False
+r35c197,Sharjah,1291.7,10,False
+r35c198,Sharjah,1940.8,10,False
+r35c199,Sharjah,2157.2,10,False
+r35c201,Sharjah,1070.8,3,True
+r35c202,Sharjah,1148.2,9,False
+r35c203,Sharjah,1148.2,9,False
+r35c204,Sharjah,1148.2,10,False
+r35c205,Sharjah,1148.2,10,False
+r35c206,Sharjah,996.2,10,False
+r35c207,Sharjah,978.5,9,False
+r35c208,Sharjah,978.5,9,False
+r35c222,Sharjah,552.8,6,False
+r35c223,Sharjah,552.8,6,False
+r35c224,Sharjah,1070.8,0,True
+r35c241,Sharjah,1070.8,0,True
+r35c242,Sharjah,1070.8,0,True
+r35c243,Sharjah,1070.8,0,True
+r36c193,Sharjah,1803.0,10,False
+r36c194,Sharjah,1124.2,10,False
+r36c195,Sharjah,933.8,10,False
+r36c196,Sharjah,785.8,10,False
+r36c197,Sharjah,1291.7,10,False
+r36c198,Sharjah,2157.2,10,False
+r36c199,Sharjah,2157.2,10,False
+r36c200,Sharjah,1131.8,10,False
+r36c201,Sharjah,759.5,8,False
+r36c202,Sharjah,1148.2,9,False
+r36c203,Sharjah,1148.2,9,False
+r36c204,Sharjah,1148.2,10,False
+r36c205,Sharjah,1112.3,10,False
+r36c206,Sharjah,950.5,10,False
+r36c207,Sharjah,996.2,10,False
+r36c208,Sharjah,996.2,10,False
+r36c211,Sharjah,1070.8,0,True
+r36c212,Sharjah,1070.8,0,True
+r36c220,Sharjah,1070.8,0,True
+r36c221,Sharjah,552.8,6,False
+r36c222,Sharjah,552.8,6,False
+r36c241,Sharjah,1070.8,0,True
+r36c242,Sharjah,1070.8,0,True
+r36c243,Sharjah,1070.8,0,True
+r37c193,Sharjah,1118.0,10,False
+r37c194,Sharjah,1409.6,10,False
+r37c195,Sharjah,1067.4,10,False
+r37c196,Sharjah,527.4,10,False
+r37c197,Sharjah,954.7,10,False
+r37c198,Sharjah,1875.5,10,False
+r37c199,Sharjah,1545.2,10,False
+r37c200,Sharjah,1131.8,10,False
+r37c201,Sharjah,443.9,6,False
+r37c202,Sharjah,1148.2,9,False
+r37c203,Sharjah,1148.2,9,False
+r37c204,Sharjah,1112.3,10,False
+r37c205,Sharjah,768.3,10,False
+r37c206,Sharjah,996.2,10,False
+r37c207,Sharjah,996.2,10,False
+r37c208,Sharjah,727.7,10,False
+r37c211,Sharjah,1070.8,0,True
+r37c212,Sharjah,1070.8,0,True
+r37c213,Sharjah,1070.8,0,True
+r37c218,Sharjah,1070.8,0,True
+r37c219,Sharjah,1070.8,2,True
+r37c220,Sharjah,1070.8,2,True
+r37c221,Sharjah,821.8,8,False
+r37c222,Sharjah,821.8,8,False
+r37c223,Sharjah,552.8,6,False
+r37c241,Sharjah,1070.8,0,True
+r37c242,Sharjah,1070.8,0,True
+r38c193,Sharjah,2173.6,10,False
+r38c195,Sharjah,1371.8,10,False
+r38c196,Sharjah,932.2,10,False
+r38c197,Sharjah,726.5,10,False
+r38c198,Sharjah,1231.9,10,False
+r38c199,Sharjah,1131.8,10,False
+r38c200,Sharjah,1209.6,10,False
+r38c201,Sharjah,1209.6,10,False
+r38c202,Sharjah,1488.2,6,False
+r38c203,Sharjah,1722.2,10,False
+r38c204,Sharjah,1722.2,10,False
+r38c205,Sharjah,909.8,10,False
+r38c206,Sharjah,946.0,10,False
+r38c207,Sharjah,527.5,10,False
+r38c208,Sharjah,727.7,10,False
+r38c215,Sharjah,1070.8,0,True
+r38c217,Sharjah,1070.8,0,True
+r38c218,Sharjah,1070.8,2,True
+r38c219,Sharjah,1070.8,2,True
+r38c220,Sharjah,1070.8,2,True
+r38c221,Sharjah,821.8,8,False
+r38c222,Sharjah,821.8,8,False
+r38c223,Sharjah,552.8,6,False
+r38c224,Sharjah,552.8,6,False
+r39c197,Sharjah,960.8,10,False
+r39c198,Sharjah,1049.2,10,False
+r39c199,Sharjah,759.4,10,False
+r39c200,Sharjah,1136.2,10,False
+r39c201,Sharjah,1291.7,10,False
+r39c202,Sharjah,1291.7,10,False
+r39c203,Sharjah,1726.1,10,False
+r39c204,Sharjah,1722.2,10,False
+r39c205,Sharjah,1726.1,10,False
+r39c206,Sharjah,909.8,10,False
+r39c207,Sharjah,946.0,10,False
+r39c209,Sharjah,1442.8,10,False
+r39c211,Sharjah,1070.8,1,True
+r39c212,Sharjah,1070.8,1,True
+r39c214,Sharjah,1070.8,0,True
+r39c217,Sharjah,1070.8,0,True
+r39c218,Sharjah,1070.8,2,True
+r39c219,Sharjah,1070.8,2,True
+r39c220,Sharjah,1070.8,2,True
+r39c221,Sharjah,1070.8,2,True
+r39c222,Sharjah,821.8,8,False
+r39c223,Sharjah,552.8,6,False
+r39c224,Sharjah,1070.8,0,True
+r39c239,Sharjah,1070.8,0,True
+r40c200,Sharjah,1136.2,10,False
+r40c201,Sharjah,1291.7,10,False
+r40c202,Sharjah,1291.7,10,False
+r40c203,Sharjah,1742.4,10,False
+r40c204,Sharjah,1742.4,10,False
+r40c205,Sharjah,1726.1,10,False
+r40c206,Sharjah,1726.1,10,False
+r40c207,Sharjah,978.7,8,False
+r40c211,Sharjah,1070.8,1,True
+r40c214,Sharjah,1070.8,0,True
+r40c216,Sharjah,1070.8,0,True
+r40c217,Sharjah,1070.8,0,True
+r40c218,Sharjah,1070.8,0,True
+r40c219,Sharjah,1070.8,2,True
+r40c220,Sharjah,1070.8,2,True
+r40c221,Sharjah,1070.8,2,True
+r40c222,Sharjah,1070.8,2,True
+r40c223,Sharjah,1070.8,0,True
+r40c224,Sharjah,1070.8,0,True
+r41c203,Sharjah,1742.4,10,False
+r41c204,Sharjah,1742.4,10,False
+r41c205,Sharjah,1745.8,10,False
+r41c206,Sharjah,1070.8,3,True
+r41c207,Sharjah,1070.8,2,True
+r41c209,Sharjah,1070.8,1,True
+r41c215,Sharjah,1070.8,0,True
+r41c216,Sharjah,1070.8,0,True
+r41c218,Sharjah,1070.8,0,True
+r41c219,Sharjah,1070.8,0,True
+r41c220,Sharjah,1070.8,0,True
+r41c221,Sharjah,1070.8,0,True
+r41c222,Sharjah,1070.8,0,True
+r41c224,Sharjah,1070.8,0,True
+r42c205,Sharjah,1070.8,3,True
+r42c206,Sharjah,1070.8,2,True
+r42c207,Sharjah,1070.8,2,True
+r42c208,Sharjah,1070.8,0,True
+r42c211,Sharjah,1070.8,0,True
+r42c212,Sharjah,1070.8,0,True
+r42c215,Sharjah,1070.8,0,True
+r42c219,Sharjah,1070.8,0,True
+r42c220,Sharjah,1070.8,0,True
+r42c221,Sharjah,1070.8,0,True
+r42c222,Sharjah,1070.8,0,True
+r42c224,Sharjah,1070.8,0,True
+r43c207,Sharjah,1070.8,2,True
+r43c208,Sharjah,1070.8,0,True
+r43c211,Sharjah,1070.8,0,True
+r43c212,Sharjah,1070.8,0,True
+r43c215,Sharjah,1070.8,0,True
+r43c216,Sharjah,1070.8,0,True
+r43c220,Sharjah,1070.8,0,True
+r43c221,Sharjah,1070.8,0,True
+r43c222,Sharjah,1070.8,0,True
+r43c223,Sharjah,1070.8,0,True
+r44c208,Sharjah,1070.8,0,True
+r44c209,Sharjah,1070.8,0,True
+r44c215,Sharjah,1070.8,0,True
+r44c216,Sharjah,1070.8,0,True
+r44c218,Sharjah,1070.8,0,True
+r44c219,Sharjah,1070.8,2,True
+r44c220,Sharjah,1070.8,0,True
+r44c221,Sharjah,1070.8,0,True
+r44c222,Sharjah,1070.8,0,True
+r44c223,Sharjah,1070.8,0,True
+r45c207,Sharjah,1070.8,0,True
+r45c208,Sharjah,1070.8,0,True
+r45c218,Sharjah,1070.8,2,True
+r45c219,Sharjah,1070.8,2,True
+r45c222,Sharjah,86.1,10,False
+r45c223,Sharjah,86.1,10,False
+r46c207,Sharjah,1070.8,0,True
+r46c212,Sharjah,1070.8,0,True
+r46c217,Sharjah,1070.8,2,True
+r46c218,Sharjah,1070.8,2,True
+r46c219,Sharjah,1070.8,2,True
+r46c220,Sharjah,1070.8,2,True
+r47c207,Sharjah,1070.8,0,True
+r47c208,Sharjah,1070.8,0,True
+r47c217,Sharjah,1070.8,2,True
+r47c218,Sharjah,1070.8,2,True
+r47c219,Sharjah,1070.8,2,True
+r47c223,Sharjah,86.1,10,False
+r48c208,Sharjah,1070.8,0,True
+r48c217,Sharjah,1070.8,0,True
+r48c218,Sharjah,1070.8,2,True
+r48c222,Sharjah,86.1,10,False
+r48c241,Sharjah,1070.8,0,True
+r48c242,Sharjah,1070.8,0,True
+r49c218,Sharjah,1070.8,0,True
+r49c222,Sharjah,86.1,10,False
+r49c241,Sharjah,1070.8,0,True
+r49c242,Sharjah,1070.8,0,True
+r49c243,Sharjah,1070.8,0,True
+r50c209,Sharjah,1070.8,0,True
+r50c210,Sharjah,1070.8,0,True
+r50c214,Sharjah,1070.8,0,True
+r50c215,Sharjah,1070.8,0,True
+r50c241,Sharjah,1070.8,0,True
+r50c242,Sharjah,1070.8,0,True
+r50c243,Sharjah,1070.8,0,True
+r51c209,Sharjah,1070.8,0,True
+r51c215,Sharjah,1070.8,0,True
+r51c216,Sharjah,1070.8,0,True
+r51c217,Sharjah,1070.8,0,True
+r51c241,Sharjah,1070.8,0,True
+r51c242,Sharjah,1070.8,0,True
+r51c243,Sharjah,1070.8,0,True
+r52c208,Sharjah,1070.8,0,True
+r52c215,Sharjah,1070.8,0,True
+r52c216,Sharjah,1070.8,0,True
+r52c217,Sharjah,1070.8,0,True
+r52c218,Sharjah,1070.8,0,True
+r52c219,Sharjah,1070.8,0,True
+r52c220,Sharjah,1070.8,0,True
+r52c222,Sharjah,1070.8,0,True
+r52c241,Sharjah,1070.8,0,True
+r52c242,Sharjah,1070.8,0,True
+r52c243,Sharjah,1070.8,0,True
+r53c208,Sharjah,1070.8,1,True
+r53c212,Sharjah,1070.8,0,True
+r53c213,Sharjah,1070.8,0,True
+r53c214,Sharjah,1070.8,0,True
+r53c215,Sharjah,1070.8,0,True
+r53c216,Sharjah,1070.8,0,True
+r53c217,Sharjah,1070.8,0,True
+r53c218,Sharjah,1070.8,0,True
+r53c219,Sharjah,1070.8,0,True
+r53c220,Sharjah,1070.8,0,True
+r53c221,Sharjah,1070.8,0,True
+r53c222,Sharjah,1070.8,0,True
+r53c235,Sharjah,1070.8,0,True
+r53c241,Sharjah,1070.8,0,True
+r53c242,Sharjah,1070.8,0,True
+r54c213,Sharjah,1070.8,0,True
+r54c214,Sharjah,1070.8,0,True
+r54c215,Sharjah,1070.8,0,True
+r54c216,Sharjah,1070.8,0,True
+r54c217,Sharjah,1070.8,0,True
+r54c221,Sharjah,1070.8,0,True
+r54c235,Sharjah,1070.8,0,True
+r54c236,Sharjah,1070.8,0,True
+r54c238,Sharjah,1070.8,0,True
+r54c242,Sharjah,1070.8,0,True
+r54c243,Sharjah,1070.8,0,True
+r55c210,Sharjah,1070.8,1,True
+r55c212,Sharjah,1070.8,0,True
+r55c213,Sharjah,1070.8,0,True
+r55c214,Sharjah,1070.8,0,True
+r55c215,Sharjah,1070.8,0,True
+r55c216,Sharjah,1070.8,0,True
+r55c235,Sharjah,1070.8,0,True
+r55c238,Sharjah,1070.8,0,True
+r56c212,Sharjah,1070.8,0,True
+r56c213,Sharjah,1070.8,0,True
+r56c214,Sharjah,1070.8,0,True
+r56c235,Sharjah,1070.8,0,True
+r57c211,Sharjah,1070.8,0,True
+r57c212,Sharjah,1070.8,0,True
+r57c213,Sharjah,1070.8,0,True
+r58c213,Sharjah,1070.8,0,True
+r58c214,Sharjah,1070.8,0,True
+r58c215,Sharjah,1070.8,0,True
+r59c214,Sharjah,1070.8,0,True
+r62c212,Sharjah,1070.8,0,True
+r62c213,Sharjah,1070.8,0,True
+r62c214,Sharjah,1070.8,0,True
+r63c214,Sharjah,1070.8,0,True
+r63c215,Sharjah,1070.8,0,True
+r22c210,Umm Al Quwain,592.2,0,True
+r24c202,Umm Al Quwain,409.6,10,False
+r24c203,Umm Al Quwain,406.3,10,False
+r25c202,Umm Al Quwain,402.7,10,False
+r25c203,Umm Al Quwain,565.1,10,False
+r25c208,Umm Al Quwain,927.5,10,False
+r25c209,Umm Al Quwain,843.9,10,False
+r25c210,Umm Al Quwain,807.2,10,False
+r26c201,Umm Al Quwain,379.9,10,False
+r26c202,Umm Al Quwain,379.9,10,False
+r26c203,Umm Al Quwain,548.8,10,False
+r26c208,Umm Al Quwain,817.0,10,False
+r26c209,Umm Al Quwain,842.7,10,False
+r26c210,Umm Al Quwain,807.2,10,False
+r26c211,Umm Al Quwain,807.2,10,False
+r27c202,Umm Al Quwain,412.6,10,False
+r27c203,Umm Al Quwain,371.9,10,False
+r27c204,Umm Al Quwain,681.3,10,False
+r28c202,Umm Al Quwain,515.5,10,False
+r28c203,Umm Al Quwain,443.6,10,False
+r28c204,Umm Al Quwain,515.5,10,False
+r28c205,Umm Al Quwain,707.3,5,False
+r29c203,Umm Al Quwain,515.5,10,False
+r29c204,Umm Al Quwain,647.3,10,False
+r29c205,Umm Al Quwain,592.2,4,True
+r29c206,Umm Al Quwain,592.2,4,True
+r30c210,Umm Al Quwain,592.2,0,True
+r31c206,Umm Al Quwain,592.2,0,True
+r31c208,Umm Al Quwain,592.2,0,True
+r31c210,Umm Al Quwain,592.2,0,True
+r31c211,Umm Al Quwain,592.2,0,True
+r32c209,Umm Al Quwain,592.2,0,True
+r32c210,Umm Al Quwain,592.2,0,True
+r32c211,Umm Al Quwain,592.2,0,True
+r32c212,Umm Al Quwain,592.2,0,True
+r33c216,Umm Al Quwain,592.2,1,True
+r33c217,Umm Al Quwain,592.2,1,True
+r34c217,Umm Al Quwain,592.2,1,True
+r35c217,Umm Al Quwain,592.2,2,True
+r35c218,Umm Al Quwain,592.2,1,True
+r36c217,Umm Al Quwain,592.2,1,True
+r36c218,Umm Al Quwain,592.2,1,True
+r37c217,Umm Al Quwain,592.2,1,True
