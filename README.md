@@ -172,37 +172,40 @@ Links carry the selection, so any page can be shared directly. Guided tour: [`do
 
 One chain: **where the women are → who can reach them → who they go to → what a site costs → the
 call.** The rules make every call; the AI only narrates it. Constants are named here, not quoted,
-because they are still being tuned: each lives in code with a `*_WHY` string saying why.
+because they are still being tuned: each lives in code with a `*_WHY` string saying why. The first
+diagram is that chain; the second lists every signal behind it, including the ones we dropped.
+
+**The model: from data to calls**
 
 ```mermaid
 flowchart LR
   subgraph SRC["Data"]
-    WP["WorldPop 2025 adults<br/>+ OSM worker housing"]
-    MB["Mapbox isochrones<br/>10 / 15 / 20 min"]
-    GP["Google Places<br/>premium salons + our lounges"]
-    RENT["Shop rents: DLD Ejari (Dubai),<br/>ADREC districts (Abu Dhabi),<br/>PF/Bayut listings (north)"]
+    WP["Population + worker housing"]
+    MB["Drive times"]
+    GP["Salons + our lounges"]
+    RENT["Shop rents"]
     OSM["OSM place names"]
   end
   subgraph DER["Derived per ~2 km cell"]
-    DEM["Demand:<br/>women 15+ per cell"]
-    REACH["Reach: suppliers within 20 min,<br/>isochrone or fitted straight line"]
-    SUP["Suppliers: competitors,<br/>lounges, stand-ins"]
-    IMP["Imputed stand-in competitors<br/>for unsearched cells"]:::assume
-    COST["Site cost = rent x REF_UNIT_M2<br/>+ amortised fit-out"]
-    UNIT["150 m2 unit, fit-out cost"]:::assume
+    DEM["Demand: women 15+"]
+    REACH["Reach: suppliers within 20 min"]
+    SUP["Suppliers"]
+    IMP["Imputed competitors<br/>for unsearched cells"]:::assume
+    COST["Site cost"]
+    UNIT["Unit size, fit-out"]:::assume
   end
-  HUFF{{"Huff split<br/>reviews^ALPHA x rating^RATING_ELASTICITY x DECAY[band]"}}
-  OUT["Outside option:<br/>women who don't buy premium here"]:::assume
+  HUFF{{"Huff split by attractiveness x distance decay"}}
+  OUT["Outside option"]:::assume
   SERVED["Served women per lounge"]
   UNSERVED["Unserved women per cell"]
-  CIX["Cost index: served per AED 1k<br/>vs emirate's median site"]
-  CANN["What-if: close a lounge,<br/>share siblings absorb"]:::whatif
-  OPEN["What-if: open a typical lounge<br/>at each named place: net new women"]:::whatif
-  LRULE["Lounge rule: served + cost composite<br/>vs PROTECT_AT / SHRINK_AT"]
-  GRULE["Growth rule: net new >= NEW_SITE_MIN<br/>and cost index >= 1"]
+  CIX["Cost index vs emirate median"]
+  CANN["What-if: close a lounge"]:::whatif
+  OPEN["What-if: open a typical lounge<br/>at each named place"]:::whatif
+  LRULE["Lounge rule"]
+  GRULE["Growth rule"]
   LCALL(["PROTECT / HOLD / SHRINK"])
   GCALL(["GROW / WATCH / SKIP"])
-  AI["AI explanation<br/>narrates the fact sheet"]
+  AI["AI explanation"]
 
   WP --> DEM
   MB --> REACH
@@ -236,6 +239,57 @@ flowchart LR
 ```
 
 *Dashed orange = an assumption, not data. Dashed blue = a what-if the model simulates.*
+
+**Signals and features**
+
+```mermaid
+flowchart LR
+  subgraph G["Growth universe"]
+    G1["Named OSM places, any reach"]
+    G2["Non-residential name rule"]
+    G3["Worker-housing cap"]
+    G4["New-lounge what-if: net new women"]
+    G5["DROPPED Premium saturation gate (reviews per 1k):<br/>competitors now take their Huff share"]:::dropped
+    G6["DROPPED Unreached cells only / contiguous pieces:<br/>now one area per named place"]:::dropped
+    G7["DROPPED Emirate-fallback-named cells as areas:<br/>no actionable place"]:::dropped
+  end
+  subgraph S["Decision rules / scores"]
+    S1["Served women (scored)"]
+    S2["Cost index (scored)"]
+    S3["Cannibalisation what-if:<br/>display only, no longer scored"]:::demoted
+    S4["DROPPED Capture share:<br/>double-counted competition with Huff"]:::dropped
+    S5["DROPPED Rating gap:<br/>moved into attractiveness"]:::dropped
+    S6["DROPPED Raw catchment overlap (shared_share):<br/>capacity-blind, penalised both lounges"]:::dropped
+    S7["DROPPED 200k anchor on catchment women:<br/>demand is now served women"]:::dropped
+    S8["DROPPED Estimated customers:<br/>computed, never scored; superseded by served women"]:::dropped
+  end
+  subgraph K["Cost"]
+    K1["Shop rent: DLD (Dubai), ADREC (Abu Dhabi),<br/>listings (north), emirate-median fallback"]
+    K2["Site assumptions: 150 m² unit, fit-out"]
+    K3["DROPPED JLL mall-class rent bands:<br/>4 lounges, read off a chart, superseded by ADREC"]:::dropped
+  end
+  subgraph C["Competition / attractiveness"]
+    C1["Premium competitor salons (Google Places)"]
+    C2["Reviews x (rating/4.6)^k = Huff attractiveness"]
+    C3["Imputed competitors for unsearched cells"]
+    C4["Outside option"]
+  end
+  subgraph R["Reach"]
+    R1["Drive-time bands 10/15/20 min:<br/>Mapbox cell isochrones, straight-line fallback"]
+  end
+  subgraph D["Demand"]
+    D1["Women 15+ per cell (WorldPop 2025)"]
+    D2["Worker-housing correction (OSM industrial)"]
+    D3["DROPPED Affluence weighting from DLD home rents:<br/>changed no call, Dubai-only"]:::dropped
+    D4["DROPPED GHSL built-form rent proxy:<br/>CV R² −0.10"]:::dropped
+  end
+
+  classDef dropped stroke:#d32f2f,stroke-width:3px,color:#d32f2f
+  classDef demoted stroke-dasharray: 5 5,stroke:#757575,stroke-width:2px,color:#757575
+```
+
+*Plain = in use. Red = dropped, with the reason. Grey dashed = demoted: still computed and shown,
+no longer scored.*
 
 1. **Demand.** Women 15+ per ~2 km cell: WorldPop 2025 adults, rebalanced so OSM worker housing
    counts few women. Affluence weighting is **off**: it changed no call and was Dubai-only
