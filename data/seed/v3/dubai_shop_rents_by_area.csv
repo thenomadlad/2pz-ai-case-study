@@ -1,85 +1,85 @@
 area,contracts,median_rent_m2,lat,lng,matched_to,match
 AL Athbah,1,869.5652173913044,25.175974,55.4784778,Al Athbah,osm_place
 AL MIZHAR FOURTH,9,3978.375,25.2639056,55.4477997,Al Mizhar 4,osm_place
-AL QUSAIS,84,2161.5882523895634,25.27917,55.36833,Al Qusais,cells_named
+AL QUSAIS,85,2152.7598381124603,25.27917,55.36833,Al Qusais,cells_named
 AL TWAR FIFTH,70,2099.3589743589746,25.2694033,55.3876996,Al Twar 5,osm_place
-Abu Hail,38,2025.5849645131948,25.2860287,55.328865,Abu Hail,osm_place
+Abu Hail,39,2018.1634712411706,25.2860287,55.328865,Abu Hail,osm_place
 Al Aweer First,27,1253.7917184265011,25.1992772,55.5716401,Al Awir 1,osm_place
-Al Aweer Second,12,1712.3287671232877,25.1652565,55.583541,Al Awir 2,osm_place
-Al Bada,214,2500.0,25.2246261,55.2684831,Al Bada'a,osm_place
+Al Aweer Second,13,1712.3287671232877,25.1652565,55.583541,Al Awir 2,osm_place
+Al Bada,217,2492.917847025496,25.2246261,55.2684831,Al Bada'a,osm_place
 Al Baraha,25,2206.405693950178,25.2809884,55.3195255,Al Baraha,osm_place
-Al Barsha First,237,2566.650107633714,25.109134,55.1955266,Al Barsha 1,osm_place
+Al Barsha First,254,2650.623076638632,25.109134,55.1955266,Al Barsha 1,osm_place
 Al Barsha Second,41,2218.9644997981177,25.1023751,55.2160653,Al Barsha 2,osm_place
 Al Barsha South Fifth,10,2118.2103891727297,25.0463175,55.1898328,Al Barsha South 5,osm_place
-Al Barsha South Fourth,173,2178.9024390243903,25.0571859,55.2083161,Al Barsha South 4,osm_place
+Al Barsha South Fourth,174,2176.9933247753534,25.0571859,55.2083161,Al Barsha South 4,osm_place
 Al Barsha Third,27,2487.6923076923076,25.092612,55.1967007,Al Barsha 3,osm_place
 Al Barshaa South First,3,3886.7021276595747,25.0901531,55.2352191,Al Barsha South 1,osm_place
-Al Barshaa South Second,13,1292.9513018847367,25.0697267,55.2261173,Al Barsha South 2,osm_place
+Al Barshaa South Second,14,1292.9513018847367,25.0697267,55.2261173,Al Barsha South 2,osm_place
 Al Barshaa South Third,118,1603.836143506392,25.0610805,55.2417407,Al Barsha South 3,osm_place
-Al Buteen,329,4027.926960257787,25.2693607,55.2998713,Al Buteen,osm_place
-Al Dhagaya,284,2902.5771188652975,,,,unmatched
+Al Buteen,341,4135.851183765502,25.2693607,55.2998713,Al Buteen,osm_place
+Al Dhagaya,300,2932.792422606818,,,,unmatched
 Al Eyas,1,785.7142857142857,,,,unmatched
-Al Garhoud,45,1286.7591240875913,25.2406551,55.3519978,Al Garhoud,osm_place
+Al Garhoud,48,1236.9156881703168,25.2406551,55.3519978,Al Garhoud,osm_place
 Al Goze First,79,1626.358695652174,25.1681196,55.2543081,Al Quoz 1,osm_place
 Al Goze Fourth,19,2216.2154918252477,25.1508742,55.2540843,Al Quoz 4,osm_place
-Al Goze Industrial First,25,2848.101265822785,25.1437141,55.232981,Al Quoz Industrial 1,osm_place
+Al Goze Industrial First,26,2857.383966244726,25.1437141,55.232981,Al Quoz Industrial 1,osm_place
 Al Goze Industrial Fourth,13,3766.655278442091,25.1160888,55.2331822,Al Quoz Industrial 4,osm_place
-Al Goze Industrial Second,21,3303.954166666667,25.1339771,55.247928,Al Quoz Industrial 2,osm_place
+Al Goze Industrial Second,22,3303.954166666667,25.1339771,55.247928,Al Quoz Industrial 2,osm_place
 Al Goze Industrial Third,17,2380.9523809523807,25.125063,55.2183603,Al Quoz Industrial 3,osm_place
-Al Goze Third,121,400.0,25.1587525,55.2428174,Al Quoz 3,osm_place
+Al Goze Third,122,400.0,25.1587525,55.2428174,Al Quoz 3,osm_place
 Al Hamriya,37,1839.1350917124114,25.2599297,55.3031938,Al Hamriya,osm_place
 Al Hamriya Port,4,3215.170278637771,25.2995316,55.334959,Al Hamriya Port,osm_place
 Al Hebiah Fifth,3,3902.439024390244,25.0062843,55.2425394,Al Hebiah 5,osm_place
 Al Hebiah First,50,2651.2359465240643,25.0486208,55.2403706,Al Hebiah 1,osm_place
-Al Hebiah Fourth,6,2391.536396103896,25.0334367,55.2205444,Al Hebiah 4,osm_place
+Al Hebiah Fourth,7,2363.6363636363635,25.0334367,55.2205444,Al Hebiah 4,osm_place
 Al Hebiah Second,9,2368.605724838412,25.0357683,55.2458412,Al Hebiah 2,osm_place
 Al Hebiah Sixth,1,4238.690812166824,25.0202874,55.2697761,Al Hebiah 6,osm_place
 Al Hebiah Third,11,2387.9363767816567,25.0171721,55.2553972,Al Hebiah 3,osm_place
 Al Hudaiba,38,2240.2963535197177,25.2428328,55.279212,Al Hudaiba,osm_place
-Al Jadaf,89,1639.344262295082,25.2142622,55.3245395,Al Jadaf,osm_place
+Al Jadaf,90,1639.344262295082,25.2142622,55.3245395,Al Jadaf,osm_place
 Al Jafliya,42,1490.7440356112663,25.23917,55.28833,Al Jafiliya,cells_named
-Al Karama,523,1776.1989342806394,25.2482136,55.3050609,Karama,osm_place
-Al Khabeesi,13,923.5376532399299,25.2680638,55.3359972,Al Khabisi,osm_place
+Al Karama,525,1776.0658505698607,25.2482136,55.3050609,Karama,osm_place
+Al Khabeesi,15,859.1408591408592,25.2680638,55.3359972,Al Khabisi,osm_place
 Al Khairan First,32,1588.3529758949749,25.2005,55.352,Dubai Creek Harbour,alias
 Al Khawaneej First,24,3501.8310904071773,25.2407108,55.4890201,Al Khawaneej 1,osm_place
 Al Khawaneej Second,61,2721.8287969515513,25.2269753,55.5215613,Al Khawaneej 2,osm_place
-Al Kheeran,63,2726.124790419162,25.2152399,55.3639198,Al Kheeran,osm_place
+Al Kheeran,70,2745.954287101473,25.2152399,55.3639198,Al Kheeran,osm_place
 Al Kifaf,1,821.8404778265236,25.2345845,55.2971134,Al Kifaf,osm_place
-Al Lusaily,86,1201.2138857070129,24.9185792,55.444718,Al Lesaily,osm_place
+Al Lusaily,88,1194.770586737941,24.9185792,55.444718,Al Lesaily,osm_place
 Al Maha,16,928.75,,,,unmatched
-Al Mamzer,38,1115.217391304348,25.3005332,55.3596332,Al Mamzar,osm_place
+Al Mamzer,39,1100.0,25.3005332,55.3596332,Al Mamzar,osm_place
 Al Manara,24,3576.5521284613096,25.1448185,55.2144527,Al Manara,osm_place
-Al Mararr,656,2333.3333333333335,25.2765621,55.3088749,Al Murar,osm_place
+Al Mararr,659,2333.3333333333335,25.2765621,55.3088749,Al Murar,osm_place
 Al Marmoom,6,2044.1176470588234,24.9756162,55.4517933,Al Marmoom,osm_place
 Al Merkadh,139,3333.3333333333335,25.169213,55.2924727,MBR- Al Merkad,osm_place
 Al Mizhar First,64,2393.628479103045,25.2453456,55.4401969,Al Mizhar 1,osm_place
 Al Mizhar Second,6,1636.8663594470047,25.2431351,55.4607968,Al Mizhar 2,osm_place
 Al Mizhar Third,10,2884.9099099099103,25.2635292,55.4648198,Al Mizhar 3,osm_place
-Al Murqabat,137,1603.2982134677052,25.2653508,55.3226201,Al Muraqqabat,osm_place
+Al Murqabat,138,1597.3823092841224,25.2653508,55.3226201,Al Muraqqabat,osm_place
 Al Muteena,63,1546.3917525773195,25.2741549,55.3225565,Al Muteena,osm_place
 Al Nahda First,76,1329.732481406204,25.290288,55.3641471,Al Nahda 1,osm_place
 Al Nahda Second,43,2165.8034321372857,25.2913041,55.3744578,Al Nahda 2,osm_place
 Al Qusais Industrial Fifth,24,1250.2535927584922,25.2870378,55.4136842,Al Qusais Industrial 5,osm_place
 Al Qusais Industrial First,43,2108.108108108108,25.285531,55.3860582,Al Qusais Industrial 1,osm_place
 Al Qusais Industrial Fourth,34,1245.320417629035,25.2923312,55.3993786,Al Qusais Industrial 4,osm_place
-Al Qusais Industrial Second,27,1641.3236032642812,25.281887,55.3930667,Al Qusais Industrial 2,osm_place
+Al Qusais Industrial Second,34,1472.2929744690239,25.281887,55.3930667,Al Qusais Industrial 2,osm_place
 Al Qusais Industrial Third,8,1388.3664858916625,25.2973305,55.3902334,Al Qusais Industrial 3,osm_place
 Al Raffa,87,1878.105332891686,25.2542057,55.2879667,Al Raffa,osm_place
-Al Ras,284,3711.2134973860693,25.2691524,55.2965792,Al Ras,osm_place
+Al Ras,296,3751.876876876877,25.2691524,55.2965792,Al Ras,osm_place
 Al Rashidiya,106,1605.994606797943,25.3969159,55.4472268,Al Rashidiya,osm_place
-Al Rega,160,2019.3449415478717,25.2672384,55.312186,Al Rigga,osm_place
+Al Rega,172,1875.7853373237988,25.2672384,55.312186,Al Rigga,osm_place
 Al Rowaiyah First,3,1429.8480786416442,25.1257628,55.4331735,Al Rowaiyah 1,osm_place
 Al Rowaiyah Third,4,1713.5862913096694,25.1142777,55.4778109,Al Rowaiyah 3,osm_place
-Al Sabkha,93,3363.6363636363635,25.2700269,55.302361,Al Sabkha,osm_place
+Al Sabkha,95,3449.074074074074,25.2700269,55.302361,Al Sabkha,osm_place
 Al Saffa First,20,1479.1994823123382,25.1774533,55.2389124,Al Safa 1,osm_place
 Al Saffa Second,11,3197.2803347280333,25.1597638,55.2263876,Al Safa 2,osm_place
 Al Safouh First,11,5773.64167835185,25.1195886,55.1824832,Al Sufouh 1,osm_place
-Al Safouh Second,31,2046.094452086199,25.0983566,55.1611169,Al Sufouh 2,osm_place
-Al Satwa,152,2669.850714272682,25.2208602,55.2737617,Al Satwa,osm_place
-Al Suq Al Kabeer,917,1714.2857142857142,,,,unmatched
+Al Safouh Second,34,2126.620857045637,25.0983566,55.1611169,Al Sufouh 2,osm_place
+Al Satwa,154,2672.3012965574753,25.2208602,55.2737617,Al Satwa,osm_place
+Al Suq Al Kabeer,923,1704.0358744394618,,,,unmatched
 Al Thanayah Fourth,18,2201.07994482715,25.0643727,55.1751883,Al Thanyah 4,osm_place
-Al Thanyah Fifth,148,1736.031066097768,25.0636542,55.1411116,Al Thanyah 5,osm_place
-Al Thanyah First,48,2389.094213758722,25.0981417,55.1765049,Al Thanyah 1,osm_place
+Al Thanyah Fifth,150,1730.4167807853864,25.0636542,55.1411116,Al Thanyah 5,osm_place
+Al Thanyah First,49,2353.7677053824364,25.0981417,55.1765049,Al Thanyah 1,osm_place
 Al Thanyah Third,20,2783.564863185406,25.0859166,55.164938,Al Thanyah 3,osm_place
 Al Ttay,12,871.5384220551131,25.2321563,55.5563174,Al Ttay,osm_place
 Al Twar First,31,1486.784140969163,25.271464,55.3627031,Al Twar 1,osm_place
@@ -90,70 +90,70 @@ Al Waheda,6,1508.793672695018,25.2915387,55.3373622,Al Waheda,osm_place
 Al Warqa First,101,2912.4193883919284,25.1890201,55.4308318,Al Warqa,osm_base_name
 Al Warqa Fourth,14,206.263233708272,25.1890201,55.4308318,Al Warqa,osm_base_name
 Al Warqa Second,21,3777.3856209150326,25.1890201,55.4308318,Al Warqa,osm_base_name
-Al Warqa Third,14,3229.166666666667,25.1890201,55.4308318,Al Warqa,osm_base_name
-Al Warsan First,987,1014.9253731343283,25.1654854,55.4083966,Warsan 1,osm_place
+Al Warqa Third,15,3125.0,25.1890201,55.4308318,Al Warqa,osm_base_name
+Al Warsan First,998,1011.0633267944269,25.1654854,55.4083966,Warsan 1,osm_place
 Al Warsan Second,1,4854.368932038835,25.1604359,55.4391413,Warsan 2,osm_place
-Al Warsan Third,46,92.93680297397769,25.1514084,55.4657417,Warsan 3,osm_place
+Al Warsan Third,47,92.93680297397769,25.1514084,55.4657417,Warsan 3,osm_place
 Al Wasl,75,2108.064516129032,25.1959326,55.2557371,Al Wasl,osm_place
 Al Yelayiss 2,13,1345.4979699068547,24.9971296,55.2901391,Al Yalayis 2,osm_place
 Al Yelayiss 3,1,1968.5039370078741,24.9734203,55.3457292,Al Yalayis 3,osm_place
 Al Yufrah 1,1,448.71794871794873,25.0024131,55.432676,Al Yufrah 1,osm_place
 Al-Cornich,30,2384.3512458162886,25.2775726,55.3031922,Al Corniche,osm_place
-Burj Khalifa,147,2255.68450924748,25.196,55.278,Downtown Dubai,alias
-Business Bay,221,2070.5882352941176,25.1794564,55.2683707,Business Bay,osm_place
+Burj Khalifa,191,4560.862037497926,25.196,55.278,Downtown Dubai,alias
+Business Bay,235,2048.9977728285076,25.1794564,55.2683707,Business Bay,osm_place
 Cornich Deira,41,5083.764163979733,25.2836607,55.3130282,Corniche Deira,osm_place
-Dubai International Airport,3,5739.586749754018,25.252503333333333,55.36832999999999,Dubai International Airport,cells_named
-Dubai Investment Park First,95,1457.1521217433042,24.9877706,55.1651608,Dubai Investment Park 1,osm_place
+Dubai International Airport,5,10520.286396181384,25.252503333333333,55.36832999999999,Dubai International Airport,cells_named
+Dubai Investment Park First,100,1435.7323783797806,24.9877706,55.1651608,Dubai Investment Park 1,osm_place
 Dubai Investment Park Second,60,1096.2648660778034,24.9739345,55.210833,Dubai Investment Park 2,osm_place
-Eyal Nasser,354,3004.890895410083,25.2745019,55.3041125,Ayal Nasir,osm_place
+Eyal Nasser,361,3000.0,25.2745019,55.3041125,Ayal Nasir,osm_place
 Ghadeer Al tair,4,3288.5375494071145,25.1509135,55.2720063,Ghadeer Al Tair,osm_place
 Grayteesah,6,1582.0117332816053,24.8553502,55.5149662,Grayteesah,osm_place
-Hadaeq Sheikh Mohammed Bin Rashid,31,3858.112854132522,25.0997729,55.2691819,Hadaeq Sheikh Mohammed Bin Rashid,osm_place
-Hatta,77,529.4117647058823,24.8,56.128,Hatta,alias
-Hessyan First,1,762.7183281214246,24.9565719,55.0213917,Hessyan 1,osm_place
-Hor Al Anz,298,2166.6666666666665,25.2782987,55.3395005,Hor Al Anz,osm_place
-Hor Al Anz East,197,1506.9967707212054,25.2822545,55.348484,Hor Al Anz East,osm_place
-Jabal Ali First,117,1976.9357495881384,25.0202567,55.136831,Jabal Ali 1,osm_place
+Hadaeq Sheikh Mohammed Bin Rashid,32,3857.9314890121886,25.0997729,55.2691819,Hadaeq Sheikh Mohammed Bin Rashid,osm_place
+Hatta,81,500.0,24.8,56.128,Hatta,alias
+Hessyan First,2,400.42712226374795,24.9565719,55.0213917,Hessyan 1,osm_place
+Hor Al Anz,300,2157.677983096977,25.2782987,55.3395005,Hor Al Anz,osm_place
+Hor Al Anz East,198,1506.083019457501,25.2822545,55.348484,Hor Al Anz East,osm_place
+Jabal Ali First,118,1985.1080929939203,25.0202567,55.136831,Jabal Ali 1,osm_place
 Jabal Ali Industrial First,87,2812.9395218002815,24.9985748,55.1215037,Jabal Ali Industrial 1,osm_place
 Jabal Ali Industrial Second,7,1505.3763440860216,24.9546887,55.1050758,Jabal Ali Industrial 2,osm_place
 Jumeirah First,106,2058.77342580208,25.219343,55.2578183,Jumeirah 1,osm_place
 Jumeirah Second,11,2076.6161459944324,25.2008309,55.2452019,Jumeirah 2,osm_place
 Jumeirah Third,36,3031.142857142857,25.1806855,55.2282258,Jumeirah 3,osm_place
 Lehbab First,15,760.8695652173914,25.0445193,55.6072767,Lehbab 1,osm_place
-Lehbab Second,25,978.2608695652174,25.0294035,55.5547987,Lehbab 2,osm_place
+Lehbab Second,26,957.8804347826087,25.0294035,55.5547987,Lehbab 2,osm_place
 Madinat Al Mataar,23,1475.5917159763314,24.9046204,55.1509855,Madinat Al Mataar,osm_place
 Madinat Dubai Almelaheyah,29,1363.8814016172505,25.264,55.277,Mina Rashid,alias
 Madinat Hind 1,59,2279.880079946702,25.065222,55.3854879,Madinat Hind 1,osm_place
 Madinat Hind 3,2,1554.6791760800786,25.0325537,55.4220384,Madinat Hind 3,osm_place
 Madinat Hind 4,17,2238.2665439638586,25.0077718,55.3681454,Madinat Hind 4,osm_place
-Mankhool,113,1945.5311938151747,25.2495092,55.2954769,Al Mankhool,osm_place
-Margham,29,520.0,24.899518,55.6254536,Margham,osm_place
-Marsa Dubai,219,2260.3983965464076,25.0805,55.1403,Dubai Marina,alias
+Mankhool,114,1942.8394819870537,25.2495092,55.2954769,Al Mankhool,osm_place
+Margham,32,416.66666666666663,24.899518,55.6254536,Margham,osm_place
+Marsa Dubai,223,2260.3983965464076,25.0805,55.1403,Dubai Marina,alias
 Me'Aisem First,67,1532.195799876467,25.0160001,55.1859115,Me'aisem 1,osm_place
-Mena Jabal Ali,7,2967.391304347826,,,,unmatched
-Mirdif,154,2239.1917808219177,25.2218433,55.4231473,Mirdif,osm_place
+Mena Jabal Ali,8,2967.391304347826,,,,unmatched
+Mirdif,159,2246.0,25.2218433,55.4231473,Mirdif,osm_place
 Muhaisanah First,12,1957.4808406982233,25.2445037,55.4181049,Muhaisanah 1,osm_place
 Muhaisanah Fourth,54,1655.2397801173215,25.2790475,55.4079106,Muhaisanah 4,osm_place
 Muhaisanah Second,65,2188.5521885521885,25.264066,55.4223532,Muhaisanah 2,osm_place
 Muhaisanah Third,5,1883.5616438356162,25.2710559,55.4048764,Muhaisanah 3,osm_place
 Muragab,1,1250.0,25.2653508,55.3226201,Al Muraqqabat,osm_place
-Nad Al Hamar,71,1716.901945822205,25.1988837,55.3857707,Nadd Al Hamar,osm_place
+Nad Al Hamar,72,1695.7965873134472,25.1988837,55.3857707,Nadd Al Hamar,osm_place
 Nad Al Shiba First,45,2691.5682504806373,25.1421242,55.3194751,Nadd Al Sheba 1,osm_place
 Nad Al Shiba Fourth,1,3157.0,25.1358653,55.3633923,Nadd Al Sheba 4,osm_place
-Nad Al Shiba Second,17,1539.408866995074,25.1565887,55.3500747,Nadd Al Sheba 2,osm_place
+Nad Al Shiba Second,18,1663.8052118670576,25.1565887,55.3500747,Nadd Al Sheba 2,osm_place
 Nad Al Shiba Third,28,1784.1662587031628,25.151424,55.3753271,Nadd Al Sheba 3,osm_place
 Nadd Hessa,131,1553.484243231247,25.1219309,55.3850506,Nadd Hessa,osm_place
-Naif,1237,2199.2669110296565,25.2717632,55.3103167,Naif,osm_place
+Naif,1252,2202.3739661354725,25.2717632,55.3103167,Naif,osm_place
 OUD AL MUTEENA,3,3832.807570977918,25.274823,55.4453362,Oud Al Muteena,osm_place
 Oud Metha,89,1564.7990945104696,25.2361516,55.3115605,Oud Metha,osm_place
 Palm Deira,3,2314.814814814815,25.29917,55.29833,Palm Deira,cells_named
 Palm Jumeirah,63,2582.7061540551554,25.1124,55.139,Palm Jumeirah,alias
-Port Saeed,102,1678.3598677626342,25.2533081,55.3318918,Port Saeed,osm_place
+Port Saeed,105,1682.18085106383,25.2533081,55.3318918,Port Saeed,osm_place
 Ras Al Khor Industrial First,46,2156.8627450980393,25.1768013,55.3392998,Ras Al Khor Industrial 1,osm_place
 Ras Al Khor Industrial Second,25,1470.5882352941176,,,,unmatched
-Ras Al Khor Industrial Third,104,1356.5049128560297,25.1737427,55.3813574,Ras Al Khor Industrial 3,osm_place
+Ras Al Khor Industrial Third,109,1345.5328310010766,25.1737427,55.3813574,Ras Al Khor Industrial 3,osm_place
 Rega Al Buteen,17,1118.2346801848817,,,,unmatched
-Saih Shuaib 1,11,2036.0091279069766,24.8947657,55.0013979,Saih Shuaib 1,osm_place
+Saih Shuaib 1,16,1668.4216954704452,24.8947657,55.0013979,Saih Shuaib 1,osm_place
 Saih Shuaib 2,14,2341.447831642632,24.8675976,55.0545162,Saih Shuaib 2,osm_place
 Saih Shuaib 3,11,500.0,24.8461171,55.0779296,Saih Shuaib 3,osm_place
 Saih Shuaib 4,9,1506.0096153846152,24.8237065,55.0961057,Saih Shuaib 4,osm_place
@@ -166,13 +166,13 @@ Um Hurair First,9,1514.6506386175809,25.2559475,55.3086012,Umm Hurair 1,osm_plac
 Um Hurair Second,62,1015.2884579700767,25.2374067,55.3213344,Umm Hurair 2,osm_place
 Um Ramool,19,1983.663943990665,25.2311645,55.3685667,Umm Ramool,osm_place
 Um Suqaim First,15,3048.780487804878,25.1647586,55.2187285,Umm Suqeim 1,osm_place
-Um Suqaim Second,44,2767.3618455377414,25.1500937,55.2057455,Umm Suqeim 2,osm_place
-Um Suqaim Third,12,3930.3526311429578,25.1375268,55.1957658,Umm Suqeim 3,osm_place
+Um Suqaim Second,45,2504.4206607724523,25.1500937,55.2057455,Umm Suqeim 2,osm_place
+Um Suqaim Third,13,4176.07223476298,25.1375268,55.1957658,Umm Suqeim 3,osm_place
 Wadi Al Amardi,10,2350.5696134956224,25.20929,55.4879092,Wadi Al Amardi,osm_place
 Wadi Al Safa 2,12,3095.451840615703,25.0998539,55.3520497,Wadi Al Safa 2,osm_place
-Wadi Al Safa 3,49,1551.1479670771705,25.1040563,55.3114257,Wadi Al Safa 3,osm_place
+Wadi Al Safa 3,51,1507.1925754060323,25.1040563,55.3114257,Wadi Al Safa 3,osm_place
 Wadi Al Safa 4,17,1238.6065573770493,25.0769255,55.318421,Wadi Al Safa 4,osm_place
-Wadi Al Safa 5,43,1573.1515469323544,25.0833637,55.3730124,Wadi Al Safa 5,osm_place
+Wadi Al Safa 5,44,1587.7318448947487,25.0833637,55.3730124,Wadi Al Safa 5,osm_place
 Wadi Al Safa 6,5,3681.264608192889,25.0492848,55.2657205,Wadi Al Safa 6,osm_place
 Wadi Al Safa 7,13,1898.3705896007427,25.0352976,55.2826859,Wadi Al Safa 7,osm_place
 Warsan Fourth,52,1368.0395175776239,25.1404144,55.4113967,Warsan 4,osm_place

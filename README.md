@@ -283,7 +283,7 @@ filling each gap would cost: [`docs/data-inventory.md`](docs/data-inventory.md).
 | 2,373 ~2 km cells: adults, worker-housing adults | WorldPop 2025, OSM industrial land, Dubai Statistics Center (calibration) | `cells.csv`, `emirates.csv`, `dubai_community_gender.csv` |
 | Drive-time catchments, 10/15/20 min | Mapbox isochrones | `lounge_isochrones.geojson`, `catchment_cells.csv`, `cell_isochrones.geojson` |
 | Median household rent per DLD area, mapped to 241 Dubai cells (Ejari contracts registered 2026-07-10 to 2026-10-09) | Dubai Land Department open data, downloaded by hand 2026-10-10 (captcha, 3-month cap) | `dubai_rents_by_area.csv`, `cell_affluence.csv` |
-| Shop rent: median AED/m²/yr per DLD area over 13,772 single-unit shop contracts (243 Dubai cells), plus published Abu Dhabi mall-class bands for 4 lounges | DLD open data (same download); JLL UAE Retail Market Dynamics Q2 2025 | `dubai_shop_rents_by_area.csv`, `cell_shop_rent.csv`, `retail_rent_bands.csv`, `lounge_site_class.csv` |
+| Shop rent: median AED/m²/yr per DLD area over 13,621 single-unit shop contracts (243 Dubai cells), plus published Abu Dhabi mall-class bands for 4 lounges | DLD open data (same download); JLL UAE Retail Market Dynamics Q2 2025 | `dubai_shop_rents_by_area.csv`, `cell_shop_rent.csv`, `retail_rent_bands.csv`, `lounge_site_class.csv` |
 | Built form per cell (residential, villa, tower, green shares; height), 2018: tested as a UAE-wide rent proxy and rejected (CV R² −0.10) | EU JRC GHSL R2023A | `cell_built_form.csv` |
 | 5,924 salons found (3,833 women's salons kept) around lounges and growth cells | Google Places nearby search | `salons.csv`, `lounge_candidates*.csv`, `growth_salons.csv`, `search_circles.csv` |
 

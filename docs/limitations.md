@@ -275,8 +275,9 @@ Each lounge shows a shop rent (AED/m²/yr) and the women it reaches per AED 1,00
   - Sharjah, Ras Al Khaimah and Fujairah have no citable source.
   - So 9 of 23 scored lounges have a rent, including 2 of the 5 SHRINKs.
 - **Area medians understate mall rents.** A DLD area median mixes street shops with mall units.
-  - Downtown (the Burj Khalifa area) reads AED 2,256/m², against JLL's prime super-regional mall rent of about AED 8,900/m² (826/sqft).
-  - So a mall lounge's real rent can be several times the figure shown (sanity check SC7).
+  - Downtown (the Burj Khalifa area) reads AED 4,561/m², against JLL's prime super-regional mall rent of about AED 8,900/m² (826/sqft). Dubai Marina reads 2,260.
+  - So a mall lounge's real rent can be well above the figure shown (sanity check SC7).
+- **Area rents need coverage.** A catchment's or area's rent is shown only when cells with a rent hold half its women.
 - **Bands are class averages,** read off a chart (±100). They aren't the lounge's lease.
 - **The 150 m² unit is assumed.** It sets the level of women per rent, never its ranking.
 - **Why display only:** shop rent tracks footfall and affluence, i.e. revenue, as well as cost. Women per rent alone would mark down exactly the prime sites a premium salon wants. Its place is the ROIC gate, next to a revenue assumption.

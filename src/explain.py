@@ -141,12 +141,15 @@ GLOSSARY: dict[str, Field] = {
                             "Premium salons found in the area's searched cells."),
     "site_rent_m2": Field("Shop rent at the site", "AED/m²/yr",
                           "Commercial (shop) rent where the lounge sits: our cost, not customer affluence. "
-                          "Dubai: DLD Ejari shop contracts in its area; elsewhere: a published band for its mall class."),
+                          "Dubai: the median of DLD Ejari shop contracts in its area, which mixes mall and street "
+                          "shops, so a mall site's lease can be well above it; elsewhere: a published band for its "
+                          "mall class, not its lease."),
     "women_per_rent_k": Field("Women per AED 1k of rent", "women",
                               "Addressable women per AED 1,000 of annual rent for a 150 m² unit (assumed): "
                               "the unit size sets the level, never the ranking. Display only, not scored."),
     "shop_rent_m2": Field("Shop rent in the area", "AED/m²/yr",
-                          "Women-weighted median DLD shop rent over the area's cells (Dubai only)."),
+                          "Women-weighted median DLD shop rent over the area's cells (Dubai only; shown when cells "
+                          "with a rent hold half its women). An area median mixes mall and street shops."),
     "premium_reviews_per_1k": Field(
         "Premium saturation", "reviews per 1k women",
         "Premium salons' Google reviews (scaled up for missed salons) per 1,000 women in the "

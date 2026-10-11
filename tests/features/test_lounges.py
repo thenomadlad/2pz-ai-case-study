@@ -286,3 +286,11 @@ def test_non_dubai_lounge_uses_its_class_band(real_v3):
     banded = [x for x in f if x.site_rent_source == "band"]
     assert banded and all(x.emirate != "Dubai" and x.site_rent_m2 > 0 and x.women_per_rent_k for x in banded)
     assert all(x.site_rent_source in ("dld", "none") for x in f if x.emirate == "Dubai")
+
+
+def test_shop_rent_needs_half_the_women_covered(tiny_v3):
+    # Review I4: an area rent standing on cells with 10% of its women is not the area's rent.
+    from src.features.lounges import _shop_rent
+    w = {"x": 100.0, "y": 900.0}
+    assert _shop_rent(["x", "y"], w, {"x": 2000.0}) == (None, pytest.approx(0.1))
+    assert _shop_rent(["x", "y"], w, {"y": 2000.0}) == (2000.0, pytest.approx(0.9))

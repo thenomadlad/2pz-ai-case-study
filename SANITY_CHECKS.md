@@ -213,11 +213,11 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 **Run 5 results:**
 - **Labels: met.** No label changed: lounges 3 / 15 / 5 / 1, areas 5 / 36 / 372. A test pins it.
 - **SC7: partly met.**
-  - 170 located shop areas, median AED 2,040/m²; across the 136 with 10+ contracts, IQR 1,538–2,491. Only 1.2% fall outside 300–10,000. Within the expected range.
-  - **Not met:** prime areas don't sit above 3,500. Downtown (Burj Khalifa) is 2,256, Business Bay 2,071 and Marsa Dubai 2,260, against JLL's prime super-regional mall rent of about 8,900/m².
-  - **Explained:** a DLD area median mixes street shops with mall units and washes out the mall premium, so mall lounges' rent is understated (limitations 15).
+  - 170 located shop areas, median AED 2,031/m²; across the 136 with 10+ contracts, IQR 1,507–2,496. Only 1.8% fall outside 300–10,000. Within the expected range.
+  - **Partly met:** Downtown (Burj Khalifa) is 4,561, above 3,500. Business Bay (2,049) and Dubai Marina (2,260) are not. Their DLD area medians mix street shops with mall units, against JLL's prime super-regional mall rent of about 8,900/m². Explained, limitations 15.
+  - **Correction from the final review:** the first build applied a 1% trim across all of Dubai, which cut 43 of Downtown's 191 contracts and halved its median (2,256). That made it look as if area medians wash out even Downtown. The trim is gone.
 - **BT6: as expected, no direction.** Women per AED 1k (150 m² assumed):
-  - Dubai: al-barsha 898, nad-al-sheba 891, city-walk 822, mirdif-35 790, jumeirah-park 545 (all HOLD).
+  - Dubai: al-barsha 898, nad-al-sheba 891, mirdif-35 790, jumeirah-park 545, city-walk 407 (all HOLD; City Walk sits in the Downtown-priced area at 4,561).
   - Abu Dhabi bands: noya-plaza 250 and westyas 235 (both SHRINK), shahama 151 and al-dhafra 127 (both HOLD). The two SHRINKs reach *more* women per dirham than the two HOLDs.
 - **Coverage: met for Dubai** (5 of 5). Elsewhere only the 4 banded Abu Dhabi lounges (mall or plaza), so 9 of 23 scored lounges in total.
 
@@ -234,6 +234,6 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 
 | 4 | 2026-10-10 | Growth area = named OSM place; unnamed (emirate-fallback) cells make no area | 3/10 | unchanged (explained) | SC2 reported; SC3 one new explained caveat (habshan) | none |
 
-| 5 | 2026-10-10 | Commercial (shop) rent and women per AED 1k of rent, display only | unchanged | BT6 run, no direction (as expected) | SC7 partly met: area medians wash out mall premiums (explained) | none |
+| 5 | 2026-10-10 | Commercial (shop) rent and women per AED 1k of rent, display only | unchanged | BT6 run, no direction (as expected) | SC7 partly met: Downtown 4,561 above 3,500; Marina and Business Bay area medians mix in street shops (explained). The first build's overall trim was corrected after review | none |
 
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.

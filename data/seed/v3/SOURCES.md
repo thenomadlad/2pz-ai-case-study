@@ -218,8 +218,8 @@ feature's 0.20. `rent_predicted` stays in `cell_affluence.csv` for the record an
 **Shop rent is our cost** (what a lounge pays for its site). It is not customer affluence; that's the residential rent above. It is display only: it doesn't enter the scorecard or the growth rule.
 
 **Dubai, from DLD Ejari contracts** (`scripts/build_shop_rent.py`). The source is the same hand-downloaded file as the residential rents (registered 2026-07-10 to 2026-10-09).
-- **Filters:** commercial usage, sub-type Shop, single unit, at least 10 m² (kiosks out), with the top and bottom 1% of AED/m² trimmed. That leaves 13,772 contracts.
-- **Placement:** the median AED/m²/yr per DLD area is placed and assigned to cells exactly as for the residential rents (inside, else nearest within 2.5 km), with a minimum of 10 contracts per area. That covers 170 of 179 areas (90% of contracts) and 243 cells, with a median of AED 1,977/m²/yr.
+- **Filters:** commercial usage, sub-type Shop, single unit, at least 10 m² (kiosks out). That leaves 13,621 contracts. Nothing is trimmed: the area median shrugs off a mistyped contract, and a 1% trim cut real rents (overall, it halved Downtown; per area, it emptied small areas).
+- **Placement:** the median AED/m²/yr per DLD area is placed and assigned to cells exactly as for the residential rents (inside, else nearest within 2.5 km), with a minimum of 10 contracts per area. That covers 170 of 179 areas (90% of contracts) and 243 cells, with a median of AED 1,985/m²/yr. A catchment's or area's rent is shown only when cells with a rent hold half its women.
 - **Caveat:** an area median mixes mall and street shops, so a mall lounge's real rent can sit well above it.
 
 **Elsewhere, from published bands by mall class** (`retail_rent_bands.csv`). The source is JLL, *United Arab Emirates: Retail Market Dynamics Q2 2025* (published 2025-09), Abu Dhabi rental rates in AED/m²/yr:

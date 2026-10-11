@@ -44,12 +44,19 @@ def women_per_rent_k(women: float, rent_m2: float | None) -> float | None:
     return women / (rent_m2 * REF_UNIT_M2 / 1000)
 
 
+MIN_RENT_COVERAGE = 0.5
+MIN_RENT_COVERAGE_WHY = ("A catchment or area shop rent needs cells holding half its women: a rent from a "
+                         "sliver of the cells (Saih Shuaib 1: 10%) describes those cells, not the place.")
+
+
 def _shop_rent(cs: list[str], w: dict, shop: dict) -> tuple[float | None, float]:
-    """Women-weighted median shop rent over these cells, and the share of women it covers."""
+    """Women-weighted median shop rent over these cells (None under MIN_RENT_COVERAGE of the
+    women), and the share of women it covers."""
     obs = [c for c in cs if shop.get(c) is not None and shop[c] == shop[c]]
     total = sum(w[c] for c in cs)
-    return (weighted_median([shop[c] for c in obs], [w[c] for c in obs]),
-            sum(w[c] for c in obs) / total if total else 0.0)
+    cov = sum(w[c] for c in obs) / total if total else 0.0
+    return (weighted_median([shop[c] for c in obs], [w[c] for c in obs]) if cov >= MIN_RENT_COVERAGE else None,
+            cov)
 
 
 def _prep(v3: V3) -> dict:

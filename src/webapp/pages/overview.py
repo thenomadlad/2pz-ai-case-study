@@ -254,7 +254,8 @@ def _area_table(r) -> None:
         "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f"),
         "Why": st.column_config.TextColumn(width="large")})
     st.caption("Ranked GROW first, then WATCH, each by addressable women. Why: the tests it passed or "
-               "failed. SKIP areas are left out.")
+               "failed. SKIP areas are left out. Shop rent is our cost; women per AED 1k assumes a 150 m² "
+               "unit (and counts the whole area's women against one unit's rent).")
 
 
 def render() -> None:

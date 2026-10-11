@@ -266,3 +266,6 @@ def test_shop_rent_shows_as_cost_with_the_unit_assumption():
     overview = _page("overview")
     assert "Shop rent (AED/m²/yr)" in overview.dataframe[0].value.columns
     assert "Shop rent is our cost; women per AED 1k assumes a 150 m² unit." in _text(overview)
+    # review I2: the area table carries the unit assumption too; I3: the mall/street caveat is shown
+    assert _text(overview).count("assumes a 150 m² unit") >= 2
+    assert "mixes mall and street shops" in lounge
