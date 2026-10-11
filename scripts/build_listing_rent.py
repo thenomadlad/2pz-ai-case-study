@@ -13,7 +13,11 @@ PF coverage: all of RAK/UAQ/Fujairah; Sharjah and Ajman fetched in price bands (
 
 1. Normalise to rows; keep yearly rents with area_sqft > MIN_SQFT and AED/sqft within JUNK bounds.
 2. De-duplicate across portals: same emirate, within DUP_M and price within DUP_PRICE (keep PF).
-3. Per cell: median AED/m2 of the K nearest listings within RADIUS_KM in the same emirate;
+3. Exclusions agreed with the owner (2026-10-11), kept in the clean file with `excluded`:
+   industrial (location path matches the growth model's NON_RESIDENTIAL pattern: an industrial
+   unit is not a lounge site) and building_cap (at most BUILDING_CAP listings per building, i.e.
+   per cluster of pins within BUILDING_M, so one agent's 50 units in one block can't set a cell).
+4. Per cell: median AED/m2 of the K nearest listings within RADIUS_KM in the same emirate;
    n_used < MIN_N -> emirate median, fallback=True.
 
 Outputs (data/seed/v3/): listing_rents_clean.csv, cell_listing_rent.csv
@@ -21,12 +25,15 @@ Run: uv run python scripts/build_listing_rent.py
 """
 import glob
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from src.model.growth import NON_RESIDENTIAL  # noqa: E402
 RAW, V3 = ROOT / "data/raw/listings", ROOT / "data/seed/v3"
 EMIRATES = ["Sharjah", "Ajman", "Ras Al Khaimah", "Umm Al Quwain", "Fujairah"]
 SQFT_PER_M2 = 10.764
@@ -34,6 +41,7 @@ MIN_SQFT = 50
 JUNK = (5, 1000)  # AED/sqft/yr; outside is a typo (monthly price, sale price, wrong area)
 DUP_M, DUP_PRICE = 50, 0.05
 K, RADIUS_KM, MIN_N = 10, 5, 5
+BUILDING_M, BUILDING_CAP = 30, 3
 
 
 def load() -> pd.DataFrame:
@@ -88,7 +96,31 @@ def clean(raw: pd.DataFrame) -> pd.DataFrame:
     return df.drop(columns="period").round({"aed_per_sqft": 2, "aed_per_m2": 1})
 
 
+def exclude(df: pd.DataFrame) -> pd.DataFrame:
+    """`excluded`: industrial | building_cap | '' (see 3. above). Buildings: greedy clusters of pins
+    within BUILDING_M of a cluster's first pin; the BUILDING_CAP kept are the lowest listing ids."""
+    df = df.sort_values(["emirate", "listing_id"]).reset_index(drop=True)
+    df["excluded"] = np.where(df.location_path.map(lambda x: bool(NON_RESIDENTIAL.search(x))), "industrial", "")
+    ok = df[df.excluded == ""]
+    building = pd.Series("", index=ok.index)
+    for em, g in ok.groupby("emirate"):
+        centres = []
+        for i, r in g.iterrows():
+            d = km(r.lat, r.lng, np.array([c[0] for c in centres]), np.array([c[1] for c in centres])) * 1000 \
+                if centres else np.array([])
+            j = int(d.argmin()) if len(d) and d.min() <= BUILDING_M else None
+            if j is None:
+                centres.append((r.lat, r.lng))
+                j = len(centres) - 1
+            building[i] = f"{em}:{j}"
+    capped = building.groupby(building).cumcount() >= BUILDING_CAP
+    df.loc[capped[capped].index, "excluded"] = "building_cap"
+    print("excluded:\n" + df.groupby(["emirate", "excluded"]).size().unstack(fill_value=0).to_string())
+    return df
+
+
 def per_cell(listings: pd.DataFrame, cells: pd.DataFrame) -> pd.DataFrame:
+    listings = listings[listings.excluded == ""]
     out = []
     for em, cs in cells[cells.emirate.isin(EMIRATES)].groupby("emirate"):
         ls = listings[listings.emirate == em]
@@ -107,9 +139,10 @@ def per_cell(listings: pd.DataFrame, cells: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     raw = load()
     print("raw:\n" + raw.groupby(["emirate", "source"]).size().to_string())
-    listings = clean(raw)
+    listings = exclude(clean(raw))
     print("kept:\n" + listings.groupby(["emirate", "source"]).size().to_string())
-    print("median AED/m2 per emirate:\n" + listings.groupby("emirate").aed_per_m2.median().round(0).to_string())
+    print("median AED/m2 per emirate (counted):\n"
+          + listings[listings.excluded == ""].groupby("emirate").aed_per_m2.median().round(0).to_string())
     listings.to_csv(V3 / "listing_rents_clean.csv", index=False)
     cells = per_cell(listings, pd.read_csv(V3 / "cells.csv"))
     print("cells direct / fallback:\n" + cells.groupby(["emirate", "fallback"]).size().unstack(fill_value=0).to_string())

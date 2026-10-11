@@ -38,3 +38,17 @@ def test_trim_is_per_area_so_a_dear_area_keeps_its_rent():
     rows += [_contract("Dear", 900_000 + i * 10_000, 100) for i in range(31)]            # 9,000-12,000/m2
     got = shop_area_rents(pd.DataFrame(rows)).set_index("area")
     assert got.loc["Dear"].median_rent_m2 == pytest.approx(10_500, rel=0.01)
+
+
+def test_listing_exclusions_drop_industrial_and_cap_listings_per_building():
+    # Owner's fixes (2026-10-11): industrial units are not lounge sites; one block can't set a cell.
+    from scripts.build_listing_rent import BUILDING_CAP, exclude
+    row = lambda i, lat, path="Sharjah > Al Majaz": dict(emirate="Sharjah", listing_id=str(i), lat=lat, lng=55.4,
+                                                          location_path=path, aed_per_m2=1000.0)
+    rows = [row(i, 25.3) for i in range(5)]                        # one building, 5 listings
+    rows += [row(10, 25.3001)]                                     # ~11 m away: same building
+    rows += [row(20, 25.31)]                                       # ~1 km away: its own building
+    rows += [row(30, 25.32, "Sharjah > Sharjah Industrial Area > Industrial Area 13")]
+    got = exclude(pd.DataFrame(rows)).set_index("listing_id").excluded
+    assert got["30"] == "industrial" and got["20"] == ""
+    assert (got[[str(i) for i in range(5)] + ["10"]] == "").sum() == BUILDING_CAP == 3
