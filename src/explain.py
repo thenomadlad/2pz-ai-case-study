@@ -139,6 +139,9 @@ GLOSSARY: dict[str, Field] = {
                           "land use).", pct=True),
     "premium_salons": Field("Premium salons", "count",
                             "Premium salons found in the area's searched cells."),
+    "served_women": Field("Women served (Huff)", "women",
+                          "Addressable women this lounge serves: its Huff share of every cell it reaches within 20 min."),
+    "absorbed_share": Field("Absorbed by siblings", "% of served", "Share of its served women other lounges take over if it closes.", pct=True),
     "site_rent_m2": Field("Shop rent at the site", "AED/m²/yr",
                           "Commercial (shop) rent where the lounge sits: our cost, not customer affluence. "
                           "Dubai: the median of DLD Ejari shop contracts in its area, which mixes mall and street "
@@ -234,13 +237,11 @@ GLOSSARY: dict[str, Field] = {
 # which apply and orders them; every reason must cite at least one of its topic's fields.
 TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     "lounge": {
-        "demand": ("addressable_women", "catchment_women", "affluence_coverage", "score_demand",
+        "demand": ("served_women", "addressable_women", "catchment_women", "affluence_coverage", "score_demand",
                    "est_customers", "affluence_rent", "catchment_cells", "contrib_demand"),
-        "cannibalisation": ("shared_share", "score_cannibalisation", "contrib_cannibalisation"),
-        "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market",
-                    "score_capture", "contrib_capture"),
-        "rating": ("rating_gap", "lounge_rating", "substitutes_median_rating", "lounge_reviews",
-                   "score_rating", "contrib_rating"),
+        "cannibalisation": ("absorbed_share", "shared_share", "score_cannibalisation", "contrib_cannibalisation"),
+        "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market"),
+        "rating": ("rating_gap", "lounge_rating", "substitutes_median_rating", "lounge_reviews"),
     },
     "area": {
         "size": ("addressable_women", "women", "grow_min_women", "big_enough", "affluence_coverage",
@@ -397,14 +398,13 @@ def _rounded(facts: dict) -> dict:
 
 # --- facts ------------------------------------------------------------------------------
 
-LOUNGE_TABLE = ("catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
+LOUNGE_TABLE = ("served_women", "absorbed_share", "catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
                 "catchment_cells", "shared_share", "premium_pool", "premium_reviews_per_1k",
                 "site_rent_m2", "women_per_rent_k",
                 "substitutes_k", "capture", "thin_premium_market", "est_customers",
                 "lounge_rating", "lounge_reviews", "substitutes_median_rating", "rating_gap",
                 "level_flips", "composite", "score_demand", "score_cannibalisation",
-                "score_capture", "score_rating", "contrib_demand", "contrib_cannibalisation",
-                "contrib_capture", "contrib_rating", "next_call", "line_gap", "flip_driver",
+                "contrib_demand", "contrib_cannibalisation", "next_call", "line_gap", "flip_driver",
                 "flip_value")
 AREA_TABLE = ("women", "addressable_women", "affluence_rent", "affluence_coverage", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
               "shop_rent_m2", "women_per_rent_k", "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
@@ -482,7 +482,7 @@ def uae_facts(decisions: list[Decision], areas: list[Area], area_decisions: list
         "grow_women_total": round(sum(a.women for a in grow)),
         "grow_nearest_km_min": min((a.nearest_lounge_km for a in grow), default=None),
         "grow_nearest_km_max": max((a.nearest_lounge_km for a in grow), default=None),
-        "grow_reviews_per_1k_max": max((a.premium_reviews_per_1k for a in grow), default=None),
+        "grow_reviews_per_1k_max": max((a.premium_reviews_per_1k for a in grow if a.premium_reviews_per_1k is not None), default=None),
         "salons_total": salons_total,
         "revenue_data_available": False,
         "rent_data_available": False,
@@ -505,7 +505,7 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
             delta = (facts[f"score_{topic}"] - 0.5) * w[topic]
             return delta * sign if sign else abs(delta)
 
-        ranked = sorted(TOPICS["lounge"], key=lweight, reverse=True)
+        ranked = sorted([t for t in TOPICS["lounge"] if t in w], key=lweight, reverse=True)   # scored topics only
         chosen = [t for t in ranked if lweight(t) >= IMPORTANT]
         return (chosen + [t for t in ranked if t not in chosen])[:max(MIN_ITEMS, len(chosen))]
     if kind == "area":
