@@ -186,6 +186,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
             catchment_shop_rent_m2=c_rent, shop_rent_coverage=c_cov,
             women_per_rent_k=women_per_rent_k(addressable, site),
             est_customers=0.0 if b in NOT_SCORED else cap * addressable, not_scored=b in NOT_SCORED))
+    feats, base = _lounge_costs(feats)
     if not areas:
         return feats, []
 
@@ -203,7 +204,63 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
         # one area per OSM place name, contiguous or not
         out.append(_area(_slug(f"{name} {emirate}"), name, emirate, sorted(cs, key=p["rc"].get),
                          w, aw, rents, shop, p, a, lounges, lats, lngs, sv["cells"].unserved))
+    out = _area_what_ifs(v3, a, aw_s, out, feats, base, closed)
     return feats, sorted(out, key=lambda x: -x.women)
+
+
+FITOUT_AED_M2 = 3_000
+FITOUT_YEARS = 5
+FITOUT_WHY = ("Assumed, not sourced (2026-10-11): a salon fit-out of about AED 3,000/m² (AED 280/sqft), "
+              "written off over 5 years, on the 150 m² reference unit: about AED 90k a year on top of rent.")
+
+
+def site_cost_k(rent_m2: float | None) -> float | None:
+    """Annual cost of a REF_UNIT_M2 site, AED 1k: rent plus amortised fit-out; None without a rent."""
+    if rent_m2 is None or rent_m2 != rent_m2:
+        return None
+    return (rent_m2 * REF_UNIT_M2 + FITOUT_AED_M2 * REF_UNIT_M2 / FITOUT_YEARS) / 1000
+
+
+def _lounge_costs(feats):
+    """Served women per AED 1k of site cost, and that against its emirate's median lounge."""
+    spc = {f.branch_id: (f.served_women / site_cost_k(f.site_rent_m2)
+                         if f.served_women and site_cost_k(f.site_rent_m2) else None) for f in feats}
+    base = {}
+    for f in feats:
+        if spc[f.branch_id] is not None and not f.not_scored:
+            base.setdefault(f.emirate, []).append(spc[f.branch_id])
+    base = {e: statistics.median(v) for e, v in base.items()}
+    return [f.model_copy(update={"site_cost_k": site_cost_k(f.site_rent_m2), "served_per_cost": spc[f.branch_id],
+                                 "cost_index": spc[f.branch_id] / base[f.emirate]
+                                 if spc[f.branch_id] is not None and f.emirate in base else None})
+            for f in feats], base
+
+
+def _area_what_ifs(v3, a, aw_s, areas, feats, base, closed):
+    """Open a typical lounge at each area worth a look (5k+ women, a residential name): what it serves,
+    what it takes from our lounges, and its net new women per AED 1k of site cost."""
+    from src.model.growth import NON_RESIDENTIAL, SKIP_UNDER_WOMEN
+    from src.model.served import what_if_open
+    scored = [f for f in feats if not f.not_scored]
+    reviews = statistics.median(f.review_count for f in scored)
+    rating = statistics.median(f.rating for f in scored if f.rating is not None)
+    out = []
+    for ar in areas:
+        if ar.women < SKIP_UNDER_WOMEN or NON_RESIDENTIAL.search(ar.name):
+            out.append(ar)
+            continue
+        key = ("open", id(v3), ar.area_id, round(float(aw_s.sum())), closed)
+        if key not in _SERVED:
+            _SERVED[key] = what_if_open(v3, a, aw_s, ar.lat, ar.lng, reviews, rating, closed=closed,
+                                        not_scored=frozenset(NOT_SCORED))
+        w = _SERVED[key]
+        cost = site_cost_k(ar.shop_rent_m2)
+        spc = w["net_new"] / cost if cost else None
+        out.append(ar.model_copy(update={
+            "new_site_served": w["served"], "new_site_taken": w["taken_from_lounges"], "new_site_net": w["net_new"],
+            "site_cost_k": cost, "served_per_cost": spc,
+            "cost_index": spc / base[ar.emirate] if spc is not None and ar.emirate in base else None}))
+    return out
 
 
 _SERVED: dict = {}

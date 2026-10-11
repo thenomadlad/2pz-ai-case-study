@@ -27,10 +27,10 @@ SIGNALS: tuple[Signal, ...] = (
     Signal("demand", "served_women", "Addressable women the lounge serves (Huff share of each reachable cell)", 0, 20_000,
            "Quick first cut (2026-10-11): served women run about 1.3k-19k over the scored lounges; "
            "20k is about the best, so a lounge serving that many scores 1."),
-    Signal("cannibalisation", "absorbed_share", "Share of its served women siblings take over if it closes",
-           0.4, 0.0,
-           "Leave-one-out: close the lounge, re-split demand; the siblings' gain over its served women. "
-           "Quick first cut: 0-0.37 over the scored lounges; 0.4 scores 0 (most of it is redundant)."),
+    Signal("cost", "cost_index", "Served women per AED 1k of site cost, against its emirate's median lounge", 0.5, 1.5,
+           "1 = as cost-efficient as the emirate's median lounge; half as good scores 0, 1.5x scores 1. "
+           "Site cost = shop rent x 150 m2 + amortised fit-out (assumed). Missing rent scores neutral. "
+           "Cannibalisation is no longer scored: it is a what-if shown on the lounge page."),
 )
 
 PROTECT_AT = 0.65

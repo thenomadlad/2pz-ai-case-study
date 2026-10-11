@@ -140,6 +140,9 @@ class LoungeFeatures(BaseModel):
     premium_reviews_per_1k: float | None = None   # catchment saturation, as for areas; display only, not scored
     served_women: float | None = None            # Huff: addressable women this lounge serves (src/model/served.py)
     absorbed_share: float | None = None          # share of them siblings take over if it closes (leave-one-out)
+    site_cost_k: float | None = None             # annual site cost, AED 1k: rent x unit + amortised fit-out (assumed)
+    served_per_cost: float | None = None         # served women per AED 1k of annual site cost
+    cost_index: float | None = None              # served_per_cost / its emirate's median lounge (1 = typical)
     site_rent_m2: float | None = None            # shop rent at the lounge's site, AED/m2/yr: our cost (display only)
     site_rent_source: str = "none"               # dld | band | none
     catchment_shop_rent_m2: float | None = None  # women-weighted median over catchment cells with one
@@ -169,6 +172,12 @@ class Area(BaseModel):
     premium_reviews_per_1k: float | None
     full_circle_share: float | None
     unserved_women: float = 0.0                  # Huff: addressable women no premium supplier serves
+    new_site_served: float | None = None         # what-if: women a typical new lounge here would serve
+    new_site_taken: float | None = None          # ... of which taken from our existing lounges
+    new_site_net: float | None = None            # ... net new to the network (served - taken)
+    site_cost_k: float | None = None             # annual site cost here, AED 1k (rent x unit + fit-out)
+    served_per_cost: float | None = None         # net new women per AED 1k of annual site cost
+    cost_index: float | None = None              # served_per_cost / its emirate's median lounge (1 = typical)
     shop_rent_m2: float | None = None            # women-weighted median shop rent over the area's cells
     shop_rent_coverage: float = 0.0
     women_per_rent_k: float | None = None        # addressable women per AED 1,000 of annual rent there

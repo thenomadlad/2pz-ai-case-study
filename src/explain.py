@@ -142,6 +142,13 @@ GLOSSARY: dict[str, Field] = {
     "served_women": Field("Women served (Huff)", "women",
                           "Addressable women this lounge serves: its Huff share of every cell it reaches within 20 min."),
     "absorbed_share": Field("Absorbed by siblings", "% of served", "Share of its served women other lounges take over if it closes.", pct=True),
+    "site_cost_k": Field("Site cost", "AED 1k/yr", "Shop rent x 150 m² (assumed unit) + fit-out of AED 3,000/m² over 5 years (assumed)."),
+    "served_per_cost": Field("Women per AED 1k of site cost", "women", "Served (or, for an area, net new) women per AED 1,000 of annual site cost."),
+    "cost_index": Field("Cost efficiency vs emirate", "x median lounge", "Women per AED 1k of site cost against the emirate's median lounge: 1 = typical."),
+    "new_site_served": Field("New lounge would serve", "women", "What-if: women a typical new lounge here would serve (Huff)."),
+    "new_site_taken": Field("Taken from our lounges", "women", "What-if: of those, women it would take from our existing lounges."),
+    "new_site_net": Field("Net new women", "women", "What-if: women a new lounge here adds to the network (served − taken)."),
+    "unserved_women": Field("Unserved women", "women", "Addressable women no premium salon serves today (Huff)."),
     "site_rent_m2": Field("Shop rent at the site", "AED/m²/yr",
                           "Commercial (shop) rent where the lounge sits: our cost, not customer affluence. "
                           "Dubai: the median of DLD Ejari shop contracts in its area, which mixes mall and street "
@@ -239,7 +246,8 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     "lounge": {
         "demand": ("served_women", "addressable_women", "catchment_women", "affluence_coverage", "score_demand",
                    "est_customers", "affluence_rent", "catchment_cells", "contrib_demand"),
-        "cannibalisation": ("absorbed_share", "shared_share", "score_cannibalisation", "contrib_cannibalisation"),
+        "cannibalisation": ("absorbed_share", "shared_share"),
+        "cost": ("cost_index", "served_per_cost", "site_cost_k", "site_rent_m2", "score_cost", "contrib_cost"),
         "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market"),
         "rating": ("rating_gap", "lounge_rating", "substitutes_median_rating", "lounge_reviews"),
     },
@@ -403,11 +411,12 @@ LOUNGE_TABLE = ("served_women", "absorbed_share", "catchment_women", "addressabl
                 "site_rent_m2", "women_per_rent_k",
                 "substitutes_k", "capture", "thin_premium_market", "est_customers",
                 "lounge_rating", "lounge_reviews", "substitutes_median_rating", "rating_gap",
-                "level_flips", "composite", "score_demand", "score_cannibalisation",
-                "contrib_demand", "contrib_cannibalisation", "next_call", "line_gap", "flip_driver",
+                "level_flips", "composite", "score_demand", "score_cost", "cost_index", "served_per_cost", "site_cost_k",
+                "contrib_demand", "contrib_cost", "next_call", "line_gap", "flip_driver",
                 "flip_value")
 AREA_TABLE = ("women", "addressable_women", "affluence_rent", "affluence_coverage", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
-              "shop_rent_m2", "women_per_rent_k", "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
+              "shop_rent_m2", "women_per_rent_k", "new_site_served", "new_site_taken", "new_site_net",
+              "unserved_women", "site_cost_k", "served_per_cost", "cost_index", "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
               "unsaturated", "confidence", "size_gap", "saturation_gap", "worker_gap", "coverage_gap")
 NOT_SCORED_ACTION = "NOT SCORED"
 
