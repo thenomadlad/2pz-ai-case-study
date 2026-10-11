@@ -36,7 +36,7 @@ from src.models import (
 logger = logging.getLogger(__name__)
 
 CACHE_PATH = REPO_ROOT / "data" / "explanations" / "cache.json"
-PROMPT_VERSION = "v4"
+PROMPT_VERSION = "v5"
 
 
 MIN_ITEMS, MAX_ITEMS = 2, 5  # per pyramid level: enough to support, few enough to read
@@ -174,31 +174,37 @@ GLOSSARY: dict[str, Field] = {
     "nearest_lounge_id": Field("Nearest lounge", "", "Closest open, scored Bedashing lounge."),
     "confidence": Field(
         "Confidence", "",
-        f"Low within {growth.NEAR_LINE:.0%} of the size or saturation line, with saturation unknown, "
-        f"under {growth.MIN_COVERAGE:.0%} of the women searched, or big only on thin affluence data; "
-        f"high {growth.FAR_LINE:.0%}+ from both lines; else medium."),
+        f"Low within {growth.NEAR_LINE:.0%} of the net-new-women line or with under "
+        f"{growth.MIN_COVERAGE:.0%} of the women searched; high {growth.FAR_LINE:.0%}+ from the line; "
+        "else medium."),
     "nearest_lounge_km": Field("Distance to nearest lounge", "km",
-                               "Straight-line distance; every area is beyond a 15-min drive."),
+                               "Straight-line distance to the closest open, scored lounge (an area can sit inside a lounge's catchment: the what-if counts what a new lounge would take from it)."),
     "big_enough": Field("Big enough", "yes/no",
-                        f"At least {growth.GROW_MIN_WOMEN:,} addressable women and worker housing under "
-                        f"{growth.WORKER_CAP:.0%} of adults."),
+                        f"A new lounge here would add at least {growth.NEW_SITE_MIN:,} net new women and "
+                        f"worker housing is under {growth.WORKER_CAP:.0%} of adults."),
     "unsaturated": Field("Unsaturated", "yes/no",
                          f"Fewer than {growth.UNSATURATED_PER_1K:g} premium reviews per 1k women "
-                         "(n/a when too little of the area was searched)."),
-    "grow_min_women": Field("Size line", "women", "Women needed to carry a lounge."),
+                         "(n/a when too little of the area was searched). Context only: competition "
+                         "already shapes the net new women, so it is not a separate test."),
+    "new_site_min": Field("Size line", "net new women",
+                          "Net new women a new lounge must add to the network: about what our median "
+                          "lounge serves today."),
     "skip_under_women": Field("Size floor", "women", "Under this the area is skipped."),
     "unsaturated_per_1k": Field("Saturation line", "reviews per 1k women",
-                                "Under this the area is unsaturated."),
+                                "Under this the area is unsaturated (context, not a test)."),
     "worker_cap": Field("Worker-housing cap", "% of adults",
                         "Above this the women estimate is too uncertain to GROW.", pct=True),
     "min_coverage": Field("Coverage needed", "% of women",
-                          "Less competitor data than this caps the call at WATCH.", pct=True),
-    "size_gap": Field("Size gap", "women",
-                      "Addressable women minus the size line: positive is headroom above it, "
-                      "negative is how many more the area needs."),
+                          "Less competitor data than this makes the call low confidence (unsearched cells are imputed).", pct=True),
+    "size_gap": Field("Size gap", "net new women",
+                      "Net new women minus the size line: positive is headroom above it, "
+                      "negative is how many more a new lounge would need to add."),
     "saturation_gap": Field("Saturation gap", "reviews per 1k women",
                             "Saturation line minus premium saturation: positive is room under the "
-                            "line, negative is how far over it the area is. n/a when unsearched."),
+                            "line, negative is how far over it. Context only. n/a when unsearched."),
+    "cost_gap": Field("Cost gap", "x emirate typical",
+                      "Cost efficiency minus 1 (the emirate's typical lounge): GROW needs 0 or more, "
+                      "else a big-enough area is WATCH. n/a when no shop rent is known."),
     "worker_gap": Field("Worker-housing gap", "% of adults",
                         "Worker-housing cap minus worker share: negative means over the cap.",
                         pct=True),
@@ -224,7 +230,7 @@ GLOSSARY: dict[str, Field] = {
         "Calls within 0.05 of a threshold, with a missing input or a thin premium market, or "
         "that flip across assumption levels or when a signal weight moves ±25%."),
     "growth_areas_total": Field("Growth areas", "count",
-                                "Populated areas beyond a 15-min drive of every lounge."),
+                                "Named places (one per OSM place name), each evaluated as a what-if new lounge."),
     "grow_count": Field("GROW", "areas", "Areas passing both tests."),
     "watch_count": Field("WATCH", "areas", "Areas passing one of the two tests."),
     "grow_areas": Field("GROW areas", "", "Ids of GROW areas."),
@@ -254,8 +260,9 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
         "rating": ("rating_gap", "lounge_rating", "substitutes_median_rating", "lounge_reviews"),
     },
     "area": {
-        "size": ("addressable_women", "women", "grow_min_women", "big_enough", "affluence_coverage",
-                 "affluence_rent", "skip_under_women", "size_gap"),
+        "size": ("new_site_net", "new_site_served", "new_site_taken", "new_site_min", "size_gap",
+                 "big_enough", "women", "skip_under_women", "unserved_women"),
+        "cost": ("cost_index", "cost_gap", "served_per_cost", "site_cost_k", "shop_rent_m2"),
         "saturation": ("premium_reviews_per_1k", "premium_salons", "unsaturated",
                        "unsaturated_per_1k", "saturation_gap"),
         "reach": ("nearest_lounge_km", "nearest_lounge_id"),
@@ -273,7 +280,7 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
 }
 TOPIC_LABELS = {
     "demand": "Demand", "cannibalisation": "Cannibalisation", "cost": "Cost efficiency", "capture": "Capture",
-    "rating": "Rating vs rivals", "size": "Size", "saturation": "Competition",
+    "rating": "Rating vs rivals", "size": "Net new women", "saturation": "Competition",
     "reach": "Distance to a lounge", "worker_housing": "Demand reliability",
     "data_gap": "What we couldn't search", "shrink": "Where to investigate",
     "grow": "Where to grow", "protect": "What to protect", "confidence": "How sure we are",
@@ -328,20 +335,21 @@ THRESHOLDS: dict[str, str] = {
                   f"SHRINK ≤ {scorecard.SHRINK_AT}"),
     "thin_premium_market": f"When yes, capture's score is pulled toward 0.5 (pool ÷ {scorecard.THIN_MARKET})",
     "level_flips": f"Low confidence at {scorecard.FLIP_LOW} or more",
-    "addressable_women": f"GROW needs {growth.GROW_MIN_WOMEN:,}",
+    "new_site_net": f"GROW needs {growth.NEW_SITE_MIN:,}; WATCH from {growth.NEW_SITE_MIN // 2:,}",
     "women": f"SKIP under {growth.SKIP_UNDER_WOMEN:,}",
     "affluence_coverage": "Under 50%: affluence mostly unknown, weighted neutral",
     "worker_share": f"GROW needs under {growth.WORKER_CAP:.0%}",
-    "premium_reviews_per_1k": f"Unsaturated under {growth.UNSATURATED_PER_1K:g}",
+    "premium_reviews_per_1k": f"Unsaturated under {growth.UNSATURATED_PER_1K:g} (context, not a test)",
     "data_coverage": f"GROW needs {growth.MIN_COVERAGE:.0%}",
-    "big_enough": "GROW needs both tests, WATCH one, SKIP neither",
-    "unsaturated": "GROW needs both tests, WATCH one, SKIP neither",
+    "big_enough": "GROW needs big enough and cost efficiency 1 or more (or unknown)",
+    "unsaturated": "Context, not a test",
     **{f"contrib_{s.name}": f"Sums to the composite (max {s.weight / _TOTAL_WEIGHT:.2f})"
        for s in scorecard.SIGNALS},
-    "size_gap": f"GROW needs 0 or more (line {growth.GROW_MIN_WOMEN:,})",
-    "saturation_gap": f"GROW needs above 0 (line {growth.UNSATURATED_PER_1K:g})",
+    "size_gap": f"GROW needs 0 or more (line {growth.NEW_SITE_MIN:,})",
+    "saturation_gap": f"Context, not a test (line {growth.UNSATURATED_PER_1K:g})",
+    "cost_gap": "GROW needs 0 or more (or no rent known)",
     "worker_gap": f"GROW needs above 0 (cap {growth.WORKER_CAP:.0%})",
-    "coverage_gap": f"GROW needs 0 or more (needs {growth.MIN_COVERAGE:.0%})",
+    "coverage_gap": f"Under 0: low confidence (needs {growth.MIN_COVERAGE:.0%})",
 }
 
 
@@ -379,17 +387,17 @@ def what_would_change(kind: str, facts: dict) -> list[str]:
     if kind != "area":
         return []
     gap = facts["size_gap"]
-    out = [f"Size: {fmt('size_gap', abs(gap))} addressable women "
+    out = [f"Size: {fmt('size_gap', abs(gap))} net new women "
            + ("above the line." if gap >= 0 else "short of the line.")]
-    sat = facts["saturation_gap"]
-    if sat is not None:
-        out.append(f"Competition: {fmt('saturation_gap', abs(sat))} premium reviews per 1k women "
-                   + ("under the line." if sat > 0 else "over the line."))
+    cost = facts["cost_gap"]
+    if cost is not None:
+        out.append(f"Cost: {fmt('cost_index', facts['cost_index'])}x the emirate's typical lounge, "
+                   f"{fmt('cost_gap', abs(cost))} " + ("above the 1x line." if cost >= 0 else "short of the 1x line."))
     if facts["worker_gap"] <= 0:
         out.append(f"Worker housing: {fmt('worker_gap', -facts['worker_gap'])} of adults over the cap.")
     if facts["coverage_gap"] < 0:
         out.append(f"Search coverage: {fmt('coverage_gap', -facts['coverage_gap'])} of women short "
-                   "of what GROW needs.")
+                   "of what a confident call needs.")
     return out
 
 
@@ -419,7 +427,7 @@ LOUNGE_TABLE = ("served_women", "absorbed_share", "catchment_women", "addressabl
 AREA_TABLE = ("women", "addressable_women", "affluence_rent", "affluence_coverage", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
               "shop_rent_m2", "women_per_rent_k", "new_site_served", "new_site_taken", "new_site_net",
               "unserved_women", "site_cost_k", "served_per_cost", "cost_index", "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
-              "unsaturated", "confidence", "size_gap", "saturation_gap", "worker_gap", "coverage_gap")
+              "unsaturated", "confidence", "size_gap", "cost_gap", "saturation_gap", "worker_gap", "coverage_gap")
 NOT_SCORED_ACTION = "NOT SCORED"
 
 
@@ -456,12 +464,13 @@ def _counterfactual(facts: dict, action: str) -> dict:
 def area_facts(a: Area, d: AreaDecision) -> dict:
     facts = {k: getattr(a, k) for k in AREA_TABLE if hasattr(a, k)}
     facts.update(area_name=a.name, emirate=a.emirate, big_enough=d.big_enough,
-                 unsaturated=d.unsaturated, confidence=d.confidence, grow_min_women=growth.GROW_MIN_WOMEN,
+                 unsaturated=d.unsaturated, confidence=d.confidence, new_site_min=growth.NEW_SITE_MIN,
                  skip_under_women=growth.SKIP_UNDER_WOMEN,
                  unsaturated_per_1k=growth.UNSATURATED_PER_1K, worker_cap=growth.WORKER_CAP,
                  min_coverage=growth.MIN_COVERAGE,
                  # Gap to each test's line (E3): positive passes, negative is the shortfall.
-                 size_gap=round(a.addressable_women - growth.GROW_MIN_WOMEN),
+                 size_gap=round((a.new_site_net or 0.0) - growth.NEW_SITE_MIN),
+                 cost_gap=None if a.cost_index is None else a.cost_index - 1,
                  saturation_gap=None if a.premium_reviews_per_1k is None
                  else growth.UNSATURATED_PER_1K - a.premium_reviews_per_1k,
                  worker_gap=growth.WORKER_CAP - a.worker_share,
@@ -522,11 +531,10 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
     if kind == "area":
         if facts["women"] < facts["skip_under_women"]:
             return ["size", "reach"]
-        topics = ["size", "saturation" if facts["unsaturated"] is not None else "data_gap",
-                  "reach"]
+        topics = ["size"] + (["cost"] if facts.get("cost_index") is not None else []) + ["reach"]
         if facts["worker_share"] >= facts["worker_cap"]:
             topics.append("worker_housing")
-        if facts["unsaturated"] is not None and facts["data_coverage"] < facts["min_coverage"]:
+        if facts["data_coverage"] < facts["min_coverage"]:
             topics.append("data_gap")
         return topics
     skip = {"shrink": facts["shrink_count"] == 0, "grow": facts["grow_count"] == 0,
@@ -535,13 +543,13 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
 
 
 GROWTH_WHY = (
-    f"GROW needs both tests: at least {growth.GROW_MIN_WOMEN:,} addressable (affluence-weighted) women 15+ (worker housing under "
-    f"{growth.WORKER_CAP:.0%} of adults), and fewer than {growth.UNSATURATED_PER_1K:g} premium "
-    f"reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not "
-    f"searched enough to tell (under {growth.MIN_COVERAGE:.0%} of its women), or is big only "
-    f"through the affluence weighting with rents observed for under {growth.MIN_COVERAGE:.0%} of its women. SKIP passes "
-    f"neither, or has under {growth.SKIP_UNDER_WOMEN:,} women, or is non-residential by name. Every area "
-    "is beyond a 15-min drive of every scored lounge.")
+    "Each area is a what-if: open a typical lounge there and count the women it would add to the "
+    f"network, net of those it takes from our own lounges (Huff). GROW needs at least {growth.NEW_SITE_MIN:,} "
+    f"net new women, worker housing under {growth.WORKER_CAP:.0%} of adults, and cost efficiency at least "
+    "the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly "
+    f"worker housing, or {growth.NEW_SITE_MIN // 2:,}+ net new women. SKIP: fewer, under "
+    f"{growth.SKIP_UNDER_WOMEN:,} women, or non-residential by name. Under {growth.MIN_COVERAGE:.0%} of the "
+    "women searched for competitors lowers confidence.")
 
 
 def _thresholds_note(kind: str) -> str:
@@ -570,15 +578,16 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
     if kind == "area":
         sat = f["premium_reviews_per_1k"]
         return {
-            "size": (f"About {fmt('addressable_women', f['addressable_women'])} addressable women 15+ "
-                     f"live here, {fmt('women', f['women'])} before affluence weighting (GROW needs "
-                     f"{fmt('grow_min_women', f['grow_min_women'])})."),
+            "size": (f"A new lounge here would add about {fmt('new_site_net', f['new_site_net'])} net new "
+                     f"women (GROW needs {fmt('new_site_min', f['new_site_min'])})."),
+            "cost": (f"Cost efficiency {fmt('cost_index', f['cost_index'])}x the emirate's typical lounge "
+                     f"(GROW needs 1x)."),
             "saturation": (f"{fmt('premium_reviews_per_1k', sat)} premium reviews per 1k women, "
                            f"{'under' if f['unsaturated'] else 'over'} the "
                            f"{fmt('unsaturated_per_1k', f['unsaturated_per_1k'])} line."),
             "reach": (f"The nearest lounge, {f['nearest_lounge_id']}, is "
                       f"{fmt('nearest_lounge_km', f['nearest_lounge_km'])} km away in a straight "
-                      "line, beyond a 15-min drive."),
+                      "line."),
             "worker_housing": (f"{fmt('worker_share', f['worker_share'])} of adults live in "
                                "worker housing, so the women estimate is uncertain."),
             "data_gap": (f"Our salon search covered {fmt('data_coverage', f['data_coverage'])} "
@@ -604,9 +613,9 @@ def _template_headline(kind: str, action: str, f: dict) -> str:
         return (f"{action}: composite {f['composite']:.2f} (PROTECT at {scorecard.PROTECT_AT} or "
                 f"more, SHRINK at {scorecard.SHRINK_AT} or less).")
     if kind == "area":
+        cost = f.get("cost_gap")
         return (f"{action}: {'big enough' if f['big_enough'] else 'not big enough'}, and "
-                + {True: "unsaturated", False: "saturated", None: "saturation unknown"}[
-                    f["unsaturated"]] + ".")
+                + ("cost unknown" if cost is None else "cost-efficient" if cost >= 0 else "dearer than typical") + ".")
     return (f"{f['protect_count']} PROTECT, {f['hold_count']} HOLD and {f['shrink_count']} "
             f"SHRINK across {f['lounges_scored']} scored lounges, with {f['grow_count']} "
             "areas to GROW.")
@@ -614,15 +623,15 @@ def _template_headline(kind: str, action: str, f: dict) -> str:
 
 _TEMPLATE_CAPTIONS = {
     "lounge": ("Each signal is scored 0-1 on a fixed scale, where 1 is good for the lounge, and "
-               "the composite is their weighted average. Demand counts women within a 15-min "
-               "drive, weighted by affluence where Dubai rents are known, cannibalisation how many of them another lounge also reaches, capture the "
-               "lounge's share of premium-salon reviews nearby, and rating its Google rating "
-               "against those rivals."),
-    "area": ("An area is big enough when enough women live there, and unsaturated when few "
-             "premium-salon reviews exist per woman. GROW needs both, WATCH has one, SKIP has "
-             "neither."),
-    "uae": ("Lounge calls come from a fixed-scale scorecard; growth-area calls from two tests, "
-            "size and premium saturation."),
+               "the composite is their weighted average. Demand is the women the lounge serves "
+               "(its Huff share of each cell it reaches); cost is those women per AED 1k of "
+               "rent-based site cost against the emirate's typical lounge. Capture, rating and "
+               "the shared catchment are shown for context, not scored."),
+    "area": ("Each area is a what-if new lounge: big enough when it would add enough net new "
+             "women to the network, and GROW when it is also at least as cost-efficient as the "
+             "emirate's typical lounge."),
+    "uae": ("Lounge calls come from a fixed-scale scorecard (served demand and site cost); "
+            "growth-area calls from a what-if new lounge's net new women and cost efficiency."),
 }
 
 
@@ -638,7 +647,7 @@ ACTIONS = {
     "GROW": ("site search", ("Start a site search here: a shortlist for a site visit and lease "
                              "search, verified on the ground before committing.")),
     "WATCH": ("revisit", "Don't act now: revisit when the failing test changes."),
-    "SKIP": ("no action", "No action: the area is too small or already crowded."),
+    "SKIP": ("no action", "No action: a new lounge here would add too few women."),
 }
 LABELS = {"lounge": ("PROTECT", "HOLD", "SHRINK"), "area": ("GROW", "WATCH", "SKIP")}
 # In-branch advice (ratings, staffing, service quality) is out of scope (rubric OB4).
@@ -655,8 +664,8 @@ def _template_so_what(kind: str, action: str, f: dict) -> str:
         return (f"{fmt('catchment_women', f['catchment_women'])} women live within a 15-min drive; "
                 f"{fmt('shared_share', f['shared_share'])} of them are also reached by another lounge.")
     if kind == "area":
-        return (f"{fmt('women', f['women'])} women 15+ live here, beyond a 15-min drive of every "
-                f"lounge (nearest: {f['nearest_lounge_id']}).")
+        return (f"{fmt('women', f['women'])} women 15+ live here; our nearest lounge is "
+                f"{f['nearest_lounge_id']}.")
     return (f"{fmt('grow_women_total', f['grow_women_total'])} women live in the {f['grow_count']} "
             f"GROW areas; {f['shrink_count']} lounges need a closer look.")
 
@@ -696,7 +705,7 @@ def _allowed_numbers(facts: dict) -> list[float]:
     nums += [4, 0, 1]
     nums += [scorecard.PROTECT_AT, scorecard.SHRINK_AT, scorecard.FLIP_LOW, scorecard.COMBOS, 15, 60, 1_000]
     nums += [x for s in scorecard.SIGNALS for x in (s.worst, s.best, s.weight)]
-    nums += [growth.GROW_MIN_WOMEN, growth.SKIP_UNDER_WOMEN, growth.UNSATURATED_PER_1K,
+    nums += [growth.NEW_SITE_MIN, growth.NEW_SITE_MIN // 2, growth.SKIP_UNDER_WOMEN, growth.UNSATURATED_PER_1K,
              growth.WORKER_CAP * 100, growth.MIN_COVERAGE * 100]
     nums += [2, 3, 10, 10_000, 100, 5]  # "per 10k", "2GIS", "out of 5"
     return nums

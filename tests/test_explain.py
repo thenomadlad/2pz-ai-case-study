@@ -62,11 +62,10 @@ def test_prioritize_always_gives_at_least_two_arguments():
 
 
 def test_prioritize_area_cases():
-    base = {"women": 60_000, "skip_under_women": 10_000, "unsaturated": True,
+    base = {"women": 60_000, "skip_under_women": 10_000, "cost_index": 1.4,
             "worker_share": 0.1, "worker_cap": 0.5, "data_coverage": 0.9, "min_coverage": 0.5}
-    assert explain.prioritize("area", base, "GROW") == ["size", "saturation", "reach"]
-    assert explain.prioritize("area", {**base, "unsaturated": None}, "WATCH") == [
-        "size", "data_gap", "reach"]
+    assert explain.prioritize("area", base, "GROW") == ["size", "cost", "reach"]
+    assert explain.prioritize("area", {**base, "cost_index": None}, "GROW") == ["size", "reach"]
     assert explain.prioritize("area", {**base, "worker_share": 0.6}, "WATCH")[-1] == "worker_housing"
     assert explain.prioritize("area", {**base, "data_coverage": 0.2}, "WATCH")[-1] == "data_gap"
     assert explain.prioritize("area", {**base, "women": 5_000}, "SKIP") == ["size", "reach"]
@@ -310,18 +309,17 @@ def test_lounge_contributions_sum_and_flip_value_reaches_the_line():
             assert abs(moved - line) < 1e-3, sid
 
 
-@pytest.mark.xfail(reason="area explanation facts still describe the v3 size/saturation tests; "
-                          "explanations regenerated in checkpoint step 2", strict=False)
 def test_area_gaps_agree_with_the_tests():
-    for kind, sid, _action, f in explain.v3_subjects():
+    for kind, sid, action, f in explain.v3_subjects():
         if kind != "area":
             continue
         assert (f["size_gap"] >= 0 and f["worker_gap"] > 0) == f["big_enough"], sid
+        if action == "GROW":
+            assert f["big_enough"] and (f["cost_gap"] is None or f["cost_gap"] >= 0), sid
         if f["unsaturated"] is not None:
             assert (f["saturation_gap"] > 0) == f["unsaturated"], sid
 
 
-@pytest.mark.xfail(reason="explanations regenerated in checkpoint step 2", strict=False)
 def test_every_committed_cache_entry_is_current_and_grounded():
     """D3/E5: the committed cache holds exactly today's AI subjects, and each passes verify()."""
     cache = explain.load_cache()
