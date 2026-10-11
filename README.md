@@ -156,12 +156,12 @@ Four pages; the loop is **Overview → click a lounge or area → its page → b
    substitutes (selected lounge or every lounge); click a lounge or area for its short pyramid and
    caveats. **Compare** has a sortable **Lounges** table and a **Growth areas, ranked** table.
 2. **Lounges** (`/lounge?lounge=delma`): a picker filtered by emirate checkboxes (Abu Dhabi and
-   Dubai ticked; a link ticks its own emirate), then address and rating, the call with its pyramid
+   Dubai ticked, plus any emirate with a PROTECT lounge; a link ticks its own emirate), then address and rating, the call with its pyramid
    and caveats, raw vs addressable women, the four signals on their scales, premium substitutes,
    which siblings share its women, *What would change the call*, and the factor table (value,
    threshold, meaning, contribution to the composite) with its sources.
 3. **Areas** (`/area?area=kalba-sharjah`): a picker of the 68 areas with 5,000+ women, with the
-   same emirate checkboxes, then the call against its tests, the margins that would move it, a map
+   same emirate checkboxes (plus any emirate with a GROW area ticked), then the call against its tests, the margins that would move it, a map
    of its cells, the nearest lounge and the factor table.
 4. **How it works & limitations:** the ranked limitations, the market model, every assumption with
    its source, and every constant with why it was chosen.

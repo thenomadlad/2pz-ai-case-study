@@ -104,7 +104,7 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 
 *To improve:*
 
-- Pass 4: the emirate checkboxes default to Abu Dhabi + Dubai, which hides all 5 GROW areas (Sharjah, Ajman) on the Areas page and the RAK/Fujairah PROTECT lounges in the lounge picker (see P1).
+- ~~Pass 4: the emirate checkboxes default to Abu Dhabi + Dubai, which hides all 5 GROW areas (Sharjah, Ajman) on the Areas page and the RAK/Fujairah PROTECT lounges in the lounge picker (see P1).~~ Fixed 2026-10-11: defaults also tick every emirate with a PROTECT lounge or a GROW area.
 - 5.5 *(model)*: weight sensitivity is shown passively, but weights and thresholds can't be changed in the what-if.
 
 ---
@@ -139,7 +139,7 @@ The brief lists these as the minimum content of the product. Most of the substan
 
 *To improve:*
 
-- Pass 4: about 10 places still say "no rent data" while shop rent is shown for 9 lounges: README:39-40/97/321, walkthrough:188, CONTEXT:116, the limitations box (views.py:188), the overview (overview.py:200), scorecard THRESHOLDS_WHY and the NO_FINANCIALS caveat (scorecard.py:51/70), and `rent_data_available: False` (explain.py:478, so the cached UAE summary needs regenerating). Reword to "no revenue, lease or capex data".
+- ~~Pass 4: about 10 places still say "no rent data" while shop rent is shown for 9 lounges: README:39-40/97/321, walkthrough:188, CONTEXT:116, the limitations box (views.py:188), the overview (overview.py:200), scorecard THRESHOLDS_WHY and the NO_FINANCIALS caveat (scorecard.py:51/70), and `rent_data_available: False` (explain.py:478, so the cached UAE summary needs regenerating). Reword to "no revenue, lease or capex data".~~ Fixed 2026-10-11.
 - A3 *(model)*: the north star and its proxy are named, but `est_customers` drives no label.
 
 ### B. Recommendation logic
@@ -155,7 +155,7 @@ The brief says it must be **coherent, explainable, defensible**. It does not hav
 
 *To improve:*
 
-- Pass 4: rounding to 2 decimals hides knife-edge calls. al-maqta reads "Composite 0.35 → HOLD" and "0.00 from the SHRINK line" (it's 0.003). Show 3 decimals within 0.01 of a line (lounge.py:46, explain.what_would_change).
+- ~~Pass 4: rounding to 2 decimals hides knife-edge calls. al-maqta reads "Composite 0.35 → HOLD" and "0.00 from the SHRINK line" (it's 0.003). Show 3 decimals within 0.01 of a line (lounge.py:46, explain.what_would_change).~~ Fixed 2026-10-11: 3 decimals within 0.01 of a line; flip values one decimal finer when they'd round equal.
 - B1 *(model)*: the airport is out, and the PROTECT markets (122/113/145 per 1k) now pass the 150 line. But a growth area is a place-name group of cells, not a candidate site's catchment, so BT3 still shows no agreement on unit.
 
 ### C. Geographic reasoning
@@ -394,7 +394,7 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 *To improve:*
 
 - Pass 4:
-  - MO6: kalba and al-jerf (2 of the 5 GROWs) flip in 27 of 81 assumption combinations, yet area confidence ignores level flips: kalba shows "high".
+  - MO6: kalba and al-jerf (2 of the 5 GROWs) flip in 27 of 81 assumption combinations, yet area confidence ignores level flips: kalba shows "high". Moved to the model plan (growth notebook sensitivity): area flips need 81 area builds.
   - MO9: MIN_RATING_REVIEWS, REF_UNIT_M2 and MIN_RENT_COVERAGE are missing from the How page, and there's a bare 0.01° site-cell tolerance (lounges.py:161).
 - MO1 *(model)*: the affluence layer still "changes no call", but is kept.
 - MO4: the methods table is in limitations. Two gaps remain: Huff is not implemented, and there's no "where our catchments differ from a Voronoi split" comparison.
