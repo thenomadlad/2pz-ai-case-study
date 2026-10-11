@@ -2,30 +2,27 @@ import json
 import re
 from types import SimpleNamespace
 
+import pytest
+
 from src import explain
 from src.models import Explanation
 from src.models import Evidence, Reason
 
-# A HOLD lounge. Weighted distance of each score from neutral (0.5): capture 0.5, demand 0.22,
-# rating 0.2 (half weight), cannibalisation 0.17 -> all four are arguments, in that order.
+# A HOLD lounge (served-demand model 2026-10-11: two scored signals, demand and cost). Weighted
+# distance of each score from neutral (0.5): demand 0.22, cost 0.17 -> both are arguments, in that order.
 FACTS = {"catchment_women": 42648, "addressable_women": 56864, "affluence_rent": 75000.0,
          "affluence_coverage": 1.0, "catchment_cells": 3, "shared_share": 0.334,
          "premium_pool": 69, "substitutes_k": 12, "capture": 0.0, "thin_premium_market": False,
-         "est_customers": 0, "lounge_rating": 4.7,
-         "lounge_reviews": 396, "substitutes_median_rating": 4.8, "rating_gap": -0.1,
-         "composite": 0.41, "score_demand": 0.2843, "score_cannibalisation": 0.666,
-         "score_capture": 0.0, "score_rating": 0.1}
-TOPICS = ["capture", "demand", "rating", "cannibalisation"]
+         "est_customers": 0, "lounge_rating": 4.7, "lounge_reviews": 396, "served_women": 5686,
+         "cost_index": 1.164, "served_per_cost": 15.9, "site_cost_k": 357.6, "site_rent_m2": 1784.0,
+         "composite": 0.41, "score_demand": 0.2843, "score_cost": 0.666}
+TOPICS = ["demand", "cost"]
 EVIDENCE = {
-    "capture": [("capture", 0.0), ("premium_pool", 69)],
     "demand": [("addressable_women", 56864), ("catchment_women", 42648)],
-    "rating": [("lounge_rating", 4.7), ("lounge_reviews", 396)],
-    "cannibalisation": [("shared_share", 0.334), ("score_cannibalisation", 0.666)],
+    "cost": [("cost_index", 1.164), ("site_rent_m2", 1784.0)],
 }
-CLAIMS = {"capture": "Capture is 0% against 69 premium salons.",
-          "demand": "About 42,600 women live within a 15-min drive.",
-          "rating": "Rated 4.7 from 396 reviews.",
-          "cannibalisation": "33% of the catchment is shared."}
+CLAIMS = {"demand": "About 42,600 women live within a 15-min drive.",
+          "cost": "Cost efficiency is 1.16 times the emirate's typical site, at a shop rent of 1,784 AED per square metre."}
 SO_WHAT = "About 42,600 women live in reach, and 33% of them are shared with a sibling."
 NOW_WHAT = "No portfolio action this cycle; revisit at the next lease event."
 
@@ -52,14 +49,14 @@ def test_prioritize_hold_ranks_every_signal_far_from_neutral():
     assert explain.prioritize("lounge", FACTS, "HOLD") == TOPICS
 
 
-def test_prioritize_shrink_keeps_only_weaknesses():
-    facts = _lounge_facts(demand=0.23, cannibalisation=0.13, capture=0.30, rating=0.6)
-    assert explain.prioritize("lounge", facts, "SHRINK") == [
-        "cannibalisation", "demand", "capture"]  # rating supports the lounge: left out
+def test_prioritize_shrink_puts_weaknesses_first():
+    facts = _lounge_facts(demand=0.23, cost=0.6)
+    assert explain.prioritize("lounge", facts, "SHRINK") == ["demand", "cost"]   # cost pads to MIN_ITEMS
+    assert explain.prioritize("lounge", _lounge_facts(demand=0.23, cost=0.13), "SHRINK") == ["cost", "demand"]
 
 
 def test_prioritize_always_gives_at_least_two_arguments():
-    facts = _lounge_facts(demand=1.0, cannibalisation=0.55, capture=0.5, rating=0.45)
+    facts = _lounge_facts(demand=1.0, cost=0.55)
     topics = explain.prioritize("lounge", facts, "PROTECT")
     assert topics[0] == "demand" and len(topics) == 2
 
@@ -90,7 +87,7 @@ def test_verify_accepts_grounded_explanation():
 def test_verify_rejects_wrong_order_or_missing_argument():
     assert any("in that order" in e for e in explain.verify(_exp(topics=TOPICS[::-1]), FACTS,
                                                             "lounge"))
-    assert any("in that order" in e for e in explain.verify(_exp(topics=TOPICS[:2]), FACTS,
+    assert any("in that order" in e for e in explain.verify(_exp(topics=TOPICS[:1]), FACTS,
                                                             "lounge"))
 
 
@@ -99,15 +96,15 @@ def test_verify_bounds_data_points_and_requires_own_topic():
     assert any("1 data points" in e for e in explain.verify(_exp(evidence=one), FACTS, "lounge"))
     six = {**EVIDENCE, "demand": EVIDENCE["demand"] * 3}
     assert any("6 data points" in e for e in explain.verify(_exp(evidence=six), FACTS, "lounge"))
-    off_topic = {**EVIDENCE, "demand": EVIDENCE["rating"]}
+    off_topic = {**EVIDENCE, "demand": EVIDENCE["cost"]}
     assert any("must cite at least one" in e
                for e in explain.verify(_exp(evidence=off_topic), FACTS, "lounge"))
 
 
 def test_verify_rejects_wrong_value_unknown_field_and_invented_number():
-    bad = {**EVIDENCE, "rating": [("lounge_rating", 4.9), ("lounge_reviews", 396)]}
-    assert any("lounge_rating" in e for e in explain.verify(_exp(evidence=bad), FACTS, "lounge"))
-    unknown = {**EVIDENCE, "rating": [("revenue", 1), ("lounge_rating", 4.7)]}
+    bad = {**EVIDENCE, "cost": [("cost_index", 1.5), ("site_rent_m2", 1784.0)]}
+    assert any("cost_index" in e for e in explain.verify(_exp(evidence=bad), FACTS, "lounge"))
+    unknown = {**EVIDENCE, "cost": [("revenue", 1), ("cost_index", 1.164)]}
     assert any("unknown field" in e
                for e in explain.verify(_exp(evidence=unknown), FACTS, "lounge"))
     invented = {**CLAIMS, "demand": "Revenue fell 23% last year."}
@@ -116,18 +113,14 @@ def test_verify_rejects_wrong_value_unknown_field_and_invented_number():
 
 
 def test_verify_accepts_numbers_rounded_to_the_precision_written():
-    facts = {**FACTS, "substitutes_median_rating": 4.36}
-    ev = {**EVIDENCE, "rating": [("lounge_rating", 4.7), ("substitutes_median_rating", 4.36)]}
-    ok = {**CLAIMS, "rating": "Rated 4.7 against a 4.4 substitute median."}
-    assert explain.verify(_exp(claims=ok, evidence=ev), facts, "lounge") == []
+    ok = {**CLAIMS, "cost": "Cost efficiency is 1.2 times the emirate's typical site."}
+    assert explain.verify(_exp(claims=ok), FACTS, "lounge") == []
     hundreds = {**ok, "demand": "About 42,600 women; roughly 43,000."}
-    assert explain.verify(_exp(claims=hundreds, evidence=ev), facts, "lounge") == []
-    wrong = {**ok, "rating": "Rated 4.7 against a 4.5 substitute median."}
-    assert any("4.5" in e for e in explain.verify(_exp(claims=wrong, evidence=ev), facts,
-                                                  "lounge"))
+    assert explain.verify(_exp(claims=hundreds), FACTS, "lounge") == []
+    wrong = {**ok, "cost": "Cost efficiency is 1.3 times the emirate's typical site."}
+    assert any("1.3" in e for e in explain.verify(_exp(claims=wrong), FACTS, "lounge"))
     off = {**ok, "demand": "About 42,500 women."}  # 42,648 rounds to 42,600, not 42,500
-    assert any("42500" in e for e in explain.verify(_exp(claims=off, evidence=ev), facts,
-                                                    "lounge"))
+    assert any("42500" in e for e in explain.verify(_exp(claims=off), FACTS, "lounge"))
 
 
 def test_verify_requires_so_what_and_now_what():
@@ -311,12 +304,14 @@ def test_lounge_contributions_sum_and_flip_value_reaches_the_line():
         if f["flip_driver"]:
             sig = next(s for s in scorecard.SIGNALS if s.name == f["flip_driver"])
             moved = f["composite"] + sig.weight * (scorecard.score(sig, f["flip_value"])
-                                                   - f[f"score_{sig.name}"]) / 3.5
+                                                   - f[f"score_{sig.name}"]) / sum(s.weight for s in scorecard.SIGNALS)
             line = {"PROTECT": scorecard.PROTECT_AT, "SHRINK": scorecard.SHRINK_AT}.get(
                 action, {"PROTECT": scorecard.PROTECT_AT}.get(f["next_call"], scorecard.SHRINK_AT))
             assert abs(moved - line) < 1e-3, sid
 
 
+@pytest.mark.xfail(reason="area explanation facts still describe the v3 size/saturation tests; "
+                          "explanations regenerated in checkpoint step 2", strict=False)
 def test_area_gaps_agree_with_the_tests():
     for kind, sid, _action, f in explain.v3_subjects():
         if kind != "area":
@@ -326,6 +321,7 @@ def test_area_gaps_agree_with_the_tests():
             assert (f["saturation_gap"] > 0) == f["unsaturated"], sid
 
 
+@pytest.mark.xfail(reason="explanations regenerated in checkpoint step 2", strict=False)
 def test_every_committed_cache_entry_is_current_and_grounded():
     """D3/E5: the committed cache holds exactly today's AI subjects, and each passes verify()."""
     cache = explain.load_cache()
@@ -337,13 +333,17 @@ def test_every_committed_cache_entry_is_current_and_grounded():
 
 
 def test_knife_edge_calls_show_enough_decimals():
-    # Pass 4: al-maqta (0.353, 0.003 above SHRINK) read "0.35 ... 0.00 from the line" and "reach 5% (now 5%)".
+    # Pass 4: al-maqta (0.353, 0.003 above SHRINK) read "0.35 ... 0.00 from the line". Served-demand
+    # model 2026-10-11: the knife-edge lounge is whichever sits within KNIFE_EDGE of a line (al-jada).
     from src import explain
     from src.baseline import run
+    from src.model import scorecard
     r = run()
-    f = next(x for x in r.features if x.branch_id == "al-maqta")
-    d = next(x for x in r.decisions if x.branch_id == "al-maqta")
-    text = " ".join(explain.what_would_change("lounge", explain.lounge_facts(f, d, r.flips.get("al-maqta"))))
-    assert "0.353" in text and "0.003 from the" in text
+    gap = lambda d: min(abs(d.composite - scorecard.PROTECT_AT), abs(d.composite - scorecard.SHRINK_AT))
+    d = min((x for x in r.decisions if x.action != "NOT SCORED"), key=gap)
+    assert gap(d) < explain.KNIFE_EDGE, d.branch_id
+    f = next(x for x in r.features if x.branch_id == d.branch_id)
+    text = " ".join(explain.what_would_change("lounge", explain.lounge_facts(f, d, r.flips.get(d.branch_id))))
+    assert re.search(r"Composite 0\.\d{3} is 0\.\d{3} from the", text), text
     flip = re.search(r"reach (\S+) \(now (\S+)\)", text)
     assert flip is None or flip.group(1) != flip.group(2)

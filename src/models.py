@@ -142,9 +142,9 @@ class LoungeFeatures(BaseModel):
     absorbed_share: float | None = None          # share of them siblings take over if it closes (leave-one-out)
     site_cost_k: float | None = None             # annual site cost, AED 1k: rent x unit + amortised fit-out (assumed)
     served_per_cost: float | None = None         # served women per AED 1k of annual site cost
-    cost_index: float | None = None              # served_per_cost / its emirate's median lounge (1 = typical)
+    cost_index: float | None = None              # served_per_cost / its emirate's typical site (1 = typical; COST_BASELINE_WHY)
     site_rent_m2: float | None = None            # shop rent at the lounge's site, AED/m2/yr: our cost (display only)
-    site_rent_source: str = "none"               # dld | band | none
+    site_rent_source: str = "none"               # dld | adrec | listings | emirate_median | none
     catchment_shop_rent_m2: float | None = None  # women-weighted median over catchment cells with one
     shop_rent_coverage: float = 0.0              # share of catchment women in cells with a shop rent
     women_per_rent_k: float | None = None        # addressable women per AED 1,000 of the site's annual rent
@@ -177,7 +177,7 @@ class Area(BaseModel):
     new_site_net: float | None = None            # ... net new to the network (served - taken)
     site_cost_k: float | None = None             # annual site cost here, AED 1k (rent x unit + fit-out)
     served_per_cost: float | None = None         # net new women per AED 1k of annual site cost
-    cost_index: float | None = None              # served_per_cost / its emirate's median lounge (1 = typical)
+    cost_index: float | None = None              # served_per_cost / its emirate's typical site (1 = typical; COST_BASELINE_WHY)
     shop_rent_m2: float | None = None            # women-weighted median shop rent over the area's cells
     shop_rent_coverage: float = 0.0
     women_per_rent_k: float | None = None        # addressable women per AED 1,000 of annual rent there

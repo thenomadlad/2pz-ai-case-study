@@ -72,3 +72,27 @@ def test_retail_rent_bands_are_sourced_and_ordered():
     classes = pd.read_csv(v3 / "lounge_site_class.csv")
     assert set(classes.location_class) <= set(bands.location_class)
     assert classes.evidence.str.len().gt(0).all()
+
+
+def test_every_cell_has_a_shop_rent_from_its_emirates_source_or_median():
+    # One rent column for all emirates (2026-10-11): DLD, ADREC, listings, else the emirate median.
+    c = load_v3().cells
+    assert c.shop_rent_m2.notna().all() and (c.shop_rent_m2 > 0).all()
+    src = c.groupby("emirate").shop_rent_source.agg(set).to_dict()
+    assert src["Dubai"] == {"dld", "emirate_median"} and src["Abu Dhabi"] == {"adrec", "emirate_median"}
+    for em in ("Sharjah", "Ajman", "Ras Al Khaimah", "Umm Al Quwain", "Fujairah"):
+        assert src[em] == {"listings", "emirate_median"}, em
+    fb = c[c.shop_rent_source == "emirate_median"]
+    direct = c[c.shop_rent_source != "emirate_median"].groupby("emirate").shop_rent_m2.median()
+    assert (fb.shop_rent_m2 == fb.emirate.map(direct)).all()
+
+
+def test_adrec_names_match_across_spellings_and_municipalities():
+    from src.data_v3 import _norm
+    assert _norm("Mzeerʻah") == _norm("Mzeer'ah") and _norm("Ghiyathi") == _norm("Ghayathi")
+    assert _norm("Al-Bateen") == _norm("Al Bateen") == _norm("Bateen")
+    c = load_v3().cells
+    bateen = c[(c.emirate == "Abu Dhabi") & (c.name == "Al Bateen")]
+    assert set(bateen.shop_rent_m2[bateen.lng > 55]) <= {1518.0} and set(bateen.shop_rent_m2[bateen.lng < 55]) <= {1380.0}
+    m = c[c.emirate == "Abu Dhabi"].shop_rent_source.eq("adrec").mean()
+    assert 0.6 < m < 0.7      # 760 of 1,167 cells matched by name (2026-10-11)

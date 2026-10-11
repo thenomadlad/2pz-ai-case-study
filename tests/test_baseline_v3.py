@@ -17,20 +17,17 @@ def test_baseline_has_24_decisions_one_not_scored():
     assert sum(d.action == "NOT SCORED" for d in r.decisions) == 1
 
 
-def test_closing_al_barsha_moves_neighbours_and_opens_no_core_area():
+def test_closing_al_barsha_moves_neighbours_and_opens_no_area():
     base, after = run(), run(closed=frozenset({"al-barsha"}))
     b, a = by_id(base.features), by_id(after.features)
     assert "al-barsha" not in a
     for n in ("jumeirah-park", "city-walk"):
         assert a[n].shared_share != b[n].shared_share
-    # capture moves only where the closed lounge was among the substitutes (city-walk, not jumeirah-park)
-    assert a["city-walk"].capture != b["city-walk"].capture
+    # Served-demand model (2026-10-11): siblings take over some of its served women, and since every
+    # named place is already a growth area, closing opens no new area (the what-ifs move instead).
+    assert all(a[n].served_women > b[n].served_women for n in ("jumeirah-park", "city-walk"))
     d = diff(base, after)
-    # small fringe areas do open up (al-sufouh, mudon...), but none is worth growing into. Since run-2
-    # fix D1 (saturation line 50 -> 150) one is a small, unsaturated WATCH (wadi-al-safa-7, 8k women).
-    acts = {x.area_id: x.action for x in after.area_decisions}
-    assert d.areas_appeared and all(acts[i] in ("SKIP", "WATCH") for i in d.areas_appeared)
-    assert all(x.women < 10_000 for x in after.areas if x.area_id in d.areas_appeared)
+    assert not d.areas_appeared and not d.areas_disappeared
     assert {c.branch_id for c in d.lounges} >= {"al-barsha", "jumeirah-park", "city-walk"}
     assert next(c for c in d.lounges if c.branch_id == "al-barsha").new_action is None
 

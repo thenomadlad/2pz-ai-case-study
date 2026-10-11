@@ -225,8 +225,9 @@ def _lounge_table(r) -> None:
                "lounge); shared catchment = share of its women another open lounge also reaches; capture "
                "share = its share of its premium substitutes' Google reviews; premium reviews per 1k women = "
                "catchment saturation, the growth areas' measure (shown, not scored). "
-               "Shop rent is our cost; women per AED 1k assumes a 150 m² unit. Blank: no rent source "
-               "(Dubai: DLD shop contracts; elsewhere only malls with a published band).")
+               "Shop rent is our cost; women per AED 1k assumes a 150 m² unit. Rent sources: DLD shop "
+               "contracts (Dubai), ADREC district rates (Abu Dhabi), shop listings (northern emirates), "
+               "else the emirate median.")
 
 
 def _area_table(r) -> None:

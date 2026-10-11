@@ -27,9 +27,11 @@ SIGNALS: tuple[Signal, ...] = (
     Signal("demand", "served_women", "Addressable women the lounge serves (Huff share of each reachable cell)", 0, 20_000,
            "Quick first cut (2026-10-11): served women run about 1.3k-19k over the scored lounges; "
            "20k is about the best, so a lounge serving that many scores 1."),
-    Signal("cost", "cost_index", "Served women per AED 1k of site cost, against its emirate's median lounge", 0.5, 1.5,
-           "1 = as cost-efficient as the emirate's median lounge; half as good scores 0, 1.5x scores 1. "
-           "Site cost = shop rent x 150 m2 + amortised fit-out (assumed). Missing rent scores neutral. "
+    Signal("cost", "cost_index", "Served women per AED 1k of site cost, against its emirate's typical site", 0.5, 1.5,
+           "1 = as cost-efficient as the emirate's median lounge (median growth area where it has under 2 "
+           "lounges: COST_BASELINE_WHY in src/features/lounges.py); half as good scores 0, 1.5x scores 1. "
+           "Site cost = shop rent x 150 m2 + amortised fit-out (assumed). Every cell has a shop rent since "
+           "2026-10-11 (DLD, ADREC, listings or the emirate median); a missing index scores neutral. "
            "Cannibalisation is no longer scored: it is a what-if shown on the lounge page."),
 )
 

@@ -91,18 +91,18 @@ def test_closed_lounge_leaves_substitute_sets(tiny_v3):
     assert closed_cap > open_cap
 
 
-def test_cells_only_a_closed_lounge_reached_become_growth_areas(tiny_v3):
-    _, areas = build(tiny_v3, ASSUMPTIONS)
-    assert {c for a in areas for c in a.cell_ids} == {C5, FAR}
-    _, areas = build(tiny_v3, ASSUMPTIONS, closed=frozenset({"b"}))
-    cells = {c for a in areas for c in a.cell_ids}
-    assert C3 in cells and C2 not in cells          # C2 is still a's
+def test_every_named_place_is_a_growth_area_reached_or_not(tiny_v3):
+    # Served-demand model (2026-10-11): an area is any named place, inside a catchment or not; the
+    # what-if (net new women) decides, not whether a lounge already reaches it. Closing changes nothing.
+    for closed in (frozenset(), frozenset({"b"})):
+        _, areas = build(tiny_v3, ASSUMPTIONS, closed=closed)
+        assert {c for a in areas for c in a.cell_ids} == {C1, C2, C3, C5, FAR}
 
 
 def test_one_growth_area_per_place_name_and_none_for_unnamed_cells(tiny_v3):
     _, areas = build(tiny_v3, ASSUMPTIONS, closed=frozenset({"b"}))
     town = [a for a in areas if a.name == "Town"]
-    assert len(town) == 1 and set(town[0].cell_ids) == {C3, C5}    # not contiguous, one place: one area
+    assert len(town) == 1 and set(town[0].cell_ids) == {C1, C2, C3, C5}   # not contiguous, one place: one area
     far = next(a for a in areas if a.name == "Far")
     assert far.area_id == "far-dubai" and far.nearest_lounge_id == "a"
     assert far.premium_salons is None and far.data_coverage == 0   # no search circle: no data
@@ -112,7 +112,7 @@ def test_one_growth_area_per_place_name_and_none_for_unnamed_cells(tiny_v3):
     v = _v3(tiny_v3.lounges, [_cell(C1, 1000), _cell(C2, 3000), _cell(C3, 2000), *unnamed],
             {"a": [C1, C2, inside], "b": [C2, C3]}, [], {})
     f, areas = build(v, ASSUMPTIONS)
-    assert all(lone not in x.cell_ids for x in areas) and not areas
+    assert all(lone not in x.cell_ids and inside not in x.cell_ids for x in areas)
     assert next(x for x in f if x.branch_id == "a").catchment_women == pytest.approx(
         women(v, C1) + women(v, C2) + women(v, inside))
 
@@ -181,21 +181,24 @@ def test_travel_level_changes_competition(real_v3):
     assert any(hi[b].premium_pool > lo[b].premium_pool for b in hi)
 
 
-# Composites and GROW areas at medium levels before affluence existed (commit f049b9b), updated for
-# the run-2 fixes (2026-10-10): A1 (airport out of shared catchments and substitute pools) moved
-# al-maqta, khalifa-city-a, ministries-complex, noya-plaza, shahama and westyas; A4 (thin-market
-# blend) moved al-dhafra 0.4851 -> 0.5851 and al-falah 0.4809 -> 0.5666; D1 (saturation line 50 ->
-# 150) added al-jerf-ajman to GROW. Affluence off must still reproduce the unweighted model.
-# Run 3 (2026-10-10): rating gap vs the whole premium pool (20+ reviews), not the top-k substitutes:
-# al-ain, al-maqta (SHRINK -> HOLD), mirdif-35, noya-plaza, ras-al-khaimah, westyas, zawaya-walk moved (SC4).
+# Served-demand model 2026-10-11 (demand = served women, cost = cost index on the three-source shop
+# rent; affluence off at baseline). Replaces the v3 pins (capture / rating / cannibalisation scorecard,
+# saturation-gated GROW): a regression pin, so any change to these is deliberate.
 BEFORE_AFFLUENCE = {
-    "al-ain": 0.7738, "al-barsha": 0.3664, "al-dhafra": 0.5851, "al-falah": 0.5666, "al-jada": 0.4872,
-    "al-maqta": 0.353, "al-taif-mall": 0.6933, "baniyas": 0.4224, "city-walk": 0.4074, "delma": 0.227,
-    "jumeirah-park": 0.4132, "khaleej-al-arabi": 0.2773, "khalifa-city-a": 0.4255,
-    "ministries-complex": 0.3831, "mirdif-35": 0.5212, "mohammed-bin-zayed-city": 0.2769,
-    "nad-al-sheba": 0.4345, "noya-plaza": 0.2394, "ras-al-khaimah": 0.6762, "shahama": 0.3828,
-    "shakhbout-city": 0.4194, "westyas": 0.249, "zawaya-walk": 0.5374}
-GROW_BEFORE = {"sharjah-sharjah", "al-dhaid-sharjah", "khor-fakkan-sharjah", "kalba-sharjah", "al-jerf-ajman"}
+    'al-ain': 0.9663, 'al-barsha': 0.3045, 'al-dhafra': 0.9408, 'al-falah': 0.6781, 'al-jada': 0.3445,
+    'al-maqta': 0.3853, 'al-taif-mall': 0.4207, 'baniyas': 0.5738, 'city-walk': 0.0894, 'delma': 0.0424,
+    'jumeirah-park': 0.2025, 'khaleej-al-arabi': 0.0771, 'khalifa-city-a': 0.9163, 'ministries-complex': 0.4174,
+    'mirdif-35': 0.6304, 'mohammed-bin-zayed-city': 0.135, 'nad-al-sheba': 0.4451, 'noya-plaza': 0.0346,
+    'ras-al-khaimah': 0.3632, 'shahama': 0.5361, 'shakhbout-city': 0.7458, 'westyas': 0.079, 'zawaya-walk': 0.4529}
+GROW_BEFORE = {
+    'al-awir-dubai', 'al-batayih-sharjah', 'al-dhahir-abu-dhabi', 'al-dhaid-sharjah', 'al-fahlain-ras-al-khaimah',
+    'al-hamriya-sharjah', 'al-helio-ajman', 'al-hiyar-abu-dhabi', 'al-jerf-ajman', 'al-madam-sharjah',
+    'al-maqam-abu-dhabi', 'al-rahbah-abu-dhabi', 'al-ramlah-sharjah', 'al-rawdah-al-sharqiyah-abu-dhabi',
+    'al-sad-abu-dhabi', 'al-samhah-abu-dhabi', 'dibba-al-hisn-sharjah', 'digdaga-ras-al-khaimah',
+    'falaj-hazza-abu-dhabi', 'hamidiya-ajman', 'kalba-sharjah', 'khatt-ras-al-khaimah', 'khor-fakkan-sharjah',
+    'manama-ajman', 'mazyad-abu-dhabi', 'mbazzarah-al-khadra-abu-dhabi', 'milehah-sharjah', 'mudayrah-ajman',
+    'mzeer-ah-abu-dhabi', 'rimah-abu-dhabi', 'sharjah-sharjah', 'um-ghafah-abu-dhabi', 'wasit-sharjah',
+    'zakhir-abu-dhabi'}
 
 
 def test_affluence_off_reproduces_the_unweighted_model_exactly(real_v3):
@@ -208,12 +211,11 @@ def test_affluence_off_reproduces_the_unweighted_model_exactly(real_v3):
     got = {d.branch_id: d.composite for d in scorecard.decide(f) if d.action != "NOT SCORED"}
     assert got == BEFORE_AFFLUENCE
     assert {d.area_id for d in growth.classify_all(areas) if d.action == "GROW"} == GROW_BEFORE
-    # and every other number is untouched by the affluence level
-    med = build(real_v3, ASSUMPTIONS)
-    # women_per_rent_k is addressable women over rent, so it moves with affluence too
-    strip = lambda x: x.model_dump(exclude={"addressable_women", "est_customers", "women_per_rent_k"})
-    assert [strip(x) for x in f] == [strip(x) for x in med[0]]
-    assert [strip(x) for x in areas] == [strip(x) for x in med[1]]
+    # and every number that doesn't read addressable women is untouched by the affluence level
+    # (served-demand model: served women, the what-ifs and the cost index all read addressable women)
+    med = build(real_v3, ASSUMPTIONS, Levels(affluence="medium"))
+    keep = lambda x: x.model_dump(include={"catchment_women", "shared_share", "capture", "site_rent_m2", "site_cost_k"})
+    assert [keep(x) for x in f] == [keep(x) for x in med[0]]
 
 
 def test_every_lounge_and_area_has_an_affluence_source(real_v3):
@@ -257,6 +259,7 @@ def test_shop_rent_is_women_weighted_over_cells_that_have_one(tiny_v3):
     tiny_v3.cells["shop_rent_m2"] = float("nan")
     tiny_v3.cells.loc[C1, "shop_rent_m2"] = 1000.0
     tiny_v3.cells.loc[C2, "shop_rent_m2"] = 3000.0
+    tiny_v3.cells["shop_rent_source"] = tiny_v3.cells.shop_rent_m2.map(lambda x: "none" if x != x else "dld")
     f, _ = build(tiny_v3, ASSUMPTIONS)
     a = next(x for x in f if x.branch_id == "a")            # reaches C1 (1000 adults), C2 (3000)
     assert a.catchment_shop_rent_m2 == 3000.0                # women-weighted median: C2 holds the majority
@@ -266,26 +269,25 @@ def test_shop_rent_is_women_weighted_over_cells_that_have_one(tiny_v3):
     assert b.site_rent_m2 is None and b.site_rent_source == "none" and b.women_per_rent_k is None
 
 
-def test_shop_rent_never_changes_a_label(real_v3):
-    from src.features import lounges
-    from src.model import growth, scorecard
-    f, areas = build(real_v3, ASSUMPTIONS)
-    before = {d.branch_id: d.action for d in scorecard.decide(f)}
-    real_v3.cells["shop_rent_m2"] = real_v3.cells["shop_rent_m2"] * 10
-    lounges._PREP.clear()
-    try:
-        f2, areas2 = build(real_v3, ASSUMPTIONS)
-    finally:
-        real_v3.cells["shop_rent_m2"] = real_v3.cells["shop_rent_m2"] / 10
-    assert {d.branch_id: d.action for d in scorecard.decide(f2)} == before
-    assert [d.action for d in growth.classify_all(areas2)] == [d.action for d in growth.classify_all(areas)]
-
-
-def test_non_dubai_lounge_uses_its_class_band(real_v3):
+def test_every_scored_lounge_has_a_site_rent_from_its_cell(real_v3):
+    # Since 2026-10-11 every cell has a shop rent (DLD, ADREC, listings or the emirate median); the
+    # JLL mall-class bands are no longer used, and a lounge's site rent is its cell's.
     f, _ = build(real_v3, ASSUMPTIONS)
-    banded = [x for x in f if x.site_rent_source == "band"]
-    assert banded and all(x.emirate != "Dubai" and x.site_rent_m2 > 0 and x.women_per_rent_k for x in banded)
-    assert all(x.site_rent_source in ("dld", "none") for x in f if x.emirate == "Dubai")
+    for x in f:
+        assert x.site_rent_m2 and x.site_rent_source in ("dld", "adrec", "listings", "emirate_median"), x.branch_id
+    assert {x.site_rent_source for x in f if x.emirate == "Dubai"} == {"dld"}
+
+
+def test_cost_baseline_is_the_median_lounge_else_the_median_area():
+    # COST_BASELINE_WHY (2026-10-11): 2+ lounges with a cost -> their median; else the evaluated areas'.
+    from types import SimpleNamespace as N
+
+    from src.features.lounges import cost_baseline
+    lo = lambda e, v, ns=False: N(emirate=e, served_per_cost=v, not_scored=ns)
+    feats = [lo("A", 10), lo("A", 30), lo("A", 99, ns=True), lo("B", 50), lo("C", None)]
+    areas = [N(emirate="A", served_per_cost=1), N(emirate="B", served_per_cost=4), N(emirate="B", served_per_cost=8),
+             N(emirate="D", served_per_cost=2), N(emirate="D", served_per_cost=None)]
+    assert cost_baseline(feats, areas) == {"A": 20, "B": 6, "D": 2}
 
 
 def test_shop_rent_needs_half_the_women_covered(tiny_v3):

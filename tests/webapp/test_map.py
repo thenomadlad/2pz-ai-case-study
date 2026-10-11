@@ -9,7 +9,8 @@ def test_lounge_layer_colours_by_action_and_hollows_low_confidence():
     rows = {r["branch_id"]: r for r in layer.data}
     assert rows["zayed-international-airport"]["color"][:3] == ACTION_COLORS["NOT SCORED"]
     assert rows["al-ain"]["color"] == [*ACTION_COLORS["PROTECT"], 230]           # high confidence
-    assert rows["al-barsha"]["color"][3] < 100 and rows["al-barsha"]["line"] == ACTION_COLORS["HOLD"]
+    # served-demand model 2026-10-11: al-barsha is a low-confidence SHRINK (0.30, near the line)
+    assert rows["al-barsha"]["color"][3] < 100 and rows["al-barsha"]["line"] == ACTION_COLORS["SHRINK"]
 
 
 def test_selected_lounge_adds_polygon_cells_and_substitutes():

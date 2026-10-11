@@ -144,22 +144,23 @@ GLOSSARY: dict[str, Field] = {
     "absorbed_share": Field("Absorbed by siblings", "% of served", "Share of its served women other lounges take over if it closes.", pct=True),
     "site_cost_k": Field("Site cost", "AED 1k/yr", "Shop rent x 150 m² (assumed unit) + fit-out of AED 3,000/m² over 5 years (assumed)."),
     "served_per_cost": Field("Women per AED 1k of site cost", "women", "Served (or, for an area, net new) women per AED 1,000 of annual site cost."),
-    "cost_index": Field("Cost efficiency vs emirate", "x median lounge", "Women per AED 1k of site cost against the emirate's median lounge: 1 = typical."),
+    "cost_index": Field("Cost efficiency vs emirate", "x emirate typical", "Women per AED 1k of site cost against the emirate's median lounge (median growth area where the emirate has under 2 lounges): 1 = typical."),
     "new_site_served": Field("New lounge would serve", "women", "What-if: women a typical new lounge here would serve (Huff)."),
     "new_site_taken": Field("Taken from our lounges", "women", "What-if: of those, women it would take from our existing lounges."),
     "new_site_net": Field("Net new women", "women", "What-if: women a new lounge here adds to the network (served − taken)."),
     "unserved_women": Field("Unserved women", "women", "Addressable women no premium salon serves today (Huff)."),
     "site_rent_m2": Field("Shop rent at the site", "AED/m²/yr",
                           "Commercial (shop) rent where the lounge sits: our cost, not customer affluence. "
-                          "Dubai: the median of DLD Ejari shop contracts in its area, which mixes mall and street "
-                          "shops, so a mall site's lease can be well above it; elsewhere: a published band for its "
-                          "mall class, not its lease."),
+                          "Dubai: the median of DLD Ejari shop contracts in its area; Abu Dhabi: ADREC's 2025 "
+                          "street-retail rate for its district; northern emirates: median asking rent of nearby "
+                          "shop listings; else the emirate median. An area rate that mixes mall and street shops, "
+                          "not the lounge's lease: a mall site can be well above it."),
     "women_per_rent_k": Field("Women per AED 1k of rent", "women",
                               "Addressable women per AED 1,000 of annual rent for a 150 m² unit (assumed): "
                               "the unit size sets the level, never the ranking. Display only, not scored."),
     "shop_rent_m2": Field("Shop rent in the area", "AED/m²/yr",
-                          "Women-weighted median DLD shop rent over the area's cells (Dubai only; shown when cells "
-                          "with a rent hold half its women). An area median mixes mall and street shops."),
+                          "Women-weighted median shop rent over the area's cells (DLD in Dubai, ADREC in Abu Dhabi, "
+                          "listings in the northern emirates, else the emirate median). Mixes mall and street shops."),
     "premium_reviews_per_1k": Field(
         "Premium saturation", "reviews per 1k women",
         "Premium salons' Google reviews (scaled up for missed salons) per 1,000 women in the "
@@ -270,7 +271,7 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     },
 }
 TOPIC_LABELS = {
-    "demand": "Demand", "cannibalisation": "Cannibalisation", "capture": "Capture",
+    "demand": "Demand", "cannibalisation": "Cannibalisation", "cost": "Cost efficiency", "capture": "Capture",
     "rating": "Rating vs rivals", "size": "Size", "saturation": "Competition",
     "reach": "Distance to a lounge", "worker_housing": "Demand reliability",
     "data_gap": "What we couldn't search", "shrink": "Where to investigate",

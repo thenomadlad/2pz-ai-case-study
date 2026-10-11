@@ -22,6 +22,7 @@ BANDS = (10, 15, 20)
 OUTSIDE_PCTL = 50
 RATING_ELASTICITY = 5.0   # attractiveness x (rating / 4.6) ** 5: 4.8 stars ~1.24x, 4.3 ~0.71x; missing rating = 1x   # outside option = the median premium supplier's attractiveness, at 10 min
 _ACCESS: dict[int, tuple] = {}
+KM_NO_FIT = {10: 5.0, 15: 8.0, 20: 12.0}   # straight-line bands for a V3 without isochrones (tests only)
 
 
 def _suppliers(v3, a, closed=frozenset(), not_scored=frozenset()) -> pd.DataFrame:
@@ -29,11 +30,13 @@ def _suppliers(v3, a, closed=frozenset(), not_scored=frozenset()) -> pd.DataFram
     rows = s.reset_index().to_dict("records")
     prem = premium_substitutes(rows, len(rows), a.premium_min_rating, a.comparable_price_levels)
     sup = pd.DataFrame([{"id": r["place_id"], "lat": float(r["lat"]), "lng": float(r["lng"]),
-                         "reviews": _reviews(r), "rating": r.get("rating"), "lounge": False} for r in prem])
+                         "reviews": _reviews(r), "rating": r.get("rating"), "lounge": False} for r in prem],
+                       columns=["id", "lat", "lng", "reviews", "rating", "lounge"])
     sup = pd.concat([sup, _imputed(v3, prem)], ignore_index=True).astype({"lat": float, "lng": float, "reviews": float})
     lo = pd.DataFrame([{"id": x.branch_id, "lat": x.lat, "lng": x.lng, "reviews": x.review_count or 0,
                         "rating": x.rating, "lounge": True}
-                       for x in v3.lounges if x.branch_id not in closed and x.branch_id not in not_scored])
+                       for x in v3.lounges if x.branch_id not in closed and x.branch_id not in not_scored],
+                      columns=["id", "lat", "lng", "reviews", "rating", "lounge"])
     return pd.concat([sup, lo], ignore_index=True).astype({"lounge": bool, "lat": float, "lng": float, "reviews": float})
 
 
@@ -55,8 +58,10 @@ def _imputed(v3, prem: list[dict]) -> pd.DataFrame:
     c = v3.cells.copy()
     c["women"] = women_15plus(c, v3.emirates, 0.055)
     c["covered"] = c.index.map(_prep(v3)["covered"]).fillna(False).astype(bool)
-    c["tier"] = c.groupby("emirate").women.transform(lambda s: pd.qcut(s.rank(method="first"), 3, labels=False))
-    sal = pd.DataFrame([{"lat": float(r["lat"]), "lng": float(r["lng"]), "reviews": _reviews(r)} for r in prem])
+    c["tier"] = c.groupby("emirate").women.transform(   # tertiles; a toy emirate under 3 cells is one tier
+        lambda s: pd.qcut(s.rank(method="first"), 3, labels=False) if len(s) >= 3 else 0)
+    sal = pd.DataFrame([{"lat": float(r["lat"]), "lng": float(r["lng"]), "reviews": _reviews(r)} for r in prem],
+                       columns=["lat", "lng", "reviews"])
     rev = {}
     for cid, x in c.iterrows():   # premium reviews per cell, by bounds
         m = (sal.lat >= x.south) & (sal.lat < x.north) & (sal.lng >= x.west) & (sal.lng < x.east)
@@ -85,7 +90,8 @@ def _access(v3, a, not_scored) -> pd.DataFrame:
     tree = STRtree([Point(x, y) for x, y in zip(sup.lng, sup.lat)])
     iso = {}
     for f in json.loads((REPO_ROOT / "data/seed/v3/cell_isochrones.geojson").read_text())["features"]:
-        iso.setdefault(f["properties"]["cell_id"], {})[f["properties"]["minutes"]] = shape(f["geometry"])
+        if f["properties"]["cell_id"] in v3.cells.index:   # the real file; a test V3 has its own cells
+            iso.setdefault(f["properties"]["cell_id"], {})[f["properties"]["minutes"]] = shape(f["geometry"])
     cells = v3.cells
     rows, fit = [], {b: [] for b in BANDS}
     for cid, poly in iso.items():
@@ -98,7 +104,9 @@ def _access(v3, a, not_scored) -> pd.DataFrame:
                     rows.append((cid, sup.id.iloc[i], b, "isochrone"))
                     fit[b].append(_km(c.lat, c.lng, sup.lat.iloc[i], sup.lng.iloc[i]))
     # straight-line band edges: the 75th pct km of pairs reached within each band (cumulative)
-    km = {b: float(np.percentile(sum((fit[x] for x in BANDS if x <= b), []), 75)) for b in BANDS}
+    # no isochrone pairs only happens on a toy V3 (tests): fall back to KM_NO_FIT
+    km = {b: float(np.percentile(sum((fit[x] for x in BANDS if x <= b), []), 75)) if fit[10] else KM_NO_FIT[b]
+          for b in BANDS}
     for cid, c in cells[~cells.index.isin(iso)].iterrows():
         d = _km(c.lat, c.lng, sup.lat.values, sup.lng.values)
         for i in np.flatnonzero(d <= km[20]):
@@ -119,7 +127,7 @@ def allocate(demand: pd.Series, acc: pd.DataFrame, sup: pd.DataFrame) -> tuple[p
     a = acc.merge(sup[["id", "reviews", "rating", "lounge"]], on="id")
     stars = pd.to_numeric(a.rating, errors="coerce").fillna(4.6)
     a["w"] = a.reviews.clip(lower=1) ** ALPHA * (stars / 4.6) ** RATING_ELASTICITY * a.minutes.map(DECAY)
-    outside = float(np.percentile(sup.reviews.clip(lower=1) ** ALPHA, OUTSIDE_PCTL))
+    outside = float(np.percentile(sup.reviews.clip(lower=1) ** ALPHA, OUTSIDE_PCTL)) if len(sup) else 1.0   # no supplier left (toy V3)
     denom = a.groupby("cell_id").w.sum() + outside
     a["women"] = a.w / a.cell_id.map(denom) * a.cell_id.map(demand).fillna(0.0)
     cells = pd.DataFrame({"demand": demand})
@@ -159,7 +167,8 @@ def site_access(v3, a, lat: float, lng: float, not_scored=frozenset()) -> pd.Dat
     if iso is None:
         iso = {}
         for f in json.loads((REPO_ROOT / "data/seed/v3/cell_isochrones.geojson").read_text())["features"]:
-            iso.setdefault(f["properties"]["cell_id"], {})[f["properties"]["minutes"]] = shape(f["geometry"])
+            if f["properties"]["cell_id"] in v3.cells.index:
+                iso.setdefault(f["properties"]["cell_id"], {})[f["properties"]["minutes"]] = shape(f["geometry"])
         _ISO[id(v3)] = iso
     pt, rows, cells = Point(lng, lat), [], v3.cells
     for cid, poly in iso.items():
