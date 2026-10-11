@@ -216,6 +216,10 @@ def test_affluence_off_reproduces_the_unweighted_model_exactly(real_v3):
     med = build(real_v3, ASSUMPTIONS, Levels(affluence="medium"))
     keep = lambda x: x.model_dump(include={"catchment_women", "shared_share", "capture", "site_rent_m2", "site_cost_k"})
     assert [keep(x) for x in f] == [keep(x) for x in med[0]]
+    # the what-if cache must tell levels apart: affluence keeps the demand total, so a key on the sum
+    # collided and every level reused the first level's what-ifs (fixed 2026-10-11)
+    awir = lambda xs: next(a for a in xs if a.area_id == "al-awir-dubai").new_site_net
+    assert awir(areas) != awir(med[1])
 
 
 def test_every_lounge_and_area_has_an_affluence_source(real_v3):

@@ -289,7 +289,8 @@ def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
         if ar.women < SKIP_UNDER_WOMEN or NON_RESIDENTIAL.search(ar.name):
             out.append(ar)
             continue
-        key = ("open", id(v3), ar.area_id, round(float(aw_s.sum())), closed)
+        # keyed on the demand itself: affluence weighting keeps the total, so a sum would collide across levels
+        key = ("open", id(v3), ar.area_id, hash(aw_s.to_numpy().tobytes()), closed)
         if key not in _SERVED:
             _SERVED[key] = what_if_open(v3, a, aw_s, ar.lat, ar.lng, reviews, rating, closed=closed,
                                         not_scored=frozenset(NOT_SCORED))
