@@ -24,14 +24,13 @@ class Signal:
 
 
 SIGNALS: tuple[Signal, ...] = (
-    Signal("demand", "addressable_women", "Addressable women 15+ in the 15-min catchment", 0, 200_000,
-           "Affluence-weighted (Dubai rents; elsewhere a woman counts 1). Lounges range 23k-321k "
-           "addressable women, median 107k (raw: 23k-272k, median 107k); 200k is where the four big "
-           "Dubai lounges sit, weighted or not, and one lounge can't absorb more, so extra women stop counting."),
-    Signal("cannibalisation", "shared_share", "Share of catchment women another lounge also reaches",
-           1.0, 0.0,
-           "Already a 0-100% share: 0% means no sibling reaches this lounge's women. Abu Dhabi "
-           "city lounges mostly sit at 82-100%."),
+    Signal("demand", "served_women", "Addressable women the lounge serves (Huff share of each reachable cell)", 0, 20_000,
+           "Quick first cut (2026-10-11): served women run about 1.3k-19k over the scored lounges; "
+           "20k is about the best, so a lounge serving that many scores 1."),
+    Signal("cannibalisation", "absorbed_share", "Share of its served women siblings take over if it closes",
+           0.4, 0.0,
+           "Leave-one-out: close the lounge, re-split demand; the siblings' gain over its served women. "
+           "Quick first cut: 0-0.37 over the scored lounges; 0.4 scores 0 (most of it is redundant)."),
     Signal("capture", "capture", "Lounge reviews as a share of lounge + premium substitutes", 0, 0.15,
            "Median 6.5% over the scored lounges; 15% is about the best reliable lounge (al-taif-mall, 14%). In a thin "
            "premium market (under 10 premium salons) a share of a tiny pool is noisy, so the score is pulled "

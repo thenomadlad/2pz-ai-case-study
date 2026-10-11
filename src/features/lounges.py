@@ -140,7 +140,9 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     rent = v3.cells.rent_observed
     w, rents = women.to_dict(), rent.to_dict()
     shop = v3.cells.shop_rent_m2.to_dict() if "shop_rent_m2" in v3.cells else {}
-    aw = (women * affluence_weight(rent, women, a.affluence_elasticity[levels.affluence])).to_dict()
+    aw_s = women * affluence_weight(rent, women, a.affluence_elasticity[levels.affluence])
+    aw = aw_s.to_dict()
+    sv = _served(v3, a, aw_s, levels, closed)
     lounges = [lo for lo in v3.lounges if lo.branch_id not in closed]
     catch = {lo.branch_id: p["catch"].get(levels.travel, {}).get(lo.branch_id, []) for lo in lounges}
     reach = Counter(c for b, cs in catch.items() if b not in NOT_SCORED for c in cs)   # scored lounges only
@@ -179,6 +181,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
             thin_premium_market=len(prem) < THIN_MARKET, premium_reviews_per_1k=sat["per_1k"],
             substitutes_median_rating=med,
             rating_gap=lo.rating - med if lo.rating is not None and med is not None else None,
+            served_women=sv["served"].get(b), absorbed_share=sv["absorbed"].get(b),
             site_rent_m2=site, site_rent_source=source,
             catchment_shop_rent_m2=c_rent, shop_rent_coverage=c_cov,
             women_per_rent_k=women_per_rent_k(addressable, site),
@@ -191,7 +194,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     for c, x in w.items():
         # Unnamed cells (only their emirate's name: no OSM place within 3 km) make no area: nobody can
         # act on them yet. They still count in lounge catchments, overlap and population totals.
-        if x > 0 and c not in reach and cell[c].get("name_source") != "emirate":
+        if x > 0 and cell[c].get("name_source") != "emirate":   # every named place, reached or not
             groups[(cell[c]["name"], cell[c]["emirate"])].append(c)
     lounges = [lo for lo in lounges if lo.branch_id not in NOT_SCORED]     # never an area's nearest lounge
     lats, lngs = np.array([lo.lat for lo in lounges]), np.array([lo.lng for lo in lounges])
@@ -199,8 +202,20 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     for (name, emirate), cs in groups.items():
         # one area per OSM place name, contiguous or not
         out.append(_area(_slug(f"{name} {emirate}"), name, emirate, sorted(cs, key=p["rc"].get),
-                         w, aw, rents, shop, p, a, lounges, lats, lngs))
+                         w, aw, rents, shop, p, a, lounges, lats, lngs, sv["cells"].unserved))
     return feats, sorted(out, key=lambda x: -x.women)
+
+
+_SERVED: dict = {}
+
+
+def _served(v3, a, aw_s, levels, closed) -> dict:
+    """Huff served/unserved demand; depends only on demand levels and closures, so cached on those."""
+    from src.model.served import served
+    key = (id(v3), levels.worker_share, levels.affluence, closed)
+    if key not in _SERVED:
+        _SERVED[key] = served(v3, a, aw_s, closed=closed, not_scored=frozenset(NOT_SCORED))
+    return _SERVED[key]
 
 
 def _affluence(cs: list[str], w: dict, rents: dict, women: float) -> dict:
@@ -226,7 +241,7 @@ def _saturation(cells: list[str], w: dict, p: dict, a: BaselineAssumptions) -> d
     return {"n": len(prem), "per_1k": per_1k, "fcs": fcs, "cw": cw}
 
 
-def _area(area_id, name, emirate, piece, w, aw, rents, shop, p, a, lounges, lats, lngs) -> Area:
+def _area(area_id, name, emirate, piece, w, aw, rents, shop, p, a, lounges, lats, lngs, unserved=None) -> Area:
     cell, women = p["cell"], sum(w[c] for c in piece)
     lat = sum(w[c] * cell[c]["lat"] for c in piece) / women
     lng = sum(w[c] * cell[c]["lng"] for c in piece) / women
@@ -238,6 +253,7 @@ def _area(area_id, name, emirate, piece, w, aw, rents, shop, p, a, lounges, lats
                 addressable_women=sum(aw[c] for c in piece), **_affluence(piece, w, rents, women), cells=len(piece),
                 worker_share=sum(cell[c]["adults_worker"] for c in piece) / sum(cell[c]["adults"] for c in piece),
                 premium_salons=sat["n"], premium_reviews_per_1k=sat["per_1k"], full_circle_share=sat["fcs"],
+                unserved_women=float(sum(unserved.get(c, 0.0) for c in piece)) if unserved is not None else 0.0,
                 shop_rent_m2=a_rent, shop_rent_coverage=a_cov,
                 women_per_rent_k=women_per_rent_k(sum(aw[c] for c in piece), a_rent),
                 data_coverage=sat["cw"] / women, cell_ids=piece,

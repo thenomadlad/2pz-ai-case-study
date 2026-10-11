@@ -72,50 +72,40 @@ def _confidence(a: Area, unsat: bool | None, thin_affluence: bool) -> tuple[str,
     return level, reasons
 
 
+UNSERVED_MIN = 10_000
+UNSERVED_MIN_WHY = ("Quick first cut (2026-10-11): an area is GROW when the Huff model leaves at least this "
+                    "many addressable women unserved: about what a mid-sized lounge serves today (median ~6k, "
+                    "top ~19k), so a new lounge there would not have to take customers from anyone.")
+
+
 def classify(a: Area) -> AreaDecision:
-    big = a.addressable_women >= GROW_MIN_WOMEN and a.worker_share < WORKER_CAP
+    """GROW / WATCH / SKIP on unserved demand (src/model/served.py), anywhere, reached or not."""
+    big = a.unserved_women >= UNSERVED_MIN and a.worker_share < WORKER_CAP
     unsat = None if a.premium_reviews_per_1k is None else a.premium_reviews_per_1k < UNSATURATED_PER_1K
     caveats = []
-    if unsat is None:
-        caveats.append("No competitor data: none of this area's cells were searched, so saturation is unknown.")
-    elif a.data_coverage < MIN_COVERAGE:
-        caveats.append(f"Competitor data covers only {a.data_coverage:.0%} of the women here.")
-    # Big only because the weighting lifted it over the line, on rents for under half its women.
-    thin_affluence = (big and a.women < GROW_MIN_WOMEN and a.affluence_coverage < MIN_COVERAGE)
+    thin_affluence = big and a.women < UNSERVED_MIN and a.affluence_coverage < MIN_COVERAGE
     if thin_affluence:
         caveats.append(f"Affluence data covers only {a.affluence_coverage:.0%} of the women here, and the "
-                       f"size test passes only through it ({a.women:,.0f} women before weighting).")
-
-    confidence, near = _confidence(a, unsat, thin_affluence)
+                       f"unserved figure leans on it ({a.women:,.0f} women before weighting).")
+    gap = (a.unserved_women - UNSERVED_MIN) / UNSERVED_MIN
+    confidence = "low" if abs(gap) < NEAR_LINE or thin_affluence else "high" if abs(gap) >= FAR_LINE else "medium"
     if NON_RESIDENTIAL.search(a.name) or a.women < SKIP_UNDER_WOMEN:
-        confidence, near = "high", []   # SKIP by name or the floor: no search or line can change it
-    caveats += near
-
+        confidence = "high"
     if NON_RESIDENTIAL.search(a.name):
         action, why = "SKIP", f"Non-residential by name ({a.name}): not where customers live."
     elif a.women < SKIP_UNDER_WOMEN:
         action, why = "SKIP", f"Only {a.women:,.0f} women 15+, under the {SKIP_UNDER_WOMEN:,} floor."
-    elif big and unsat and a.data_coverage >= MIN_COVERAGE and not thin_affluence:
-        action, why = "GROW", "Big enough and not saturated with premium salons."
-    elif big and unsat and a.data_coverage >= MIN_COVERAGE:
-        action, why = "WATCH", ("Looks unsaturated, but big enough only through the affluence weighting, "
-                                "on rents observed for too few of its women to be sure.")
-    elif big and unsat:
-        action, why = "WATCH", "Big enough and looks unsaturated, but too little of it was searched to be sure."
-    elif big and unsat is None:
-        action, why = "WATCH", "Big enough; saturation unknown (no competitor data)."
+    elif big and not thin_affluence:
+        action, why = "GROW", f"{a.unserved_women:,.0f} addressable women no premium salon serves."
     elif big:
-        action, why = "WATCH", "Big enough, but already served by premium salons."
-    elif a.addressable_women >= GROW_MIN_WOMEN:
-        action, why = "WATCH", f"Big, but mostly worker housing ({a.worker_share:.0%} of adults)."
-    elif unsat and a.worker_share >= WORKER_CAP:
-        action, why = "SKIP", (f"Few premium salons, but only {a.addressable_women:,.0f} addressable women and "
-                               f"mostly worker housing ({a.worker_share:.0%} of adults).")
-    elif unsat:
-        action, why = "WATCH", (f"Few premium salons, but only {a.addressable_women:,.0f} addressable women "
-                                 f"(GROW needs {GROW_MIN_WOMEN:,}).")
+        action, why = "WATCH", "Enough unserved women only through the affluence weighting, on thin rent data."
+    elif a.unserved_women >= UNSERVED_MIN:
+        action, why = "WATCH", f"Enough unserved women, but mostly worker housing ({a.worker_share:.0%} of adults)."
+    elif a.unserved_women >= UNSERVED_MIN / 2:
+        action, why = "WATCH", (f"{a.unserved_women:,.0f} unserved addressable women: half a lounge's market "
+                                f"(GROW needs {UNSERVED_MIN:,}).")
     else:
-        action, why = "SKIP", f"Under {GROW_MIN_WOMEN:,} addressable women and not clearly unsaturated."
+        action, why = "SKIP", f"Only {a.unserved_women:,.0f} unserved addressable women; the rest is served."
     why += f" Nearest lounge: {a.nearest_lounge_id}, {a.nearest_lounge_km:.1f} km in a straight line."
     return AreaDecision(area_id=a.area_id, action=action, big_enough=big, unsaturated=unsat,
                         rationale=why, caveats=caveats, confidence=confidence)

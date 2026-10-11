@@ -138,6 +138,8 @@ class LoungeFeatures(BaseModel):
     premium_pool: int               # premium salons in its catchment
     thin_premium_market: bool       # premium_pool < THIN_MARKET
     premium_reviews_per_1k: float | None = None   # catchment saturation, as for areas; display only, not scored
+    served_women: float | None = None            # Huff: addressable women this lounge serves (src/model/served.py)
+    absorbed_share: float | None = None          # share of them siblings take over if it closes (leave-one-out)
     site_rent_m2: float | None = None            # shop rent at the lounge's site, AED/m2/yr: our cost (display only)
     site_rent_source: str = "none"               # dld | band | none
     catchment_shop_rent_m2: float | None = None  # women-weighted median over catchment cells with one
@@ -166,6 +168,7 @@ class Area(BaseModel):
     premium_salons: int | None              # over covered cells; None = none covered
     premium_reviews_per_1k: float | None
     full_circle_share: float | None
+    unserved_women: float = 0.0                  # Huff: addressable women no premium supplier serves
     shop_rent_m2: float | None = None            # women-weighted median shop rent over the area's cells
     shop_rent_coverage: float = 0.0
     women_per_rent_k: float | None = None        # addressable women per AED 1,000 of annual rent there
