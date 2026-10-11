@@ -11,7 +11,9 @@ PF coverage: all of RAK/UAQ/Fujairah; Sharjah and Ajman fetched in price bands (
 60 rows per search), ~95% of the live count. Bayut: first 201 (RAK/UAQ/Fujairah) and 250
 (Sharjah+Ajman, default order) results only, budget-capped.
 
-1. Normalise to rows; keep yearly rents with area_sqft > MIN_SQFT and AED/sqft within JUNK bounds.
+1. Normalise to rows (missing keys -> None, numbers coerced); `validate` drops rows that aren't yearly,
+   have no positive price, area <= MIN_SQFT, a pin outside the UAE box or AED/sqft outside JUNK,
+   with a drop_reason (data/raw/listings/rejected.csv) instead of crashing.
 2. De-duplicate across portals: same emirate, within DUP_M and price within DUP_PRICE (keep PF).
 3. Exclusions agreed with the owner (2026-10-11), kept in the clean file with `excluded`:
    industrial (location path matches the growth model's NON_RESIDENTIAL pattern: an industrial
@@ -39,27 +41,68 @@ EMIRATES = ["Sharjah", "Ajman", "Ras Al Khaimah", "Umm Al Quwain", "Fujairah"]
 SQFT_PER_M2 = 10.764
 MIN_SQFT = 50
 JUNK = (5, 1000)  # AED/sqft/yr; outside is a typo (monthly price, sale price, wrong area)
+UAE_LAT, UAE_LNG = (22.5, 26.5), (51.5, 56.5)  # bounding box; a pin outside is a geocoding error
 DUP_M, DUP_PRICE = 50, 0.05
 K, RADIUS_KM, MIN_N = 10, 5, 5
 BUILDING_M, BUILDING_CAP = 30, 3
 
 
+def _get(x: dict, *path):
+    """x[path[0]][path[1]]..., or None when any step is missing or the wrong type."""
+    for k in path:
+        try:
+            x = x[k]
+        except (KeyError, IndexError, TypeError):
+            return None
+    return x
+
+
+def _rows(f: str) -> list:
+    try:
+        data = json.load(open(f))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"skipped unreadable file {f}: {exc}")
+        return []
+    return [x for x in data if isinstance(x, dict)] if isinstance(data, list) else []
+
+
 def load() -> pd.DataFrame:
+    """Raw listings, one row each. Fields are read defensively (a missing key is None), never
+    trusted: `validate` checks them."""
     rows = []
     for f in glob.glob(str(RAW / "pf_*.json")):
-        for x in json.load(open(f)):
-            rows.append(dict(source="propertyfinder", emirate=x["locationTree"][0]["name"],
-                             listing_id=str(x["id"]), lat=x["latitude"], lng=x["longitude"],
-                             area_sqft=x["size"] if x.get("sizeUnit") == "sqft" else np.nan,
-                             annual_rent_aed=x["priceAmount"], period=x["pricePeriod"],
-                             location_path=" > ".join(t["name"] for t in x["locationTree"])))
+        for x in _rows(f):
+            tree = x.get("locationTree") if isinstance(x.get("locationTree"), list) else []
+            rows.append(dict(source="propertyfinder", emirate=_get(tree, 0, "name"),
+                             listing_id=str(x.get("id")), lat=x.get("latitude"), lng=x.get("longitude"),
+                             area_sqft=x.get("size") if x.get("sizeUnit") == "sqft" else None,
+                             annual_rent_aed=x.get("priceAmount"), period=x.get("pricePeriod"),
+                             location_path=" > ".join(str(_get(t, "name")) for t in tree)))
     for f in glob.glob(str(RAW / "bayut_*.json")):
-        for x in json.load(open(f)):
-            rows.append(dict(source="bayut", emirate=x["city"], listing_id=str(x["externalID"]),
-                             lat=x["latitude"], lng=x["longitude"], area_sqft=x["areaSqft"],
-                             annual_rent_aed=x["price"], period=x["rentFrequency"],
-                             location_path=x["locationPath"]))
-    return pd.DataFrame(rows).drop_duplicates(["source", "listing_id"])
+        for x in _rows(f):
+            rows.append(dict(source="bayut", emirate=x.get("city"), listing_id=str(x.get("externalID")),
+                             lat=x.get("latitude"), lng=x.get("longitude"), area_sqft=x.get("areaSqft"),
+                             annual_rent_aed=x.get("price"), period=x.get("rentFrequency"),
+                             location_path=str(x.get("locationPath") or "")))
+    df = pd.DataFrame(rows).drop_duplicates(["source", "listing_id"])
+    for c in ("lat", "lng", "area_sqft", "annual_rent_aed"):
+        df[c] = pd.to_numeric(df[c], errors="coerce")  # "12,000", "", "n/a" -> NaN, caught by validate
+    return df
+
+
+def validate(df: pd.DataFrame) -> pd.Series:
+    """Why each row is unusable ('' = usable), first failing check wins."""
+    checks = [
+        ("not_yearly", df.period != "yearly"),
+        ("bad_price", ~(df.annual_rent_aed > 0)),               # NaN fails too
+        ("bad_area", ~(df.area_sqft > MIN_SQFT)),
+        ("outside_uae", ~(df.lat.between(*UAE_LAT) & df.lng.between(*UAE_LNG))),
+        ("junk_aed_per_sqft", ~(df.annual_rent_aed / df.area_sqft).between(*JUNK)),
+    ]
+    reason = pd.Series("", index=df.index)
+    for name, bad in reversed(checks):  # reversed so the first check's name is the one kept
+        reason[bad.fillna(True)] = name
+    return reason
 
 
 def km(lat1, lng1, lat2, lng2):
@@ -85,13 +128,12 @@ def dedup(df: pd.DataFrame) -> pd.DataFrame:
 
 def clean(raw: pd.DataFrame) -> pd.DataFrame:
     df = raw[raw.emirate.isin(EMIRATES)].copy()
+    df["drop_reason"] = validate(df)
     df["aed_per_sqft"] = df.annual_rent_aed / df.area_sqft
-    keep = ((df.period == "yearly") & (df.area_sqft > MIN_SQFT) & df.lat.notna()
-            & df.aed_per_sqft.between(*JUNK))
-    print("dropped (not yearly / area <= 50 sqft / no coords / junk AED/sqft):")
-    print(df[~keep].groupby(["emirate", "source"]).size().to_string())
-    print("junk AED/sqft values:", sorted(df[~df.aed_per_sqft.between(*JUNK)].aed_per_sqft.round(1)))
-    df = dedup(df[keep])
+    bad = df[df.drop_reason != ""]
+    print("dropped by reason:\n" + bad.groupby(["drop_reason", "emirate", "source"]).size().to_string())
+    bad.to_csv(RAW / "rejected.csv", index=False)  # gitignored, with the reason per row
+    df = dedup(df[df.drop_reason == ""].drop(columns="drop_reason"))
     df["aed_per_m2"] = df.aed_per_sqft * SQFT_PER_M2
     return df.drop(columns="period").round({"aed_per_sqft": 2, "aed_per_m2": 1})
 
@@ -151,4 +193,9 @@ def main() -> None:
 
 if __name__ == "__main__":
     assert abs(km(25, 55, 25, 56) - 100.9) < 1  # 1 deg lng at 25N ~ 101 km
+    t = pd.DataFrame(dict(period=["yearly", "monthly", "yearly", "yearly", "yearly", "yearly"],
+                          annual_rent_aed=[50_000, 50_000, None, 50_000, 50_000, 50_000],
+                          area_sqft=[1000, 1000, 1000, -5, 1000, 10],
+                          lat=[25.3, 25.3, 25.3, 25.3, 0.0, 25.3], lng=[55.4] * 6))
+    assert list(validate(t)) == ["", "not_yearly", "bad_price", "bad_area", "outside_uae", "bad_area"]
     main()
