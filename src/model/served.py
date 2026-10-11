@@ -19,7 +19,8 @@ from src.market import _reviews, premium_substitutes
 ALPHA = 1.0
 DECAY = {10: 1.0, 15: 0.5, 20: 0.25}
 BANDS = (10, 15, 20)
-OUTSIDE_PCTL = 50   # outside option = the median premium supplier's attractiveness, at 10 min
+OUTSIDE_PCTL = 50
+RATING_ELASTICITY = 5.0   # attractiveness x (rating / 4.6) ** 5: 4.8 stars ~1.24x, 4.3 ~0.71x; missing rating = 1x   # outside option = the median premium supplier's attractiveness, at 10 min
 _ACCESS: dict[int, tuple] = {}
 
 
@@ -28,8 +29,9 @@ def _suppliers(v3, a, closed=frozenset(), not_scored=frozenset()) -> pd.DataFram
     rows = s.reset_index().to_dict("records")
     prem = premium_substitutes(rows, len(rows), a.premium_min_rating, a.comparable_price_levels)
     sup = pd.DataFrame([{"id": r["place_id"], "lat": float(r["lat"]), "lng": float(r["lng"]),
-                         "reviews": _reviews(r), "lounge": False} for r in prem])
-    lo = pd.DataFrame([{"id": x.branch_id, "lat": x.lat, "lng": x.lng, "reviews": x.review_count or 0, "lounge": True}
+                         "reviews": _reviews(r), "rating": r.get("rating"), "lounge": False} for r in prem])
+    lo = pd.DataFrame([{"id": x.branch_id, "lat": x.lat, "lng": x.lng, "reviews": x.review_count or 0,
+                        "rating": x.rating, "lounge": True}
                        for x in v3.lounges if x.branch_id not in closed and x.branch_id not in not_scored])
     return pd.concat([sup, lo], ignore_index=True)
 
@@ -74,8 +76,9 @@ def _km(lat, lng, lats, lngs):
 
 def allocate(demand: pd.Series, acc: pd.DataFrame, sup: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     """Per cell: demand, served_lounges, served_competitors, unserved; per lounge: women served."""
-    a = acc.merge(sup[["id", "reviews", "lounge"]], on="id")
-    a["w"] = a.reviews.clip(lower=1) ** ALPHA * a.minutes.map(DECAY)
+    a = acc.merge(sup[["id", "reviews", "rating", "lounge"]], on="id")
+    stars = pd.to_numeric(a.rating, errors="coerce").fillna(4.6)
+    a["w"] = a.reviews.clip(lower=1) ** ALPHA * (stars / 4.6) ** RATING_ELASTICITY * a.minutes.map(DECAY)
     outside = float(np.percentile(sup.reviews.clip(lower=1) ** ALPHA, OUTSIDE_PCTL))
     denom = a.groupby("cell_id").w.sum() + outside
     a["women"] = a.w / a.cell_id.map(denom) * a.cell_id.map(demand).fillna(0.0)

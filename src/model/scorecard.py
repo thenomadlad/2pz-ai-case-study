@@ -31,15 +31,6 @@ SIGNALS: tuple[Signal, ...] = (
            0.4, 0.0,
            "Leave-one-out: close the lounge, re-split demand; the siblings' gain over its served women. "
            "Quick first cut: 0-0.37 over the scored lounges; 0.4 scores 0 (most of it is redundant)."),
-    Signal("capture", "capture", "Lounge reviews as a share of lounge + premium substitutes", 0, 0.15,
-           "Median 6.5% over the scored lounges; 15% is about the best reliable lounge (al-taif-mall, 14%). In a thin "
-           "premium market (under 10 premium salons) a share of a tiny pool is noisy, so the score is pulled "
-           "toward 0.5 in proportion: with n premium salons it keeps n/10 of its distance from 0.5. A blend, "
-           "not a cliff, so one more salon can't swing the score."),
-    Signal("rating", "rating_gap", "Rating minus the premium salons' median rating (stars)", -0.3, 0.3,
-           "Gaps run -0.2 to +0.3, median -0.1: most lounges rate slightly below their premium "
-           "substitutes; ±0.3 stars covers the whole range. Half weight: Google ratings come in "
-           "0.1 steps, so the gap takes only a handful of values.", 0.5),
 )
 
 PROTECT_AT = 0.65
@@ -114,16 +105,9 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
                         rationale="Not scored: this lounge serves travellers, not the women in its catchment.",
                         key_drivers=[], caveats=[])
     scores = {s.name: score(s, getattr(f, s.field)) for s in SIGNALS}
-    if f.thin_premium_market:
-        scores["capture"] = NEUTRAL + (scores["capture"] - NEUTRAL) * min(1.0, f.premium_pool / THIN_MARKET)
     composite = _composite(scores, {s.name: s.weight for s in SIGNALS})
     action = _action(composite)
     caveats = [NO_FINANCIALS]
-    if f.thin_premium_market:
-        caveats.append(f"Thin premium market ({f.premium_pool} premium salons): capture's score pulled toward "
-                       f"neutral, keeping {f.premium_pool}/{THIN_MARKET} of its distance from 0.5.")
-    if f.rating_gap is None:
-        caveats.append("No rating gap (missing rating or no rated substitutes): scored neutral.")
     flippy = flips is not None and flips >= FLIP_LOW
     if flippy:
         caveats.append(f"The call changes in {flips} of {COMBOS} assumption combinations.")
@@ -132,8 +116,8 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
         caveats.append("The call depends on the signal weights: it changes with " + "; ".join(wflips) + ".")
     return Decision(
         branch_id=f.branch_id, action=action, weight_flips=wflips,
-        confidence=_confidence(composite, f.thin_premium_market or f.rating_gap is None or flippy or bool(wflips)),
-        rationale=(f"Composite {composite:.2f} across demand, cannibalisation, capture and rating "
+        confidence=_confidence(composite, flippy or bool(wflips)),
+        rationale=(f"Composite {composite:.2f} across served demand and cannibalisation "
                    f"(PROTECT ≥ {PROTECT_AT}, SHRINK ≤ {SHRINK_AT})."),
         key_drivers=sorted(scores, key=lambda n: abs(scores[n] - NEUTRAL), reverse=True)[:2],
         caveats=caveats, composite=round(composite, 4), scores={k: round(v, 4) for k, v in scores.items()})
