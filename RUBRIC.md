@@ -64,7 +64,7 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 *To improve:*
 
 - 2.3 *(model/data)*: affluence is Dubai-only and now off at baseline (what-if only); there's no target-customer signal beyond women 15+ and the worker-housing cap.
-- ~~2.5 *(model)*: areas are still only cells no lounge reaches.~~ Passes since pass 5: every named place is an area, and GROW is the net new women a typical lounge would add after the Huff split with our lounges and competitors, plus the nearest-lounge distance in the why. Caveat F4 *(model)*: in 4 areas net new women exceed 2x the area's own women (manama-ajman 35.1k from 5.1k) via the fitted 12.8 km straight-line 20-min band.
+- ~~2.5 *(model)*: areas are still only cells no lounge reaches.~~ Passes since pass 5: every named place is an area, and GROW is the net new women a typical lounge would add after the Huff split with our lounges and competitors, plus the nearest-lounge distance in the why. Caveat F4, explained in sanity run 8: in 4 areas net new women exceed 2x the area's own women (manama-ajman 35.1k from 5.1k). The straight-line band isn't the cause (it under-reaches the isochrones: 86k vs 98k pairs at 20 min). An area is one place, but its what-if reaches a 20-min catchment that covers a neighbouring town (Al Dhaid for manama-ajman). Neighbouring areas claim the same women, so net new must not be summed across GROW areas.
 
 ### Q3. Where are we overlapping with ourselves?
 
@@ -142,7 +142,7 @@ The brief lists these as the minimum content of the product. Most of the substan
 
 - ~~Pass 4: about 10 places still say "no rent data" while shop rent is shown for 9 lounges: README:39-40/97/321, walkthrough:188, CONTEXT:116, the limitations box (views.py:188), the overview (overview.py:200), scorecard THRESHOLDS_WHY and the NO_FINANCIALS caveat (scorecard.py:51/70), and `rent_data_available: False` (explain.py:478, so the cached UAE summary needs regenerating). Reword to "no revenue, lease or capex data".~~ Fixed 2026-10-11.
 - ~~A3 *(model)*: `est_customers` drives no label.~~ Passes since pass 5: README:78 names services delivered as the north star and served women (Huff) as its proxy, and it's a scored signal; each signal's `why` is on the How page.
-- Pass 5 (non-model, needs a regeneration): the lounge fact sheet still carries `est_customers` ("Women captured", capture × women; explain.py:102, :256, :422), so the AI quotes two women-at-stake figures per lounge (khalifa-city-a: serves 16,700 in the headline, "roughly 11,500 captured" in the so-what; al-jada 5.9k vs 10,500). Drop it from the fact sheet and regenerate.
+- ~~Pass 5 (non-model, needs a regeneration)~~ Fixed after pass 5 (run 8): `est_customers` is out of the fact sheet, and the 23 lounge so-whats were regenerated to quote served women. Was: the lounge fact sheet still carries `est_customers` ("Women captured", capture × women; explain.py:102, :256, :422), so the AI quotes two women-at-stake figures per lounge (khalifa-city-a: serves 16,700 in the headline, "roughly 11,500 captured" in the so-what; al-jada 5.9k vs 10,500). Drop it from the fact sheet and regenerate.
 
 ### B. Recommendation logic
 
@@ -216,7 +216,7 @@ From the reviewer's seat, each question below should be answerable **for any sin
 
 *To improve:*
 
-- E6 *(model)*: every explanation has what / so what / now what, but none can address the ROIC gate. Pass 5: the regenerated so-whats now state women at stake, absorption and competition for every lounge (the pass-4 restate-only list is resolved), but see the `est_customers` double figure under A. As of pass 4, the so-whats that only restate figures are al-falah, al-jada, baniyas, khalifa-city-a and shakhbout-city. jumeirah-park's "we pay for a large market…" overreads an area-median rent. Tighten these on the next regeneration.
+- E6 *(model)*: every explanation has what / so what / now what, but none can address the ROIC gate. Pass 5: the regenerated so-whats now state women at stake, absorption and competition for every lounge (the pass-4 restate-only list is resolved); since run 8 they quote one figure, served women. As of pass 4, the so-whats that only restate figures are al-falah, al-jada, baniyas, khalifa-city-a and shakhbout-city. jumeirah-park's "we pay for a large market…" overreads an area-median rent. Tighten these on the next regeneration.
 
 ---
 
@@ -276,7 +276,7 @@ The brief says to source inputs from public sources and lists some combination o
 *To improve:*
 
 - ~~P1: merged; live click-through pending.~~ Passes since 2026-10-11: `main` is at b53e319, and the live link renders overview (5/9/9, 34 GROW), lounge (khalifa-city-a with its AI explanation), area (sharjah-sharjah GROW) and how, with no tracebacks (Playwright).
-- Pass 5 (flaky test): `tests/webapp/test_pages.py::test_level_switch_is_fast_and_marks_explanations_as_template` failed once at 2.0 s against its < 2 s limit in a full `tests/webapp` run, and passed alone.
+- ~~Pass 5 (flaky test)~~ Fixed after pass 5: the limit is 3 s. A level switch re-runs level_flips' 82 lounge builds (1.6–1.9 s warm). Was: `tests/webapp/test_pages.py::test_level_switch_is_fast_and_marks_explanations_as_template` failed once at 2.0 s against its < 2 s limit in a full `tests/webapp` run, and passed alone.
 
 ---
 
@@ -342,7 +342,7 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 - OB1 *(model)*: pass 5: served women is the label's demand signal, but with no capacity and no ROIC gate, PROTECT/SHRINK/GROW don't yet trace to "demand we'd otherwise lose / excess capacity". Run 7's BT1 shows SHRINK now means "few served women or a dear site", not excess capacity.
 - OB2 *(model)*: capacity isn't modelled (README:80). Huff attractiveness = lifetime reviews × a rating factor, so served women largely restates review volume (F2: the same site serves 16.7k for khalifa-city-a, 6.1k for a typical lounge). No capacity proxy is named as such, and no equal-capacity fallback.
-- OB3 passes since pass 5: src/model/served.py splits each cell's women across the premium suppliers that reach it, plus an outside option, so served and unserved demand exist per cell; the scorecard and growth what-if both use it. Caveats *(model)*: uncalibrated parameters (ALPHA 1, stepped decay, OUTSIDE_PCTL 50), and F4's over-reach through the fitted straight-line bands.
+- OB3 passes since pass 5: src/model/served.py splits each cell's women across the premium suppliers that reach it, plus an outside option, so served and unserved demand exist per cell; the scorecard and growth what-if both use it. Caveats *(model)*: uncalibrated parameters (ALPHA 1, stepped decay, OUTSIDE_PCTL 50), and F4. Run 8 found the fitted straight-line bands slightly *under*-reach the isochrones, so F4 isn't the fallback. What remains is the thin-market share (54–56% of the women reached, vs al-dhafra's own 77%) and areas double-claiming a shared town.
 - OB4 passes since pass 5: rating enters only as Huff attractiveness ((rating / 4.6)^5) and isn't scored (limitations §9); in-branch advice stays banned.
 - OB5 *(model)*: no ROIC. The cost index is a relative efficiency, and its live emirate-median baseline is F1.
 
@@ -405,8 +405,8 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 *To improve:*
 
 - Pass 5:
-  - MO5 *(model)*: **fails** on sanity run 7's two unexplained failures: F1 (SC4: sibling changes flip calls through the emirate-median cost baseline) and F4 (net new women > 2x the area's own women in 4 areas). F3 (one 2,000-review competitor 200 m away moves al-dhafra PROTECT → SHRINK, 0.94 → 0.07) is explained but fragile.
-  - MO1: two scored signals now. Still open: `GROW_MIN_WOMEN` and `growth._confidence` are dead code kept "for the retired rule" (growth.py:11, :17, :31, :55-69, and its WHY row shows on the How page), capture, rating gap and saturation are computed and shown but drive nothing, and affluence is kept as a what-if axis.
+  - MO5 *(model)*: **fails** on sanity run 7's two unexplained failures: F1 (SC4: sibling changes flip calls through the emirate-median cost baseline) and F4 (net new women > 2x the area's own women in 4 areas). Since run 8, F4 is explained (area vs 20-min catchment; the straight-line band under-reaches), so only F1 keeps MO5 failing. F3 (one 2,000-review competitor 200 m away moves al-dhafra PROTECT → SHRINK, 0.94 → 0.07) is explained but fragile.
+  - MO1: two scored signals now. The dead `GROW_MIN_WOMEN` / `growth._confidence` code was deleted after pass 5 (run 8). Still open: capture, rating gap and saturation are computed and shown but drive nothing, and affluence is kept as a what-if axis.
   - MO8 *(model)*: one Huff model and one competitor set for both now. Open on the cross-tab: 3 of 5 PROTECT sites come out WATCH when re-opened as a typical lounge (F2), and SHRINK al-jada's site comes out GROW (F1's Sharjah baseline).
   - MO9: the served.py parameters (ALPHA, DECAY, OUTSIDE_PCTL, RATING_ELASTICITY, the fitted km bands) and the cost baseline (`MIN_BASELINE_LOUNGES`) aren't on the How page; RATING_ELASTICITY's line carries OUTSIDE_PCTL's comment (served.py:20); NEW_SITE_MIN's WHY is duplicated (growth.py:29 and :73); the bare 0.01° tolerance is still there (lounges.py:164).
   - MO6: still no area level flips (kalba, below).
