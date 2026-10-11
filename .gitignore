@@ -9,3 +9,4 @@ data/raw/
 .DS_Store
 .playwright-mcp/
 .ipynb_checkpoints/
+.cache/

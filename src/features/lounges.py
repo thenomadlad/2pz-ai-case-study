@@ -143,7 +143,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     shop = v3.cells.shop_rent_m2.to_dict() if "shop_rent_m2" in v3.cells else {}
     aw_s = women * affluence_weight(rent, women, a.affluence_elasticity[levels.affluence])
     aw = aw_s.to_dict()
-    sv = _served(v3, a, aw_s, levels, closed)
+    sv = _served(v3, a, aw_s, levels, closed, leave_one_out=areas)
     lounges = [lo for lo in v3.lounges if lo.branch_id not in closed]
     catch = {lo.branch_id: p["catch"].get(levels.travel, {}).get(lo.branch_id, []) for lo in lounges}
     reach = Counter(c for b, cs in catch.items() if b not in NOT_SCORED for c in cs)   # scored lounges only
@@ -305,13 +305,21 @@ def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
 _SERVED: dict = {}
 
 
-def _served(v3, a, aw_s, levels, closed) -> dict:
-    """Huff served/unserved demand; depends only on demand levels and closures, so cached on those."""
+def _served(v3, a, aw_s, levels, closed, leave_one_out: bool = True) -> dict:
+    """Huff served/unserved demand; depends only on demand levels and closures, so cached on those.
+    Without leave_one_out (level_flips: absorbed_share isn't scored) the full result is reused if
+    cached, else a lighter one is cached apart."""
     from src.model.served import served
     key = (id(v3), levels.worker_share, levels.affluence, closed)
-    if key not in _SERVED:
+    if key in _SERVED:
+        return _SERVED[key]
+    if leave_one_out:
         _SERVED[key] = served(v3, a, aw_s, closed=closed, not_scored=frozenset(NOT_SCORED))
-    return _SERVED[key]
+        return _SERVED[key]
+    light = (*key, "no-loo")
+    if light not in _SERVED:
+        _SERVED[light] = served(v3, a, aw_s, closed=closed, not_scored=frozenset(NOT_SCORED), leave_one_out=False)
+    return _SERVED[light]
 
 
 def _affluence(cs: list[str], w: dict, rents: dict, women: float) -> dict:
