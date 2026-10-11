@@ -60,6 +60,11 @@ def _shared(r, b: str) -> None:
     rows = sorted(((o, sum(w[x] for x in g.cell_id)) for o, g in c.groupby("branch_id")), key=lambda t: -t[1])
     total = sum(w[x] for x in mine)
     st.markdown("##### Shared catchment")
+    f = next((f for f in r.features if f.branch_id == b), None)
+    if f is not None and f.absorbed_share is not None:
+        st.caption(f"Cannibalisation what-if: if {b} closed, our other lounges would absorb "
+                   f"{f.absorbed_share:.0%} of the {f.served_women:,.0f} women it serves; the rest go to rival "
+                   "salons or to no premium salon. Shown, not scored.")
     if not rows:
         st.caption("No other open, scored lounge reaches any of its catchment cells.")
         return

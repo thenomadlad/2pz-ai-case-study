@@ -156,9 +156,10 @@ def _area_panel(r, area_id: str) -> None:
     left, right = st.columns([3, 2])
     with left:
         render_pyramid(exp)
-        st.markdown(f"**The tests:** {_check(d.big_enough)} big enough ({a.addressable_women:,.0f} addressable "
-                    f"women) · {_check(d.unsaturated)} unsaturated · {_check(a.data_coverage >= growth.MIN_COVERAGE)} "
-                    f"searched ({a.data_coverage:.0%} of women)")
+        cost = "cost unknown" if a.cost_index is None else f"{a.cost_index:.2f}x typical cost efficiency"
+        st.markdown(f"**The tests:** {_check(d.big_enough)} big enough ({a.new_site_net or 0:,.0f} net new "
+                    f"women, line {growth.NEW_SITE_MIN:,}) · {_check(a.cost_index is None or a.cost_index >= 1)} "
+                    f"{cost} · {_check(a.data_coverage >= growth.MIN_COVERAGE)} searched ({a.data_coverage:.0%} of women)")
     with right:
         render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
                        d.action != "SKIP")
@@ -231,9 +232,10 @@ def _lounge_table(r) -> None:
 def _area_table(r) -> None:
     by_id = {a.area_id: a for a in r.areas}
     ranked = sorted((d for d in r.area_decisions if d.action != "SKIP"),
-                    key=lambda d: (ORDER[d.action], -by_id[d.area_id].addressable_women))
+                    key=lambda d: (ORDER[d.action], -(by_id[d.area_id].new_site_net or 0)))
     df = pd.DataFrame([{"Rank": i, "Area": a.name, "Emirate": a.emirate, "Call": d.action,
-                        "Addressable women": round(a.addressable_women), "Worker housing": a.worker_share,
+                        "Net new women": round(a.new_site_net or 0), "Cost index": a.cost_index,
+                        "Women 15+": round(a.women), "Worker housing": a.worker_share,
                         "Premium reviews per 1k women": a.premium_reviews_per_1k, "Searched": a.data_coverage,
                         "Shop rent (AED/m²/yr)": a.shop_rent_m2, "Women per AED 1k rent": a.women_per_rent_k,
                         "Nearest lounge": a.nearest_lounge_id, "km (straight line)": round(a.nearest_lounge_km, 1),
@@ -248,11 +250,13 @@ def _area_table(r) -> None:
     pct = st.column_config.NumberColumn(format="percent")
     st.dataframe(df, hide_index=True, column_config={
         "Worker housing": pct, "Searched": pct,
+        "Cost index": st.column_config.NumberColumn(format="%.2f"),
         "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
         "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
         "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f"),
         "Why": st.column_config.TextColumn(width="large")})
-    st.caption("Ranked GROW first, then WATCH, each by addressable women. Why: the tests it passed or "
+    st.caption("Ranked GROW first, then WATCH, each by net new women (what a typical new lounge would add to the "
+               "network, net of what it takes from our lounges). Cost index: vs the emirate's typical lounge. Why: the tests it passed or "
                "failed. SKIP areas are left out. Shop rent is our cost; women per AED 1k assumes a 150 m² "
                "unit (and counts the whole area's women against one unit's rent).")
 

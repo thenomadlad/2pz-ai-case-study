@@ -251,7 +251,7 @@ def test_overview_compares_lounges_and_ranks_growth_areas_with_filters():
                                    "Premium reviews per 1k women"} <= set(lounges.columns)
     assert "Confidence" in areas.columns
     assert list(areas.Call) == sorted(areas.Call) and set(areas.Call) == {"GROW", "WATCH"}   # GROW first
-    grow = areas[areas.Call == "GROW"]["Addressable women"]
+    grow = areas[areas.Call == "GROW"]["Net new women"]
     assert list(grow) == sorted(grow, reverse=True) and areas.Why.str.len().min() > 0
     at.multiselect(key="cmp-call").set_value(["SHRINK"]).run()
     at.multiselect(key="cmp-area-emirate").set_value(["Sharjah"]).run()
