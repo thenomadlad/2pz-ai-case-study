@@ -125,22 +125,25 @@ def locate(areas: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([areas.reset_index(drop=True), found], axis=1)
 
 
-def observed(cells: pd.DataFrame, areas: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
-    """Per Dubai cell: contract-weighted median of the areas whose point is inside it, else the
-    nearest area point within RADIUS_KM. Also how each was assigned (inside | nearest)."""
+def observed(cells: pd.DataFrame, areas: pd.DataFrame, col: str = "median_rent",
+             min_contracts: int = MIN_CONTRACTS) -> tuple[pd.Series, pd.Series]:
+    """Per Dubai cell: contract-weighted median of `col` over the areas whose point is inside it,
+    else the nearest area point within RADIUS_KM. Also how each was assigned (inside | nearest)."""
     a = areas.dropna(subset=["lat"])
-    a = a[a.contracts >= MIN_CONTRACTS]
+    a = a[a.contracts >= min_contracts]
     out, how = {}, {}
+    if a.empty:   # nothing qualifies: no cell gets a value
+        return pd.Series(out, name="rent_observed", dtype=float), pd.Series(how, name="assignment", dtype=object)
     for cid, c in cells[cells.emirate == "Dubai"].iterrows():
         inside = a[(a.lat >= c.south) & (a.lat < c.north) & (a.lng >= c.west) & (a.lng < c.east)]
         if len(inside):
-            inside = inside.sort_values("median_rent")
+            inside = inside.sort_values(col)
             cum = inside.contracts.cumsum()
-            out[cid], how[cid] = float(inside.median_rent[cum >= cum.iloc[-1] / 2].iloc[0]), "inside"
+            out[cid], how[cid] = float(inside[col][cum >= cum.iloc[-1] / 2].iloc[0]), "inside"
             continue
         d = haversine_km(c.lat, c.lng, a.lat.values, a.lng.values)
         if d.min() <= RADIUS_KM:
-            out[cid], how[cid] = float(a.median_rent.iloc[d.argmin()]), "nearest"
+            out[cid], how[cid] = float(a[col].iloc[d.argmin()]), "nearest"
     return pd.Series(out, name="rent_observed"), pd.Series(how, name="assignment")
 
 
