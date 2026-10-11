@@ -213,6 +213,36 @@ feature's 0.20. `rent_predicted` stays in `cell_affluence.csv` for the record an
 - **Sharjah rental index:** announced, not published. **Meta Relative Wealth Index:** no UAE.
   **Bayut / Property Finder:** scraping is against their terms. **Night lights:** everything is lit.
 
+## Commercial rent (`dubai_shop_rents_by_area.csv`, `cell_shop_rent.csv`, `retail_rent_bands.csv`, `lounge_site_class.csv`, built 2026-10-10)
+
+**Shop rent is our cost** (what a lounge pays for its site). It is not customer affluence; that's the residential rent above. It is display only: it doesn't enter the scorecard or the growth rule.
+
+**Dubai, from DLD Ejari contracts** (`scripts/build_shop_rent.py`). The source is the same hand-downloaded file as the residential rents (registered 2026-07-10 to 2026-10-09).
+- **Filters:** commercial usage, sub-type Shop, single unit, at least 10 m² (kiosks out), with the top and bottom 1% of AED/m² trimmed. That leaves 13,772 contracts.
+- **Placement:** the median AED/m²/yr per DLD area is placed and assigned to cells exactly as for the residential rents (inside, else nearest within 2.5 km), with a minimum of 10 contracts per area. That covers 170 of 179 areas (90% of contracts) and 243 cells, with a median of AED 1,977/m²/yr.
+- **Caveat:** an area median mixes mall and street shops, so a mall lounge's real rent can sit well above it.
+
+**Elsewhere, from published bands by mall class** (`retail_rent_bands.csv`). The source is JLL, *United Arab Emirates: Retail Market Dynamics Q2 2025* (published 2025-09), Abu Dhabi rental rates in AED/m²/yr:
+
+| Class | AED/m²/yr | How we got it |
+|---|---|---|
+| Prime super regional | 5,524 | stated in the text |
+| Regional | about 2,900 | read off the chart, ±100 |
+| Community | about 1,200 | read off the chart, ±100 |
+
+As a cross-check, JLL's Dubai super-regional rent of AED 211/sqft is about 2,270/m², close to our DLD median.
+
+Each lounge's class is assigned by hand from its Google address (`lounge_site_class.csv`):
+- **Regional mall:** shahama (Deerfields Mall).
+- **Community mall:** al-dhafra (Al Dhafra Walk), noya-plaza and westyas (neighbourhood plazas).
+
+**Not covered:**
+- **Ten Abu Dhabi lounges are villas or street shops.** JLL publishes mall classes only, and we don't invent a street band: al-ain, al-falah, al-maqta, baniyas, delma, khaleej-al-arabi, khalifa-city-a, ministries-complex, mohammed-bin-zayed-city, shakhbout-city.
+- **No citable mall-class figures were found for Sharjah, Ras Al Khaimah or Fujairah.** We only found listing averages and blog summaries. So al-jada, zawaya-walk, ras-al-khaimah and al-taif-mall show no shop rent.
+- **Listing portals** (Bayut, Property Finder) are against their terms (see "Affluence").
+
+**The reference unit** (`REF_UNIT_M2` = 150 m²) is an assumption: lounge floor areas aren't public. Women per AED 1,000 of rent uses it, so it sets that figure's level but never its ranking.
+
 ## Market model (how the pieces fit; for the app's "how it works")
 
 Notebooks: `market_size.ipynb` (structure, market size), `catchments.ipynb`, `competitors.ipynb`.

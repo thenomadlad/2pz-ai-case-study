@@ -59,3 +59,16 @@ def test_cells_carry_observed_dubai_rents_and_nothing_else():
     assert obs.sum() == 241 and set(c.affluence_source) == {"observed", "none"}
     assert c.rent_observed[obs].notna().all() and c.rent_observed[~obs].isna().all()
     assert (c.emirate[obs] == "Dubai").all() and (c.rent_observed[obs] > 0).all()
+
+
+def test_retail_rent_bands_are_sourced_and_ordered():
+    import pandas as pd
+    from src.config import REPO_ROOT
+    v3 = REPO_ROOT / "data" / "seed" / "v3"
+    bands = pd.read_csv(v3 / "retail_rent_bands.csv")
+    assert bands.source_url.str.startswith("http").all() and bands.published.notna().all()
+    assert (bands.low_m2 <= bands.base_m2).all() and (bands.base_m2 <= bands.high_m2).all()
+    assert bands.base_m2.between(200, 15_000).all()                      # AED/m2/yr, not per sqft
+    classes = pd.read_csv(v3 / "lounge_site_class.csv")
+    assert set(classes.location_class) <= set(bands.location_class)
+    assert classes.evidence.str.len().gt(0).all()
