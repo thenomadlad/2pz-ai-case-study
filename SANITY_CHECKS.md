@@ -199,6 +199,17 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 - **SC3:** no non-residential name gets past SKIP. **New explained caveat:** habshan is WATCH with 44% worker housing and pieces spanning 39 km. That's the cost of merging by name, disclosed in the limitations. Seven non-SKIP areas span more than 20 km, including the GROW areas sharjah-sharjah (33 km) and al-dhaid (23 km). These are large OSM admin units, so an area is a place, not a site (same as BT2/BT3).
 - **Everything else:** unchanged, since lounges didn't move. No unexplained failure.
 
+## Expected outcomes for run 5 (written before the commercial-rent work)
+
+- **No label changes.** Shop rent is display only. Any change to a lounge or area label is a bug.
+- **SC7 (new): plausibility.**
+  - Dubai's median shop rent per DLD area lands within published ranges for Dubai community and street retail (roughly AED 1,000–3,500/m²/yr). Prime mall areas (Downtown / Dubai Mall) sit above AED 3,500.
+  - Fewer than 10% of located shop areas fall outside AED 300–10,000/m².
+- **BT6 (new): women per rent vs. the calls.**
+  - Within Dubai all 5 lounges are HOLD, so there's nothing to test.
+  - Outside Dubai (after Task 3): no expected direction. PROTECT lounges win on exclusivity and capture, not on cost. Report the ranking, and don't tune anything to it.
+- **Coverage.** Dubai shop rent covers most of the 5 Dubai lounge sites. Outside Dubai, coverage is the band table only.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
