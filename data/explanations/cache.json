@@ -242,66 +242,6 @@
     "table_caption": "Net new women is what a typical new lounge here would add to the network after subtracting the women it would pull from our own lounges; the line is 6,000. Cost efficiency compares women per AED 1k of site cost with the emirate's typical lounge, where 1x is par and higher is better. Al Sad passes both tests, cost only just.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "0898c4664f11e415": {
-    "action": "HOLD",
-    "headline": "HOLD Nad Al Sheba: good cost efficiency props up weak demand at 0.45, and the call is low confidence.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle; revisit at the next lease event. It drops to SHRINK if the composite falls 0.10, or if cost efficiency alone eases from 1.28x to 1.09x typical.",
-    "reasons": [
-      {
-        "claim": "It serves only about 2,230 women from a 247,200-woman catchment, capturing 2% of premium reviews and scoring 0.11.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 2229.3958
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 247185.9676
-          },
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.016
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.1115
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "Cost efficiency is 1.28x the emirate's typical lounge at AED 1,784/m² shop rent, scoring 0.78.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 1.2787
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1784.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.7787
-          }
-        ],
-        "topic": "cost"
-      }
-    ],
-    "so_what": "Siblings reach 75% of its catchment but would absorb only 1% of its served women; its roughly 4,000 captured women face 119 premium salons, and the call changes in 27 of 81 assumption combinations.",
-    "source": "ai",
-    "subject_id": "nad-al-sheba",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Nad Al Sheba scores 0.11 on demand and 0.78 on cost, a composite of 0.45, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "098c55c9141e479d": {
     "action": "GROW",
     "headline": "GROW in Al Fahlain: a new lounge would add 8,098 net new women at 1.19x Ras Al Khaimah's typical cost efficiency.",
@@ -666,6 +606,66 @@
     "table_caption": "Net new women is what a typical new lounge would add after subtracting women taken from our own lounges; cost efficiency compares women per unit of site cost with Dubai's typical lounge (1x is par). Umm Ramool passes cost, fails size.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "0dc823c8151d36e7": {
+    "action": "HOLD",
+    "headline": "HOLD Zawaya Walk: thin demand from a big catchment is offset by above-typical cost efficiency, at 0.45.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle; revisit at the next lease event. It falls to SHRINK only if the composite drops 0.10, or if women served falls from 6,046 to 1,930.",
+    "reasons": [
+      {
+        "claim": "It serves about 6,050 women from a 193,400-woman catchment, capturing 2% of premium reviews, a demand score of 0.30.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 6045.6013
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 193381.9866
+          },
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.0204
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.3023
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "Cost efficiency is 1.10x the emirate's typical lounge at AED 1,389/m² shop rent, scoring 0.60.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 1.1036
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1389.1
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.6036
+          }
+        ],
+        "topic": "cost"
+      }
+    ],
+    "so_what": "Siblings reach 47% of its catchment but would absorb only 2% of its served women; it serves about 6,050 women against 102 premium salons.",
+    "source": "ai",
+    "subject_id": "zawaya-walk",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Zawaya Walk scores 0.30 on demand and 0.60 on cost, a composite of 0.45, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
   "0df1abd6ebdf3b8a": {
     "action": "WATCH",
     "headline": "WATCH: a lounge in Muhaisnah would add only about 3,484 net new women, 2,516 short of the line, though at 1.86x a typical Dubai lounge's cost efficiency.",
@@ -822,66 +822,6 @@
     "subject_id": "al-shamkhah-abu-dhabi",
     "table_caption": "Net new women is what a typical new lounge here would add to the network after subtracting the women it would pull from our own lounges; the line is 6,000. Cost efficiency compares women per AED 1k of site cost with the emirate's typical lounge, where 1x is par and higher is better. Al Shamkhah is a hair under the size line and well short on cost.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
-  },
-  "10f3eb239fe9236f": {
-    "action": "SHRINK",
-    "headline": "SHRINK Noya Plaza: it serves about 1,390 women at 0.15x the emirate's typical cost efficiency, a composite of 0.03.",
-    "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review whether sibling lounges could cover this catchment. HOLD needs a 0.32 composite gain, or cost efficiency rising from 0.15x to 1.13x typical alone.",
-    "reasons": [
-      {
-        "claim": "It serves 4.0 women per thousand dirhams of site cost, 0.15x the emirate's typical lounge, scoring zero on cost.",
-        "evidence": [
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 4.0044
-          },
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 0.1542
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.0
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1707.0
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves about 1,390 of the 45,000 women in its catchment, a demand score of 0.07.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 1385.7164
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 45036.5814
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.0693
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "Every woman in its catchment is also reached by a sibling lounge, and siblings would absorb 30% of its served women; it holds about 1,320 women against 38 premium salons.",
-    "source": "ai",
-    "subject_id": "noya-plaza",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Noya Plaza scores 0.07 on demand and 0.00 on cost, a composite of 0.03, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "1117f59674324eb7": {
     "action": "WATCH",
@@ -1126,69 +1066,69 @@
     "table_caption": "Women counts everyone 15+ in the area; net new women is what a typical new lounge would actually add after subtracting women taken from our own lounges. Cost efficiency compares women per unit of site cost with Dubai's typical lounge (1x is par).",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "164ee4cf36a32543": {
-    "action": "SHRINK",
-    "headline": "SHRINK Al Jada, by a hair: weak demand holds its composite at 0.34, a fraction under the 0.35 line.",
+  "191edcda74d55ffc": {
+    "action": "PROTECT",
+    "headline": "PROTECT Al Dhafra: a low-cost site serving most of a catchment no sibling reaches, with a composite of 0.94.",
     "kind": "lounge",
-    "now_what": "Investigate, don't close: review the site before the lease event, knowing the call is marginal. Serving 6,072 women instead of 5,853 would lift it to HOLD on its own.",
+    "now_what": "Defend the site: renew at the lease event, don't relocate, and treat a new premium competitor nearby as the main threat. HOLD would take a 0.29 fall in the composite, or cost efficiency dropping from 2.3x to 0.92x typical.",
     "reasons": [
       {
-        "claim": "It serves about 5,853 women out of a 141,300-woman catchment, a demand score of 0.29.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 5852.9265
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 141329.5351
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.2926
-          },
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.074
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "Cost efficiency is 0.90x the emirate's typical lounge at AED 1,771/m² shop rent, slightly below par.",
+        "claim": "It serves 2.3x the women per dirham of site cost of the emirate's typical lounge, a full cost score.",
         "evidence": [
           {
             "field": "cost_index",
             "label": "Cost efficiency vs emirate",
-            "value": 0.8964
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1770.8
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.3964
+            "value": 2.3344
           },
           {
             "field": "served_per_cost",
             "label": "Women per AED 1k of site cost",
-            "value": 16.4584
+            "value": 60.6275
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 1.0
+          },
+          {
+            "field": "site_cost_k",
+            "label": "Site cost",
+            "value": 290.85
           }
         ],
         "topic": "cost"
+      },
+      {
+        "claim": "It serves about 17,600 of the 22,900 women in its catchment and holds an estimated 71% of premium reviews.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 17633.5017
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 22927.3037
+          },
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.7086
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.8817
+          }
+        ],
+        "topic": "demand"
       }
     ],
-    "so_what": "66% of its catchment is shared with siblings, but they would absorb only 2% of its served women, so most of its roughly 10,500 captured women would go to the 38 premium salons rather than stay with Bedashing.",
+    "so_what": "No sibling lounge reaches this catchment, so the roughly 17,630 women it serves have no Bedashing alternative; only 7 premium salons compete, a thin market.",
     "source": "ai",
-    "subject_id": "al-jada",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Jada scores 0.29 on demand and 0.40 on cost, a composite of 0.34, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "subject_id": "al-dhafra",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Dhafra scores 0.88 on demand and 1.00 on cost, a composite of 0.94, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "20b5ad963b78b731": {
@@ -1261,6 +1201,66 @@
     "subject_id": "bani-yas-abu-dhabi",
     "table_caption": "Net new women is what a typical new lounge here would add to the network after subtracting the women it would pull from our own lounges; the line is 6,000. Cost efficiency compares women per AED 1k of site cost with the emirate's typical lounge, where 1x is par and higher is better. Bani Yas passes size and fails cost.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "214b262f58de1379": {
+    "action": "SHRINK",
+    "headline": "SHRINK Jumeirah Park: it serves only about 1,640 women from a large catchment, a composite of 0.20.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether this site earns its place. HOLD needs a 0.15 composite gain, or women served rising from 1,636 to 7,536 on its own.",
+    "reasons": [
+      {
+        "claim": "From 171,600 women in its catchment it serves about 1,636 and captures 1% of premium reviews, a demand score of 0.08.",
+        "evidence": [
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 171594.8075
+          },
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 1636.4881
+          },
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.0099
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.0818
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "Cost efficiency is 0.82x the emirate's typical lounge at AED 2,118/m² shop rent, scoring 0.32.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.8233
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 2118.0
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.3233
+          }
+        ],
+        "topic": "cost"
+      }
+    ],
+    "so_what": "73% of its catchment overlaps sibling lounges, yet they would absorb only 0.5% of its served women; the roughly 1,640 women it serves face 121 premium salons.",
+    "source": "ai",
+    "subject_id": "jumeirah-park",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Jumeirah Park scores 0.08 on demand and 0.32 on cost, a composite of 0.20, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "26634b0ddbcb6fa8": {
     "action": "WATCH",
@@ -1785,71 +1785,6 @@
     "table_caption": "Net new women is what a typical new lounge would add after subtracting women taken from our own lounges; cost efficiency compares women per unit of site cost with Abu Dhabi's typical lounge (1x is par). Rimah clears both on low-confidence competitor data.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "2cc217b7fbe6b2cc": {
-    "action": "HOLD",
-    "headline": "HOLD Al Maqta: a fully shared catchment and below-typical cost efficiency put it at 0.39, just above the SHRINK line.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle; revisit at the next lease event. It slips to SHRINK if the composite falls 0.04, or if women served drops from 6,990 to 5,578.",
-    "reasons": [
-      {
-        "claim": "It serves about 6,990 women from a catchment of 126,100, a demand score of 0.35.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 6989.7296
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 126053.6265
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.3495
-          },
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.0533
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "Cost efficiency is 0.92x the emirate's typical lounge at AED 1,348/m² shop rent, scoring 0.42.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 0.921
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.421
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1348.0
-          },
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 23.921
-          }
-        ],
-        "topic": "cost"
-      }
-    ],
-    "so_what": "Every woman in its catchment is also reached by a sibling lounge, and siblings would absorb 18% of its served women; against 87 premium salons it holds about 6,700 women.",
-    "source": "ai",
-    "subject_id": "al-maqta",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Maqta scores 0.35 on demand and 0.42 on cost, a composite of 0.39, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "2eafe7e78959bce1": {
     "action": "GROW",
     "headline": "GROW: a lounge in Mazyad would add about 12,712 net new women, 6,712 above the line, at 2.0x a typical Abu Dhabi lounge's cost efficiency.",
@@ -1930,6 +1865,66 @@
     "subject_id": "mazyad-abu-dhabi",
     "table_caption": "Figures are a what-if for one typical new lounge in Mazyad: women served, those taken from our own lounges, and the net gain. Cost efficiency compares net new women per AED 1k of site cost with the emirate's typical lounge, where 1x is par.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "2fe4a829a6c21a71": {
+    "action": "HOLD",
+    "headline": "HOLD Nad Al Sheba: good cost efficiency props up weak demand at 0.45, and the call is low confidence.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle; revisit at the next lease event. It drops to SHRINK if the composite falls 0.10, or if cost efficiency alone eases from 1.28x to 1.09x typical.",
+    "reasons": [
+      {
+        "claim": "It serves only about 2,230 women from a 247,200-woman catchment, capturing 2% of premium reviews and scoring 0.11.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 2229.3958
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 247185.9676
+          },
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.016
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.1115
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "Cost efficiency is 1.28x the emirate's typical lounge at AED 1,784/m² shop rent, scoring 0.78.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 1.2787
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1784.0
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.7787
+          }
+        ],
+        "topic": "cost"
+      }
+    ],
+    "so_what": "Siblings reach 75% of its catchment but would absorb only 1% of its served women; the roughly 2,230 women it serves face 119 premium salons, and the call changes in 27 of 81 assumption combinations.",
+    "source": "ai",
+    "subject_id": "nad-al-sheba",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Nad Al Sheba scores 0.11 on demand and 0.78 on cost, a composite of 0.45, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "304a5a1ee912162e": {
     "action": "WATCH",
@@ -2026,6 +2021,71 @@
     "subject_id": "al-khawaneej-1-dubai",
     "table_caption": "Net new women is what a typical lounge would add net of women taken from our lounges; cost efficiency is women per dirham of site cost against Dubai's typical lounge, 1x being par. Al Khawaneej 1 is above par on cost but too small.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "31cf25425afbaaea": {
+    "action": "HOLD",
+    "headline": "HOLD Al Maqta: a fully shared catchment and below-typical cost efficiency put it at 0.39, just above the SHRINK line.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle; revisit at the next lease event. It slips to SHRINK if the composite falls 0.04, or if women served drops from 6,990 to 5,578.",
+    "reasons": [
+      {
+        "claim": "It serves about 6,990 women from a catchment of 126,100, a demand score of 0.35.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 6989.7296
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 126053.6265
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.3495
+          },
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.0533
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "Cost efficiency is 0.92x the emirate's typical lounge at AED 1,348/m² shop rent, scoring 0.42.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.921
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.421
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1348.0
+          },
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 23.921
+          }
+        ],
+        "topic": "cost"
+      }
+    ],
+    "so_what": "Every woman in its catchment is also reached by a sibling lounge, and siblings would absorb 18% of its served women; against 87 premium salons it serves about 6,990 women.",
+    "source": "ai",
+    "subject_id": "al-maqta",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Maqta scores 0.35 on demand and 0.42 on cost, a composite of 0.39, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "3202e40d00cb3250": {
     "action": "WATCH",
@@ -2199,66 +2259,6 @@
     "subject_id": "al-qou-abu-dhabi",
     "table_caption": "Net new women is what a typical new lounge here would add to the network after subtracting the women it would pull from our own lounges; the line is 6,000. Cost efficiency compares women per AED 1k of site cost with the emirate's typical lounge, where 1x is par and higher is better. Al Qou' fails size and cost, and our search did not reach it.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
-  },
-  "32c555d9d77d090a": {
-    "action": "SHRINK",
-    "headline": "SHRINK Mohammed Bin Zayed City: below-typical cost efficiency in a fully shared catchment leaves it at 0.14.",
-    "kind": "lounge",
-    "now_what": "Investigate, don't close: review the site before the lease event. HOLD needs a 0.21 composite gain, or cost efficiency reaching 1.00x the emirate's typical lounge (now 0.57x) on its own.",
-    "reasons": [
-      {
-        "claim": "It serves 14.7 women per thousand dirhams of site cost, 0.57x the emirate's typical lounge, scoring 0.07.",
-        "evidence": [
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 14.731
-          },
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 0.5672
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.0672
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1236.0
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves about 4,060 of the 129,100 women in its catchment, a demand score of 0.20.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 4056.9194
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 129055.6898
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.2028
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "Every woman in its catchment is also reached by a sibling lounge, and siblings would absorb 19% of its served women; it holds about 4,700 women against 80 premium salons.",
-    "source": "ai",
-    "subject_id": "mohammed-bin-zayed-city",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Mohammed Bin Zayed City scores 0.20 on demand and 0.07 on cost, a composite of 0.14, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "33164edcd2f34fb3": {
     "action": "GROW",
@@ -2930,6 +2930,136 @@
     "table_caption": "Net new women is what a typical lounge would add net of women taken from our lounges; cost efficiency is women per dirham of site cost against the emirate's typical lounge, 1x being par. Al Fou'ah passes on cost and misses size by a rounding error.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "3a8945f5ec32d096": {
+    "action": "PROTECT",
+    "headline": "PROTECT Al Falah, narrowly: cost efficiency carries a composite of 0.68, only 0.03 above the HOLD line, and the call is low confidence.",
+    "kind": "lounge",
+    "now_what": "Defend the site at the lease event, but treat it as the weakest PROTECT: a 0.03 drop in the composite, or cost efficiency easing from 1.38x to 1.32x typical, makes it HOLD.",
+    "reasons": [
+      {
+        "claim": "At 1.38x the emirate's typical cost efficiency and AED 1,168/m² shop rent, cost scores 0.88 and does most of the work.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 1.3807
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.8807
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1168.0
+          },
+          {
+            "field": "contrib_cost",
+            "label": "Cost contribution",
+            "value": 0.4404
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "Demand is middling: about 9,500 women served from a catchment of 49,900 scores 0.48.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 9509.6479
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 49946.8292
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.4755
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.2377
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "57% of the catchment is shared with sibling lounges, which would absorb 15% of its served women on closure; with only 6 premium salons the market is thin, and the call changes in 27 of 81 assumption combinations.",
+    "source": "ai",
+    "subject_id": "al-falah",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Falah scores 0.48 on demand and 0.88 on cost, a composite of 0.68, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
+  "3c2c426b78550603": {
+    "action": "HOLD",
+    "headline": "HOLD Mirdif: excellent cost efficiency but thin demand leave it at 0.63, 0.02 short of PROTECT.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle; revisit at the next lease event. Serving 5,998 women instead of 5,214, a 0.02 composite gain, would make it PROTECT.",
+    "reasons": [
+      {
+        "claim": "At 2.8x the emirate's typical cost efficiency and AED 1,957/m² shop rent, it takes a full cost score.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 2.7882
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 1.0
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1957.0
+          },
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 13.5943
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "It serves only about 5,214 women from a 241,400-woman catchment, scoring 0.26 on demand.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 5214.0907
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 241392.5859
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.2607
+          },
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.0265
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "Siblings reach 52% of its catchment but would absorb only 1% of its served women; it serves about 5,210 women in a market of 85 premium salons.",
+    "source": "ai",
+    "subject_id": "mirdif-35",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Mirdif scores 0.26 on demand and 1.00 on cost, a composite of 0.63, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
   "3d0c14ec4fab9cbb": {
     "action": "WATCH",
     "headline": "WATCH Al Kheeran: a new lounge would add only 3,558 net new women, 2,442 short of the size line, despite cost efficiency of 1.45x Dubai's typical lounge.",
@@ -3025,6 +3155,61 @@
     "subject_id": "al-kheeran-dubai",
     "table_caption": "Net new women is what a typical lounge would add net of women taken from our lounges; cost efficiency is women per dirham of site cost against Dubai's typical lounge, 1x being par. Al Kheeran passes on cost but is far too small.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "3de062154db8a7c4": {
+    "action": "HOLD",
+    "headline": "HOLD Shahama: above-typical cost efficiency and middling demand give 0.54, 0.11 below PROTECT.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle; revisit at the next lease event. PROTECT would need a 0.11 composite gain, or cost efficiency alone rising from 1.08x to 1.31x typical.",
+    "reasons": [
+      {
+        "claim": "Cost efficiency is 1.08x the emirate's typical lounge at AED 1,747/m² shop rent, scoring 0.58.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 1.079
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1747.0
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.579
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "It serves about 9,870 women from a 65,800-woman catchment, scoring 0.49 on demand.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 9865.3121
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 65769.1568
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.4933
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "82% of its catchment is shared with sibling lounges, which would absorb 19% of its served women; it serves about 9,870 women against 40 premium salons.",
+    "source": "ai",
+    "subject_id": "shahama",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Shahama scores 0.49 on demand and 0.58 on cost, a composite of 0.54, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "3f7a5ad478432ea6": {
     "action": "GROW",
@@ -3585,6 +3770,66 @@
     "table_caption": "Net new women is what a typical new lounge would add after subtracting women taken from our own lounges; cost efficiency is women per unit of site cost against Abu Dhabi's typical lounge (1x is par). Rabdan is short on both, and close to an existing lounge.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "4aa91cfd17ed36a3": {
+    "action": "SHRINK",
+    "headline": "SHRINK Khaleej Al Arabi: cost efficiency at 0.40x the emirate's typical lounge drags the composite to 0.08.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: review the site before its lease event. HOLD needs a 0.27 composite gain, or cost efficiency rising from 0.40x to 1.05x typical alone.",
+    "reasons": [
+      {
+        "claim": "It serves 10.4 women per thousand dirhams of site cost, 0.40x typical, scoring zero on cost.",
+        "evidence": [
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 10.3811
+          },
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.3997
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.0
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1380.0
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "It serves about 3,080 of the 69,400 women in its catchment, a demand score of 0.15.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 3083.1893
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 69366.5903
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.1542
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "98% of its catchment is shared with sibling lounges, which would absorb 8% of its served women; it serves about 3,080 women against 100 premium salons.",
+    "source": "ai",
+    "subject_id": "khaleej-al-arabi",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Khaleej Al Arabi scores 0.15 on demand and 0.00 on cost, a composite of 0.08, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
   "4aaddfe6666ff37e": {
     "action": "GROW",
     "headline": "GROW Dibba Al Hisn: a new lounge would add about 9,900 net new women, none taken from our lounges, at 2.09x Sharjah's typical cost efficiency.",
@@ -3854,71 +4099,6 @@
     "table_caption": "Net new women is what a typical lounge would add net of women taken from our lounges; cost efficiency is women per dirham of site cost against the emirate's typical lounge, 1x being par. Al Hiyar narrowly clears both, on unsearched competitor data.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "4fb312cef1956448": {
-    "action": "PROTECT",
-    "headline": "PROTECT Al Dhafra: a low-cost site serving most of a catchment no sibling reaches, with a composite of 0.94.",
-    "kind": "lounge",
-    "now_what": "Defend the site: renew at the lease event, don't relocate, and treat a new premium competitor nearby as the main threat. HOLD would take a 0.29 fall in the composite, or cost efficiency dropping from 2.3x to 0.92x typical.",
-    "reasons": [
-      {
-        "claim": "It serves 2.3x the women per dirham of site cost of the emirate's typical lounge, a full cost score.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 2.3344
-          },
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 60.6275
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 1.0
-          },
-          {
-            "field": "site_cost_k",
-            "label": "Site cost",
-            "value": 290.85
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves about 17,600 of the 22,900 women in its catchment and holds an estimated 71% of premium reviews.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 17633.5017
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 22927.3037
-          },
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.7086
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.8817
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "No sibling lounge reaches this catchment, so its roughly 16,200 captured women have no Bedashing alternative; only 7 premium salons compete, a thin market where the capture figure is noisy.",
-    "source": "ai",
-    "subject_id": "al-dhafra",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Dhafra scores 0.88 on demand and 1.00 on cost, a composite of 0.94, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "501b9fea448694bd": {
     "action": "GROW",
     "headline": "GROW Sharjah: a new lounge would add about 12,800 net new women at 2.7x the emirate's typical cost efficiency, the strongest case in the batch on both tests.",
@@ -4107,69 +4287,64 @@
     "table_caption": "Net new women is what a typical new lounge here would add after subtracting women taken from our own lounges; cost efficiency is women per unit of site cost against Abu Dhabi's typical lounge (1x is par). Mzeer'ah clears both, but the competitor data behind the size estimate is missing.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "5146f3a8688db151": {
-    "action": "PROTECT",
-    "headline": "PROTECT Al Falah, narrowly: cost efficiency carries a composite of 0.68, only 0.03 above the HOLD line, and the call is low confidence.",
+  "54f1f1c6ef938ce9": {
+    "action": "SHRINK",
+    "headline": "SHRINK Mohammed Bin Zayed City: below-typical cost efficiency in a fully shared catchment leaves it at 0.14.",
     "kind": "lounge",
-    "now_what": "Defend the site at the lease event, but treat it as the weakest PROTECT: a 0.03 drop in the composite, or cost efficiency easing from 1.38x to 1.32x typical, makes it HOLD.",
+    "now_what": "Investigate, don't close: review the site before the lease event. HOLD needs a 0.21 composite gain, or cost efficiency reaching 1.00x the emirate's typical lounge (now 0.57x) on its own.",
     "reasons": [
       {
-        "claim": "At 1.38x the emirate's typical cost efficiency and AED 1,168/m² shop rent, cost scores 0.88 and does most of the work.",
+        "claim": "It serves 14.7 women per thousand dirhams of site cost, 0.57x the emirate's typical lounge, scoring 0.07.",
         "evidence": [
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 14.731
+          },
           {
             "field": "cost_index",
             "label": "Cost efficiency vs emirate",
-            "value": 1.3807
+            "value": 0.5672
           },
           {
             "field": "score_cost",
             "label": "Cost score",
-            "value": 0.8807
+            "value": 0.0672
           },
           {
             "field": "site_rent_m2",
             "label": "Shop rent at the site",
-            "value": 1168.0
-          },
-          {
-            "field": "contrib_cost",
-            "label": "Cost contribution",
-            "value": 0.4404
+            "value": 1236.0
           }
         ],
         "topic": "cost"
       },
       {
-        "claim": "Demand is middling: about 9,500 women served from a catchment of 49,900 scores 0.48.",
+        "claim": "It serves about 4,060 of the 129,100 women in its catchment, a demand score of 0.20.",
         "evidence": [
           {
             "field": "served_women",
             "label": "Women served (Huff)",
-            "value": 9509.6479
+            "value": 4056.9194
           },
           {
             "field": "catchment_women",
             "label": "Women 15+ in catchment",
-            "value": 49946.8292
+            "value": 129055.6898
           },
           {
             "field": "score_demand",
             "label": "Demand score",
-            "value": 0.4755
-          },
-          {
-            "field": "contrib_demand",
-            "label": "Demand contribution",
-            "value": 0.2377
+            "value": 0.2028
           }
         ],
         "topic": "demand"
       }
     ],
-    "so_what": "57% of the catchment is shared with sibling lounges, which would absorb 15% of its served women on closure; with only 6 premium salons the market is thin, and the call changes in 27 of 81 assumption combinations.",
+    "so_what": "Every woman in its catchment is also reached by a sibling lounge, and siblings would absorb 19% of its served women; it serves about 4,060 women against 80 premium salons.",
     "source": "ai",
-    "subject_id": "al-falah",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Falah scores 0.48 on demand and 0.88 on cost, a composite of 0.68, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "subject_id": "mohammed-bin-zayed-city",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Mohammed Bin Zayed City scores 0.20 on demand and 0.07 on cost, a composite of 0.14, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "5766d02cef6abf4d": {
@@ -4420,61 +4595,6 @@
     "table_caption": "Net new women is what a typical new lounge would add after subtracting women taken from our own lounges; cost efficiency compares women per unit of site cost with Abu Dhabi's typical lounge (1x is par). Shiab Al Ashkhar passes size and fails cost.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "5e9ff21844457e8b": {
-    "action": "HOLD",
-    "headline": "HOLD Ministries Complex: slightly below-typical cost efficiency and middling demand put it at 0.42.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle; revisit at the next lease event. It falls to SHRINK if the composite drops 0.07, or if cost efficiency alone slides from 0.92x to 0.78x typical.",
-    "reasons": [
-      {
-        "claim": "Cost efficiency is 0.92x the emirate's typical lounge at AED 1,756/m² shop rent, or 23.8 women per thousand dirhams of site cost.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 0.915
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1756.0
-          },
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 23.7631
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves about 8,400 women from a 107,700-woman catchment, a demand score of 0.42.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 8397.8896
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 107721.6783
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.4199
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "Every woman in its catchment is also reached by a sibling lounge, and siblings would absorb 16% of its served women; it holds roughly 4,900 women against 95 premium salons.",
-    "source": "ai",
-    "subject_id": "ministries-complex",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Ministries Complex scores 0.42 on demand and 0.41 on cost, a composite of 0.42, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "60dd2b91b12a7de7": {
     "action": "WATCH",
     "headline": "WATCH Al Khawaneej 2: a new lounge would add 5,775 net new women, 225 short of the size line, at 2.38x Dubai's typical cost efficiency.",
@@ -4570,6 +4690,71 @@
     "subject_id": "al-khawaneej-2-dubai",
     "table_caption": "Net new women is what a typical lounge would add net of women taken from our lounges; cost efficiency is women per dirham of site cost against Dubai's typical lounge, 1x being par. Al Khawaneej 2 passes on cost and misses size narrowly.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "66e1416f0c64472f": {
+    "action": "SHRINK",
+    "headline": "SHRINK City Walk: a high-rent site serving few women, with a composite of 0.09 against the 0.35 line.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether the site earns its cost. HOLD needs a 0.26 composite gain, or cost efficiency rising from 0.57x to 1.09x typical on its own.",
+    "reasons": [
+      {
+        "claim": "At AED 4,561/m² shop rent its site cost is AED 774k a year, and it serves only 2.8 women per thousand dirhams, 0.57x the emirate's typical lounge.",
+        "evidence": [
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 4561.0
+          },
+          {
+            "field": "site_cost_k",
+            "label": "Site cost",
+            "value": 774.15
+          },
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 2.784
+          },
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.571
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "From a 259,900-woman catchment it serves only about 2,155 women and captures 1% of premium reviews.",
+        "evidence": [
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 259918.8867
+          },
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 2155.2429
+          },
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.01
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.1078
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "Facing 187 premium salons, it serves about 2,155 women and siblings would absorb only 1% of them, even though 72% of its catchment is already reached by other Bedashing lounges.",
+    "source": "ai",
+    "subject_id": "city-walk",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: City Walk scores 0.11 on demand and 0.07 on cost, a composite of 0.09, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "68241a997afc511e": {
     "action": "WATCH",
@@ -4753,6 +4938,66 @@
     "subject_id": "nahil-abu-dhabi",
     "table_caption": "Net new women is the what-if count a typical new lounge would add after subtracting women taken from our own lounges; cost efficiency is women per unit of site cost against Abu Dhabi's typical lounge (1x is par). Nahil passes cost but is too small, on unsearched data.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "6b490686ed84c5e1": {
+    "action": "SHRINK",
+    "headline": "SHRINK Westyas: cost efficiency at 0.35x the emirate's typical lounge leaves a composite of 0.08.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether sibling lounges could cover this catchment. HOLD needs a 0.27 composite gain, or cost efficiency rising from 0.35x to 1.04x typical alone.",
+    "reasons": [
+      {
+        "claim": "It serves 9.1 women per thousand dirhams of site cost, 0.35x typical, scoring zero on cost.",
+        "evidence": [
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 9.1319
+          },
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.3516
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.0
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1707.0
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "It serves about 3,160 of the 42,400 women in its catchment, a demand score of 0.16.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 3160.0923
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 42368.0713
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.158
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "98% of its catchment is also reached by sibling lounges, which would absorb 27% of its served women; it serves about 3,160 women against 45 premium salons.",
+    "source": "ai",
+    "subject_id": "westyas",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Westyas scores 0.16 on demand and 0.00 on cost, a composite of 0.08, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "6ccf6b71961985b8": {
     "action": "WATCH",
@@ -5747,66 +5992,6 @@
     "table_caption": "Net new women counts what a typical lounge here would add after the women it takes from our own lounges; cost efficiency compares women per dirham of site cost with Dubai's typical lounge, 1x being par. Al Awir clears the size line and is far above par on cost.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "81fa6ae2ff7fe3ef": {
-    "action": "PROTECT",
-    "headline": "PROTECT Shakhbout City: above-typical cost efficiency and solid demand give a composite of 0.75.",
-    "kind": "lounge",
-    "now_what": "Defend the site: renew at the lease event and respond to any premium opening nearby. HOLD would follow a 0.10 composite fall, or cost efficiency easing from 1.4x to 1.16x typical.",
-    "reasons": [
-      {
-        "claim": "It serves 35.2 women per thousand dirhams of site cost, 1.4x the emirate's typical lounge.",
-        "evidence": [
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 35.1781
-          },
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 1.3545
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1815.0
-          },
-          {
-            "field": "site_cost_k",
-            "label": "Site cost",
-            "value": 362.25
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "About 12,740 women served from a 134,600-woman catchment give a demand score of 0.64.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 12743.2741
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 134563.9063
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.6372
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "98% of its catchment overlaps sibling lounges, but they would absorb only 19% of its served women; it holds about 12,200 women against 57 premium salons.",
-    "source": "ai",
-    "subject_id": "shakhbout-city",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Shakhbout City scores 0.64 on demand and 0.85 on cost, a composite of 0.75, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "8417f4b4821afa9c": {
     "action": "WATCH",
     "headline": "WATCH Nadd Al Hamar: a new lounge would add only about 3,030 net new women, short of the 6,000 line, even though space is cost-efficient at 1.81x Dubai's typical lounge.",
@@ -6197,6 +6382,246 @@
     "table_caption": "Figures are a what-if for one typical new lounge in Jarn Yafour: women served, those taken from our own lounges, and the net gain. Cost efficiency compares net new women per AED 1k of site cost with the emirate's typical lounge (1x).",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "889704291044cc84": {
+    "action": "HOLD",
+    "headline": "HOLD Al Taif Mall: modest demand and a neutral cost score leave it at 0.42, between the lines.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle; revisit at the next lease event. It drops to SHRINK only if the composite falls 0.07, which on demand alone means women served falling from 6,828 to 4,000.",
+    "reasons": [
+      {
+        "claim": "It serves about 6,830 women from a 44,800-woman catchment, scoring 0.34 on demand.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 6827.8541
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 44817.8103
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.3414
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "There is no emirate benchmark for its cost efficiency, so cost is scored neutral at 0.5, on a site cost of AED 162k a year at AED 481/m² shop rent.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": null
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.5
+          },
+          {
+            "field": "site_cost_k",
+            "label": "Site cost",
+            "value": 162.09
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 480.6
+          }
+        ],
+        "topic": "cost"
+      }
+    ],
+    "so_what": "No sibling lounge reaches its catchment, so the roughly 6,830 women it serves and its position against 35 premium salons rest on this one site.",
+    "source": "ai",
+    "subject_id": "al-taif-mall",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Taif Mall scores 0.34 on demand and 0.50 on cost, a composite of 0.42, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
+  "8c149610187438e2": {
+    "action": "SHRINK",
+    "headline": "SHRINK Al Barsha: in a crowded premium market it serves only about 2,180 women, leaving a composite of 0.30 under the 0.35 line.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether this site still earns its place. It returns to HOLD with a 0.05 composite gain, which on demand alone means serving 4,000 women instead of 2,180.",
+    "reasons": [
+      {
+        "claim": "Despite 272,400 women in the catchment, its Huff share is only about 2,180 and it captures 0.8% of premium reviews, the weakest demand signal.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 2180.1392
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 272370.6414
+          },
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.0081
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.109
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "Cost efficiency sits exactly at the emirate's typical lounge at AED 2,381/m² shop rent, so cost neither rescues nor sinks the call.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 1.0
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.5
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 2381.0
+          },
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 4.8756
+          }
+        ],
+        "topic": "cost"
+      }
+    ],
+    "so_what": "86% of its catchment women are also reached by sibling lounges, yet siblings would absorb only 0.7% of the women it serves; the real contest is with 228 premium salons, where it serves about 2,180 women.",
+    "source": "ai",
+    "subject_id": "al-barsha",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Barsha scores 0.11 on demand and 0.50 on cost, a composite of 0.30, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
+  "8d4afd1b796f0d58": {
+    "action": "SHRINK",
+    "headline": "SHRINK Delma: it serves few women for its cost, with a composite of 0.04, far below the 0.35 line.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether this site is worth keeping. HOLD needs a 0.31 composite gain, or cost efficiency rising from 0.21x to 1.12x typical alone.",
+    "reasons": [
+      {
+        "claim": "It serves 5.4 women per thousand dirhams of site cost, 0.21x the emirate's typical lounge, scoring zero on cost.",
+        "evidence": [
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 5.3639
+          },
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.2065
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.0
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1507.0
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "Only about 1,695 of the 93,200 women in its catchment are served, a demand score of 0.08.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 1695.2545
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 93189.9871
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.0848
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "98% of its catchment is also reached by sibling lounges, which would absorb 11% of its served women; it serves roughly 1,700 women against 114 premium salons.",
+    "source": "ai",
+    "subject_id": "delma",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Delma scores 0.08 on demand and 0.00 on cost, a composite of 0.04, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
+  "8df125d48b2eb923": {
+    "action": "HOLD",
+    "headline": "HOLD Ras Al Khaimah: both signals sit slightly below par, leaving it at 0.36, only 0.01 above the SHRINK line.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle; revisit at the next lease event with care: a 0.01 drop in the composite, or cost efficiency easing from 0.86x to 0.83x typical, makes it SHRINK.",
+    "reasons": [
+      {
+        "claim": "Cost efficiency is 0.86x the emirate's typical lounge at AED 1,172/m² shop rent, scoring 0.36.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.8599
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1172.0
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.3599
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "It serves about 7,330 women from a 55,800-woman catchment, a demand score of 0.37.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 7328.2823
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 55839.6964
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.3664
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "No sibling lounge reaches this catchment, so the roughly 7,330 women it serves have no Bedashing fallback against 44 premium salons.",
+    "source": "ai",
+    "subject_id": "ras-al-khaimah",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Ras Al Khaimah scores 0.37 on demand and 0.36 on cost, a composite of 0.36, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
   "8e4102d6c0b7ac31": {
     "action": "WATCH",
     "headline": "WATCH Al Shahamah: barely big enough at about 6,280 net new women, and dearer than Abu Dhabi's typical lounge at 0.86x.",
@@ -6537,64 +6962,64 @@
     "table_caption": "Figures are a what-if for one typical new lounge in Khatt: women served, those taken from our own lounges, and the net gain. Cost efficiency compares net new women per AED 1k of site cost with the emirate's typical lounge (1x); data coverage shows how much our salon search saw.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "9c337b72306cec7f": {
-    "action": "SHRINK",
-    "headline": "SHRINK Jumeirah Park: it serves only about 1,640 women from a large catchment, a composite of 0.20.",
+  "a0dd32da94e2a414": {
+    "action": "PROTECT",
+    "headline": "PROTECT Shakhbout City: above-typical cost efficiency and solid demand give a composite of 0.75.",
     "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review whether this site earns its place. HOLD needs a 0.15 composite gain, or women served rising from 1,636 to 7,536 on its own.",
+    "now_what": "Defend the site: renew at the lease event and respond to any premium opening nearby. HOLD would follow a 0.10 composite fall, or cost efficiency easing from 1.4x to 1.16x typical.",
     "reasons": [
       {
-        "claim": "From 171,600 women in its catchment it serves about 1,636 and captures 1% of premium reviews, a demand score of 0.08.",
+        "claim": "It serves 35.2 women per thousand dirhams of site cost, 1.4x the emirate's typical lounge.",
         "evidence": [
           {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 171594.8075
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 35.1781
           },
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 1636.4881
-          },
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.0099
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.0818
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "Cost efficiency is 0.82x the emirate's typical lounge at AED 2,118/m² shop rent, scoring 0.32.",
-        "evidence": [
           {
             "field": "cost_index",
             "label": "Cost efficiency vs emirate",
-            "value": 0.8233
+            "value": 1.3545
           },
           {
             "field": "site_rent_m2",
             "label": "Shop rent at the site",
-            "value": 2118.0
+            "value": 1815.0
           },
           {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.3233
+            "field": "site_cost_k",
+            "label": "Site cost",
+            "value": 362.25
           }
         ],
         "topic": "cost"
+      },
+      {
+        "claim": "About 12,740 women served from a 134,600-woman catchment give a demand score of 0.64.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 12743.2741
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 134563.9063
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.6372
+          }
+        ],
+        "topic": "demand"
       }
     ],
-    "so_what": "73% of its catchment overlaps sibling lounges, yet they would absorb only 0.5% of its served women; its roughly 1,700 captured women face 121 premium salons.",
+    "so_what": "98% of its catchment overlaps sibling lounges, but they would absorb only 19% of its served women; it serves about 12,740 women against 57 premium salons.",
     "source": "ai",
-    "subject_id": "jumeirah-park",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Jumeirah Park scores 0.08 on demand and 0.32 on cost, a composite of 0.20, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "subject_id": "shakhbout-city",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Shakhbout City scores 0.64 on demand and 0.85 on cost, a composite of 0.75, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "a1676fc3d244ea44": {
@@ -6683,189 +7108,64 @@
     "table_caption": "Figures are a what-if for one typical new lounge in Madinat Al Riyad: women served, those taken from our own lounges, and the net gain. Cost efficiency compares net new women per AED 1k of site cost with the emirate's typical lounge (1x).",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "a4e8a0d78c025880": {
-    "action": "SHRINK",
-    "headline": "SHRINK City Walk: a high-rent site serving few women, with a composite of 0.09 against the 0.35 line.",
+  "a2f945b19d3b375f": {
+    "action": "PROTECT",
+    "headline": "PROTECT Khalifa City A: it serves about 16,700 women at 1.5x the emirate's typical cost efficiency, a composite of 0.92.",
     "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review whether the site earns its cost. HOLD needs a 0.26 composite gain, or cost efficiency rising from 0.57x to 1.09x typical on its own.",
+    "now_what": "Defend the site: renew at the lease event, don't relocate, and respond to any premium opening nearby. HOLD would need a 0.27 fall in the composite, or cost efficiency falling from 1.5x to 0.97x typical.",
     "reasons": [
       {
-        "claim": "At AED 4,561/m² shop rent its site cost is AED 774k a year, and it serves only 2.8 women per thousand dirhams, 0.57x the emirate's typical lounge.",
-        "evidence": [
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 4561.0
-          },
-          {
-            "field": "site_cost_k",
-            "label": "Site cost",
-            "value": 774.15
-          },
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 2.784
-          },
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 0.571
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "From a 259,900-woman catchment it serves only about 2,155 women and captures 1% of premium reviews.",
-        "evidence": [
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 259918.8867
-          },
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 2155.2429
-          },
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.01
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.1078
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "Facing 187 premium salons, it holds an estimated 2,600 women and siblings would absorb only 1% of them, even though 72% of its catchment is already reached by other Bedashing lounges.",
-    "source": "ai",
-    "subject_id": "city-walk",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: City Walk scores 0.11 on demand and 0.07 on cost, a composite of 0.09, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "a5d1e8cc82322de4": {
-    "action": "HOLD",
-    "headline": "HOLD Zawaya Walk: thin demand from a big catchment is offset by above-typical cost efficiency, at 0.45.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle; revisit at the next lease event. It falls to SHRINK only if the composite drops 0.10, or if women served falls from 6,046 to 1,930.",
-    "reasons": [
-      {
-        "claim": "It serves about 6,050 women from a 193,400-woman catchment, capturing 2% of premium reviews, a demand score of 0.30.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 6045.6013
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 193381.9866
-          },
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.0204
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.3023
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "Cost efficiency is 1.10x the emirate's typical lounge at AED 1,389/m² shop rent, scoring 0.60.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 1.1036
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1389.1
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.6036
-          }
-        ],
-        "topic": "cost"
-      }
-    ],
-    "so_what": "Siblings reach 47% of its catchment but would absorb only 2% of its served women; it holds about 3,900 women against 102 premium salons.",
-    "source": "ai",
-    "subject_id": "zawaya-walk",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Zawaya Walk scores 0.30 on demand and 0.60 on cost, a composite of 0.45, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "a8dad2dbc85de6ec": {
-    "action": "SHRINK",
-    "headline": "SHRINK Delma: it serves few women for its cost, with a composite of 0.04, far below the 0.35 line.",
-    "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review whether this site is worth keeping. HOLD needs a 0.31 composite gain, or cost efficiency rising from 0.21x to 1.12x typical alone.",
-    "reasons": [
-      {
-        "claim": "It serves 5.4 women per thousand dirhams of site cost, 0.21x the emirate's typical lounge, scoring zero on cost.",
+        "claim": "It serves 38.9 women per thousand dirhams of site cost, 1.5x typical despite AED 2,257/m² shop rent.",
         "evidence": [
           {
             "field": "served_per_cost",
             "label": "Women per AED 1k of site cost",
-            "value": 5.3639
+            "value": 38.9202
           },
           {
             "field": "cost_index",
             "label": "Cost efficiency vs emirate",
-            "value": 0.2065
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.0
+            "value": 1.4986
           },
           {
             "field": "site_rent_m2",
             "label": "Shop rent at the site",
-            "value": 1507.0
+            "value": 2257.0
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.9986
           }
         ],
         "topic": "cost"
       },
       {
-        "claim": "Only about 1,695 of the 93,200 women in its catchment are served, a demand score of 0.08.",
+        "claim": "About 16,680 women served from a catchment of 91,400 give a demand score of 0.83.",
         "evidence": [
           {
             "field": "served_women",
             "label": "Women served (Huff)",
-            "value": 1695.2545
+            "value": 16679.2576
           },
           {
             "field": "catchment_women",
             "label": "Women 15+ in catchment",
-            "value": 93189.9871
+            "value": 91431.5935
           },
           {
             "field": "score_demand",
             "label": "Demand score",
-            "value": 0.0848
+            "value": 0.834
           }
         ],
         "topic": "demand"
       }
     ],
-    "so_what": "98% of its catchment is also reached by sibling lounges, which would absorb 11% of its served women; it holds roughly 1,900 women against 114 premium salons.",
+    "so_what": "97% of its catchment is shared with sibling lounges, but they would absorb only 20% of its served women, so most of the roughly 16,680 women it serves would go to the 74 premium salons if it closed.",
     "source": "ai",
-    "subject_id": "delma",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Delma scores 0.08 on demand and 0.00 on cost, a composite of 0.04, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "subject_id": "khalifa-city-a",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Khalifa City A scores 0.83 on demand and 1.00 on cost, a composite of 0.92, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "ad31105c5a6b48fc": {
@@ -7374,69 +7674,69 @@
     "table_caption": "Net new women is what a typical new lounge here would add to the network after subtracting the women it would pull from our own lounges; the line is 6,000. Cost efficiency compares women per AED 1k of site cost with the emirate's typical lounge, where 1x is par and higher is better. Al Rahbah clears both tests with room to spare.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "beea3fcab19a473a": {
-    "action": "HOLD",
-    "headline": "HOLD Al Taif Mall: modest demand and a neutral cost score leave it at 0.42, between the lines.",
+  "be1d7daf79d61926": {
+    "action": "PROTECT",
+    "headline": "PROTECT Al Ain: a highly cost-efficient site serving a large catchment no sibling touches, with a composite of 0.97.",
     "kind": "lounge",
-    "now_what": "No portfolio action this cycle; revisit at the next lease event. It drops to SHRINK only if the composite falls 0.07, which on demand alone means women served falling from 6,828 to 4,000.",
+    "now_what": "Defend the site: renew at the lease event, stay put, and treat any premium opening nearby as a threat to answer. It only drops to HOLD if the composite falls 0.32, or if cost efficiency alone slides from 2.7x to 0.87x the emirate's typical lounge.",
     "reasons": [
       {
-        "claim": "It serves about 6,830 women from a 44,800-woman catchment, scoring 0.34 on demand.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 6827.8541
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 44817.8103
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.3414
-          },
-          {
-            "field": "est_customers",
-            "label": "Women captured (est.)",
-            "value": 6401.9587
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "There is no emirate benchmark for its cost efficiency, so cost is scored neutral at 0.5, on a site cost of AED 162k a year at AED 481/m² shop rent.",
+        "claim": "Al Ain serves 2.7x the women per dirham of site cost of the emirate's typical lounge, a full cost score.",
         "evidence": [
           {
             "field": "cost_index",
             "label": "Cost efficiency vs emirate",
-            "value": null
+            "value": 2.708
+          },
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 70.3312
           },
           {
             "field": "score_cost",
             "label": "Cost score",
-            "value": 0.5
-          },
-          {
-            "field": "site_cost_k",
-            "label": "Site cost",
-            "value": 162.09
+            "value": 1.0
           },
           {
             "field": "site_rent_m2",
             "label": "Shop rent at the site",
-            "value": 480.6
+            "value": 1168.0
           }
         ],
         "topic": "cost"
+      },
+      {
+        "claim": "It serves about 18,650 women from a catchment of 102,400, with no sibling lounge reaching the same cells.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 18651.8397
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 102438.9547
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.9326
+          },
+          {
+            "field": "shared_share",
+            "label": "Shared catchment",
+            "value": 0.0
+          }
+        ],
+        "topic": "demand"
       }
     ],
-    "so_what": "No sibling lounge reaches its catchment, so its roughly 6,400 captured women and its position against 35 premium salons rest on this one site.",
+    "so_what": "No other Bedashing lounge overlaps this catchment and none would absorb its women on closure, so the roughly 18,650 women it serves depend on this one site, set against 59 premium salons.",
     "source": "ai",
-    "subject_id": "al-taif-mall",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Taif Mall scores 0.34 on demand and 0.50 on cost, a composite of 0.42, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "subject_id": "al-ain",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Ain scores 0.93 on demand and 1.00 on cost, a composite of 0.97, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "bf6c3d69f8ab99b5": {
@@ -7601,6 +7901,131 @@
     "table_caption": "Figures are a what-if for one typical new lounge in Dubai Investment Park 1: women served, those taken from our lounges, and the net gain. Cost efficiency compares net new women per AED 1k of site cost with Dubai's typical lounge, where 1x is par.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "c4c1c1645ba3c9be": {
+    "action": "SHRINK",
+    "headline": "SHRINK Noya Plaza: it serves about 1,390 women at 0.15x the emirate's typical cost efficiency, a composite of 0.03.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether sibling lounges could cover this catchment. HOLD needs a 0.32 composite gain, or cost efficiency rising from 0.15x to 1.13x typical alone.",
+    "reasons": [
+      {
+        "claim": "It serves 4.0 women per thousand dirhams of site cost, 0.15x the emirate's typical lounge, scoring zero on cost.",
+        "evidence": [
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 4.0044
+          },
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.1542
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.0
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1707.0
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "It serves about 1,390 of the 45,000 women in its catchment, a demand score of 0.07.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 1385.7164
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 45036.5814
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.0693
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "Every woman in its catchment is also reached by a sibling lounge, and siblings would absorb 30% of its served women; it serves about 1,390 women against 38 premium salons.",
+    "source": "ai",
+    "subject_id": "noya-plaza",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Noya Plaza scores 0.07 on demand and 0.00 on cost, a composite of 0.03, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
+  "c53261793b5c80bc": {
+    "action": "SHRINK",
+    "headline": "SHRINK Al Jada, by a hair: weak demand holds its composite at 0.34, a fraction under the 0.35 line.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: review the site before the lease event, knowing the call is marginal. Serving 6,072 women instead of 5,853 would lift it to HOLD on its own.",
+    "reasons": [
+      {
+        "claim": "It serves about 5,853 women out of a 141,300-woman catchment, a demand score of 0.29.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 5852.9265
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 141329.5351
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.2926
+          },
+          {
+            "field": "capture",
+            "label": "Capture",
+            "value": 0.074
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "Cost efficiency is 0.90x the emirate's typical lounge at AED 1,771/m² shop rent, slightly below par.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.8964
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1770.8
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.3964
+          },
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 16.4584
+          }
+        ],
+        "topic": "cost"
+      }
+    ],
+    "so_what": "66% of its catchment is shared with siblings, but they would absorb only 2% of its served women, so most of the roughly 5,850 women it serves would go to the 38 premium salons rather than stay with Bedashing.",
+    "source": "ai",
+    "subject_id": "al-jada",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Jada scores 0.29 on demand and 0.40 on cost, a composite of 0.34, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+  },
   "c6d5cf27aab59670": {
     "action": "WATCH",
     "headline": "WATCH Muntazy: a new lounge would add about 12,000 net new women, well clear of the 6,000 line, but at 0.95x Ajman's typical lounge it falls just short on cost efficiency.",
@@ -7682,124 +8107,64 @@
     "table_caption": "Net new women is the what-if count a typical new lounge here would add after subtracting those it takes from our own lounges; cost efficiency compares women per unit of site cost with Ajman's typical lounge, where 1x is par. Muntazy passes size comfortably and misses cost by a sliver.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "c7e44de4c875a2eb": {
-    "action": "SHRINK",
-    "headline": "SHRINK Khaleej Al Arabi: cost efficiency at 0.40x the emirate's typical lounge drags the composite to 0.08.",
+  "cde68c01a936cb53": {
+    "action": "HOLD",
+    "headline": "HOLD Baniyas: solid on both signals but strong on neither, it sits at 0.57, 0.08 below PROTECT.",
     "kind": "lounge",
-    "now_what": "Investigate, don't close: review the site before its lease event. HOLD needs a 0.27 composite gain, or cost efficiency rising from 0.40x to 1.05x typical alone.",
+    "now_what": "No portfolio action this cycle; revisit at the next lease event. It would earn PROTECT with a 0.08 composite gain, or with cost efficiency alone rising from 1.09x to 1.25x typical.",
     "reasons": [
       {
-        "claim": "It serves 10.4 women per thousand dirhams of site cost, 0.40x typical, scoring zero on cost.",
+        "claim": "Cost efficiency is 1.09x the emirate's typical lounge at AED 2,003/m² shop rent, scoring 0.59.",
         "evidence": [
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 10.3811
-          },
           {
             "field": "cost_index",
             "label": "Cost efficiency vs emirate",
-            "value": 0.3997
+            "value": 1.0932
           },
           {
             "field": "score_cost",
             "label": "Cost score",
-            "value": 0.0
+            "value": 0.5932
           },
           {
             "field": "site_rent_m2",
             "label": "Shop rent at the site",
-            "value": 1380.0
+            "value": 2003.0
+          },
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 28.3929
           }
         ],
         "topic": "cost"
       },
       {
-        "claim": "It serves about 3,080 of the 69,400 women in its catchment, a demand score of 0.15.",
+        "claim": "It serves about 11,100 women from a catchment of 106,800, a demand score of 0.55.",
         "evidence": [
           {
             "field": "served_women",
             "label": "Women served (Huff)",
-            "value": 3083.1893
+            "value": 11086.023
           },
           {
             "field": "catchment_women",
             "label": "Women 15+ in catchment",
-            "value": 69366.5903
+            "value": 106825.8184
           },
           {
             "field": "score_demand",
             "label": "Demand score",
-            "value": 0.1542
+            "value": 0.5543
           }
         ],
         "topic": "demand"
       }
     ],
-    "so_what": "98% of its catchment is shared with sibling lounges, which would absorb 8% of its served women; it holds about 4,500 women against 100 premium salons.",
+    "so_what": "85% of its catchment is shared with siblings, who would absorb 13% of its served women; it serves about 11,090 women against 36 premium salons.",
     "source": "ai",
-    "subject_id": "khaleej-al-arabi",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Khaleej Al Arabi scores 0.15 on demand and 0.00 on cost, a composite of 0.08, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "c8e3a36f544266aa": {
-    "action": "PROTECT",
-    "headline": "PROTECT Khalifa City A: it serves about 16,700 women at 1.5x the emirate's typical cost efficiency, a composite of 0.92.",
-    "kind": "lounge",
-    "now_what": "Defend the site: renew at the lease event, don't relocate, and respond to any premium opening nearby. HOLD would need a 0.27 fall in the composite, or cost efficiency falling from 1.5x to 0.97x typical.",
-    "reasons": [
-      {
-        "claim": "It serves 38.9 women per thousand dirhams of site cost, 1.5x typical despite AED 2,257/m² shop rent.",
-        "evidence": [
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 38.9202
-          },
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 1.4986
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 2257.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.9986
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "About 16,680 women served from a catchment of 91,400 give a demand score of 0.83.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 16679.2576
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 91431.5935
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.834
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "97% of its catchment is shared with sibling lounges, but they would absorb only 20% of its served women, so most of its roughly 11,500 captured women would go to the 74 premium salons if it closed.",
-    "source": "ai",
-    "subject_id": "khalifa-city-a",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Khalifa City A scores 0.83 on demand and 1.00 on cost, a composite of 0.92, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "subject_id": "baniyas",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Baniyas scores 0.55 on demand and 0.59 on cost, a composite of 0.57, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "cee17350713f2224": {
@@ -7979,66 +8344,6 @@
     "subject_id": "al-madam-sharjah",
     "table_caption": "Net new women is what a typical lounge would add net of women taken from our lounges; cost efficiency is women per dirham of site cost against Sharjah's typical lounge, 1x being par. Al Madam clears both by a wide margin on partial competitor data.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
-  },
-  "cf5dfcdc7cef6e54": {
-    "action": "SHRINK",
-    "headline": "SHRINK Westyas: cost efficiency at 0.35x the emirate's typical lounge leaves a composite of 0.08.",
-    "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review whether sibling lounges could cover this catchment. HOLD needs a 0.27 composite gain, or cost efficiency rising from 0.35x to 1.04x typical alone.",
-    "reasons": [
-      {
-        "claim": "It serves 9.1 women per thousand dirhams of site cost, 0.35x typical, scoring zero on cost.",
-        "evidence": [
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 9.1319
-          },
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 0.3516
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.0
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1707.0
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves about 3,160 of the 42,400 women in its catchment, a demand score of 0.16.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 3160.0923
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 42368.0713
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.158
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "98% of its catchment is also reached by sibling lounges, which would absorb 27% of its served women; it holds about 3,000 women against 45 premium salons.",
-    "source": "ai",
-    "subject_id": "westyas",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Westyas scores 0.16 on demand and 0.00 on cost, a composite of 0.08, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "d06b24a36b46d9cb": {
     "action": "WATCH",
@@ -8400,61 +8705,6 @@
     "table_caption": "Net new women is what a typical new lounge would add after subtracting women taken from our own lounges; cost efficiency compares women per unit of site cost with Abu Dhabi's typical lounge (1x is par). Um Ghafah clears both by wide margins.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "d5da375b3dabb2fc": {
-    "action": "HOLD",
-    "headline": "HOLD Ras Al Khaimah: both signals sit slightly below par, leaving it at 0.36, only 0.01 above the SHRINK line.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle; revisit at the next lease event with care: a 0.01 drop in the composite, or cost efficiency easing from 0.86x to 0.83x typical, makes it SHRINK.",
-    "reasons": [
-      {
-        "claim": "Cost efficiency is 0.86x the emirate's typical lounge at AED 1,172/m² shop rent, scoring 0.36.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 0.8599
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1172.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.3599
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves about 7,330 women from a 55,800-woman catchment, a demand score of 0.37.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 7328.2823
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 55839.6964
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.3664
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "No sibling lounge reaches this catchment, so its roughly 7,700 captured women have no Bedashing fallback against 44 premium salons.",
-    "source": "ai",
-    "subject_id": "ras-al-khaimah",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Ras Al Khaimah scores 0.37 on demand and 0.36 on cost, a composite of 0.36, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "d80d05a7c37e261a": {
     "action": "WATCH",
     "headline": "WATCH: a lounge in Masakin would add about 5,680 net new women, 320 short of the line, at 0.82x a typical Abu Dhabi lounge, with no competitor data.",
@@ -8642,61 +8892,6 @@
     "subject_id": "hili-abu-dhabi",
     "table_caption": "Figures are a what-if for one typical new lounge in Hili: women served, those taken from our own lounges, and the net gain. Cost efficiency compares net new women per AED 1k of site cost with the emirate's typical lounge (1x).",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
-  },
-  "da1072e2f50d4e0f": {
-    "action": "HOLD",
-    "headline": "HOLD Shahama: above-typical cost efficiency and middling demand give 0.54, 0.11 below PROTECT.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle; revisit at the next lease event. PROTECT would need a 0.11 composite gain, or cost efficiency alone rising from 1.08x to 1.31x typical.",
-    "reasons": [
-      {
-        "claim": "Cost efficiency is 1.08x the emirate's typical lounge at AED 1,747/m² shop rent, scoring 0.58.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 1.079
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1747.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.579
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves about 9,870 women from a 65,800-woman catchment, scoring 0.49 on demand.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 9865.3121
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 65769.1568
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.4933
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "82% of its catchment is shared with sibling lounges, which would absorb 19% of its served women; it holds about 5,700 women against 40 premium salons.",
-    "source": "ai",
-    "subject_id": "shahama",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Shahama scores 0.49 on demand and 0.58 on cost, a composite of 0.54, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "de60be8d58f222e0": {
     "action": "WATCH",
@@ -9088,71 +9283,6 @@
     "table_caption": "Figures are a what-if for one typical new lounge in Mudayrah: women served, those taken from our own lounges, and the net gain. Cost efficiency compares net new women per AED 1k of site cost with Ajman's typical lounge, where 1x is par.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "ecb177c02dea1014": {
-    "action": "PROTECT",
-    "headline": "PROTECT Al Ain: a highly cost-efficient site serving a large catchment no sibling touches, with a composite of 0.97.",
-    "kind": "lounge",
-    "now_what": "Defend the site: renew at the lease event, stay put, and treat any premium opening nearby as a threat to answer. It only drops to HOLD if the composite falls 0.32, or if cost efficiency alone slides from 2.7x to 0.87x the emirate's typical lounge.",
-    "reasons": [
-      {
-        "claim": "Al Ain serves 2.7x the women per dirham of site cost of the emirate's typical lounge, a full cost score.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 2.708
-          },
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 70.3312
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 1.0
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1168.0
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves about 18,650 women from a catchment of 102,400, with no sibling lounge reaching the same cells.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 18651.8397
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 102438.9547
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.9326
-          },
-          {
-            "field": "shared_share",
-            "label": "Shared catchment",
-            "value": 0.0
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "No other Bedashing lounge overlaps this catchment and none would absorb its women on closure, so roughly 12,600 captured women depend on this one site, set against 59 premium salons.",
-    "source": "ai",
-    "subject_id": "al-ain",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Ain scores 0.93 on demand and 1.00 on cost, a composite of 0.97, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "ed6464418261b9ab": {
     "action": "WATCH",
     "headline": "WATCH Al Marmoom: a lounge here would be cheap to run per woman but adds about 4,500 net new women, short of the 6,000 line.",
@@ -9340,6 +9470,61 @@
     "subject_id": "eastern-mahadir-abu-dhabi",
     "table_caption": "Figures are a what-if for one typical new lounge in Eastern Mahadir: women served, those taken from our own lounges, and the net gain. Cost efficiency is net new women per AED 1k of site cost against the emirate's typical lounge (1x); data coverage shows how much of the area our salon search saw.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "f3a54a5983b3b37f": {
+    "action": "HOLD",
+    "headline": "HOLD Ministries Complex: slightly below-typical cost efficiency and middling demand put it at 0.42.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle; revisit at the next lease event. It falls to SHRINK if the composite drops 0.07, or if cost efficiency alone slides from 0.92x to 0.78x typical.",
+    "reasons": [
+      {
+        "claim": "Cost efficiency is 0.92x the emirate's typical lounge at AED 1,756/m² shop rent, or 23.8 women per thousand dirhams of site cost.",
+        "evidence": [
+          {
+            "field": "cost_index",
+            "label": "Cost efficiency vs emirate",
+            "value": 0.915
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1756.0
+          },
+          {
+            "field": "served_per_cost",
+            "label": "Women per AED 1k of site cost",
+            "value": 23.7631
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "It serves about 8,400 women from a 107,700-woman catchment, a demand score of 0.42.",
+        "evidence": [
+          {
+            "field": "served_women",
+            "label": "Women served (Huff)",
+            "value": 8397.8896
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 107721.6783
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.4199
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "Every woman in its catchment is also reached by a sibling lounge, and siblings would absorb 16% of its served women; it serves roughly 8,400 women against 95 premium salons.",
+    "source": "ai",
+    "subject_id": "ministries-complex",
+    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Ministries Complex scores 0.42 on demand and 0.41 on cost, a composite of 0.42, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "f45539ca754d3e8f": {
     "action": "WATCH",
@@ -9589,136 +9774,6 @@
     "table_caption": "Net new women is what a typical lounge would add net of women taken from our lounges; cost efficiency is women per dirham of site cost against Sharjah's typical lounge, 1x being par. Al Dhaid is far past both lines.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "f5df73d7ec28d01e": {
-    "action": "HOLD",
-    "headline": "HOLD Mirdif: excellent cost efficiency but thin demand leave it at 0.63, 0.02 short of PROTECT.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle; revisit at the next lease event. Serving 5,998 women instead of 5,214, a 0.02 composite gain, would make it PROTECT.",
-    "reasons": [
-      {
-        "claim": "At 2.8x the emirate's typical cost efficiency and AED 1,957/m² shop rent, it takes a full cost score.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 2.7882
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 1.0
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1957.0
-          },
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 13.5943
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves only about 5,214 women from a 241,400-woman catchment, scoring 0.26 on demand.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 5214.0907
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 241392.5859
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.2607
-          },
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.0265
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "Siblings reach 52% of its catchment but would absorb only 1% of its served women; it holds about 6,400 women in a market of 85 premium salons.",
-    "source": "ai",
-    "subject_id": "mirdif-35",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Mirdif scores 0.26 on demand and 1.00 on cost, a composite of 0.63, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "f6e7aeec7c36aa4c": {
-    "action": "SHRINK",
-    "headline": "SHRINK Al Barsha: in a crowded premium market it serves only about 2,180 women, leaving a composite of 0.30 under the 0.35 line.",
-    "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review whether this site still earns its place. It returns to HOLD with a 0.05 composite gain, which on demand alone means serving 4,000 women instead of 2,180.",
-    "reasons": [
-      {
-        "claim": "Despite 272,400 women in the catchment, its Huff share is only about 2,180 and it captures 0.8% of premium reviews, the weakest demand signal.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 2180.1392
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 272370.6414
-          },
-          {
-            "field": "capture",
-            "label": "Capture",
-            "value": 0.0081
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.109
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "Cost efficiency sits exactly at the emirate's typical lounge at AED 2,381/m² shop rent, so cost neither rescues nor sinks the call.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 1.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.5
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 2381.0
-          },
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 4.8756
-          }
-        ],
-        "topic": "cost"
-      }
-    ],
-    "so_what": "86% of its catchment women are also reached by sibling lounges, yet siblings would absorb only 0.7% of the women it serves; the real contest is with 228 premium salons, where it holds about 2,200 women.",
-    "source": "ai",
-    "subject_id": "al-barsha",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Al Barsha scores 0.11 on demand and 0.50 on cost, a composite of 0.30, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "faf4bbc13eefcaab": {
     "action": "WATCH",
     "headline": "WATCH Al Wathbah: big enough at about 7,550 net new women, but at 0.67x it costs more per woman than Abu Dhabi's typical lounge.",
@@ -9906,65 +9961,5 @@
     "subject_id": "ghalilah-ras-al-khaimah",
     "table_caption": "Figures are a what-if for one typical new lounge in Ghalilah: women served, those taken from our own lounges, and the net gain. Cost efficiency compares net new women per AED 1k of site cost with the emirate's typical lounge (1x); data coverage shows how much of the area our salon search saw.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, and cost efficiency at least the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
-  },
-  "fdc4cffeaa58238a": {
-    "action": "HOLD",
-    "headline": "HOLD Baniyas: solid on both signals but strong on neither, it sits at 0.57, 0.08 below PROTECT.",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle; revisit at the next lease event. It would earn PROTECT with a 0.08 composite gain, or with cost efficiency alone rising from 1.09x to 1.25x typical.",
-    "reasons": [
-      {
-        "claim": "Cost efficiency is 1.09x the emirate's typical lounge at AED 2,003/m² shop rent, scoring 0.59.",
-        "evidence": [
-          {
-            "field": "cost_index",
-            "label": "Cost efficiency vs emirate",
-            "value": 1.0932
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.5932
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 2003.0
-          },
-          {
-            "field": "served_per_cost",
-            "label": "Women per AED 1k of site cost",
-            "value": 28.3929
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "It serves about 11,100 women from a catchment of 106,800, a demand score of 0.55.",
-        "evidence": [
-          {
-            "field": "served_women",
-            "label": "Women served (Huff)",
-            "value": 11086.023
-          },
-          {
-            "field": "catchment_women",
-            "label": "Women 15+ in catchment",
-            "value": 106825.8184
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.5543
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "85% of its catchment is shared with siblings, who would absorb 13% of its served women; it holds an estimated 10,000 women against 36 premium salons.",
-    "source": "ai",
-    "subject_id": "baniyas",
-    "table_caption": "Demand scores the women this lounge serves; cost scores women served per dirham of site cost against the emirate's typical lounge. Each carries equal weight: Baniyas scores 0.55 on demand and 0.59 on cost, a composite of 0.57, where PROTECT needs 0.65 or more and SHRINK 0.35 or less.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   }
 }

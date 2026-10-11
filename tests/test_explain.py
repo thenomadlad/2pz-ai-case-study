@@ -13,7 +13,7 @@ from src.models import Evidence, Reason
 FACTS = {"catchment_women": 42648, "addressable_women": 56864, "affluence_rent": 75000.0,
          "affluence_coverage": 1.0, "catchment_cells": 3, "shared_share": 0.334,
          "premium_pool": 69, "substitutes_k": 12, "capture": 0.0, "thin_premium_market": False,
-         "est_customers": 0, "lounge_rating": 4.7, "lounge_reviews": 396, "served_women": 5686,
+         "lounge_rating": 4.7, "lounge_reviews": 396, "served_women": 5686,
          "cost_index": 1.164, "served_per_cost": 15.9, "site_cost_k": 357.6, "site_rent_m2": 1784.0,
          "composite": 0.41, "score_demand": 0.2843, "score_cost": 0.666}
 TOPICS = ["demand", "cost"]

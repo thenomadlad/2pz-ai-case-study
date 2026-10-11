@@ -98,8 +98,6 @@ GLOSSARY: dict[str, Field] = {
                                        "Median Google rating of the premium salons in the catchment with 20+ reviews."),
     "rating_gap": Field("Rating gap", "stars",
                         "Lounge rating minus the median rating of the premium salons in its catchment (20+ reviews)."),
-    "est_customers": Field("Women captured (est.)", "women",
-                           "Capture × addressable women: a rough size of the lounge's share."),
     "level_flips": Field(
         "Assumption sensitivity", f"of {scorecard.COMBOS} combinations",
         f"How many of the {scorecard.COMBOS} combinations of travel time, competitor coverage, "
@@ -252,7 +250,7 @@ GLOSSARY: dict[str, Field] = {
 TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     "lounge": {
         "demand": ("served_women", "addressable_women", "catchment_women", "affluence_coverage", "score_demand",
-                   "est_customers", "affluence_rent", "catchment_cells", "contrib_demand"),
+                   "affluence_rent", "catchment_cells", "contrib_demand"),
         "cannibalisation": ("absorbed_share", "shared_share"),
         "cost": ("cost_index", "served_per_cost", "site_cost_k", "site_rent_m2", "score_cost", "contrib_cost"),
         "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market"),
@@ -418,7 +416,7 @@ def _rounded(facts: dict) -> dict:
 LOUNGE_TABLE = ("served_women", "absorbed_share", "catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
                 "catchment_cells", "shared_share", "premium_pool", "premium_reviews_per_1k",
                 "site_rent_m2", "women_per_rent_k",
-                "substitutes_k", "capture", "thin_premium_market", "est_customers",
+                "substitutes_k", "capture", "thin_premium_market",
                 "lounge_rating", "lounge_reviews", "substitutes_median_rating", "rating_gap",
                 "level_flips", "composite", "score_demand", "score_cost", "cost_index", "served_per_cost", "site_cost_k",
                 "contrib_demand", "contrib_cost", "next_call", "line_gap", "flip_driver",
