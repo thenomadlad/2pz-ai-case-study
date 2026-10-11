@@ -26,8 +26,6 @@ NEAR_LINE = 0.10    # within 10% of the size or saturation line: low confidence
 FAR_LINE = 0.20     # 20%+ from both: high confidence
 
 WHY = {
-    "NEW_SITE_MIN": ("Quick first cut (2026-10-11): a new lounge should add at least about what our median "
-                     "lounge serves today (~6k women, Huff), net of what it takes from our own lounges."),
     "GROW_MIN_WOMEN": "Retired with the two-test rule (2026-10-11; not used in the call). Was: just under the smallest lounge catchment (23k women at medium levels): the least a lounge runs on today.",
     "SKIP_UNDER_WOMEN": "Under 5,000 women an area can't carry a lounge whatever the competition.",
     "WORKER_CAP": "Where most adults live in worker housing, the women estimate rests on the worker-housing female share.",
@@ -72,6 +70,7 @@ def _confidence(a: Area, unsat: bool | None, thin_affluence: bool) -> tuple[str,
 NEW_SITE_MIN = 6_000
 NEW_SITE_MIN_WHY = ("Quick first cut (2026-10-11): a new lounge here should add at least about what our median "
                     "lounge serves today (~6k women, Huff), net of what it takes from our own lounges.")
+WHY = {"NEW_SITE_MIN": NEW_SITE_MIN_WHY, **WHY}  # shown first on the How page
 
 
 def classify(a: Area) -> AreaDecision:

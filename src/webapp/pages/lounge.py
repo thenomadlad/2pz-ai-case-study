@@ -40,9 +40,7 @@ def _signals(f, d) -> None:
         score = d.scores[s.name]
         st.progress(score, text=f"**{s.label}:** {val(s.field, getattr(f, s.field))} → score "
                                 f"{score:.2f} (weight {s.weight:g})")
-        note = (f" Thin premium market ({f.premium_pool} premium salons): score pulled toward 0.5, keeping "
-                f"{f.premium_pool}/{scorecard.THIN_MARKET} of its distance." if s.name == "capture" and f.thin_premium_market
-                else " Missing: scored neutral." if getattr(f, s.field) is None else "")
+        note = " Missing: scored neutral." if getattr(f, s.field) is None else ""
         st.caption(f"Scale: {val(s.field, s.worst)} → 0, {val(s.field, s.best)} → 1. {s.why}{note}")
     nd = explain.composite_digits(min(abs(d.composite - scorecard.PROTECT_AT), abs(d.composite - scorecard.SHRINK_AT)))
     verdict = (f"Composite **{d.composite:.{nd}f}** → **{d.action}** (PROTECT at {scorecard.PROTECT_AT} "

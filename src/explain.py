@@ -90,9 +90,8 @@ GLOSSARY: dict[str, Field] = {
         "missed). A proxy for share of premium customers.", pct=True),
     "thin_premium_market": Field(
         "Thin premium market", "yes/no",
-        f"Fewer than {scorecard.THIN_MARKET} premium salons: capture of a tiny pool is noisy, so its "
-        f"score is pulled toward neutral (0.5), keeping premium salons ÷ {scorecard.THIN_MARKET} of its "
-        "distance from it."),
+        f"Fewer than {scorecard.THIN_MARKET} premium salons: capture of a tiny pool is noisy. "
+        "Capture is shown, not scored."),
     "lounge_rating": Field("Google rating", "stars (of 5)", "The lounge's Google rating."),
     "lounge_reviews": Field("Google reviews", "count", "Reviews behind the lounge's rating."),
     "substitutes_median_rating": Field("Premium salons' median rating", "stars (of 5)",
@@ -333,7 +332,7 @@ THRESHOLDS: dict[str, str] = {
     **{f"score_{s.name}": f"Weight {s.weight:g} of {_TOTAL_WEIGHT:g}" for s in scorecard.SIGNALS},
     "composite": (f"PROTECT ≥ {scorecard.PROTECT_AT} · HOLD between · "
                   f"SHRINK ≤ {scorecard.SHRINK_AT}"),
-    "thin_premium_market": f"When yes, capture's score is pulled toward 0.5 (pool ÷ {scorecard.THIN_MARKET})",
+    "thin_premium_market": "Context: capture is shown, not scored",
     "level_flips": f"Low confidence at {scorecard.FLIP_LOW} or more",
     "new_site_net": f"GROW needs {growth.NEW_SITE_MIN:,}; WATCH from {growth.NEW_SITE_MIN // 2:,}",
     "women": f"SKIP under {growth.SKIP_UNDER_WOMEN:,}",
