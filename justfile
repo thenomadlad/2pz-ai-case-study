@@ -18,7 +18,7 @@ notebook:
     uv run --extra notebook jupyter lab notebooks/scorecard.ipynb
 
 test:
-    uv run --extra dev --extra notebook pytest
+    uv run --extra dev --extra notebook pytest --durations=10
 
 # Print every lounge and growth-area call at the baseline as CSV (e.g. just labels > labels.csv)
 labels:
