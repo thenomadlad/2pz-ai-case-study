@@ -326,7 +326,7 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
   estimated contribution = catchment demand × capture share × visit frequency × margin per visit − fixed site cost
   implied ROIC          = estimated contribution / estimated invested capital
   ```
-  - [ ] Catchment demand and capture share come from the model (OB3 / Huff). The rest (visit frequency, margin per visit, fixed site cost, invested capital) are **assumptions**. Each one is either sourced (filings, industry benchmarks, rent data) or explicitly marked **open**. *Which values we can actually find is still open.*
+  - [ ] Catchment demand and capture share come from the model (OB3 / Huff). The rest (visit frequency, margin per visit, fixed site cost, invested capital) are **assumptions**. Each one is either sourced (filings, industry benchmarks, rent data) or explicitly marked **open**. *Which values we can actually find is still open.* **Fixed site cost now has a planned source:** DLD Ejari shop rents for Dubai (13.8k contracts already downloaded), plus published retail rent bands by mall class elsewhere (`docs/superpowers/plans/2026-10-10-commercial-rent.md`).
   - [ ] The hurdle is tiered (e.g. below hurdle / acceptable / strong), and the tiers are what the labels key off. We set levels; we don't predict exact returns.
   - [ ] Assumptions are visible next to every ROIC figure. A label that clears the gate only under optimistic assumptions is flagged as such.
 
