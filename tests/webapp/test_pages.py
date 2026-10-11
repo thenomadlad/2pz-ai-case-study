@@ -258,3 +258,11 @@ def test_overview_overlap_toggle_adds_its_legend():
     at = _page("overview")
     next(c for c in at.checkbox if c.label == "All catchments (overlap)").check().run()
     assert not at.exception and "shared** by 2+ lounges" in _text(at)
+
+
+def test_shop_rent_shows_as_cost_with_the_unit_assumption():
+    lounge = " ".join(t.value.to_string() for t in _page("lounge", lounge="al-barsha").table)   # factor table
+    assert "Shop rent at the site" in lounge and "AED/m²/yr" in lounge
+    overview = _page("overview")
+    assert "Shop rent (AED/m²/yr)" in overview.dataframe[0].value.columns
+    assert "Shop rent is our cost; women per AED 1k assumes a 150 m² unit." in _text(overview)

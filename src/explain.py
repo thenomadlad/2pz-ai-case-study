@@ -139,6 +139,14 @@ GLOSSARY: dict[str, Field] = {
                           "land use).", pct=True),
     "premium_salons": Field("Premium salons", "count",
                             "Premium salons found in the area's searched cells."),
+    "site_rent_m2": Field("Shop rent at the site", "AED/m²/yr",
+                          "Commercial (shop) rent where the lounge sits: our cost, not customer affluence. "
+                          "Dubai: DLD Ejari shop contracts in its area; elsewhere: a published band for its mall class."),
+    "women_per_rent_k": Field("Women per AED 1k of rent", "women",
+                              "Addressable women per AED 1,000 of annual rent for a 150 m² unit (assumed): "
+                              "the unit size sets the level, never the ranking. Display only, not scored."),
+    "shop_rent_m2": Field("Shop rent in the area", "AED/m²/yr",
+                          "Women-weighted median DLD shop rent over the area's cells (Dubai only)."),
     "premium_reviews_per_1k": Field(
         "Premium saturation", "reviews per 1k women",
         "Premium salons' Google reviews (scaled up for missed salons) per 1,000 women in the "
@@ -378,6 +386,7 @@ def _rounded(facts: dict) -> dict:
 
 LOUNGE_TABLE = ("catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
                 "catchment_cells", "shared_share", "premium_pool", "premium_reviews_per_1k",
+                "site_rent_m2", "women_per_rent_k",
                 "substitutes_k", "capture", "thin_premium_market", "est_customers",
                 "lounge_rating", "lounge_reviews", "substitutes_median_rating", "rating_gap",
                 "level_flips", "composite", "score_demand", "score_cannibalisation",
@@ -385,7 +394,7 @@ LOUNGE_TABLE = ("catchment_women", "addressable_women", "affluence_rent", "afflu
                 "contrib_capture", "contrib_rating", "next_call", "line_gap", "flip_driver",
                 "flip_value")
 AREA_TABLE = ("women", "addressable_women", "affluence_rent", "affluence_coverage", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
-              "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
+              "shop_rent_m2", "women_per_rent_k", "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
               "unsaturated", "confidence", "size_gap", "saturation_gap", "worker_gap", "coverage_gap")
 NOT_SCORED_ACTION = "NOT SCORED"
 
@@ -756,7 +765,9 @@ SYSTEM_PROMPT = (
     "branch (ratings, reviews to chase, staffing, service quality, operations); rating is "
     "context, not a lever. Use only the fact sheet. Every number you write must appear in the "
     "fact sheet or the thresholds; round sensibly. Write like a board memo: short, concrete "
-    "claims. Never mention revenue, rent or profit figures (none exist). Always answer by "
+    "claims. Never mention revenue or profit (none exist). Quote shop rent only when the fact "
+    "sheet has it, as our cost (never customer affluence, never a lever to renegotiate), and say "
+    "the 150 m² unit is assumed when quoting women per rent. Always answer by "
     "calling the submit_explanation tool."
 )
 # Server-side refusal fallback: a declined request is re-run on Anthropic's recommended

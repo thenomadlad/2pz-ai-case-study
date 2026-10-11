@@ -2,7 +2,7 @@
 
 Candidates and full shares are precomputed per level by `scripts/fetch_salons.py pool`."""
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
 
@@ -26,6 +26,8 @@ class V3:
     polygons: dict[tuple[str, int], dict]    # (branch_id, minutes) -> GeoJSON geometry
     candidates: dict[tuple[str, str], list[dict]]   # (branch_id, level) -> non-excluded salons in the polygon
     full_share: dict[tuple[str, str], float]        # (branch_id, level) -> share of circles that came back full
+    rent_bands: pd.DataFrame = field(default_factory=pd.DataFrame)   # retail_rent_bands.csv (published, by mall class)
+    site_class: dict[str, str] = field(default_factory=dict)         # branch_id -> location_class (by hand)
 
 
 def _salons(path) -> pd.DataFrame:
@@ -74,4 +76,7 @@ def _load(d: Path) -> V3:       # cached on the directory: Settings is unhashabl
     full_share = {(r.branch_id, r.level): float(r.full_share) for r in sat.itertuples()}
     return V3(lounges, _cells(d),
               pd.read_csv(d / "emirates.csv").set_index("emirate"), pd.read_csv(d / "catchment_cells.csv"),
-              salons, pd.read_csv(d / "search_circles.csv"), polygons, candidates, full_share)
+              salons, pd.read_csv(d / "search_circles.csv"), polygons, candidates, full_share,
+              pd.read_csv(d / "retail_rent_bands.csv") if (d / "retail_rent_bands.csv").exists() else pd.DataFrame(),
+              (pd.read_csv(d / "lounge_site_class.csv").set_index("branch_id").location_class.to_dict()
+               if (d / "lounge_site_class.csv").exists() else {}))

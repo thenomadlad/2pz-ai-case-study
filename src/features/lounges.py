@@ -156,6 +156,12 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
         site = shop.get(site_cell) if site_cell else None
         site = None if site is None or site != site else float(site)
         c_rent, c_cov = _shop_rent(cs, w, shop)
+        source = "dld" if site is not None else "none"
+        cls = v3.site_class.get(b)
+        if site is None and cls and lo.emirate != "Dubai" and len(v3.rent_bands):   # a published band
+            row = v3.rent_bands[(v3.rent_bands.emirate == lo.emirate) & (v3.rent_bands.location_class == cls)]
+            if len(row):
+                site, source = float(row.base_m2.iloc[0]), "band"
         feats.append(LoungeFeatures(
             branch_id=b, name=lo.name, emirate=lo.emirate, lat=lo.lat, lng=lo.lng, rating=lo.rating,
             review_count=lo.review_count, catchment_women=women_, addressable_women=addressable,
@@ -166,7 +172,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
             thin_premium_market=len(prem) < THIN_MARKET, premium_reviews_per_1k=sat["per_1k"],
             substitutes_median_rating=med,
             rating_gap=lo.rating - med if lo.rating is not None and med is not None else None,
-            site_rent_m2=site, site_rent_source="dld" if site is not None else "none",
+            site_rent_m2=site, site_rent_source=source,
             catchment_shop_rent_m2=c_rent, shop_rent_coverage=c_cov,
             women_per_rent_k=women_per_rent_k(addressable, site),
             est_customers=0.0 if b in NOT_SCORED else cap * addressable, not_scored=b in NOT_SCORED))

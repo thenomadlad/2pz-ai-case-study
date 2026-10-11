@@ -205,7 +205,9 @@ def _lounge_table(r) -> None:
                         "Composite": None if f.not_scored else d.composite,
                         **{n.capitalize(): d.scores.get(n) for n in WEIGHTS},
                         "Shared catchment": f.shared_share, "Capture share": f.capture,
-                        "Premium reviews per 1k women": f.premium_reviews_per_1k, "Google rating": f.rating,
+                        "Premium reviews per 1k women": f.premium_reviews_per_1k,
+                        "Shop rent (AED/m²/yr)": f.site_rent_m2, "Women per AED 1k rent": f.women_per_rent_k,
+                        "Google rating": f.rating,
                         "Reviews": f.review_count, "Confidence": "n/a" if f.not_scored else d.confidence}
                        for f, d in zip(r.features, r.decisions)]).sort_values("Composite", ascending=False)
     c1, c2 = st.columns(2)
@@ -216,11 +218,15 @@ def _lounge_table(r) -> None:
     pct = st.column_config.NumberColumn(format="percent")
     st.dataframe(df, hide_index=True, column_config={
         "Composite": score, **{n.capitalize(): score for n in WEIGHTS}, "Shared catchment": pct,
-        "Capture share": pct, "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f")})
+        "Capture share": pct, "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
+        "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
+        "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f")})
     st.caption("Click a column header to sort. Signal scores are 0-1 on fixed scales (1 = good for the "
                "lounge); shared catchment = share of its women another open lounge also reaches; capture "
                "share = its share of its premium substitutes' Google reviews; premium reviews per 1k women = "
-               "catchment saturation, the growth areas' measure (shown, not scored).")
+               "catchment saturation, the growth areas' measure (shown, not scored). "
+               "Shop rent is our cost; women per AED 1k assumes a 150 m² unit. Blank: no rent source "
+               "(Dubai: DLD shop contracts; elsewhere only malls with a published band).")
 
 
 def _area_table(r) -> None:
@@ -230,6 +236,7 @@ def _area_table(r) -> None:
     df = pd.DataFrame([{"Rank": i, "Area": a.name, "Emirate": a.emirate, "Call": d.action,
                         "Addressable women": round(a.addressable_women), "Worker housing": a.worker_share,
                         "Premium reviews per 1k women": a.premium_reviews_per_1k, "Searched": a.data_coverage,
+                        "Shop rent (AED/m²/yr)": a.shop_rent_m2, "Women per AED 1k rent": a.women_per_rent_k,
                         "Nearest lounge": a.nearest_lounge_id, "km (straight line)": round(a.nearest_lounge_km, 1),
                         "Confidence": d.confidence,
                         "Why": d.rationale.split(" Nearest lounge:")[0]}
@@ -243,6 +250,8 @@ def _area_table(r) -> None:
     st.dataframe(df, hide_index=True, column_config={
         "Worker housing": pct, "Searched": pct,
         "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
+        "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
+        "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f"),
         "Why": st.column_config.TextColumn(width="large")})
     st.caption("Ranked GROW first, then WATCH, each by addressable women. Why: the tests it passed or "
                "failed. SKIP areas are left out.")

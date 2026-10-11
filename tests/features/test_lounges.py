@@ -279,3 +279,10 @@ def test_shop_rent_never_changes_a_label(real_v3):
         real_v3.cells["shop_rent_m2"] = real_v3.cells["shop_rent_m2"] / 10
     assert {d.branch_id: d.action for d in scorecard.decide(f2)} == before
     assert [d.action for d in growth.classify_all(areas2)] == [d.action for d in growth.classify_all(areas)]
+
+
+def test_non_dubai_lounge_uses_its_class_band(real_v3):
+    f, _ = build(real_v3, ASSUMPTIONS)
+    banded = [x for x in f if x.site_rent_source == "band"]
+    assert banded and all(x.emirate != "Dubai" and x.site_rent_m2 > 0 and x.women_per_rent_k for x in banded)
+    assert all(x.site_rent_source in ("dld", "none") for x in f if x.emirate == "Dubai")
