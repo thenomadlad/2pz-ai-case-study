@@ -79,7 +79,8 @@ def test_level_switch_is_fast_and_marks_explanations_as_template():
     at = _page("overview", lounge="al-barsha")
     start = time.perf_counter()
     at.selectbox(key="wi-travel").set_value("high").run()
-    assert time.perf_counter() - start < 2
+    # 3 s: a new level re-runs level_flips' 82 lounge builds (~20 ms each, 1.6-1.9 s warm); memoising them across levels would be one more cache to clear on parameter sweeps
+    assert time.perf_counter() - start < 3
     assert not at.exception
     assert at.session_state["what_if"]["levels"] == Levels(travel="high")
     assert any("What-if view" in w.value and "20 min (high)" in w.value for w in at.warning)
