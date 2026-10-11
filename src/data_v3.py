@@ -50,6 +50,9 @@ def _cells(d: Path) -> pd.DataFrame:
     cells = pd.read_csv(d / "cells.csv").set_index("cell_id")
     cells = cells.join(aff[["rent_observed"]]).join(aff.source.rename("affluence_source"))
     cells["affluence_source"] = cells.affluence_source.fillna("none")
+    shop = d / "cell_shop_rent.csv"   # commercial (shop) rent, AED/m2/yr: our cost, Dubai only
+    cells["shop_rent_m2"] = (pd.read_csv(shop).set_index("cell_id").shop_rent_m2
+                             if shop.exists() else pd.Series(dtype=float)).reindex(cells.index)
     return cells
 
 

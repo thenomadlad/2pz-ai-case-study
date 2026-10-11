@@ -31,7 +31,25 @@ MIN_RATING_REVIEWS_WHY = ("The rating gap compares a lounge with the median rati
                           "stars on a single review. The whole pool, not the top-k substitutes, because k "
                           "grows with the pool, so one added salon could shift which salons count and "
                           "raise a lounge's score (sanity check SC4, run 2).")
+REF_UNIT_M2 = 150
+REF_UNIT_WHY = ("Lounge floor areas aren't public: 150 m2 is an assumed reference unit. One size "
+                "for every site, so it sets the level of women-per-rent, never the ranking.")
 _PREP: dict[int, tuple[V3, dict]] = {}
+
+
+def women_per_rent_k(women: float, rent_m2: float | None) -> float | None:
+    """Addressable women per AED 1,000 of annual rent for a REF_UNIT_M2 unit; None without a rent."""
+    if rent_m2 is None or rent_m2 != rent_m2 or rent_m2 <= 0:
+        return None
+    return women / (rent_m2 * REF_UNIT_M2 / 1000)
+
+
+def _shop_rent(cs: list[str], w: dict, shop: dict) -> tuple[float | None, float]:
+    """Women-weighted median shop rent over these cells, and the share of women it covers."""
+    obs = [c for c in cs if shop.get(c) is not None and shop[c] == shop[c]]
+    total = sum(w[c] for c in cs)
+    return (weighted_median([shop[c] for c in obs], [w[c] for c in obs]),
+            sum(w[c] for c in obs) / total if total else 0.0)
 
 
 def _prep(v3: V3) -> dict:
@@ -114,6 +132,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     women = women_15plus(v3.cells, v3.emirates, a.worker_housing_female_share[levels.worker_share])
     rent = v3.cells.rent_observed
     w, rents = women.to_dict(), rent.to_dict()
+    shop = v3.cells.shop_rent_m2.to_dict() if "shop_rent_m2" in v3.cells else {}
     aw = (women * affluence_weight(rent, women, a.affluence_elasticity[levels.affluence])).to_dict()
     lounges = [lo for lo in v3.lounges if lo.branch_id not in closed]
     catch = {lo.branch_id: p["catch"].get(levels.travel, {}).get(lo.branch_id, []) for lo in lounges}
@@ -131,6 +150,12 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
                  if s.get("rating") not in (None, "") and _reviews(s) >= MIN_RATING_REVIEWS]
         med = statistics.median(rated) if rated else None
         sat = _saturation(cs, w, p, a)
+        cell_ = p["cell"]
+        site_cell = next((c for c in cs if abs(cell_[c]["lat"] - lo.lat) <= 0.01
+                          and abs(cell_[c]["lng"] - lo.lng) <= 0.01), None)
+        site = shop.get(site_cell) if site_cell else None
+        site = None if site is None or site != site else float(site)
+        c_rent, c_cov = _shop_rent(cs, w, shop)
         feats.append(LoungeFeatures(
             branch_id=b, name=lo.name, emirate=lo.emirate, lat=lo.lat, lng=lo.lng, rating=lo.rating,
             review_count=lo.review_count, catchment_women=women_, addressable_women=addressable,
@@ -141,6 +166,9 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
             thin_premium_market=len(prem) < THIN_MARKET, premium_reviews_per_1k=sat["per_1k"],
             substitutes_median_rating=med,
             rating_gap=lo.rating - med if lo.rating is not None and med is not None else None,
+            site_rent_m2=site, site_rent_source="dld" if site is not None else "none",
+            catchment_shop_rent_m2=c_rent, shop_rent_coverage=c_cov,
+            women_per_rent_k=women_per_rent_k(addressable, site),
             est_customers=0.0 if b in NOT_SCORED else cap * addressable, not_scored=b in NOT_SCORED))
     if not areas:
         return feats, []
@@ -158,7 +186,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     for (name, emirate), cs in groups.items():
         # one area per OSM place name, contiguous or not
         out.append(_area(_slug(f"{name} {emirate}"), name, emirate, sorted(cs, key=p["rc"].get),
-                         w, aw, rents, p, a, lounges, lats, lngs))
+                         w, aw, rents, shop, p, a, lounges, lats, lngs))
     return feats, sorted(out, key=lambda x: -x.women)
 
 
@@ -185,17 +213,20 @@ def _saturation(cells: list[str], w: dict, p: dict, a: BaselineAssumptions) -> d
     return {"n": len(prem), "per_1k": per_1k, "fcs": fcs, "cw": cw}
 
 
-def _area(area_id, name, emirate, piece, w, aw, rents, p, a, lounges, lats, lngs) -> Area:
+def _area(area_id, name, emirate, piece, w, aw, rents, shop, p, a, lounges, lats, lngs) -> Area:
     cell, women = p["cell"], sum(w[c] for c in piece)
     lat = sum(w[c] * cell[c]["lat"] for c in piece) / women
     lng = sum(w[c] * cell[c]["lng"] for c in piece) / women
     sat = _saturation(piece, w, p, a)
+    a_rent, a_cov = _shop_rent(piece, w, shop)
     d = haversine_km(lat, lng, lats, lngs)
     j = int(d.argmin()) if len(d) else None
     return Area(area_id=area_id, name=name, emirate=emirate, lat=lat, lng=lng, women=women,
                 addressable_women=sum(aw[c] for c in piece), **_affluence(piece, w, rents, women), cells=len(piece),
                 worker_share=sum(cell[c]["adults_worker"] for c in piece) / sum(cell[c]["adults"] for c in piece),
                 premium_salons=sat["n"], premium_reviews_per_1k=sat["per_1k"], full_circle_share=sat["fcs"],
+                shop_rent_m2=a_rent, shop_rent_coverage=a_cov,
+                women_per_rent_k=women_per_rent_k(sum(aw[c] for c in piece), a_rent),
                 data_coverage=sat["cw"] / women, cell_ids=piece,
                 nearest_lounge_id=lounges[j].branch_id if j is not None else "",
                 nearest_lounge_km=float(d[j]) if j is not None else float("nan"))

@@ -210,7 +210,8 @@ def test_affluence_off_reproduces_the_unweighted_model_exactly(real_v3):
     assert {d.area_id for d in growth.classify_all(areas) if d.action == "GROW"} == GROW_BEFORE
     # and every other number is untouched by the affluence level
     med = build(real_v3, ASSUMPTIONS)
-    strip = lambda x: x.model_dump(exclude={"addressable_women", "est_customers"})
+    # women_per_rent_k is addressable women over rent, so it moves with affluence too
+    strip = lambda x: x.model_dump(exclude={"addressable_women", "est_customers", "women_per_rent_k"})
     assert [strip(x) for x in f] == [strip(x) for x in med[0]]
     assert [strip(x) for x in areas] == [strip(x) for x in med[1]]
 
@@ -242,3 +243,39 @@ def test_a_better_rated_competitor_never_raises_a_lounge(real_v3):
     finally:
         real_v3.candidates[(b, travel)].remove(rival)
     assert after[b] <= base[b]
+
+
+def test_women_per_rent_is_none_without_rent_and_scales_with_rent():
+    from src.features.lounges import REF_UNIT_M2, women_per_rent_k
+    assert women_per_rent_k(50_000, None) is None
+    assert women_per_rent_k(50_000, float("nan")) is None
+    assert women_per_rent_k(50_000, 2000.0) == pytest.approx(50_000 / (2000 * REF_UNIT_M2 / 1000))
+    assert women_per_rent_k(50_000, 1000.0) == pytest.approx(2 * women_per_rent_k(50_000, 2000.0))
+
+
+def test_shop_rent_is_women_weighted_over_cells_that_have_one(tiny_v3):
+    tiny_v3.cells["shop_rent_m2"] = float("nan")
+    tiny_v3.cells.loc[C1, "shop_rent_m2"] = 1000.0
+    tiny_v3.cells.loc[C2, "shop_rent_m2"] = 3000.0
+    f, _ = build(tiny_v3, ASSUMPTIONS)
+    a = next(x for x in f if x.branch_id == "a")            # reaches C1 (1000 adults), C2 (3000)
+    assert a.catchment_shop_rent_m2 == 3000.0                # women-weighted median: C2 holds the majority
+    assert a.shop_rent_coverage == pytest.approx(1.0)
+    assert a.site_rent_m2 == 1000.0 and a.site_rent_source == "dld"   # a sits in C1
+    b = next(x for x in f if x.branch_id == "b")            # sits in C3: no shop rent there
+    assert b.site_rent_m2 is None and b.site_rent_source == "none" and b.women_per_rent_k is None
+
+
+def test_shop_rent_never_changes_a_label(real_v3):
+    from src.features import lounges
+    from src.model import growth, scorecard
+    f, areas = build(real_v3, ASSUMPTIONS)
+    before = {d.branch_id: d.action for d in scorecard.decide(f)}
+    real_v3.cells["shop_rent_m2"] = real_v3.cells["shop_rent_m2"] * 10
+    lounges._PREP.clear()
+    try:
+        f2, areas2 = build(real_v3, ASSUMPTIONS)
+    finally:
+        real_v3.cells["shop_rent_m2"] = real_v3.cells["shop_rent_m2"] / 10
+    assert {d.branch_id: d.action for d in scorecard.decide(f2)} == before
+    assert [d.action for d in growth.classify_all(areas2)] == [d.action for d in growth.classify_all(areas)]
