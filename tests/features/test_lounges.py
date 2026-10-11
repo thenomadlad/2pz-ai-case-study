@@ -181,26 +181,6 @@ def test_travel_level_changes_competition(real_v3):
     assert any(hi[b].premium_pool > lo[b].premium_pool for b in hi)
 
 
-# Served-demand model 2026-10-11 (demand = served women, cost = cost index on the three-source shop
-# rent; affluence off at baseline). Replaces the v3 pins (capture / rating / cannibalisation scorecard,
-# saturation-gated GROW): a regression pin, so any change to these is deliberate.
-BEFORE_AFFLUENCE = {
-    'al-ain': 0.9663, 'al-barsha': 0.3045, 'al-dhafra': 0.9408, 'al-falah': 0.6781, 'al-jada': 0.3445,
-    'al-maqta': 0.3853, 'al-taif-mall': 0.4207, 'baniyas': 0.5738, 'city-walk': 0.0894, 'delma': 0.0424,
-    'jumeirah-park': 0.2025, 'khaleej-al-arabi': 0.0771, 'khalifa-city-a': 0.9163, 'ministries-complex': 0.4174,
-    'mirdif-35': 0.6304, 'mohammed-bin-zayed-city': 0.135, 'nad-al-sheba': 0.4451, 'noya-plaza': 0.0346,
-    'ras-al-khaimah': 0.3632, 'shahama': 0.5361, 'shakhbout-city': 0.7458, 'westyas': 0.079, 'zawaya-walk': 0.4529}
-GROW_BEFORE = {
-    'al-awir-dubai', 'al-batayih-sharjah', 'al-dhahir-abu-dhabi', 'al-dhaid-sharjah', 'al-fahlain-ras-al-khaimah',
-    'al-hamriya-sharjah', 'al-helio-ajman', 'al-hiyar-abu-dhabi', 'al-jerf-ajman', 'al-madam-sharjah',
-    'al-maqam-abu-dhabi', 'al-rahbah-abu-dhabi', 'al-ramlah-sharjah', 'al-rawdah-al-sharqiyah-abu-dhabi',
-    'al-sad-abu-dhabi', 'al-samhah-abu-dhabi', 'dibba-al-hisn-sharjah', 'digdaga-ras-al-khaimah',
-    'falaj-hazza-abu-dhabi', 'hamidiya-ajman', 'kalba-sharjah', 'khatt-ras-al-khaimah', 'khor-fakkan-sharjah',
-    'manama-ajman', 'mazyad-abu-dhabi', 'mbazzarah-al-khadra-abu-dhabi', 'milehah-sharjah', 'mudayrah-ajman',
-    'mzeer-ah-abu-dhabi', 'rimah-abu-dhabi', 'sharjah-sharjah', 'um-ghafah-abu-dhabi', 'wasit-sharjah',
-    'zakhir-abu-dhabi'}
-
-
 def test_affluence_off_reproduces_the_unweighted_model_exactly(real_v3):
     from src.model import growth, scorecard
     off = Levels(affluence="low")
@@ -208,9 +188,12 @@ def test_affluence_off_reproduces_the_unweighted_model_exactly(real_v3):
     assert all(x.addressable_women == x.catchment_women for x in f)
     assert all(x.est_customers == (0.0 if x.not_scored else x.capture * x.catchment_women) for x in f)
     assert all(a.addressable_women == a.women for a in areas)
-    got = {d.branch_id: d.composite for d in scorecard.decide(f) if d.action != "NOT SCORED"}
-    assert got == BEFORE_AFFLUENCE
-    assert {d.area_id for d in growth.classify_all(areas) if d.action == "GROW"} == GROW_BEFORE
+    # the calls are the baseline run's (affluence is off at baseline); no frozen composites since the
+    # site-scored model (2026-10-11): calls are checked by behaviour, the call diff lives in SANITY_CHECKS
+    from src.baseline import run
+    r = run()
+    assert [(d.branch_id, d.composite) for d in scorecard.decide(f)] == [(d.branch_id, d.composite) for d in r.decisions]
+    assert [d.action for d in growth.classify_all(areas)] == [d.action for d in r.area_decisions]
     # and every number that doesn't read addressable women is untouched by the affluence level
     # (served-demand model: served women, the what-ifs and the cost index all read addressable women)
     med = build(real_v3, ASSUMPTIONS, Levels(affluence="medium"))
@@ -282,16 +265,56 @@ def test_every_scored_lounge_has_a_site_rent_from_its_cell(real_v3):
     assert {x.site_rent_source for x in f if x.emirate == "Dubai"} == {"dld"}
 
 
-def test_cost_baseline_is_the_median_lounge_else_the_median_area():
-    # COST_BASELINE_WHY (2026-10-11): 2+ lounges with a cost -> their median; else the evaluated areas'.
-    from types import SimpleNamespace as N
+def test_cost_index_is_women_per_cost_against_the_frozen_anchor(real_v3):
+    # F1 (2026-10-11): one UAE-wide anchor for lounges (site-served women) and areas (net new women)
+    import statistics
 
-    from src.features.lounges import cost_baseline
-    lo = lambda e, v, ns=False: N(emirate=e, served_per_cost=v, not_scored=ns)
-    feats = [lo("A", 10), lo("A", 30), lo("A", 99, ns=True), lo("B", 50), lo("C", None)]
-    areas = [N(emirate="A", served_per_cost=1), N(emirate="B", served_per_cost=4), N(emirate="B", served_per_cost=8),
-             N(emirate="D", served_per_cost=2), N(emirate="D", served_per_cost=None)]
-    assert cost_baseline(feats, areas) == {"A": 20, "B": 6, "D": 2}
+    from src.features.lounges import COST_ANCHOR, site_cost_k
+    f, areas = build(real_v3, ASSUMPTIONS)
+    for x in (x for x in f if not x.not_scored):
+        assert x.cost_index == pytest.approx(x.site_served / site_cost_k(x.site_rent_m2) / COST_ANCHOR), x.branch_id
+    for a in areas:
+        if a.served_per_cost is not None:
+            assert a.cost_index == pytest.approx(a.new_site_net / a.site_cost_k / COST_ANCHOR), a.area_id
+    # the anchor is the median scored lounge site at baseline: re-freeze it if this drifts
+    assert statistics.median(x.cost_index for x in f if not x.not_scored) == pytest.approx(1, abs=0.01)
+
+
+def test_closing_a_lounge_never_changes_another_lounges_cost_index_except_through_served(real_v3):
+    # SANITY_CHECKS F1: the old emirate-median baseline moved a lounge's cost index (and call) when a
+    # sibling closed. Now the index moves only with the lounge's own site-served women.
+    base = {x.branch_id: x for x in build(real_v3, ASSUMPTIONS, areas=False)[0] if not x.not_scored}
+    for gone in base:
+        for x in build(real_v3, ASSUMPTIONS, closed=frozenset({gone}), areas=False)[0]:
+            if x.not_scored:
+                continue
+            b = base[x.branch_id]
+            assert x.site_cost_k == b.site_cost_k
+            assert x.cost_index / b.cost_index == pytest.approx(x.site_served / b.site_served), (gone, x.branch_id)
+
+
+def test_site_served_is_a_typical_lounge_at_the_site_with_this_one_closed(real_v3):
+    # F2 (2026-10-11): the demand signal scores the site, not the lounge's own reviews
+    import statistics
+
+    from src.features.lounges import NOT_SCORED, _SERVED
+    from src.market import affluence_weight, women_15plus
+    from src.model.served import what_if_open
+    f, _ = build(real_v3, ASSUMPTIONS, areas=False)
+    scored = [x for x in f if not x.not_scored]
+    reviews = statistics.median(x.review_count for x in scored)
+    rating = statistics.median(x.rating for x in scored if x.rating is not None)
+    a, lv = ASSUMPTIONS, Levels()
+    women = women_15plus(real_v3.cells, real_v3.emirates, a.worker_housing_female_share[lv.worker_share])
+    demand = women * affluence_weight(real_v3.cells.rent_observed, women, a.affluence_elasticity[lv.affluence])
+    for x in scored[:3]:
+        w = what_if_open(real_v3, a, demand, x.lat, x.lng, reviews, rating, closed=frozenset({x.branch_id}),
+                         not_scored=frozenset(NOT_SCORED))
+        assert x.site_served == pytest.approx(w["served"])
+        assert x.performance_vs_site == pytest.approx(x.served_women / x.site_served)
+    assert _SERVED   # cached: level_flips' 81 builds reuse it
+    air = next(x for x in f if x.not_scored)
+    assert air.site_served is None and air.performance_vs_site is None
 
 
 def test_shop_rent_needs_half_the_women_covered(tiny_v3):

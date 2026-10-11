@@ -144,6 +144,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     aw_s = women * affluence_weight(rent, women, a.affluence_elasticity[levels.affluence])
     aw = aw_s.to_dict()
     sv = _served(v3, a, aw_s, levels, closed, leave_one_out=areas)
+    site = _site_served(v3, a, aw_s, closed, [lo for lo in v3.lounges if lo.branch_id not in closed])
     lounges = [lo for lo in v3.lounges if lo.branch_id not in closed]
     catch = {lo.branch_id: p["catch"].get(levels.travel, {}).get(lo.branch_id, []) for lo in lounges}
     reach = Counter(c for b, cs in catch.items() if b not in NOT_SCORED for c in cs)   # scored lounges only
@@ -163,10 +164,10 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
         cell_ = p["cell"]
         site_cell = next((c for c in cs if abs(cell_[c]["lat"] - lo.lat) <= 0.01
                           and abs(cell_[c]["lng"] - lo.lng) <= 0.01), None)
-        site = shop.get(site_cell) if site_cell else None
-        site = None if site is None or site != site else float(site)
+        rent_ = shop.get(site_cell) if site_cell else None
+        rent_ = None if rent_ is None or rent_ != rent_ else float(rent_)
         c_rent, c_cov = _shop_rent(cs, w, shop)
-        source = p["shop_source"].get(site_cell, "none") if site is not None else "none"
+        source = p["shop_source"].get(site_cell, "none") if rent_ is not None else "none"
         feats.append(LoungeFeatures(
             branch_id=b, name=lo.name, emirate=lo.emirate, lat=lo.lat, lng=lo.lng, rating=lo.rating,
             review_count=lo.review_count, catchment_women=women_, addressable_women=addressable,
@@ -178,21 +179,21 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
             substitutes_median_rating=med,
             rating_gap=lo.rating - med if lo.rating is not None and med is not None else None,
             served_women=sv["served"].get(b), absorbed_share=sv["absorbed"].get(b),
-            site_rent_m2=site, site_rent_source=source,
+            site_served=site.get(b), performance_vs_site=sv["served"].get(b, 0.0) / site[b] if site.get(b) else None,
+            site_rent_m2=rent_, site_rent_source=source,
             catchment_shop_rent_m2=c_rent, shop_rent_coverage=c_cov,
-            women_per_rent_k=women_per_rent_k(addressable, site),
+            women_per_rent_k=women_per_rent_k(addressable, rent_),
             est_customers=0.0 if b in NOT_SCORED else cap * addressable, not_scored=b in NOT_SCORED))
     feats = _lounge_costs(feats)
-    need = _need_area_baseline(feats)
-    if not areas and not need:
-        return _cost_index(feats, [], {})[0], []
+    if not areas:
+        return feats, []
 
     cell = p["cell"]
     groups = defaultdict(list)
     for c, x in w.items():
         # Unnamed cells (only their emirate's name: no OSM place within 3 km) make no area: nobody can
         # act on them yet. They still count in lounge catchments, overlap and population totals.
-        if x > 0 and cell[c].get("name_source") != "emirate" and (areas or cell[c]["emirate"] in need):
+        if x > 0 and cell[c].get("name_source") != "emirate":
             groups[(cell[c]["name"], cell[c]["emirate"])].append(c)
     lounges = [lo for lo in lounges if lo.branch_id not in NOT_SCORED]     # never an area's nearest lounge
     lats, lngs = np.array([lo.lat for lo in lounges]), np.array([lo.lng for lo in lounges])
@@ -202,9 +203,6 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
         out.append(_area(_slug(f"{name} {emirate}"), name, emirate, sorted(cs, key=p["rc"].get),
                          w, aw, rents, shop, p, a, lounges, lats, lngs, sv["cells"].unserved))
     out = _area_what_ifs(v3, a, aw_s, out, feats, closed)
-    feats, out = _cost_index(feats, out, need)
-    if not areas:   # areas built only for their emirates' cost baseline (level_flips)
-        return feats, []
     return feats, sorted(out, key=lambda x: -x.women)
 
 
@@ -221,58 +219,43 @@ def site_cost_k(rent_m2: float | None) -> float | None:
     return (rent_m2 * REF_UNIT_M2 + FITOUT_AED_M2 * REF_UNIT_M2 / FITOUT_YEARS) / 1000
 
 
-MIN_BASELINE_LOUNGES = 2
-COST_BASELINE_WHY = (
-    "Cost index = women per AED 1k of site cost against its emirate's typical site (2026-10-11). Typical = "
-    "the median over the emirate's scored lounges when it has at least 2 with a cost (Abu Dhabi, Dubai, "
-    "Sharjah); otherwise (Ajman and Umm Al Quwain have no lounge, Fujairah and Ras Al Khaimah one) the "
-    "median over the emirate's evaluated growth areas (5k+ women, residential name: net new women of a "
-    "what-if lounge per AED 1k). One lounge is no baseline: it would always score exactly 1. The area "
-    "baseline measures net new women, not served women, so a lone lounge's index against it is rougher. "
-    "Fujairah has no area that qualifies, so al-taif-mall has no index (cost scores neutral).")
+COST_ANCHOR = 14.34   # women per AED 1k of site cost; COST_ANCHOR_WHY
+COST_ANCHOR_WHY = (
+    "Cost index = women per AED 1k of annual site cost against ONE UAE-wide anchor, frozen 2026-10-11: "
+    "the median site-served women per AED 1k over the 23 scored lounges at baseline (default levels, "
+    "nothing closed) = {:.2f}. A constant, so a lounge's or area's index moves only with its own served "
+    "women and site cost, never when a sibling opens, closes or grows or the levels change (the old "
+    "emirate-median baseline did: SANITY_CHECKS F1). Lounges are measured on site-served women (a typical "
+    "lounge at the site), areas on net new women of a what-if lounge; both against the same anchor. "
+    "Re-freeze it (and say so) only when the served model or site cost changes.").format(COST_ANCHOR)
 
 
 def _lounge_costs(feats):
-    """Site cost and served women per AED 1k of it, per lounge."""
+    """Site cost, site-served women per AED 1k of it, and the cost index against COST_ANCHOR."""
     out = []
     for f in feats:
         cost = site_cost_k(f.site_rent_m2)
-        out.append(f.model_copy(update={"site_cost_k": cost,
-                                        "served_per_cost": f.served_women / cost if f.served_women and cost else None}))
+        spc = f.site_served / cost if f.site_served and cost else None
+        out.append(f.model_copy(update={"site_cost_k": cost, "served_per_cost": spc,
+                                        "cost_index": None if spc is None else spc / COST_ANCHOR}))
     return out
 
 
-def _lounge_base(feats) -> dict[str, list[float]]:
-    base = {}
-    for f in feats:
-        if f.served_per_cost is not None and not f.not_scored:
-            base.setdefault(f.emirate, []).append(f.served_per_cost)
-    return base
+def _typical(lounges) -> tuple[float, float | None]:
+    """The typical lounge for what-ifs: median reviews and median rating over the scored ones."""
+    scored = [lo for lo in lounges if lo.branch_id not in NOT_SCORED]
+    rated = [lo.rating for lo in scored if lo.rating is not None]
+    return statistics.median(lo.review_count for lo in scored), statistics.median(rated) if rated else None
 
 
-def _need_area_baseline(feats) -> set[str]:
-    """Emirates with lounges whose cost baseline must come from areas (COST_BASELINE_WHY)."""
-    have = _lounge_base(feats)
-    return {f.emirate for f in feats if len(have.get(f.emirate, [])) < MIN_BASELINE_LOUNGES}
-
-
-def cost_baseline(feats, areas) -> dict[str, float]:
-    """Per emirate, the typical women per AED 1k of site cost (COST_BASELINE_WHY)."""
-    base = {e: statistics.median(v) for e, v in _lounge_base(feats).items() if len(v) >= MIN_BASELINE_LOUNGES}
-    by_area = {}
-    for ar in areas:
-        if ar.emirate not in base and ar.served_per_cost is not None:
-            by_area.setdefault(ar.emirate, []).append(ar.served_per_cost)
-    return {**base, **{e: statistics.median(v) for e, v in by_area.items()}}
-
-
-def _cost_index(feats, areas, need):
-    base = cost_baseline(feats, areas)
-
-    def ix(x):
-        return {"cost_index": x.served_per_cost / base[x.emirate]
-                if x.served_per_cost is not None and base.get(x.emirate) else None}
-    return [f.model_copy(update=ix(f)) for f in feats], [ar.model_copy(update=ix(ar)) for ar in areas]
+def _site_served(v3, a, aw_s, closed, lounges) -> dict[str, float]:
+    """site_served per open scored lounge (src/model/served.site_served); cached on the demand and closures."""
+    from src.model.served import site_served
+    reviews, rating = _typical(lounges)
+    key = ("site", id(v3), hash(aw_s.to_numpy().tobytes()), closed, reviews, rating)
+    if key not in _SERVED:
+        _SERVED[key] = site_served(v3, a, aw_s, reviews, rating, closed=closed, not_scored=frozenset(NOT_SCORED))
+    return _SERVED[key]
 
 
 def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
@@ -280,10 +263,7 @@ def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
     what it takes from our lounges, and its net new women per AED 1k of site cost."""
     from src.model.growth import NON_RESIDENTIAL, SKIP_UNDER_WOMEN
     from src.model.served import what_if_open
-    scored = [f for f in feats if not f.not_scored]
-    reviews = statistics.median(f.review_count for f in scored)
-    rated = [f.rating for f in scored if f.rating is not None]
-    rating = statistics.median(rated) if rated else None
+    reviews, rating = _typical(feats)
     out = []
     for ar in areas:
         if ar.women < SKIP_UNDER_WOMEN or NON_RESIDENTIAL.search(ar.name):
@@ -298,7 +278,8 @@ def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
         cost = site_cost_k(ar.shop_rent_m2)
         out.append(ar.model_copy(update={
             "new_site_served": w["served"], "new_site_taken": w["taken_from_lounges"], "new_site_net": w["net_new"],
-            "site_cost_k": cost, "served_per_cost": w["net_new"] / cost if cost else None}))
+            "site_cost_k": cost, "served_per_cost": w["net_new"] / cost if cost else None,
+            "cost_index": w["net_new"] / cost / COST_ANCHOR if cost else None}))
     return out
 
 

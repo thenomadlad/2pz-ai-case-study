@@ -13,7 +13,7 @@ from src.models import Evidence, Reason
 FACTS = {"catchment_women": 42648, "addressable_women": 56864, "affluence_rent": 75000.0,
          "affluence_coverage": 1.0, "catchment_cells": 3, "shared_share": 0.334,
          "premium_pool": 69, "substitutes_k": 12, "capture": 0.0, "thin_premium_market": False,
-         "lounge_rating": 4.7, "lounge_reviews": 396, "served_women": 5686,
+         "lounge_rating": 4.7, "lounge_reviews": 396, "served_women": 5686, "site_served": 5686.0, "performance_vs_site": 1.0,
          "cost_index": 1.164, "served_per_cost": 15.9, "site_cost_k": 357.6, "site_rent_m2": 1784.0,
          "composite": 0.41, "score_demand": 0.2843, "score_cost": 0.666}
 TOPICS = ["demand", "cost"]
@@ -22,8 +22,9 @@ EVIDENCE = {
     "cost": [("cost_index", 1.164), ("site_rent_m2", 1784.0)],
 }
 CLAIMS = {"demand": "About 42,600 women live within a 15-min drive.",
-          "cost": "Cost efficiency is 1.16 times the emirate's typical site, at a shop rent of 1,784 AED per square metre."}
-SO_WHAT = "About 42,600 women live in reach, and 33% of them are shared with a sibling."
+          "cost": "Cost efficiency is 1.16 times the typical lounge site, at a shop rent of 1,784 AED per square metre."}
+SO_WHAT = ("The model estimates this lounge is performing 1.0x compared to its site (context, not scored). "
+           "About 42,600 women live in reach, and 33% of them are shared with a sibling.")
 NOW_WHAT = "No portfolio action this cycle; revisit at the next lease event."
 
 
@@ -112,11 +113,11 @@ def test_verify_rejects_wrong_value_unknown_field_and_invented_number():
 
 
 def test_verify_accepts_numbers_rounded_to_the_precision_written():
-    ok = {**CLAIMS, "cost": "Cost efficiency is 1.2 times the emirate's typical site."}
+    ok = {**CLAIMS, "cost": "Cost efficiency is 1.2 times the typical lounge site."}
     assert explain.verify(_exp(claims=ok), FACTS, "lounge") == []
     hundreds = {**ok, "demand": "About 42,600 women; roughly 43,000."}
     assert explain.verify(_exp(claims=hundreds), FACTS, "lounge") == []
-    wrong = {**ok, "cost": "Cost efficiency is 1.3 times the emirate's typical site."}
+    wrong = {**ok, "cost": "Cost efficiency is 1.3 times the typical lounge site."}
     assert any("1.3" in e for e in explain.verify(_exp(claims=wrong), FACTS, "lounge"))
     off = {**ok, "demand": "About 42,500 women."}  # 42,648 rounds to 42,600, not 42,500
     assert any("42500" in e for e in explain.verify(_exp(claims=off), FACTS, "lounge"))
@@ -345,3 +346,11 @@ def test_knife_edge_calls_show_enough_decimals():
     assert re.search(r"Composite 0\.\d{3} is 0\.\d{3} from the", text), text
     flip = re.search(r"reach (\S+) \(now (\S+)\)", text)
     assert flip is None or flip.group(1) != flip.group(2)
+
+
+def test_lounge_so_what_must_quote_performance_vs_site():
+    # owner's wording (2026-10-11): context, not scored, quoted word for word
+    assert not explain.verify(_exp(), FACTS, "lounge")
+    errors = explain.verify(_exp(so_what="About 42,600 women live in reach."), FACTS, "lounge")
+    assert any("performing 1.0x compared to its site" in e for e in errors)
+    assert explain.performance_sentence(0.6449) == "The model estimates this lounge is performing 0.6x compared to its site"

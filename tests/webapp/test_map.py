@@ -5,12 +5,18 @@ from src.webapp.pages.overview import map_layers
 
 
 def test_lounge_layer_colours_by_action_and_hollows_low_confidence():
-    layer = next(x for x in map_layers(run(), None, True, False, True) if x.id == "lounges")
-    rows = {r["branch_id"]: r for r in layer.data}
+    r = run()
+    layer = next(x for x in map_layers(r, None, True, False, True) if x.id == "lounges")
+    rows = {x["branch_id"]: x for x in layer.data}
     assert rows["zayed-international-airport"]["color"][:3] == ACTION_COLORS["NOT SCORED"]
-    assert rows["al-ain"]["color"] == [*ACTION_COLORS["PROTECT"], 230]           # high confidence
-    # served-demand model 2026-10-11: al-barsha is a low-confidence SHRINK (0.30, near the line)
-    assert rows["al-barsha"]["color"][3] < 100 and rows["al-barsha"]["line"] == ACTION_COLORS["SHRINK"]
+    scored = [d for d in r.decisions if d.action != "NOT SCORED"]
+    assert any(d.confidence == "low" for d in scored) and any(d.confidence != "low" for d in scored)
+    for d in scored:   # filled in the call's colour; hollow (outlined in it) when low confidence
+        row = rows[d.branch_id]
+        if d.confidence == "low":
+            assert row["color"][3] < 100 and row["line"] == ACTION_COLORS[d.action]
+        else:
+            assert row["color"] == [*ACTION_COLORS[d.action], 230]
 
 
 def test_selected_lounge_adds_polygon_cells_and_substitutes():

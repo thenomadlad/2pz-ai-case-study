@@ -192,13 +192,15 @@ def limitations_box(r: Run) -> None:
             "scores served demand and cost efficiency only. SHRINK means *investigate*, not *close*; a "
             "SHRINK lounge can be profitable and a PROTECT one unprofitable.\n"
             "2. **Served demand leans on lifetime Google reviews.** Each salon's pull in the Huff split is "
-            "its review count, so older salons look bigger and new lounges (noya-plaza, 215 reviews) look "
-            "weak partly because they are new. Reviews are a proxy for customers, not a count.\n"
+            "its review count, so older salons look bigger. The call therefore scores the *site* (what a "
+            "typical lounge would serve there), not the lounge's own served women; those are shown as "
+            "performance vs its site, context only. Reviews are a proxy for customers, not a count.\n"
             "3. **Shop rent comes from different sources per emirate.** Dubai: DLD Ejari shop contracts; "
             "Abu Dhabi: ADREC 2025 district street-retail rates, read by hand off its public map; northern "
             "emirates: Property Finder / Bayut asking rents scraped via third-party Apify actors (a grey area "
             "under those portals' terms; asking rents run above achieved ones); gaps take the "
-            "emirate median. The cost index only compares a site with its own emirate's typical one. "
+            "emirate median. The cost index compares every site with one frozen UAE-wide anchor (the median "
+            "lounge site at baseline), so dear Dubai sites score low on cost. "
             "Affluence weighting is off: every woman counts the same.\n"
             f"4. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
             "lounges are low confidence: near a threshold, a call "
@@ -210,6 +212,15 @@ def limitations_box(r: Run) -> None:
             "both on the Dubai side. Why the footprint there is only two lounges is a business question: "
             "the model can't see licensing, brand fit, landlord terms or customer mix.")
         st.page_link(nav.HOW, label="All the limitations, every assumption and threshold →", icon="⚠️")
+
+
+def performance_line(f) -> str:
+    """The owner's wording for performance_vs_site, with the two numbers behind it: context, not scored."""
+    if f.performance_vs_site is None:
+        return "No site estimate to compare this lounge's served women with."
+    return (f"**{explain.performance_sentence(f.performance_vs_site)}** ({f.served_women:,.0f} women served "
+            f"vs {f.site_served:,.0f} a typical lounge would serve at its site). Context, not scored: the call "
+            "scores the site, not the lounge.")
 
 
 def near_threshold(d: Decision) -> str | None:

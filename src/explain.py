@@ -36,7 +36,7 @@ from src.models import (
 logger = logging.getLogger(__name__)
 
 CACHE_PATH = REPO_ROOT / "data" / "explanations" / "cache.json"
-PROMPT_VERSION = "v5"
+PROMPT_VERSION = "v6"
 
 
 MIN_ITEMS, MAX_ITEMS = 2, 5  # per pyramid level: enough to support, few enough to read
@@ -137,12 +137,21 @@ GLOSSARY: dict[str, Field] = {
                           "land use).", pct=True),
     "premium_salons": Field("Premium salons", "count",
                             "Premium salons found in the area's searched cells."),
+    "site_served": Field("Women a typical lounge would serve here", "women",
+                         "What-if: the women a typical lounge (median reviews and rating) would serve at this site, "
+                         "with this lounge closed and its siblings and rivals open (Huff). The demand signal: it "
+                         "scores the site, not the lounge's own popularity."),
     "served_women": Field("Women served (Huff)", "women",
-                          "Addressable women this lounge serves: its Huff share of every cell it reaches within 20 min."),
+                          "Addressable women this lounge serves: its Huff share of every cell it reaches within 20 min. "
+                          "It rests on the lounge's own reviews and rating, so it is context, not scored."),
+    "performance_vs_site": Field("Performance vs site", "x its site",
+                                 "Women this lounge serves ÷ women a typical lounge would serve at its site. Read as "
+                                 "'The model estimates this lounge is performing 2.7x compared to its site'. Context, "
+                                 "not scored: it reflects the lounge's own reviews and rating, not the site."),
     "absorbed_share": Field("Absorbed by siblings", "% of served", "Share of its served women other lounges take over if it closes.", pct=True),
     "site_cost_k": Field("Site cost", "AED 1k/yr", "Shop rent x 150 m² (assumed unit) + fit-out of AED 3,000/m² over 5 years (assumed)."),
-    "served_per_cost": Field("Women per AED 1k of site cost", "women", "Served (or, for an area, net new) women per AED 1,000 of annual site cost."),
-    "cost_index": Field("Cost efficiency vs emirate", "x emirate typical", "Women per AED 1k of site cost against the emirate's median lounge (median growth area where the emirate has under 2 lounges): 1 = typical."),
+    "served_per_cost": Field("Women per AED 1k of site cost", "women", "Site-served (for an area, net new) women per AED 1,000 of annual site cost."),
+    "cost_index": Field("Cost efficiency vs typical site", "x typical site", "Women per AED 1k of site cost against one frozen UAE-wide anchor: the median lounge site at baseline (14.34 women per AED 1k). 1 = typical; it never moves when other lounges open or close."),
     "new_site_served": Field("New lounge would serve", "women", "What-if: women a typical new lounge here would serve (Huff)."),
     "new_site_taken": Field("Taken from our lounges", "women", "What-if: of those, women it would take from our existing lounges."),
     "new_site_net": Field("Net new women", "women", "What-if: women a new lounge here adds to the network (served − taken)."),
@@ -199,8 +208,8 @@ GLOSSARY: dict[str, Field] = {
     "saturation_gap": Field("Saturation gap", "reviews per 1k women",
                             "Saturation line minus premium saturation: positive is room under the "
                             "line, negative is how far over it. Context only. n/a when unsearched."),
-    "cost_gap": Field("Cost gap", "x emirate typical",
-                      "Cost efficiency minus 1 (the emirate's typical lounge): GROW needs 0 or more, "
+    "cost_gap": Field("Cost gap", "x typical site",
+                      "Cost efficiency minus 1 (the typical lounge site, UAE-wide): GROW needs 0 or more, "
                       "else a big-enough area is WATCH. n/a when no shop rent is known."),
     "worker_gap": Field("Worker-housing gap", "% of adults",
                         "Worker-housing cap minus worker share: negative means over the cap.",
@@ -249,8 +258,8 @@ GLOSSARY: dict[str, Field] = {
 # which apply and orders them; every reason must cite at least one of its topic's fields.
 TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     "lounge": {
-        "demand": ("served_women", "addressable_women", "catchment_women", "affluence_coverage", "score_demand",
-                   "affluence_rent", "catchment_cells", "contrib_demand"),
+        "demand": ("site_served", "served_women", "performance_vs_site", "score_demand", "addressable_women",
+                   "catchment_women", "affluence_coverage", "affluence_rent", "catchment_cells", "contrib_demand"),
         "cannibalisation": ("absorbed_share", "shared_share"),
         "cost": ("cost_index", "served_per_cost", "site_cost_k", "site_rent_m2", "score_cost", "contrib_cost"),
         "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market"),
@@ -388,7 +397,7 @@ def what_would_change(kind: str, facts: dict) -> list[str]:
            + ("above the line." if gap >= 0 else "short of the line.")]
     cost = facts["cost_gap"]
     if cost is not None:
-        out.append(f"Cost: {fmt('cost_index', facts['cost_index'])}x the emirate's typical lounge, "
+        out.append(f"Cost: {fmt('cost_index', facts['cost_index'])}x the typical lounge site, "
                    f"{fmt('cost_gap', abs(cost))} " + ("above the 1x line." if cost >= 0 else "short of the 1x line."))
     if facts["worker_gap"] <= 0:
         out.append(f"Worker housing: {fmt('worker_gap', -facts['worker_gap'])} of adults over the cap.")
@@ -413,7 +422,7 @@ def _rounded(facts: dict) -> dict:
 
 # --- facts ------------------------------------------------------------------------------
 
-LOUNGE_TABLE = ("served_women", "absorbed_share", "catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
+LOUNGE_TABLE = ("site_served", "served_women", "performance_vs_site", "absorbed_share", "catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
                 "catchment_cells", "shared_share", "premium_pool", "premium_reviews_per_1k",
                 "site_rent_m2", "women_per_rent_k",
                 "substitutes_k", "capture", "thin_premium_market",
@@ -543,7 +552,7 @@ GROWTH_WHY = (
     "Each area is a what-if: open a typical lounge there and count the women it would add to the "
     f"network, net of those it takes from our own lounges (Huff). GROW needs at least {growth.NEW_SITE_MIN:,} "
     f"net new women, worker housing under {growth.WORKER_CAP:.0%} of adults, and cost efficiency at least "
-    "the emirate's typical lounge (1x, or no shop rent known). WATCH: big enough but dearer, mostly "
+    "the typical lounge site (1x the UAE-wide anchor, or no shop rent known). WATCH: big enough but dearer, mostly "
     f"worker housing, or {growth.NEW_SITE_MIN // 2:,}+ net new women. SKIP: fewer, under "
     f"{growth.SKIP_UNDER_WOMEN:,} women, or non-residential by name. Under {growth.MIN_COVERAGE:.0%} of the "
     "women searched for competitors lowers confidence.")
@@ -577,7 +586,7 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
         return {
             "size": (f"A new lounge here would add about {fmt('new_site_net', f['new_site_net'])} net new "
                      f"women (GROW needs {fmt('new_site_min', f['new_site_min'])})."),
-            "cost": (f"Cost efficiency {fmt('cost_index', f['cost_index'])}x the emirate's typical lounge "
+            "cost": (f"Cost efficiency {fmt('cost_index', f['cost_index'])}x the typical lounge site "
                      f"(GROW needs 1x)."),
             "saturation": (f"{fmt('premium_reviews_per_1k', sat)} premium reviews per 1k women, "
                            f"{'under' if f['unsaturated'] else 'over'} the "
@@ -620,14 +629,15 @@ def _template_headline(kind: str, action: str, f: dict) -> str:
 
 _TEMPLATE_CAPTIONS = {
     "lounge": ("Each signal is scored 0-1 on a fixed scale, where 1 is good for the lounge, and "
-               "the composite is their weighted average. Demand is the women the lounge serves "
-               "(its Huff share of each cell it reaches); cost is those women per AED 1k of "
-               "rent-based site cost against the emirate's typical lounge. Capture, rating and "
-               "the shared catchment are shown for context, not scored."),
+               "the composite is their weighted average. Both score the site: demand is the women "
+               "a typical lounge would serve there (Huff); cost is those women per AED 1k of "
+               "rent-based site cost against the typical lounge site UAE-wide. The lounge's own "
+               "served women, as performance vs its site, capture, rating and the shared catchment "
+               "are shown for context, not scored."),
     "area": ("Each area is a what-if new lounge: big enough when it would add enough net new "
              "women to the network, and GROW when it is also at least as cost-efficient as the "
-             "emirate's typical lounge."),
-    "uae": ("Lounge calls come from a fixed-scale scorecard (served demand and site cost); "
+             "typical lounge site (UAE-wide)."),
+    "uae": ("Lounge calls come from a fixed-scale scorecard scoring each site (site demand and site cost); "
             "growth-area calls from a what-if new lounge's net new women and cost efficiency."),
 }
 
@@ -654,11 +664,19 @@ IN_BRANCH = re.compile(
     re.IGNORECASE)
 
 
+def performance_sentence(x: float | None) -> str:
+    """The owner's wording for performance_vs_site (context, not scored)."""
+    if x is None:
+        return "The model has no site estimate to compare this lounge with"
+    return f"The model estimates this lounge is performing {x:.1f}x compared to its site"
+
+
 def _template_so_what(kind: str, action: str, f: dict) -> str:
     if kind == "lounge":
         if action == NOT_SCORED_ACTION:
             return "Its customers are travellers, so the catchment says nothing about its market."
-        return (f"{fmt('catchment_women', f['catchment_women'])} women live within a 15-min drive; "
+        return (f"{performance_sentence(f.get('performance_vs_site'))} (context, not scored). "
+                f"{fmt('catchment_women', f['catchment_women'])} women live within a 15-min drive; "
                 f"{fmt('shared_share', f['shared_share'])} of them are also reached by another lounge.")
     if kind == "area":
         return (f"{fmt('women', f['women'])} women 15+ live here; our nearest lounge is "
@@ -738,6 +756,10 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
         if ACTIONS[exp.action][0] not in getattr(exp, "now_what", "").lower():
             errors.append(f"now_what must give the {exp.action} action "
                           f"({ACTIONS[exp.action][0]!r}): {ACTIONS[exp.action][1]}")
+    if kind == "lounge" and facts.get("performance_vs_site") is not None and exp.action in LABELS["lounge"]:
+        want = performance_sentence(facts["performance_vs_site"])
+        if want not in getattr(exp, "so_what", ""):
+            errors.append(f"so_what must quote, word for word, {want!r} and say it is context, not scored")
     texts = [exp.headline, exp.table_caption, getattr(exp, "so_what", ""),
              getattr(exp, "now_what", "")] + [r.claim for r in exp.reasons]
     if any(IN_BRANCH.search(t) for t in texts):
@@ -797,7 +819,10 @@ SYSTEM_PROMPT = (
     "fact sheet or the thresholds; round sensibly. Write like a board memo: short, concrete "
     "claims. Never mention revenue or profit (none exist). Quote shop rent only when the fact "
     "sheet has it, as our cost (never customer affluence, never a lever to renegotiate), and say "
-    "the 150 m² unit is assumed when quoting women per rent. Always answer by "
+    "the 150 m² unit is assumed when quoting women per rent. For a lounge, the call scores its SITE "
+    "(what a typical lounge would serve there and its cost), not the lounge's own popularity: so_what "
+    "must quote performance_vs_site word for word as 'The model estimates this lounge is performing "
+    "N.Nx compared to its site' (1 decimal) and say it is context, not scored. Always answer by "
     "calling the submit_explanation tool."
 )
 # Server-side refusal fallback: a declined request is re-run on Anthropic's recommended

@@ -3,7 +3,7 @@
 from our own lounges.
 
   GROW   net new women >= NEW_SITE_MIN, worker housing under WORKER_CAP of adults, and cost index >= 1
-         (as cost-efficient as the emirate's typical lounge) or unknown.
+         (as cost-efficient as the typical lounge site, UAE-wide: COST_ANCHOR) or unknown.
   WATCH  big enough but dearer; or big enough but mostly worker housing; or NEW_SITE_MIN / 2 or more.
   SKIP   fewer net new women; under SKIP_UNDER_WOMEN women (raw); or a NON_RESIDENTIAL name.
   Saturation (premium reviews per 1k women vs UNSATURATED_PER_1K) is context, not a test: competition

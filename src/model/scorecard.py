@@ -1,5 +1,6 @@
-"""Lounge scorecard: two signals on FIXED scales (served demand, site cost efficiency), weighted,
-PROTECT / HOLD / SHRINK.
+"""Lounge scorecard: two signals on FIXED scales (site demand, site cost efficiency), weighted,
+PROTECT / HOLD / SHRINK. Both score the SITE (a typical lounge there), as growth areas do; the
+lounge's own served women are context (performance_vs_site), not scored.
 
 Fixed scales so a lounge's score doesn't move when a sibling opens or closes. Each `why` says how its
 anchors were set (2026-10-11, served-demand model). Capture and rating are shown, not scored;
@@ -26,15 +27,19 @@ class Signal:
 
 
 SIGNALS: tuple[Signal, ...] = (
-    Signal("demand", "served_women", "Addressable women the lounge serves (Huff share of each reachable cell)", 0, 20_000,
-           "Quick first cut (2026-10-11): served women run about 1.3k-19k over the scored lounges; "
-           "20k is about the best, so a lounge serving that many scores 1."),
-    Signal("cost", "cost_index", "Served women per AED 1k of site cost, against its emirate's typical site", 0.5, 1.5,
-           "1 = as cost-efficient as the emirate's median lounge (median growth area where it has under 2 "
-           "lounges: COST_BASELINE_WHY in src/features/lounges.py); half as good scores 0, 1.5x scores 1. "
-           "Site cost = shop rent x 150 m2 + amortised fit-out (assumed). Every cell has a shop rent since "
-           "2026-10-11 (DLD, ADREC, listings or the emirate median); a missing index scores neutral. "
-           "Cannibalisation is no longer scored: it is a what-if shown on the lounge page."),
+    Signal("demand", "site_served", "Women a typical lounge would serve at this site (Huff, this lounge closed, rivals and siblings open)",
+           0, 20_000,
+           "Quick first cut (2026-10-11): scores the SITE, not the lounge's popularity. A typical lounge "
+           "(median reviews and rating) at the site serves about 1.4k-23k women over the scored lounges; "
+           "20k is about the best, so a site serving that many scores 1. The lounge's own served women are "
+           "shown as performance_vs_site (context, not scored): served by its own reviews, they partly "
+           "restate review volume (SANITY_CHECKS F2)."),
+    Signal("cost", "cost_index", "Site-served women per AED 1k of site cost, against the UAE-wide anchor", 0.5, 1.5,
+           "1 = as cost-efficient as the median lounge site at baseline (COST_ANCHOR, frozen: COST_ANCHOR_WHY "
+           "in src/features/lounges.py); half as good scores 0, 1.5x scores 1. Site cost = shop rent x 150 m2 "
+           "+ amortised fit-out (assumed). Every cell has a shop rent since 2026-10-11 (DLD, ADREC, listings "
+           "or the emirate median); a missing index scores neutral. Cannibalisation is not scored: it is a "
+           "what-if shown on the lounge page."),
 )
 
 PROTECT_AT = 0.65
@@ -121,7 +126,7 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
     return Decision(
         branch_id=f.branch_id, action=action, weight_flips=wflips,
         confidence=_confidence(composite, flippy or bool(wflips)),
-        rationale=(f"Composite {composite:.2f} across served demand and site cost efficiency "
+        rationale=(f"Composite {composite:.2f} across site demand and site cost efficiency "
                    f"(PROTECT ≥ {PROTECT_AT}, SHRINK ≤ {SHRINK_AT})."),
         key_drivers=sorted(scores, key=lambda n: abs(scores[n] - NEUTRAL), reverse=True)[:2],
         caveats=caveats, composite=round(composite, 4), scores={k: round(v, 4) for k, v in scores.items()})

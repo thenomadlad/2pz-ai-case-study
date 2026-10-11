@@ -270,24 +270,49 @@ def site_access(v3, a, lat: float, lng: float, not_scored=frozenset()) -> pd.Dat
     return pd.DataFrame(rows, columns=["cell_id", "minutes"])
 
 
+def _with_site(x: dict, new: pd.DataFrame, lat: float, lng: float, reviews: float, rating: float | None) -> dict:
+    """x with a typical lounge "NEW" at (lat, lng) appended (as allocate on the concatenated tables);
+    `new` is its site_access."""
+    y = _arrays(new.assign(id="NEW"), pd.DataFrame([{"id": "NEW", "lat": lat, "lng": lng, "reviews": reviews,
+                                                     "rating": rating, "lounge": True}]))
+    code = x["cells"].get_indexer(y["cells"])
+    fresh = code < 0
+    code[fresh] = len(x["cells"]) + np.arange(fresh.sum())
+    return {"w": np.concatenate([x["w"], y["w"]]), "code": np.concatenate([x["code"], code[y["code"]]]),
+            "cells": x["cells"].append(y["cells"][fresh]), "sup": np.concatenate([x["sup"], y["sup"] + len(x["ids"])]),
+            "lounge": np.concatenate([x["lounge"], y["lounge"]]), "ids": np.append(x["ids"], "NEW"),
+            "reviews": np.append(x["reviews"], y["reviews"])}
+
+
 def what_if_open(v3, a, demand: pd.Series, lat: float, lng: float, reviews: float, rating: float | None,
                  closed=frozenset(), not_scored=frozenset()) -> dict:
     """Open a typical lounge at (lat, lng): the women it would serve, and how many of them it takes
     from our existing lounges (the rest is new to the network)."""
     _, x = _base(v3, a, frozenset(closed), frozenset(not_scored))
     before = _by_lounge(x, _alloc(x, demand, x["w"], _outside(x["reviews"]))[0])
-    # the new lounge's rows appended to the scenario's (as allocate on the concatenated tables)
-    new = site_access(v3, a, lat, lng, not_scored).assign(id="NEW")
-    y = _arrays(new, pd.DataFrame([{"id": "NEW", "lat": lat, "lng": lng, "reviews": reviews,
-                                    "rating": rating, "lounge": True}]))
-    code = x["cells"].get_indexer(y["cells"])
-    fresh = code < 0
-    code[fresh] = len(x["cells"]) + np.arange(fresh.sum())
-    x2 = {"w": np.concatenate([x["w"], y["w"]]), "code": np.concatenate([x["code"], code[y["code"]]]),
-          "cells": x["cells"].append(y["cells"][fresh]), "sup": np.concatenate([x["sup"], y["sup"] + len(x["ids"])]),
-          "lounge": np.concatenate([x["lounge"], y["lounge"]]), "ids": np.append(x["ids"], "NEW"),
-          "reviews": np.append(x["reviews"], y["reviews"])}
+    x2 = _with_site(x, site_access(v3, a, lat, lng, not_scored), lat, lng, reviews, rating)
     after = _by_lounge(x2, _alloc(x2, demand, x2["w"], _outside(x2["reviews"]))[0])
     served = float(after.get("NEW", 0.0))
     taken = float(before.sum() - after.drop("NEW", errors="ignore").sum())
     return {"served": served, "taken_from_lounges": taken, "net_new": served - taken}
+
+
+_SITE_ACCESS: dict[tuple, tuple] = {}
+
+
+def site_served(v3, a, demand: pd.Series, reviews: float, rating: float | None,
+                closed=frozenset(), not_scored=frozenset()) -> dict[str, float]:
+    """Per open scored lounge: the women a typical lounge (these reviews and rating) would serve at its
+    site with that lounge closed and the rest open. Same as what_if_open(closed=closed | {b}), but b's
+    rows are zeroed (as the leave-one-out in `served`) instead of rebuilding the arrays: ~3 ms a lounge."""
+    sup, x = _base(v3, a, frozenset(closed), frozenset(not_scored))
+    out = {}
+    for b, lat, lng in sup.loc[sup.lounge, ["id", "lat", "lng"]].itertuples(index=False):
+        k = int(np.flatnonzero(x["ids"] == b)[0])
+        hit = _SITE_ACCESS.get((id(v3), lat, lng))
+        if not (hit and hit[0] is v3):
+            _SITE_ACCESS[(id(v3), lat, lng)] = hit = (v3, site_access(v3, a, lat, lng, not_scored))
+        x2 = _with_site({**x, "w": np.where(x["sup"] == k, 0.0, x["w"])}, hit[1], lat, lng, reviews, rating)
+        women, _ = _alloc(x2, demand, x2["w"], _outside(np.delete(x2["reviews"], k)))
+        out[b] = float(women[x2["sup"] == len(x2["ids"]) - 1].sum())
+    return out

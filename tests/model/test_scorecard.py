@@ -17,7 +17,8 @@ from src.models import LoungeFeatures
 SIG = {s.name: s for s in SIGNALS}
 
 
-# Served-demand model 2026-10-11: two signals, demand (served women) and cost (cost index). The
+# Served-demand model 2026-10-11: two signals, demand (site served: a typical lounge at the site) and
+# cost (cost index vs the frozen UAE-wide anchor). The
 # capture / rating / cannibalisation signals and their tests (thin-market blend, rating half weight,
 # missing rating gap) are gone with them; cannibalisation is display only.
 def _f(b="a", served=10_000.0, cost=1.0, not_scored=False):
@@ -26,7 +27,7 @@ def _f(b="a", served=10_000.0, cost=1.0, not_scored=False):
         catchment_women=50_000, addressable_women=50_000, affluence_rent=None, affluence_coverage=0.0,
         catchment_cells=10, shared_share=0.5, capture=0.1, substitutes_k=5, recall_multiplier=1.0,
         premium_pool=50, thin_premium_market=False, substitutes_median_rating=4.5, rating_gap=0.0,
-        est_customers=5_000, served_women=served, cost_index=cost, not_scored=not_scored)
+        est_customers=5_000, served_women=served, site_served=served, cost_index=cost, not_scored=not_scored)
 
 
 @pytest.mark.parametrize("name", ["demand", "cost"])
@@ -41,7 +42,7 @@ def test_scores_on_the_anchors_and_clipped(name):
 
 def test_drafted_anchors():
     assert [(s.field, s.worst, s.best, s.weight) for s in SIGNALS] == [
-        ("served_women", 0, 20_000, 1.0), ("cost_index", 0.5, 1.5, 1.0)]
+        ("site_served", 0, 20_000, 1.0), ("cost_index", 0.5, 1.5, 1.0)]
     assert all(s.why for s in SIGNALS)
 
 

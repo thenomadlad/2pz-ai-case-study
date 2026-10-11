@@ -5,7 +5,7 @@ import re
 import streamlit as st
 
 from src.config import REPO_ROOT
-from src.features.lounges import NOT_SCORED, NOT_SCORED_WHY
+from src.features.lounges import COST_ANCHOR, COST_ANCHOR_WHY, NOT_SCORED, NOT_SCORED_WHY
 from src.market import AFFLUENCE_CLIP, AFFLUENCE_CLIP_WHY
 from src.model import growth, scorecard
 from src.webapp import data
@@ -84,6 +84,12 @@ def render() -> None:
         {"Constant": "LOW_MARGIN / HIGH_MARGIN",
          "Value": f"low within {scorecard.LOW_MARGIN} of a line; high from {scorecard.HIGH_MARGIN}",
          "Why": f"Low also when the call flips {scorecard.FLIP_LOW}+ times or a signal weight ±25% changes it."},
+        {"Constant": "COST_ANCHOR (src/features/lounges.py)", "Value": f"{COST_ANCHOR:g} women per AED 1k",
+         "Why": COST_ANCHOR_WHY},
+        {"Constant": "performance_vs_site", "Value": "served women ÷ site served",
+         "Why": "Context, not scored: 'The model estimates this lounge is performing 2.7x compared to its site' "
+                "(khalifa-city-a at baseline). The call scores the site; this says how the lounge does on it, "
+                "which rests on its own reviews and rating."},
         {"Constant": "NOT_SCORED", "Value": ", ".join(sorted(NOT_SCORED)), "Why": NOT_SCORED_WHY},
         {"Constant": "AFFLUENCE_CLIP (src/market.py)", "Value": f"{AFFLUENCE_CLIP[0]:g} to {AFFLUENCE_CLIP[1]:g}",
          "Why": AFFLUENCE_CLIP_WHY},

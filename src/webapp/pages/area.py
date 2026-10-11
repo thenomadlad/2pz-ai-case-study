@@ -37,7 +37,7 @@ def _rule(a, d) -> None:
     cost = "no data" if a.cost_index is None else f"{a.cost_index:.2f}x"
     cols[1].metric("Cost index", cost)
     cols[1].caption(f"{_check(a.cost_index is None or a.cost_index >= 1)} Not dearer: net new women per AED 1k "
-                    "of site cost at least the emirate's typical lounge (1x); unknown passes")
+                    "of site cost at least the typical lounge site, UAE-wide (1x); unknown passes")
     per_1k = "no data" if a.premium_reviews_per_1k is None else f"{a.premium_reviews_per_1k:,.0f}"
     cols[2].metric("Premium reviews per 1k women", per_1k)
     cols[2].caption(f"Saturation, context only (our lightest-quarter line is {growth.UNSATURATED_PER_1K:g}); "

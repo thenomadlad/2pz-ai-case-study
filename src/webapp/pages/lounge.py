@@ -23,6 +23,7 @@ from src.webapp.views import (
     emirate_filter,
     explanation_for,
     lounge_caveats,
+    performance_line,
     render_caveats,
     render_factor_table,
     render_pyramid,
@@ -108,6 +109,7 @@ def render() -> None:
     if d.action != "NOT SCORED":
         st.caption(f"Composite {d.composite:.2f} · confidence {d.confidence} · the call changes in "
                    f"{flips} of {scorecard.COMBOS} assumption combinations")
+        st.markdown(performance_line(f))
     left, right = st.columns([3, 2])
     with left:
         render_pyramid(exp)
