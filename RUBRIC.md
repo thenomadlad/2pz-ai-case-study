@@ -23,6 +23,7 @@ Anything else is **NO-GO**, and the audit log records which condition failed.
 | 3b | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO** on the `[brief]` model items only (2.5, A3, B1, C3) and P1/J7 (the live app hasn't redeployed; reboot it on Streamlit Cloud); sanity checks now GO (no unexplained failure) | Fixed the SC4 bug: rating gap over the whole premium pool with 20+ reviews (al-maqta SHRINK → HOLD by 0.003, low confidence). Lounges 3 PROTECT / 15 HOLD / 5 SHRINK. UI: the area picker drops sub-5k areas (580 → 68), and emirate checkboxes on both pickers (Abu Dhabi and Dubai by default). |
 | 3c | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO**, same open items (2.5, A3, B1, C3 structural; P1/J7 live app) | A growth area is now one named OSM place (580 → 413 areas, same 5 GROW). Unnamed emirate-fallback cells (67, ~33.8k women) make no area but stay in catchments and totals. Sanity run 4: no unexplained failure. |
 | 3d | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO**, same open items | Shop rent and women per AED 1k of rent shown for 9 of 23 scored lounges (DLD for Dubai, JLL bands for Abu Dhabi malls), display only. OB5 has a partial site-cost source. Sanity run 5: no unexplained failure. |
+| 4 | 2026-10-11 | 74/80 | 34/40 | 10/26 | **NO-GO**: 6 `[brief]` open (2.5, A3, B1, C3 structural (OB3); P1, J7 need the live app rebooted and clicked through); sanity run 6 has no unexplained failure | Full re-audit after the median fix, named-place areas and shop rent, by fresh agents. No score regressions. New, all small: stale "no rent data" text in about 10 places, knife-edge rounding (al-maqta), emirate defaults hiding every GROW area, area confidence blind to level flips (kalba), a possible name-rule overreach near al-falah. |
 
 
 ---
@@ -103,6 +104,7 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 
 *To improve:*
 
+- Pass 4: the emirate checkboxes default to Abu Dhabi + Dubai, which hides all 5 GROW areas (Sharjah, Ajman) on the Areas page and the RAK/Fujairah PROTECT lounges in the lounge picker (see P1).
 - 5.5 *(model)*: weight sensitivity is shown passively, but weights and thresholds can't be changed in the what-if.
 
 ---
@@ -137,6 +139,7 @@ The brief lists these as the minimum content of the product. Most of the substan
 
 *To improve:*
 
+- Pass 4: about 10 places still say "no rent data" while shop rent is shown for 9 lounges: README:39-40/97/321, walkthrough:188, CONTEXT:116, the limitations box (views.py:188), the overview (overview.py:200), scorecard THRESHOLDS_WHY and the NO_FINANCIALS caveat (scorecard.py:51/70), and `rent_data_available: False` (explain.py:478, so the cached UAE summary needs regenerating). Reword to "no revenue, lease or capex data".
 - A3 *(model)*: the north star and its proxy are named, but `est_customers` drives no label.
 
 ### B. Recommendation logic
@@ -152,6 +155,7 @@ The brief says it must be **coherent, explainable, defensible**. It does not hav
 
 *To improve:*
 
+- Pass 4: rounding to 2 decimals hides knife-edge calls. al-maqta reads "Composite 0.35 → HOLD" and "0.00 from the SHRINK line" (it's 0.003). Show 3 decimals within 0.01 of a line (lounge.py:46, explain.what_would_change).
 - B1 *(model)*: the airport is out, and the PROTECT markets (122/113/145 per 1k) now pass the 150 line. But a growth area is a place-name group of cells, not a candidate site's catchment, so BT3 still shows no agreement on unit.
 
 ### C. Geographic reasoning
@@ -210,7 +214,7 @@ From the reviewer's seat, each question below should be answerable **for any sin
 
 *To improve:*
 
-- E6 *(model)*: every explanation has what / so what / now what, but none can address the ROIC gate. Some so-whats only restate figures, e.g. jumeirah-park, mirdif-35, zawaya-walk and hili: "About N women captured…; X% shared", with no stated consequence. Tighten these on the next regeneration.
+- E6 *(model)*: every explanation has what / so what / now what, but none can address the ROIC gate. As of pass 4, the so-whats that only restate figures are al-falah, al-jada, baniyas, khalifa-city-a and shakhbout-city. jumeirah-park's "we pay for a large market…" overreads an area-median rent. Tighten these on the next regeneration.
 
 ---
 
@@ -354,6 +358,11 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 *To improve:*
 
+- Pass 4:
+  - DA3: 150 of 243 shop-rent cells are nearest-assigned, with no error estimate.
+  - DA6: 398 salons with a missing review_count (all also unrated) become 0, and this isn't documented.
+  - DA8: JLL Q2 2025 is missing from the freshness section.
+  - Name rule: zayed-military-city's OSM polygon reaches the cells next to the al-falah lounge (SANITY run 6).
 - DA1 *(model/data)*: the DLD download is manual, and search_recall rests on one tile (the clip range now has a WHY).
 - DA2-competitors *(model/data)*: recall isn't tracked per emirate.
 - DA3 *(model/data)*: the 139 of 241 rent cells that borrow the nearest area's rent have no error estimate.
@@ -384,6 +393,9 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 *To improve:*
 
+- Pass 4:
+  - MO6: kalba and al-jerf (2 of the 5 GROWs) flip in 27 of 81 assumption combinations, yet area confidence ignores level flips: kalba shows "high".
+  - MO9: MIN_RATING_REVIEWS, REF_UNIT_M2 and MIN_RENT_COVERAGE are missing from the How page, and there's a bare 0.01° site-cell tolerance (lounges.py:161).
 - MO1 *(model)*: the affluence layer still "changes no call", but is kept.
 - MO4: the methods table is in limitations. Two gaps remain: Huff is not implemented, and there's no "where our catchments differ from a Voronoi split" comparison.
 - MO5 (passes since run 3): no unexplained sanity failure remains. BT2/BT3 (unit), BT4/SC3 (DIP) and BT5 (empty-area tilt) are explained and documented failures; SC4 is explained (the thin-market blend's +0.014 slope by design; the median-premium test is deferred with no label effect).

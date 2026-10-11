@@ -236,4 +236,6 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 
 | 5 | 2026-10-10 | Commercial (shop) rent and women per AED 1k of rent, display only | unchanged | BT6 run, no direction (as expected) | SC7 partly met: Downtown 4,561 above 3,500; Marina and Business Bay area medians mix in street shops (explained). The first build's overall trim was corrected after review | none |
 
+| 6 | 2026-10-11 | Full run after runs 3–5 (median fix, named-place areas, shop rent) | 3/10 (US4 findability regression: the Areas page's default emirates hide every GROW) | BT2/BT3 explained fails (now a true same-unit test: areas are scored on residents, lounges on 15-min catchments; al-ain's place misses the 5k floor by 16 women); BT4 partial (DIP); BT5 unchanged; BT6 no direction | SC2, SC5 pass; SC1, SC3, SC4, SC7 partial, all explained; SC4 cleaner than run 1 (no sibling-closure dips) | **none** |
+
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.
