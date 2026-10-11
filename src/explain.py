@@ -58,8 +58,9 @@ GLOSSARY: dict[str, Field] = {
         "WorldPop adults, rebalanced so worker housing counts few women. Raw: not affluence-weighted."),
     "addressable_women": Field(
         "Addressable women 15+", "women",
-        "Catchment women weighted by how affluent their cell is (observed median rent vs the "
-        "women-weighted median, to the affluence elasticity; mean weight 1): the demand signal. "
+        "Catchment women times an affluence weight (observed median rent vs the women-weighted "
+        "median, to the affluence elasticity; mean weight 1). Affluence is off at baseline "
+        "(elasticity 0), so this equals the raw count; it moves only in the assumption what-ifs. "
         "Dubai rents only; elsewhere neutral (weight 1)."),
     "affluence_rent": Field(
         "Affluence rent", "AED/yr",
@@ -116,7 +117,7 @@ GLOSSARY: dict[str, Field] = {
     **{f"contrib_{s.name}": Field(
         f"{s.name.capitalize()} contribution", "0-1",
         f"What the {s.name} score adds to the composite: weight × score ÷ total weight. The "
-        "four contributions sum to the composite.")
+        f"{len(scorecard.SIGNALS)} contributions sum to the composite.")
        for s in scorecard.SIGNALS},
     "next_call": Field("Nearest other call", "",
                        "The call this lounge would get if its composite crossed the nearest line."),
@@ -843,7 +844,7 @@ EXPLAIN_TOOL = {
                 "type": "string",
                 "description": "1-2 sentences: the business consequence for the COO (women and "
                                "customers at stake, competitive position, overlap with sibling "
-                               "lounges). No money: the model has none.",
+                               "lounges). No revenue or profit: the model has none (site cost is rent-based).",
             },
             "now_what": {
                 "type": "string",

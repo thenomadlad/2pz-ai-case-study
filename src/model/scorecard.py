@@ -1,9 +1,11 @@
-"""Lounge scorecard: four signals on FIXED scales, weighted, PROTECT / HOLD / SHRINK.
+"""Lounge scorecard: two signals on FIXED scales (served demand, site cost efficiency), weighted,
+PROTECT / HOLD / SHRINK.
 
-Fixed scales so a lounge's score doesn't move when a sibling opens or closes. Anchors were set
-from the v3 features at medium levels (notebooks/features/decisions.ipynb); each `why` says why. They
-were reviewed by the user on 2026-10-09 (rating at half weight; flips lower confidence). Demand
-reads affluence-weighted women since 2026-10-10 (notebooks/features/affluence.ipynb); same anchors.
+Fixed scales so a lounge's score doesn't move when a sibling opens or closes. Each `why` says how its
+anchors were set (2026-10-11, served-demand model). Capture and rating are shown, not scored;
+cannibalisation is a what-if on the lounge page, not a signal. Affluence weighting is off at baseline
+(Levels.affluence = "low", elasticity 0: notebooks/features/affluence.ipynb); it stays one of the four
+assumption axes the flip count varies.
 """
 from collections import Counter
 from dataclasses import dataclass, fields
@@ -119,7 +121,7 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
     return Decision(
         branch_id=f.branch_id, action=action, weight_flips=wflips,
         confidence=_confidence(composite, flippy or bool(wflips)),
-        rationale=(f"Composite {composite:.2f} across served demand and cannibalisation "
+        rationale=(f"Composite {composite:.2f} across served demand and site cost efficiency "
                    f"(PROTECT ≥ {PROTECT_AT}, SHRINK ≤ {SHRINK_AT})."),
         key_drivers=sorted(scores, key=lambda n: abs(scores[n] - NEUTRAL), reverse=True)[:2],
         caveats=caveats, composite=round(composite, 4), scores={k: round(v, 4) for k, v in scores.items()})
