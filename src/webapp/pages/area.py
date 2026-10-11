@@ -52,7 +52,8 @@ def render() -> None:
     # areas under the SKIP floor are noise: always SKIP, whatever the competition, so not listed
     options = sorted((i for i in by_id if by_id[i].women >= growth.SKIP_UNDER_WOMEN),
                      key=lambda i: (ORDER[act[i]], -by_id[i].women))
-    options = emirate_filter(options, {i: by_id[i].emirate for i in options}, "area", "area-em")
+    grow = frozenset(by_id[i].emirate for i in options if act[i] == "GROW")
+    options = emirate_filter(options, {i: by_id[i].emirate for i in options}, "area", "area-em", also=grow)
     wanted = st.query_params.get("area")
     area_id = url_picker("Growth area", "area", options,
                          lambda i: f"{by_id[i].name}, {by_id[i].emirate} · {act[i]}", "area-pick")

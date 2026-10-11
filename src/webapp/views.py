@@ -158,14 +158,15 @@ def url_picker(label: str, param: str, options: list[str], format_func, key: str
 DEFAULT_EMIRATES = ("Abu Dhabi", "Dubai")   # where most lounges are
 
 
-def emirate_filter(options: list[str], emirate_of: dict[str, str], param: str, key: str) -> list[str]:
-    """Emirate checkboxes above a picker: Abu Dhabi and Dubai ticked, plus the emirate of the item
-    in ?param=. Returns `options` in the ticked emirates (all of them if none is ticked), always
+def emirate_filter(options: list[str], emirate_of: dict[str, str], param: str, key: str,
+                   also: frozenset[str] = frozenset()) -> list[str]:
+    """Emirate checkboxes above a picker: Abu Dhabi and Dubai ticked, plus `also` (the emirates
+    holding the strong calls, so none is hidden) and the emirate of the item in ?param=. Returns `options` in the ticked emirates (all of them if none is ticked), always
     keeping the linked item so a deep link never silently shows something else."""
     wanted = st.query_params.get(param)
     names = sorted({emirate_of[i] for i in options})
     on = {e for e, c in zip(names, st.columns(len(names)))
-          if c.checkbox(e, value=e in DEFAULT_EMIRATES or e == emirate_of.get(wanted), key=f"{key}-{e}")}
+          if c.checkbox(e, value=e in DEFAULT_EMIRATES or e in also or e == emirate_of.get(wanted), key=f"{key}-{e}")}
     kept = [i for i in options if emirate_of[i] in on or i == wanted]
     return kept or options
 

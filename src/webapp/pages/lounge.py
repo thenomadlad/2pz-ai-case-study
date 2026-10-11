@@ -85,7 +85,9 @@ def render() -> None:
     r = data.current()
     labels = {f.branch_id: f"{f.name} · {d.action}" for f, d in zip(r.features, r.decisions)}
     wanted = st.query_params.get("lounge")
-    options = emirate_filter(sorted(labels), {f.branch_id: f.emirate for f in r.features}, "lounge", "lounge-em")
+    protect = frozenset(f.emirate for f, d in zip(r.features, r.decisions) if d.action == "PROTECT")
+    options = emirate_filter(sorted(labels), {f.branch_id: f.emirate for f in r.features}, "lounge", "lounge-em",
+                             also=protect)
     b = url_picker("Lounge", "lounge", options, labels.get, "lounge-pick")
     st.page_link(nav.OVERVIEW, label="Back to overview", icon="⬅️", query_params={"lounge": b})
     banner()

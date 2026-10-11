@@ -131,27 +131,34 @@ def test_area_picker_leaves_out_areas_under_the_skip_floor():
     thin = next(a.area_id for a in r.areas if a.women < growth.SKIP_UNDER_WOMEN)
     at = _page("area", area=thin)
     opts = at.selectbox(key="area-pick").options
-    shown = {"Abu Dhabi", "Dubai"}       # the default emirates (a thin area's own emirate isn't ticked)
+    act = {d.area_id: d.action for d in r.area_decisions}
+    shown = {"Abu Dhabi", "Dubai"} | {a.emirate for a in r.areas if act[a.area_id] == "GROW"}   # default emirates
     assert len(opts) == sum(a.women >= growth.SKIP_UNDER_WOMEN and a.emirate in shown for a in r.areas)
     assert "isn't listed in this view" in _text(at)
 
 
-def test_pickers_filter_by_emirate_abu_dhabi_and_dubai_by_default():
+def test_pickers_default_to_abu_dhabi_dubai_and_where_the_strong_calls_are():
     from src.baseline import run
     r = run()
     emirate = {f"{f.name} · {d.action}": f.emirate for f, d in zip(r.features, r.decisions)}   # option labels
+    protect = {f.emirate for f, d in zip(r.features, r.decisions) if d.action == "PROTECT"}
     at = _page("lounge")
-    assert at.checkbox(key="lounge-em-Abu Dhabi").value and at.checkbox(key="lounge-em-Dubai").value
-    assert not at.checkbox(key="lounge-em-Sharjah").value
-    assert {emirate[b] for b in at.selectbox(key="lounge-pick").options} == {"Abu Dhabi", "Dubai"}
+    ticked = {e for e in ("Abu Dhabi", "Dubai", "Sharjah", "Ras Al Khaimah", "Fujairah")
+              if at.checkbox(key=f"lounge-em-{e}").value}
+    assert ticked == {"Abu Dhabi", "Dubai"} | protect                     # every PROTECT lounge is listed
+    assert {emirate[b] for b in at.selectbox(key="lounge-pick").options} == {"Abu Dhabi", "Dubai"} | protect
+    grow = {a.emirate for a in r.areas for d in r.area_decisions if d.area_id == a.area_id and d.action == "GROW"}
+    at = _page("area")
+    assert all(at.checkbox(key=f"area-em-{e}").value for e in grow)       # every GROW area is listed
+    assert any("GROW" in o for o in at.selectbox(key="area-pick").options)
     # a deep link outside the defaults ticks its emirate and shows it, never something else
-    at = _page("lounge", lounge="ras-al-khaimah")
-    assert at.checkbox(key="lounge-em-Ras Al Khaimah").value
-    assert at.selectbox(key="lounge-pick").value == "ras-al-khaimah"
+    at = _page("lounge", lounge="al-jada")
+    assert at.checkbox(key="lounge-em-Sharjah").value
+    assert at.selectbox(key="lounge-pick").value == "al-jada"
     # unticking narrows the list
     at = _page("lounge")
     at.checkbox(key="lounge-em-Dubai").uncheck().run()
-    assert {emirate[b] for b in at.selectbox(key="lounge-pick").options} == {"Abu Dhabi"}
+    assert "Dubai" not in {emirate[b] for b in at.selectbox(key="lounge-pick").options}
 
 
 def test_how_page_renders_limitations_market_model_and_every_assumption():
