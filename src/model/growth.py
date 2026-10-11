@@ -8,13 +8,11 @@ from our own lounges.
   SKIP   fewer net new women; under SKIP_UNDER_WOMEN women (raw); or a NON_RESIDENTIAL name.
   Saturation (premium reviews per 1k women vs UNSATURATED_PER_1K) is context, not a test: competition
   already shapes the Huff split. Under MIN_COVERAGE of the women searched lowers confidence.
-  GROW_MIN_WOMEN and _confidence below belong to the retired two-test rule (no caller uses them for the call).
 """
 import re
 
 from src.models import Area, AreaDecision
 
-GROW_MIN_WOMEN = 20_000
 SKIP_UNDER_WOMEN = 5_000
 WORKER_CAP = 0.5
 MIN_COVERAGE = 0.5
@@ -22,11 +20,10 @@ UNSATURATED_PER_1K = 150.0
 NON_RESIDENTIAL = re.compile(
     r"\b(industrial|free zone|military|airport)\b|\bport\b(?!\s+saeed)"
     r"|صناعي|منطقة حرة|عسكري|مطار|ميناء", re.IGNORECASE)
-NEAR_LINE = 0.10    # within 10% of the size or saturation line: low confidence
-FAR_LINE = 0.20     # 20%+ from both: high confidence
+NEAR_LINE = 0.10    # within 10% of the net-new-women line: low confidence
+FAR_LINE = 0.20     # 20%+ from it: high confidence
 
 WHY = {
-    "GROW_MIN_WOMEN": "Retired with the two-test rule (2026-10-11; not used in the call). Was: just under the smallest lounge catchment (23k women at medium levels): the least a lounge runs on today.",
     "SKIP_UNDER_WOMEN": "Under 5,000 women an area can't carry a lounge whatever the competition.",
     "WORKER_CAP": "Where most adults live in worker housing, the women estimate rests on the worker-housing female share.",
     "MIN_COVERAGE": ("Under half the women in searched cells, the saturation figure describes the minority "
@@ -44,27 +41,10 @@ WHY = {
         "Areas named industrial, free zone, military, airport or port (and the Arabic equivalents) are "
         "not where customers live, whatever WorldPop counts there: SKIP before any test. Port Saeed is "
         "excluded from the pattern: it is a residential and retail district of Deira, not a port."),
-    "NEAR_LINE": ("An area within 10% of the size or saturation line is low confidence, as are areas with "
-                  "unknown saturation, under half their women searched, or big only on thin affluence data; "
-                  "20%+ from both lines is high, mirroring the lounges' 0.05 / 0.10 margins."),
+    "NEAR_LINE": ("An area within 10% of the net-new-women line (NEW_SITE_MIN) is low confidence, as are areas "
+                  "with under half their women searched; 20%+ from the line is high, mirroring the lounges' "
+                  "0.05 / 0.10 margins."),
 }
-
-
-def _confidence(a: Area, unsat: bool | None, thin_affluence: bool) -> tuple[str, list[str]]:
-    """low / medium / high, and why it is low (shown with the caveats)."""
-    gaps = [(a.addressable_women - GROW_MIN_WOMEN) / GROW_MIN_WOMEN]
-    reasons = []
-    if abs(gaps[0]) < NEAR_LINE:
-        reasons.append(f"Within {NEAR_LINE:.0%} of the size line ({a.addressable_women:,.0f} addressable "
-                       f"women vs {GROW_MIN_WOMEN:,}).")
-    if a.premium_reviews_per_1k is not None:
-        gaps.append((a.premium_reviews_per_1k - UNSATURATED_PER_1K) / UNSATURATED_PER_1K)
-        if abs(gaps[1]) < NEAR_LINE:
-            reasons.append(f"Within {NEAR_LINE:.0%} of the saturation line ({a.premium_reviews_per_1k:.0f} vs "
-                           f"{UNSATURATED_PER_1K:g} premium reviews per 1k women).")
-    low = bool(reasons) or unsat is None or a.data_coverage < MIN_COVERAGE or thin_affluence
-    level = "low" if low else "high" if min(map(abs, gaps)) >= FAR_LINE else "medium"
-    return level, reasons
 
 
 NEW_SITE_MIN = 6_000

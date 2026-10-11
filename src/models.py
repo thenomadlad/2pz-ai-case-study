@@ -63,7 +63,7 @@ class AreaDecision(BaseModel):
     unsaturated: bool | None        # None: no competitor data
     rationale: str
     caveats: list[str]
-    confidence: Literal["low", "medium", "high"] = "medium"   # as for lounges (growth._confidence)
+    confidence: Literal["low", "medium", "high"] = "medium"   # distance from NEW_SITE_MIN (growth.classify)
 
 
 class Evidence(BaseModel):
