@@ -291,6 +291,73 @@ Scope: F4 only, plus the non-model changes since run 7 (`est_customers` out of t
 - **What remains is a model property, not the fallback.** A thin-market share of 55% is in line with our own isolated lounges: al-dhafra serves 17.6k of 22.9k catchment women (77%). It's the same outside-option and attractiveness calibration as F2/F3 (ALPHA 1, OUTSIDE_PCTL 50, affluence off at baseline). Also, neighbouring areas claim the same women: manama-ajman's 35.1k and al-dhaid-sharjah's 57.9k both come mostly from Al Dhaid. Each what-if opens one lounge alone, so GROW net-new figures must not be summed across areas.
 - **Non-model changes, no call moved:** the lounge fact sheet no longer carries `est_customers`, and the 23 lounge so-whats were regenerated offline to quote served women (121 cached, all grounded). The dead two-test rule is out of growth.py. The level-switch test limit is now 3 s: a new level re-runs level_flips' 82 lounge builds, which take 1.6–1.9 s warm.
 
+## Expected outcomes for run 9 (written 2026-10-11, before running SC4 and the back-tests)
+
+Scope: F1 and F2 fixed by the owner's decisions. **F1 (b):** the cost index compares every lounge and area with one frozen UAE-wide anchor, `COST_ANCHOR` = 14.34 site-served women per AED 1k of site cost (the median scored lounge site at baseline). The emirate / area baseline switch is gone. **F2 (a):** the demand signal is `site_served`, what a typical lounge (median reviews and rating) would serve at the lounge's site with that lounge closed and its siblings and rivals open (`served.site_served`, equal to `what_if_open(closed={b})`). The cost signal uses site_served too, so both scored signals assess the site. The lounge's own served women are context: `performance_vs_site` = served_women ÷ site_served ("The model estimates this lounge is performing 2.7x compared to its site"). The SC2 counts and call diff below were computed before this section was written; the rest are predictions.
+
+- **SC2.** Lounges 10 PROTECT / 4 HOLD / 9 SHRINK / 1 not scored, areas 49 GROW / 48 WATCH / 464 SKIP (see the call diff). Big swings attributed: Dubai sites are dear against a UAE-wide anchor, so Dubai drops; lounges whose own reviews carried them (khalifa-city-a, 2.7x its site) drop; northern-emirate and Fujairah sites rise.
+- **SC4 (the F1 check).** Closing a sibling can only change another lounge's cost index through its own site-served women (there's no relative baseline left). Site-served women rise when a sibling closes (one rival fewer), except that the typical lounge (median reviews and rating over open lounges) shifts slightly with each closure, so small dips are possible. Expect **no label move toward SHRINK**; flag any. +50% women in one lounge's catchment can't lower another lounge (no median to rise). A new premium competitor never raises a label. Expect SC4 to **PASS on F1**.
+- **Level flips.** site_served depends only on demand (worker share, affluence), not on travel time or coverage, so expect far fewer flips than run 8.
+- **BT1.** The served model is unchanged: absorbed share ≤ 0.30 as in run 7.
+- **BT2/BT3.** The lounge call and the growth what-if now score the same unit (a typical lounge at the spot). Expect PROTECT sites → GROW or WATCH; SHRINK sites → SKIP or WATCH. Remaining disagreements come from net vs gross (the what-if counts net new women, the lounge signal gross site-served) and the area's 5k place floor.
+- **BT4 / SC3 / SC1.** The name rule and size floor are untouched: all controls stay SKIP by name, DIP stays WATCH. The 15 new GROW areas are residential places.
+- **SC7, BT5, BT6.** Data unchanged: unchanged results. BT5's empty-area tilt is a little stronger (15 more GROW, none in Dubai).
+- **SC5.** All 121 explanations regenerated offline (every fact sheet changed); all must pass `check`, every lounge so-what quotes the performance sentence.
+- **SC8.** run() a little faster: level_flips no longer builds areas for the emirates that needed an area baseline.
+
+## Run 9 results (2026-10-11, site-scored model, F1 + F2 fixed)
+
+Scripts: `src.baseline.run()` against a snapshot of the committed run 8 (`0ee05eb`), plus `lounges.build` + `scorecard.decide` with closures, a +50% demand multiplier and an added salon on in-memory copies (no repo code edited for the checks). Anchor: `COST_ANCHOR` = 14.34 site-served women per AED 1k (median of the 23 scored lounges at baseline; median scored cost index now 0.9998).
+
+**Call diff vs run 8** (bold = call changed; 14 of 23 scored lounges change call; composites sorted high to low):
+
+| Lounge | Emirate | Old call (composite) | New call (composite) | Served | Site served | Performance vs site | Cost index old → new |
+|---|---|---|---|---|---|---|---|
+| al-dhafra | Abu Dhabi | PROTECT (0.94) | PROTECT (1.00) | 17,634 | 22,852 | 0.8x | 2.33 → 5.48 |
+| **baniyas** | Abu Dhabi | HOLD (0.57) | **PROTECT** (0.83) | 11,086 | 13,036 | 0.9x | 1.09 → 2.33 |
+| al-ain | Abu Dhabi | PROTECT (0.97) | PROTECT (0.75) | 18,652 | 10,173 | 1.8x | 2.71 → 2.68 |
+| **shahama** | Abu Dhabi | HOLD (0.54) | **PROTECT** (0.75) | 9,865 | 9,865 | 1.0x | 1.08 → 1.95 |
+| **al-taif-mall** | Fujairah | HOLD (0.42) | **PROTECT** (0.72) | 6,828 | 8,980 | 0.8x | – → 3.86 |
+| shakhbout-city | Abu Dhabi | PROTECT (0.75) | PROTECT (0.72) | 12,743 | 8,685 | 1.5x | 1.35 → 1.67 |
+| **ras-al-khaimah** | Ras Al Khaimah | HOLD (0.36) | **PROTECT** (0.70) | 7,328 | 7,946 | 0.9x | 0.86 → 2.08 |
+| **al-jada** | Sharjah | SHRINK (0.34) | **PROTECT** (0.70) | 5,853 | 7,912 | 0.7x | 0.90 → 1.55 |
+| al-falah | Abu Dhabi | PROTECT (0.68) | PROTECT (0.70) | 9,510 | 7,866 | 1.2x | 1.38 → 2.07 |
+| **zawaya-walk** | Sharjah | HOLD (0.45) | **PROTECT** (0.69) | 6,046 | 7,569 | 0.8x | 1.10 → 1.77 |
+| **mohammed-bin-zayed-city** | Abu Dhabi | SHRINK (0.14) | **HOLD** (0.44) | 4,057 | 4,581 | 0.9x | 0.57 → 1.16 |
+| **khalifa-city-a** | Abu Dhabi | PROTECT (0.92) | **HOLD** (0.40) | 16,679 | 6,144 | 2.7x | 1.50 → 1.00 |
+| mirdif-35 | Dubai | HOLD (0.63) | HOLD (0.37) | 5,214 | 5,388 | 1.0x | 2.79 → 0.98 |
+| al-maqta | Abu Dhabi | HOLD (0.39) | HOLD (0.35) | 6,990 | 4,159 | 1.7x | 0.92 → 0.99 |
+| noya-plaza | Abu Dhabi | SHRINK (0.03) | SHRINK (0.28) | 1,386 | 4,228 | 0.3x | 0.15 → 0.85 |
+| **ministries-complex** | Abu Dhabi | HOLD (0.42) | **SHRINK** (0.23) | 8,398 | 3,919 | 2.1x | 0.91 → 0.77 |
+| westyas | Abu Dhabi | SHRINK (0.08) | SHRINK (0.16) | 3,160 | 3,259 | 1.0x | 0.35 → 0.66 |
+| **nad-al-sheba** | Dubai | HOLD (0.45) | **SHRINK** (0.08) | 2,229 | 2,670 | 0.8x | 1.28 → 0.52 |
+| jumeirah-park | Dubai | SHRINK (0.20) | SHRINK (0.06) | 1,636 | 2,234 | 0.7x | 0.82 → 0.38 |
+| al-barsha | Dubai | SHRINK (0.30) | SHRINK (0.05) | 2,180 | 2,192 | 1.0x | 1.00 → 0.34 |
+| city-walk | Dubai | SHRINK (0.09) | SHRINK (0.05) | 2,155 | 1,905 | 1.1x | 0.57 → 0.17 |
+| delma | Abu Dhabi | SHRINK (0.04) | SHRINK (0.05) | 1,695 | 1,895 | 0.9x | 0.21 → 0.42 |
+| khaleej-al-arabi | Abu Dhabi | SHRINK (0.08) | SHRINK (0.03) | 3,083 | 1,359 | 2.3x | 0.40 → 0.32 |
+
+Areas: **15 WATCH → GROW, nothing else moves** (34 → 49 GROW, 63 → 48 WATCH, 464 SKIP). All 15 were WATCH on cost alone and clear the lower UAE-wide anchor (the old Abu Dhabi and Ras Al Khaimah baselines were higher): al-wathbah, al-aamerah, bani-yas, al-muwaij-i, al-sader, al-nahdah, shiab-al-ashkhar, al-khibeesi and al-shahamah (Abu Dhabi); meshairef, muntazy, al-rashidiya and al-muwaihat (Ajman); al-dhait-south and ghalilah (Ras Al Khaimah). GROW by emirate: Abu Dhabi 23, Sharjah 11, Ajman 9, Ras Al Khaimah 5, Dubai 1.
+
+- **SC2: reported, swings attributed.** Lounges **10 PROTECT / 4 HOLD / 9 SHRINK / 1 not scored**. Three movers explain most of it. (1) Dubai: every Dubai site is dear against a UAE-wide anchor (cost index 0.17–0.98), so nad-al-sheba HOLD → SHRINK and mirdif-35 slides to the SHRINK line; under the old baseline Dubai lounges were only compared with each other. (2) Popularity no longer scores: khalifa-city-a PROTECT → HOLD (it serves 16,679, but a typical lounge at its site serves 6,144: **2.7x its site**), ministries-complex HOLD → SHRINK (2.1x). (3) Cheap, under-served sites rise: al-jada SHRINK → PROTECT (0.7x its site; a typical lounge would serve more there than it does), al-taif-mall gets an index for the first time (3.86) and goes to PROTECT, ras-al-khaimah, zawaya-walk, baniyas and shahama to PROTECT.
+- **SC4: F1 PASSES; one knife-edge move through a different channel (F5).**
+  - *Close a sibling (23 closures):* the cost index of every other lounge now moves exactly with its own site-served women (unit test `test_closing_a_lounge_never_changes_another_lounges_cost_index_except_through_served`). Run 7's 10 label moves are gone. **One remains:** al-maqta HOLD → SHRINK (0.3503 → 0.3487) when al-ain, city-walk, mirdif-35 or ras-al-khaimah closes, none of them near it. Mechanism, verified: the "typical lounge" is the median reviews and rating over the *open* scored lounges, so closing al-ain moves it from 757 to 755 reviews and every site-served figure dips by up to ~12 women. al-maqta sits 0.0003 above the SHRINK line. 166 composite dips of at most 0.0018. **Explained, model property (F5):** the typical lounge, like the anchor, should arguably be frozen. Not changed here: the owner's spec defines it as the what-ifs' median, and freezing it would also change the area what-ifs under closures.
+  - *+50% women in one lounge's catchment (23 cases):* no lounge's label drops and no lounge's own composite falls. **Pass** (run 7 failed this through the emirate median).
+  - *A premium competitor (expensive, 4.9★, 2,000 reviews, 200 m north of each lounge):* **no label rises**; 12 composites rise by 0.0001 (jumeirah-park, mirdif-35, ras-al-khaimah), in lounges far from the new salon. Not investigated (likely the global outside-option percentile or the imputed stand-ins shifting); below any line. Labels fall in 24 cases: a big rival next door now hits the site score directly (al-dhafra, al-falah, al-jada, ras-al-khaimah, shahama, shakhbout-city PROTECT → HOLD, khalifa-city-a and mirdif-35 HOLD → SHRINK). That is F3's fragility, now on the site rather than the lounge.
+- **Level flips:** only al-maqta flips (27 of 81, at 0.3503 on the line); the other 22 flip 0 times. site_served depends on worker share and affluence, not travel time or coverage, as predicted.
+- **BT2/BT3: PASS.** Same unit on both sides now (a typical lounge at the site, the lounge closed; GROW rule on net new women ≥ 6,000 and cost index ≥ 1, without the place floor). PROTECT → GROW **10 of 10**; HOLD → WATCH 4; SHRINK → SKIP 8, WATCH 1 (ministries-complex, 3,279 net new). Run 7: PROTECT → GROW 1 / WATCH 3 / SKIP 1. The lounge scorecard and the growth model now agree by construction of the unit, which is what F2 asked for; they still differ in gross vs net (the lounge signal counts site-served women, the what-if net new).
+- **BT1:** served model unchanged; absorbed share ≤ 0.30 for every lounge, as in run 7.
+- **BT4 / SC3: unchanged.** 5 of 6 controls SKIP by name; Dubai Investments Park WATCH (residential pockets, as runs 2–8). The only non-SKIP area with a non-residential name or 30%+ worker housing is habshan WATCH (44%, run 4 caveat). None of the 15 new GROW areas is non-residential.
+- **SC1, SC7, BT6:** data unchanged, results unchanged (BT6 women per rent still doesn't track the call). **BT5:** the empty-area tilt is a little stronger: 49 GROW, one in Dubai (al-awir).
+- **SC5: PASS.** 121 explanations regenerated offline (prompt v6: uae, 23 lounges, 97 non-SKIP areas), all pass `check`; `verify()` now also requires every lounge so-what to quote the performance sentence word for word. Read-through of al-barsha, al-jada, al-maqta, manama-ajman, al-wathbah-abu-dhabi and uae: what / so what / now what present, no in-branch advice, performance quoted as context. al-maqta's now-what states the 0.0003 knife edge.
+- **SC8:** run() 4.4 s cold, 4.1–4.3 s warm (fresh processes; run 7: 4.9 / 4.4); suite 58 s, 182 passed. Faster, because level_flips no longer builds areas for the emirate baseline.
+- **User stories:** unchanged count (3/10). US1 improves: a lounge's pressure now reads as its site, and performance vs site separates a weak site from a weak lounge.
+
+**Model issues after run 9:**
+- **F1: fixed.** **F2: fixed** (both scored signals assess the site; performance vs site is context).
+- **F3 (explained finding, fragility):** unchanged in kind, larger in reach: one big rival 200 m away moves 6 PROTECT sites to HOLD.
+- **F5 (new, explained, minor):** the typical lounge (median reviews and rating of open lounges) drifts with closures, so a closure far away can move a knife-edge call (al-maqta). Fix if wanted: freeze it like the anchor.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
@@ -311,5 +378,7 @@ Scope: F4 only, plus the non-model changes since run 7 (`est_customers` out of t
 | 7 | 2026-10-11 | Served-demand (Huff) model: 2-signal scorecard (served women, cost index), growth = what-if new lounge, areas = every named place | 3/10 (US4/US5 partial: net new shown but GROW table ranks by area women; absorbed share not shown) | BT1 first run: absorbed ≤ 0.30 for all (SHRINK ≠ cannibalised; explained); BT2/BT3 same-unit via what_if_open: al-ain SKIP on the place floor only (explained); BT4 partial (DIP); BT5 data unchanged, empty-area tilt stronger; BT6 report | SC2 5/9/9/1, 34/63/464 (attributed); SC4 **FAIL**; SC1, SC3, SC7 partial (ADREC 10.8% < AED 300, rural); SC5 pass (121 regenerated); SC8 4.9 s cold / 4.4 s warm, suite 63 s | **SC4/F1: closing or growing a sibling flips labels via the emirate-median cost baseline (zawaya-walk HOLD → SHRINK when al-jada closes; al-falah PROTECT → HOLD; al-maqta, nad-al-sheba → SHRINK). F4: net new women > 2x area women in 4 areas (manama-ajman 35k from 5k)** |
 
 | 8 | 2026-10-11 | F4 diagnosis; `est_customers` out of the lounge fact sheet; retired growth rule deleted | unchanged (3/10) | unchanged from run 7 | Calls unchanged (5/9/9/1, 34/63/464); SC5 pass (121 regenerated, 23 lounges); suite green | **F1 still open.** F4 explained: the straight-line band under-reaches the isochrones (86k vs 98k pairs at 20 min), and the 4 areas are small places whose 20-min reach covers a neighbouring town (Sharjah city, Al Dhaid, Dubai) |
+
+| 9 | 2026-10-11 | F1 (frozen UAE-wide cost anchor, 14.34) and F2 (site_served demand; performance_vs_site as context) | unchanged (3/10) | BT2/BT3 **pass**: PROTECT → GROW 10/10, SHRINK → SKIP 8 + WATCH 1, HOLD → WATCH 4; BT4 partial (DIP); BT1, BT5, BT6 unchanged | SC2 10/4/9/1, 49/48/464 (14 lounge calls and 15 WATCH → GROW, attributed); SC4 **F1 passes** (no relative baseline; +50% demand never lowers another lounge), one knife-edge closure move via the typical-lounge median (F5); SC5 pass (121 regenerated); SC8 4.4 s cold / 4.1 s warm, suite 58 s | **none unexplained.** F5 (typical lounge drifts with closures; al-maqta 0.0003 from the line) and F3 fragility explained |
 
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.
