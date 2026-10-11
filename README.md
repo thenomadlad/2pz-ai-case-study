@@ -168,71 +168,133 @@ Four pages; the loop is **Overview → click a lounge or area → its page → b
 
 Links carry the selection, so any page can be shared directly. Guided tour: [`docs/walkthrough.md`](docs/walkthrough.md).
 
-## How it decides
+## How the model works
 
-**Market.** Women aged 15+ per ~2 km grid cell (WorldPop 2025 adults, rebalanced so worker housing
-counts few women). **Addressable women** weight each cell's women by its median household rent
-relative to the women-weighted median (`(rent / median) ^ 0.5` at medium, clipped before
-rescaling to a mean of 1 over the observed cells; final weights 0.44-2.53); only
-241 Dubai cells have a rent (DLD Ejari), so every other cell weighs 1. A lounge's **catchment** is the cells within a 15-min drive (Mapbox, typical
-midday traffic). Its **premium substitutes** are the most-reviewed premium salons in the catchment
-that together hold 60% of its premium reviews. **Capture** = the lounge's Google reviews ÷ (its own
-+ its substitutes' reviews, scaled up for salons the search missed).
+One chain: **where the women are → who can reach them → who they go to → what a site costs → the
+call.** The rules make every call; the AI only narrates it. Constants are named here, not quoted,
+because they are still being tuned: each lives in code with a `*_WHY` string saying why.
 
-- **One competitive set.** All lounges are treated as one format (same assumed price level, same
-  scorecard, each other's substitutes), because we have no data to split them by size, mall vs
-  street or menu. The airport lounge gets no call because it serves travellers, not a neighbourhood, and it is left out of every comparison: no lounge's sibling in the overlap, no lounge's premium substitute, no area's nearest lounge. (It used to count as a sibling and a substitute; fixing that moved shahama from SHRINK to HOLD.)
+```mermaid
+flowchart LR
+  subgraph SRC["Data"]
+    WP["WorldPop 2025 adults<br/>+ OSM worker housing"]
+    MB["Mapbox isochrones<br/>10 / 15 / 20 min"]
+    GP["Google Places<br/>premium salons + our lounges"]
+    RENT["Shop rents: DLD Ejari (Dubai),<br/>ADREC districts (Abu Dhabi),<br/>PF/Bayut listings (north)"]
+    OSM["OSM place names"]
+  end
+  subgraph DER["Derived per ~2 km cell"]
+    DEM["Demand:<br/>women 15+ per cell"]
+    REACH["Reach: suppliers within 20 min,<br/>isochrone or fitted straight line"]
+    SUP["Suppliers: competitors,<br/>lounges, stand-ins"]
+    IMP["Imputed stand-in competitors<br/>for unsearched cells"]:::assume
+    COST["Site cost = rent x REF_UNIT_M2<br/>+ amortised fit-out"]
+    UNIT["150 m2 unit, fit-out cost"]:::assume
+  end
+  HUFF{{"Huff split<br/>reviews^ALPHA x rating^RATING_ELASTICITY x DECAY[band]"}}
+  OUT["Outside option:<br/>women who don't buy premium here"]:::assume
+  SERVED["Served women per lounge"]
+  UNSERVED["Unserved women per cell"]
+  CIX["Cost index: served per AED 1k<br/>vs emirate's median site"]
+  CANN["What-if: close a lounge,<br/>share siblings absorb"]:::whatif
+  OPEN["What-if: open a typical lounge<br/>at each named place: net new women"]:::whatif
+  LRULE["Lounge rule: served + cost composite<br/>vs PROTECT_AT / SHRINK_AT"]
+  GRULE["Growth rule: net new >= NEW_SITE_MIN<br/>and cost index >= 1"]
+  LCALL(["PROTECT / HOLD / SHRINK"])
+  GCALL(["GROW / WATCH / SKIP"])
+  AI["AI explanation<br/>narrates the fact sheet"]
+
+  WP --> DEM
+  MB --> REACH
+  GP --> SUP
+  IMP -.-> SUP
+  RENT --> COST
+  UNIT -.-> COST
+  DEM --> HUFF
+  REACH --> HUFF
+  SUP --> HUFF
+  OUT -.-> HUFF
+  HUFF --> SERVED
+  HUFF --> UNSERVED
+  SERVED --> CIX
+  COST --> CIX
+  SERVED --> LRULE
+  CIX --> LRULE
+  HUFF --> CANN
+  CANN -.->|display only| LCALL
+  UNSERVED --> OPEN
+  OSM --> OPEN
+  OPEN --> GRULE
+  CIX --> GRULE
+  LRULE --> LCALL
+  GRULE --> GCALL
+  LCALL --> AI
+  GCALL --> AI
+
+  classDef assume stroke-dasharray: 5 5,fill:#fff4e0,stroke:#c77700,color:#000
+  classDef whatif stroke-dasharray: 2 2,fill:#e8f0ff,stroke:#3b6fd6,color:#000
+```
+
+*Dashed orange = an assumption, not data. Dashed blue = a what-if the model simulates.*
+
+1. **Demand.** Women 15+ per ~2 km cell: WorldPop 2025 adults, rebalanced so OSM worker housing
+   counts few women. Affluence weighting is **off**: it changed no call and was Dubai-only
+   (evidence: [`notebooks/features/affluence.ipynb`](notebooks/features/affluence.ipynb)).
+2. **Reach.** Which suppliers each cell reaches within 20 min, in 10/15/20-min bands: the cell's own
+   Mapbox isochrones where fetched, elsewhere straight-line km bands fitted on those cells. Demand
+   ignores emirate borders.
+3. **Suppliers.** Premium competitor salons (Google Places), our lounges, and, for cells the salon
+   search never covered, one imputed stand-in competitor sized like searched cells of the same
+   emirate and density tier.
+4. **Huff split.** Each cell's women are shared among the suppliers it reaches, by weight
+   `reviews^ALPHA x (rating/4.6)^RATING_ELASTICITY x DECAY[band]`, plus an **outside option** (the
+   median premium supplier's weight) standing for women who go elsewhere or don't buy premium. Out
+   come **served women per lounge** and **unserved women per cell**
+   ([`notebooks/served_demand.ipynb`](notebooks/served_demand.ipynb)).
+5. **Cost.** Commercial shop rent per cell: Dubai from DLD Ejari shop contracts; Abu Dhabi from
+   ADREC's 2025 district retail rates; northern emirates from Property Finder/Bayut asking rents
+   (industrial areas dropped, at most 3 listings per building); otherwise the emirate median.
+   Site cost = rent x `REF_UNIT_M2` + amortised fit-out (`FITOUT_AED_M2` over `FITOUT_YEARS`).
+   **Cost index** = served women per AED 1k of site cost, against the emirate's median lounge (or its
+   median growth area where it has under 2 lounges). Compared only within an emirate
+   ([`notebooks/rent.ipynb`](notebooks/rent.ipynb)).
+6. **Lounge call** (`src/model/scorecard.py`). A composite of the served-demand score and the
+   cost-index score: PROTECT at `PROTECT_AT` or above, SHRINK at `SHRINK_AT` or below, HOLD between.
+   **Cannibalisation** is a display-only what-if: close the lounge, what share of its women do
+   siblings absorb ([`notebooks/scorecard.ipynb`](notebooks/scorecard.ipynb)).
+7. **Growth call** (`src/model/growth.py`). Areas are named OSM places (cells with only an emirate
+   fallback name make no area). The what-if opens a typical lounge (median lounge reviews and
+   rating) at each one: women it would serve, how many it takes from our lounges, **net new**. GROW
+   if net new ≥ `NEW_SITE_MIN`, mostly not worker housing, and cost index ≥ 1 (or unknown); WATCH
+   if it falls short on one of those or reaches half of `NEW_SITE_MIN`; SKIP otherwise, and always for
+   non-residential names or places under `SKIP_UNDER_WOMEN`
+   ([`notebooks/growth.ipynb`](notebooks/growth.ipynb)).
+8. **Explanations.** Claude narrates each call from its fact sheet; it never makes the call (below).
+
+**Key assumptions and known weaknesses** (full ranked list: [`docs/limitations.md`](docs/limitations.md)):
+
+- **The outside option is a convention, not a measurement.** Pegging it to the median premium
+  supplier sets how much demand is "unserved"; a different peg moves every served count.
+- **The what-if lounge is a median lounge.** A new site gets the median lounge's reviews and rating
+  on day one, which flatters it (a new lounge has few reviews) and ignores size or format.
+- **Rents mix sources.** Dubai is contract rent, Abu Dhabi published rates, the north asking rents
+  (which run above signed rents); that is why cost is compared only within an emirate.
+- **Imputed competitors** stand in for unsearched cells: remote areas' competition is assumed, not seen.
+- **No capacity cap.** A lounge can "serve" any number of women; chairs and staff never bind.
+
+Other modelling choices that still hold:
+
+- **One competitive set.** All lounges are treated as one format (same assumed price level and
+  scorecard), because we have no data to split them by size, mall vs street or menu. The airport
+  lounge gets no call (it serves travellers) and is left out as a supplier and a sibling.
 - **Why driving.** The UAE is car-centric: low-density cities on wide arterial roads, malls with
   big car parks, public transport that covers only parts of the cities, and summer heat that
-  makes walking to a salon rare. So a drive-time catchment is the honest default; it overstates
-  reach for women without a car. Mapbox's typical traffic for a **weekday 12:00** departure is a
+  makes walking to a salon rare. Mapbox's typical traffic for a **weekday 12:00** departure is a
   stated simplification: evening rush, when salon demand peaks, is ~40% slower in Dubai (TomTom
-  2025), so real after-work catchments are smaller.
+  2025), so real after-work reach is smaller.
 - **Why a 0.02° grid.** Cells are ~2.2 x 2.0 km. Cell area varies by under 2% between 24° and
-  26°N, where 97% of UAE adults live (2.5% over every cell, 22.9-26.0°N), and nothing computes an
-  area in degrees: distances are haversine, sizes are people counts.
-
-**Lounges** (`src/model/scorecard.py`). Four signals, each 0-1 on a *fixed* scale, so a lounge's score
-doesn't move when a sibling opens or closes:
-
-| Signal | Measure | 0 at | 1 at | Weight |
-|---|---|---|---|---|
-| Demand | addressable (affluence-weighted) women 15+ in the catchment | 0 | 200k | 1 |
-| Cannibalisation | share of them another lounge also reaches | 100% | 0% | 1 |
-| Capture | share of premium-substitute reviews | 0% | 15% | 1 |
-| Rating | rating minus the premium pool's median (salons with 20+ reviews) | −0.3★ | +0.3★ | ½ |
-
-PROTECT ≥ 0.65, SHRINK ≤ 0.35, HOLD between: strong calls need the signals to agree. Rating counts
-half because Google ratings come in 0.1★ steps. **Low confidence** = within 0.05 of a line, a thin
-premium market (under 10 premium salons: the capture score is pulled toward neutral, keeping n/10 of
-its distance from 0.5), no rating gap, a call that changes in a third or more (27+) of the 81
-combinations of the four assumption levels, or one that changes when a signal weight moves ±25%.
-
-**Growth areas** (`src/model/growth.py`). Populated cells beyond a 15-min drive of every scored lounge,
-one area per OSM place name, whether the cells touch or not. Cells with no OSM place within 3 km
-(about 34k women) stay in catchments and totals but make no area: nothing actionable is known about
-them. **Big enough?** ≥ 20k addressable women, under 50% of adults in worker housing.
-**Unsaturated?** Under 150 premium reviews per 1k women in the cells we searched (the lightest quarter
-of our own lounges' real premium markets, by a rule fixed in advance; lounge pages show the same
-measure). Both → GROW, one → WATCH, neither → SKIP; under 5k women is SKIP, as are areas named
-industrial, free zone, military, airport or port, and small unsaturated areas that are mostly worker
-housing. Under half the women searched caps at WATCH, as does passing the size test only through
-the affluence weighting with rents for under half the women. Each area gets low / medium / high
-confidence by its distance from the two lines.
-
-Every anchor, with why it was chosen, is on the app's How page and in `notebooks/features/decisions.ipynb`.
-
-### Which data answers which question
-
-Field names are as in `src/features/lounges.py`; files are in `data/seed/v3/`.
-
-| Question | Signal(s) | Dataset(s) | How direct |
-|---|---|---|---|
-| **Q1** protect / hold / shrink a lounge | the composite of the four signals below (`addressable_women`, `shared_share`, `capture`, `rating_gap`) | all of the files below | **Indirect.** Health is a market-position score; there is no revenue or lease data (limitations 1) |
-| **Q2** where to open | `addressable_women` and `worker_share` per area (big enough?); `premium_reviews_per_1k` (unsaturated?) | `cells.csv` + `emirates.csv` (WorldPop, OSM worker housing), `cell_affluence.csv` (DLD rents, Dubai only), `catchment_cells.csv` (what's already reached), `salons.csv` + `search_circles.csv` (Places) | **Proxy.** Modelled women stand in for customers; premium reviews stand in for competing supply |
-| **Q3** overlap with ourselves | `shared_share`: share of a lounge's catchment women another lounge also reaches | `catchment_cells.csv`, `lounge_isochrones.geojson` (Mapbox), `cells.csv` | **Fairly direct** for geography; it can't say where customers would go if a lounge closed (limitations 11) |
-| *Cost* (shown, not scored; for the ROIC gate later) | `site_rent_m2`, `women_per_rent_k` (addressable women per AED 1k of annual rent, 150 m² unit assumed) | `cell_shop_rent.csv` (DLD shop contracts, Dubai), `retail_rent_bands.csv` + `lounge_site_class.csv` (JLL, 4 Abu Dhabi lounges) | **Partial.** 9 of 23 scored lounges have a rent. Area medians mix mall and street shops (limitations 15) |
-| **Q4** strength vs local competition | `capture` (lounge reviews ÷ lounge + premium substitutes), `rating_gap` (rating − median of the catchment's premium salons with 20+ reviews) | `branches.csv` (lounge reviews, rating), `salons.csv`, `lounge_candidates_by_level.csv`, `lounge_search_saturation_by_level.csv` (recall correction) | **Proxy of a proxy** for capture: lifetime Google reviews stand in for customers, which stand in for market share. Rating is direct but coarse (0.1★ steps) |
+  26°N, where 97% of UAE adults live, and nothing computes an area in degrees: distances are
+  haversine, sizes are people counts.
 
 ## The AI layer
 
