@@ -171,7 +171,7 @@ Script: `scripts/fetch_salons.py`. Notebook: `notebooks/competitors.ipynb`.
 ## Affluence (`dubai_rents_by_area.csv`, `cell_affluence.csv`, `cell_built_form.csv`, built 2026-10-10)
 
 Scripts: `scripts/build_affluence.py` (method in its docstring), `scripts/fetch_ghsl.py`. Notebook:
-`notebooks/affluence.ipynb`. Weighting: `src.market.affluence_weight`, `affluence_elasticity` in
+`notebooks/features/affluence.ipynb`. Weighting: `src.market.affluence_weight`, `affluence_elasticity` in
 `baseline.yaml`.
 
 **DLD rents (used).** Dubai Land Department open data (dubailand.gov.ae, Open Data, "Rents"): one

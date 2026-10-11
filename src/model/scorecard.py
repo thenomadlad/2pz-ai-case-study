@@ -1,9 +1,9 @@
 """Lounge scorecard: four signals on FIXED scales, weighted, PROTECT / HOLD / SHRINK.
 
 Fixed scales so a lounge's score doesn't move when a sibling opens or closes. Anchors were set
-from the v3 features at medium levels (notebooks/decisions.ipynb); each `why` says why. They
+from the v3 features at medium levels (notebooks/features/decisions.ipynb); each `why` says why. They
 were reviewed by the user on 2026-10-09 (rating at half weight; flips lower confidence). Demand
-reads affluence-weighted women since 2026-10-10 (notebooks/affluence.ipynb); same anchors.
+reads affluence-weighted women since 2026-10-10 (notebooks/features/affluence.ipynb); same anchors.
 """
 from collections import Counter
 from dataclasses import dataclass, fields

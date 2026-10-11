@@ -142,7 +142,7 @@ uv run streamlit run streamlit_app.py     # http://localhost:8501  (or: just app
 No API key needed: the app computes everything in memory from the committed `data/seed/v3/` and
 serves the committed AI explanations. `just test` runs the tests. `just labels` prints every
 lounge and growth-area call at the baseline as CSV. `just notebook` opens the notebooks (start
-with `decisions.ipynb`).
+with `features/decisions.ipynb`).
 
 ## Using the app
 
@@ -220,7 +220,7 @@ housing. Under half the women searched caps at WATCH, as does passing the size t
 the affluence weighting with rents for under half the women. Each area gets low / medium / high
 confidence by its distance from the two lines.
 
-Every anchor, with why it was chosen, is on the app's How page and in `notebooks/decisions.ipynb`.
+Every anchor, with why it was chosen, is on the app's How page and in `notebooks/features/decisions.ipynb`.
 
 ### Which data answers which question
 

@@ -189,10 +189,10 @@ not decisions.
   PROTECT ≥ 0.65, SHRINK ≤ 0.35; low confidence near a line, on a missing input, or at a third or
   more flips of the level combinations: 27 of 81 since affluence became the fourth level) and `src/model/growth.py` (GROW / WATCH / SKIP, unsaturated line 50
   premium reviews per 1k women). Anchors signed off by the user 2026-10-09
-  (`notebooks/decisions.ipynb`); an "estimated customers" signal was considered and rejected.
+  (`notebooks/features/decisions.ipynb`); an "estimated customers" signal was considered and rejected.
 - **Affluence (2026-10-10):** observed DLD rents for 241 Dubai cells weight demand (addressable
   women; elasticity off / 0.5 / 1); the built-form proxy for the rest of the UAE failed (CV R²
-  −0.10), so everything outside those cells is neutral (`notebooks/affluence.ipynb`,
+  −0.10), so everything outside those cells is neutral (`notebooks/features/affluence.ipynb`,
   `docs/limitations.md` 3). The cached explanations were regenerated for it on 2026-10-10.
 - **What-ifs in memory** (`src/baseline.py`): levels, search recall and closed lounges; no
   processed-JSON pipeline.

@@ -12,7 +12,7 @@ catchment, 15 min at baseline, of every open scored lounge, by construction in s
   Unknown saturation, or under MIN_COVERAGE of the women searched, caps at WATCH, and so does a size
   test passed only through the affluence weighting (raw women under GROW_MIN_WOMEN) when under
   MIN_COVERAGE of the women have an observed rent. Thresholds reviewed by the user on 2026-10-09
-  (notebooks/decisions.ipynb); UNSATURATED_PER_1K recalibrated by a fixed rule on 2026-10-10.
+  (notebooks/features/decisions.ipynb); UNSATURATED_PER_1K recalibrated by a fixed rule on 2026-10-10.
 """
 import re
 

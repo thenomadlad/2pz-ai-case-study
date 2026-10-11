@@ -20,7 +20,7 @@ rent_predicted is kept in the CSV for the record and unused.
 Outputs (data/seed/v3/): dubai_rents_by_area.csv, cell_affluence.csv
 (cell_id, rent_observed, rent_predicted (unused), affluence_rent, source: observed | none
 (predicted only if the proxy passed), assignment: inside | nearest | blank).
-Analysis and plots: notebooks/affluence.ipynb.
+Analysis and plots: notebooks/features/affluence.ipynb.
 
 Run: uv run --extra notebook python scripts/build_affluence.py
 """

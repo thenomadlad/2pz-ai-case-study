@@ -115,7 +115,7 @@ class Levels:
     travel: str = "medium"          # travel_time_minutes
     coverage: str = "medium"        # competitor_coverage
     worker_share: str = "medium"    # worker_housing_female_share
-    affluence: str = "medium"       # affluence_elasticity
+    affluence: str = "low"          # affluence_elasticity; "low" = 0 = off (notebooks/features/affluence.ipynb)
 
 
 class LoungeFeatures(BaseModel):

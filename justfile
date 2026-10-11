@@ -15,7 +15,7 @@ app:
 
 # Open the notebooks in JupyterLab, starting at the scorecard and growth decisions
 notebook:
-    uv run --extra notebook jupyter lab notebooks/decisions.ipynb
+    uv run --extra notebook jupyter lab notebooks/scorecard.ipynb
 
 test:
     uv run --extra dev --extra notebook pytest
