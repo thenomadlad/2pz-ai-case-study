@@ -1,4 +1,5 @@
 import json
+import re
 from types import SimpleNamespace
 
 from src import explain
@@ -333,3 +334,16 @@ def test_every_committed_cache_entry_is_current_and_grounded():
     assert set(cache) == set(keys)
     for key, (kind, sid, _action, facts) in keys.items():
         assert explain.verify(Explanation(**cache[key]), facts, kind) == [], sid
+
+
+def test_knife_edge_calls_show_enough_decimals():
+    # Pass 4: al-maqta (0.353, 0.003 above SHRINK) read "0.35 ... 0.00 from the line" and "reach 5% (now 5%)".
+    from src import explain
+    from src.baseline import run
+    r = run()
+    f = next(x for x in r.features if x.branch_id == "al-maqta")
+    d = next(x for x in r.decisions if x.branch_id == "al-maqta")
+    text = " ".join(explain.what_would_change("lounge", explain.lounge_facts(f, d, r.flips.get("al-maqta"))))
+    assert "0.353" in text and "0.003 from the" in text
+    flip = re.search(r"reach (\S+) \(now (\S+)\)", text)
+    assert flip is None or flip.group(1) != flip.group(2)

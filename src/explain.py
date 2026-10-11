@@ -271,14 +271,21 @@ TOPIC_LABELS = {
 IMPORTANT = 0.1  # a lounge signal must sit this far from neutral (0.5), weighted, to be an argument
 
 
-def fmt(field: str, value) -> str:
+KNIFE_EDGE = 0.01   # within this of a line, show a composite to 3 decimals (al-maqta: 0.353 vs 0.35)
+
+
+def composite_digits(line_gap: float) -> int:
+    return 3 if abs(line_gap) < KNIFE_EDGE else 2
+
+
+def fmt(field: str, value, pct_digits: int = 0) -> str:
     f = GLOSSARY.get(field)
     if value is None:
         return "n/a (missing)"
     if isinstance(value, bool):
         return "yes" if value else "no"
     if f and f.pct:
-        return f"{value * 100:.0f}%"
+        return f"{value * 100:.{pct_digits}f}%"
     if isinstance(value, float):
         return f"{value:,.2f}".rstrip("0").rstrip(".") if abs(value) < 100 else f"{value:,.0f}"
     if isinstance(value, int):
@@ -327,16 +334,16 @@ THRESHOLDS: dict[str, str] = {
 }
 
 
-def _in_unit(field: str, value) -> str:
+def _in_unit(field: str, value, pct_digits: int = 0) -> str:
     """A signal input with its full unit ("38,123 women", "47% of catchment women")."""
-    f, text = GLOSSARY[field], fmt(field, value)
+    f, text = GLOSSARY[field], fmt(field, value, pct_digits)
     return text + (f.unit[1:] if f.pct else f" {f.unit}")
 
 
-def _flip_text(facts: dict) -> str:
+def _flip_text(facts: dict, pct_digits: int = 0) -> str:
     """flip_value in its driver's own unit."""
     sig = next(s for s in scorecard.SIGNALS if s.name == facts["flip_driver"])
-    return _in_unit(sig.field, facts["flip_value"])
+    return _in_unit(sig.field, facts["flip_value"], pct_digits)
 
 
 def what_would_change(kind: str, facts: dict) -> list[str]:
@@ -345,13 +352,16 @@ def what_would_change(kind: str, facts: dict) -> list[str]:
     if kind == "lounge":
         if "next_call" not in facts:
             return []
-        out = [(f"Composite {facts['composite']:.2f} is {facts['line_gap']:.2f} from the "
+        nd = composite_digits(facts["line_gap"])
+        out = [(f"Composite {facts['composite']:.{nd}f} is {facts['line_gap']:.{nd}f} from the "
                 f"{facts['next_call']} line.")]
         if facts["flip_driver"]:
             sig = next(s for s in scorecard.SIGNALS if s.name == facts["flip_driver"])
+            flip, now = _flip_text(facts), _in_unit(sig.field, facts[sig.field])
+            if flip == now:   # a knife edge: one more decimal tells them apart
+                flip, now = _flip_text(facts, 1), _in_unit(sig.field, facts[sig.field], 1)
             out.append(f"On its own, {GLOSSARY[sig.field].label.lower()} would have to reach "
-                       f"{_flip_text(facts)} (now {_in_unit(sig.field, facts[sig.field])}) to make "
-                       f"it {facts['next_call']}.")
+                       f"{flip} (now {now}) to make it {facts['next_call']}.")
         else:
             out.append("No single market signal could move it there on its own.")
         return out

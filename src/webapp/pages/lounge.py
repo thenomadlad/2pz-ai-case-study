@@ -44,7 +44,8 @@ def _signals(f, d) -> None:
                 f"{f.premium_pool}/{scorecard.THIN_MARKET} of its distance." if s.name == "capture" and f.thin_premium_market
                 else " Missing: scored neutral." if getattr(f, s.field) is None else "")
         st.caption(f"Scale: {val(s.field, s.worst)} → 0, {val(s.field, s.best)} → 1. {s.why}{note}")
-    verdict = (f"Composite **{d.composite:.2f}** → **{d.action}** (PROTECT at {scorecard.PROTECT_AT} "
+    nd = explain.composite_digits(min(abs(d.composite - scorecard.PROTECT_AT), abs(d.composite - scorecard.SHRINK_AT)))
+    verdict = (f"Composite **{d.composite:.{nd}f}** → **{d.action}** (PROTECT at {scorecard.PROTECT_AT} "
                f"or more, SHRINK at {scorecard.SHRINK_AT} or less). Confidence: {d.confidence}.")
     {"PROTECT": st.success, "SHRINK": st.error}.get(d.action, st.warning)(verdict)
     st.caption(f"{scorecard.THRESHOLDS_WHY} {scorecard.FLIP_WHY}")
