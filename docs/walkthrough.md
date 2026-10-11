@@ -185,7 +185,7 @@ back. SKIP areas and the NOT SCORED airport lounge always use the template.
 These matter more than the calls. The full ranked list is the **How it works & limitations** page
 (`docs/limitations.md`).
 
-- **No capacity, no money, no ROIC.** No chairs, hours, utilisation, revenue, rent or capex. The
+- **No capacity, no money, no ROIC.** No chairs, hours, utilisation, revenue, lease or capex (shop rent is shown for 9 lounges as context, not scored). The
   model can't tell a full lounge from an empty one or a profitable SHRINK from an unprofitable
   PROTECT. A SHRINK is a prompt to pull the P&L.
 - **SHRINK is driven by raw catchment overlap** among the scored lounges, not by services that

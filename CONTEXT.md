@@ -113,7 +113,7 @@ the COO to do:
 - **HOLD**: no portfolio action this cycle. Revisit at the next lease event, or sooner if a signal
   crosses a line (the lounge page names which one is closest).
 - **SHRINK**: investigate, don't close. Before the lease event, review whether to downsize or
-  consolidate into the sibling that shares most of its catchment. The model has no revenue or rent,
+  consolidate into the sibling that shares most of its catchment. The model has no revenue or lease data,
   so it can only raise the question.
 
 **Growth action**:

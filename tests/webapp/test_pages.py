@@ -106,7 +106,7 @@ def test_lounge_page_shows_al_barshas_caveats_beside_the_call():
     assert "Confidence: low" in caveats
     assert "within 0.05 of the SHRINK line" in caveats
     assert "changes in 27 of 81" in caveats
-    assert "No revenue, rent or footfall data" in caveats
+    assert "No revenue, lease or footfall data" in caveats
     assert "Threshold" in at.table[-1].value.columns
     assert "PROTECT ≥ 0.65" in " ".join(at.table[-1].value["Threshold"])
 

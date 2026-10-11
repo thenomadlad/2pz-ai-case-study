@@ -36,7 +36,7 @@ The full ten-minute version, with the AI layer and where not to trust it:
 This is a first pass we will iterate on. The calls are **a shortlist to test with the business, not
 decisions**, and the limitations matter more than the calls. The biggest ones:
 
-- **No money in the model.** No revenue, rent, capex or lease data: it scores location and market
+- **No money in the model.** No revenue, capex or lease data (shop rent is shown for 9 lounges, as an area median or a published band, not scored): it scores location and market
   position only. **SHRINK means "investigate", not "close".**
 - **Capture rests on lifetime Google review counts.** Older salons look bigger, new lounges look
   weak, and big crowded markets show tiny shares.
@@ -94,7 +94,7 @@ what-ifs in the same place the COO reads the answer, and the board sees the same
 Our job ends at **allocating lounges to neighbourhoods**: where the network should be denser,
 thinner or new. Out of scope:
 
-- **The P&L: revenue, rent, capex, lease terms.** We have none of it, and it is Bedashing's own
+- **The P&L: revenue, actual rent paid, capex, lease terms.** We have none of it, and it is Bedashing's own
   data. It decides whether a SHRINK is closed; the model only says which lounges to look at.
 - **In-branch staffing and capacity.** How many chairs and stylists a lounge needs is an
   operations question, answered from bookings, not from maps.
@@ -228,7 +228,7 @@ Field names are as in `src/features/lounges.py`; files are in `data/seed/v3/`.
 
 | Question | Signal(s) | Dataset(s) | How direct |
 |---|---|---|---|
-| **Q1** protect / hold / shrink a lounge | the composite of the four signals below (`addressable_women`, `shared_share`, `capture`, `rating_gap`) | all of the files below | **Indirect.** Health is a market-position score; there is no revenue or rent (limitations 1) |
+| **Q1** protect / hold / shrink a lounge | the composite of the four signals below (`addressable_women`, `shared_share`, `capture`, `rating_gap`) | all of the files below | **Indirect.** Health is a market-position score; there is no revenue or lease data (limitations 1) |
 | **Q2** where to open | `addressable_women` and `worker_share` per area (big enough?); `premium_reviews_per_1k` (unsaturated?) | `cells.csv` + `emirates.csv` (WorldPop, OSM worker housing), `cell_affluence.csv` (DLD rents, Dubai only), `catchment_cells.csv` (what's already reached), `salons.csv` + `search_circles.csv` (Places) | **Proxy.** Modelled women stand in for customers; premium reviews stand in for competing supply |
 | **Q3** overlap with ourselves | `shared_share`: share of a lounge's catchment women another lounge also reaches | `catchment_cells.csv`, `lounge_isochrones.geojson` (Mapbox), `cells.csv` | **Fairly direct** for geography; it can't say where customers would go if a lounge closed (limitations 11) |
 | *Cost* (shown, not scored; for the ROIC gate later) | `site_rent_m2`, `women_per_rent_k` (addressable women per AED 1k of annual rent, 150 m² unit assumed) | `cell_shop_rent.csv` (DLD shop contracts, Dubai), `retail_rent_bands.csv` + `lounge_site_class.csv` (JLL, 4 Abu Dhabi lounges) | **Partial.** 9 of 23 scored lounges have a rent. Area medians mix mall and street shops (limitations 15) |
@@ -318,7 +318,7 @@ Tunable values: [`data/scenarios/baseline.yaml`](data/scenarios/baseline.yaml).
 | Rules decide, Claude explains | An LLM classifier (deleted in v2) | Calls are deterministic and auditable; the AI can only phrase them |
 | Explanations written offline in Claude Code | Generating via the API | No API spend; same prompts, same grounding check |
 | Search recall 0.66, estimated on one tile | A full sweep of capped circles (~$54-210) | Declined on cost; stated as an estimate and an upper bound |
-| Location and market only | Any money: revenue, rent, ROIC | No data; SHRINK means investigate |
+| Location and market only | Any money: revenue, ROIC (shop rent is shown, not scored) | No revenue or lease data; SHRINK means investigate |
 
 ## Decisions & hardest parts
 

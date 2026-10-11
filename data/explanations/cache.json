@@ -144,7 +144,7 @@
     "source": "ai",
     "subject_id": "jumeirah-park",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored. Shop rent and women per AED 1,000 of rent (for an assumed 150 m² unit) are our cost at the site, shown for context and not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "067fe1e14a9a38f8": {
     "action": "HOLD",
@@ -235,7 +235,7 @@
     "source": "ai",
     "subject_id": "ministries-complex",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "08eba54f47e13d20": {
     "action": "HOLD",
@@ -295,7 +295,7 @@
     "source": "ai",
     "subject_id": "shahama",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored. Shop rent and women per AED 1,000 of rent (for an assumed 150 m² unit) are our cost at the site, shown for context and not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "08f5c5d993d0edf0": {
     "action": "WATCH",
@@ -593,7 +593,7 @@
     "source": "ai",
     "subject_id": "baniyas",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "13b69ccc80b2b445": {
     "action": "SHRINK",
@@ -679,7 +679,7 @@
     "source": "ai",
     "subject_id": "noya-plaza",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored. Shop rent and women per AED 1,000 of rent (for an assumed 150 m² unit) are our cost at the site, shown for context and not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "1457aaa2e295e60d": {
     "action": "WATCH",
@@ -1096,7 +1096,7 @@
         "topic": "confidence"
       },
       {
-        "claim": "There is no revenue or rent data, so these are location and market calls from 3,833 searched salons, not return-on-capital calls.",
+        "claim": "There is no revenue or lease data, so these are location and market calls from 3,833 searched salons, not return-on-capital calls.",
         "evidence": [
           {
             "field": "revenue_data_available",
@@ -1105,7 +1105,7 @@
           },
           {
             "field": "rent_data_available",
-            "label": "Rent data",
+            "label": "Lease data",
             "value": false
           },
           {
@@ -1121,7 +1121,7 @@
     "source": "ai",
     "subject_id": "uae",
     "table_caption": "Lounge calls come from a fixed-scale scorecard of demand, cannibalisation, capture and rating; growth-area calls from two tests, size and premium saturation. Counts cover the 23 scored lounges; the airport lounge is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. GROW needs both tests: at least 20,000 addressable (affluence-weighted) women 15+ (worker housing under 50% of adults), and fewer than 150 premium reviews per 1,000 women in the cells we searched. WATCH passes one, or is big but not searched enough to tell (under 50% of its women), or is big only through the affluence weighting with rents observed for under 50% of its women. SKIP passes neither, or has under 5,000 women, or is non-residential by name. Every area is beyond a 15-min drive of every scored lounge."
   },
   "37f1b550b3c535c4": {
     "action": "GROW",
@@ -1364,7 +1364,7 @@
     "source": "ai",
     "subject_id": "al-maqta",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "4090bafe4a2b2e47": {
     "action": "HOLD",
@@ -1445,7 +1445,7 @@
     "source": "ai",
     "subject_id": "al-falah",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "42ce57b56a622108": {
     "action": "WATCH",
@@ -1602,7 +1602,7 @@
     "source": "ai",
     "subject_id": "westyas",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored. Shop rent and women per AED 1,000 of rent (for an assumed 150 m² unit) are our cost at the site, shown for context and not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "468cbc4d95dca646": {
     "action": "WATCH",
@@ -1754,7 +1754,7 @@
     "source": "ai",
     "subject_id": "ras-al-khaimah",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "4898fa726e20cc83": {
     "action": "WATCH",
@@ -1987,7 +1987,7 @@
     "source": "ai",
     "subject_id": "zawaya-walk",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "58fddb931c723d9a": {
     "action": "WATCH",
@@ -2831,7 +2831,7 @@
     "source": "ai",
     "subject_id": "shakhbout-city",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "92689f63ff2da56d": {
     "action": "HOLD",
@@ -2933,7 +2933,7 @@
     "source": "ai",
     "subject_id": "al-barsha",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored. Shop rent and women per AED 1,000 of rent (for an assumed 150 m² unit) are our cost at the site, shown for context and not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "983e3fcfadcbcfc6": {
     "action": "WATCH",
@@ -3166,7 +3166,7 @@
     "source": "ai",
     "subject_id": "al-ain",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "9ee33d55480276bc": {
     "action": "SHRINK",
@@ -3247,7 +3247,7 @@
     "source": "ai",
     "subject_id": "mohammed-bin-zayed-city",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "a984cf8ce7b26070": {
     "action": "WATCH",
@@ -3469,7 +3469,7 @@
     "source": "ai",
     "subject_id": "khalifa-city-a",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "b484534960c933e6": {
     "action": "HOLD",
@@ -3571,7 +3571,7 @@
     "source": "ai",
     "subject_id": "city-walk",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored. Shop rent and women per AED 1,000 of rent (for an assumed 150 m² unit) are our cost at the site, shown for context and not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "b6a8ab8e1057ddac": {
     "action": "WATCH",
@@ -3789,7 +3789,7 @@
     "source": "ai",
     "subject_id": "nad-al-sheba",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored. Shop rent and women per AED 1,000 of rent (for an assumed 150 m² unit) are our cost at the site, shown for context and not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "c4405da0d25ef5e2": {
     "action": "GROW",
@@ -3925,7 +3925,7 @@
     "source": "ai",
     "subject_id": "delma",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "cac5d9aae19bc95f": {
     "action": "HOLD",
@@ -4032,7 +4032,7 @@
     "source": "ai",
     "subject_id": "al-dhafra",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored. Shop rent and women per AED 1,000 of rent (for an assumed 150 m² unit) are our cost at the site, shown for context and not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "cc7f99bc25a96d95": {
     "action": "PROTECT",
@@ -4092,7 +4092,7 @@
     "source": "ai",
     "subject_id": "al-taif-mall",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "cf69f3eb22d798b4": {
     "action": "WATCH",
@@ -4299,7 +4299,7 @@
     "source": "ai",
     "subject_id": "khaleej-al-arabi",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "d71cee95cab897e4": {
     "action": "WATCH",
@@ -4577,7 +4577,7 @@
     "source": "ai",
     "subject_id": "mirdif-35",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored. Shop rent and women per AED 1,000 of rent (for an assumed 150 m² unit) are our cost at the site, shown for context and not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "ed1b94dbe4d5c998": {
     "action": "WATCH",
@@ -4931,7 +4931,7 @@
     "source": "ai",
     "subject_id": "al-jada",
     "table_caption": "Each signal is scored 0-1 on a fixed scale where 1 is good for the lounge, and the contribution rows add up to the composite. Premium saturation (premium reviews per 1k women in the catchment) is shown for context and is not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "febb9da47198b454": {
     "action": "WATCH",

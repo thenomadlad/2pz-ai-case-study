@@ -197,7 +197,7 @@ def _at_stake(r) -> None:
     cols[2].metric(f"To grow: {s['GROW'][0]} GROW areas", f"{s['GROW'][1]:,.0f} women")
     cols[2].caption(f"Addressable women beyond a {minutes}-min drive of every lounge; "
                     f"{s['WATCH'][0]} more areas on WATCH.")
-    st.caption("At stake is counted in women, not money: the model has no revenue, rent or capex.")
+    st.caption("At stake is counted in women, not money: the model has no revenue, lease or capex data.")
 
 
 def _lounge_table(r) -> None:

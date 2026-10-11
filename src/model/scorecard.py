@@ -48,7 +48,7 @@ SHRINK_AT = 0.35
 THRESHOLDS_WHY = (
     f"PROTECT at a composite of {PROTECT_AT} or more means the lounge clears the bar on most "
     f"signals, not just one. SHRINK at {SHRINK_AT} or less means it is weak on most signals. "
-    "Everything between is HOLD: with no revenue or rent data, strong calls need the signals to agree."
+    "Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree."
 )
 AXES = tuple(f.name for f in fields(Levels))     # travel, coverage, worker_share, affluence
 COMBOS = 3 ** len(AXES)                          # 81 level combinations
@@ -67,7 +67,7 @@ WEIGHT_STEPS = (0.75, 1.25)
 WEIGHT_WHY = ("The weights are a design choice, not data. Each signal's weight is moved ×0.75 and ×1.25, "
               "one at a time (8 variants); a call that changes under any of them depends on the weighting, "
               "so it is low confidence. The decision lines aren't varied: within 0.05 of one is already low.")
-NO_FINANCIALS = ("No revenue, rent or footfall data: this scores location and market position "
+NO_FINANCIALS = ("No revenue, lease or footfall data (shop rent, where shown, is context): this scores location and market position "
                  "only, not return on invested capital.")
 
 

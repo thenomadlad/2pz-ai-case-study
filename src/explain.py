@@ -227,7 +227,7 @@ GLOSSARY: dict[str, Field] = {
                           "Women's salons found by the Google Places search (all of the UAE "
                           "searched)."),
     "revenue_data_available": Field("Revenue data", "yes/no", "Per-lounge revenue or footfall."),
-    "rent_data_available": Field("Rent data", "yes/no", "Per-lounge rent, capex or lease terms."),
+    "rent_data_available": Field("Lease data", "yes/no", "Per-lounge lease terms, capex or rent actually paid (shop rent shown is an area median or a published band)."),
 }
 
 # Each argument a pyramid can make, with the facts that can back it. `prioritize` picks
@@ -570,7 +570,7 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
         "protect": f"Protect {f['protect_lounges']}.",
         "confidence": (f"{f['hold_count']} lounges sit in the HOLD band and "
                        f"{f['low_confidence_count']} calls are low confidence."),
-        "data_gaps": ("No revenue or rent data: these are location and market calls, not "
+        "data_gaps": ("No revenue or lease data: these are location and market calls, not "
                       "return-on-capital calls."),
     }[topic]
 

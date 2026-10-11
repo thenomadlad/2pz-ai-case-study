@@ -185,7 +185,8 @@ def limitations_box(r: Run) -> None:
         st.markdown("#### ⚠️ Before you trust these calls")
         st.markdown(
             "These calls are a shortlist to test with the business, not decisions.\n\n"
-            "1. **No money in the model.** No revenue, rent, capex or lease data: it scores location "
+            "1. **No money in the model.** No revenue, capex or lease data (shop rent, where shown, is an "
+            "area median or a published band, not the lease): it scores location "
             "and market position only. SHRINK means *investigate*, not *close*; a SHRINK lounge can be "
             "profitable and a PROTECT one unprofitable.\n"
             "2. **Capture comes from lifetime Google reviews.** Older salons look bigger, so new lounges "
