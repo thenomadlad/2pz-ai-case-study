@@ -12,9 +12,9 @@ Data sources and their own caveats: `data/seed/v3/SOURCES.md`. The notebooks sho
 
 ## 1. No revenue or lease data in the model
 
-The lounge scorecard has two signals: **served demand** (the women a lounge serves in a Huff split)
-and **site cost efficiency** (`cost_index`: served women per AED 1,000 of annual site cost, against its
-emirate's typical lounge). Site cost is built, not observed: shop rent x an **assumed** 150 m² unit,
+The lounge scorecard has two signals, both on the site: **site served** (the women a typical lounge
+would serve there in a Huff split) and **site cost efficiency** (`cost_index`: site-served women per
+AED 1,000 of annual site cost, against one frozen UAE-wide anchor). Site cost is built, not observed: shop rent x an **assumed** 150 m² unit,
 plus an **assumed** fit-out of AED 3,000/m² written off over 5 years. There is no revenue, no actual
 lease (rent, floor area, terms), no actual capex, no staffing and no footfall. SHRINK means "serves
 few women for what its site costs, investigate", not "loses money". A lounge can be SHRINK and
@@ -41,6 +41,9 @@ review count, times a rating factor ((rating / 4.6)^5) and a drive-time decay (1
 - **The Huff parameters are a first cut** (2026-10-11): review exponent 1, the decay steps, the rating
   elasticity and the outside option (the median supplier's pull) are starting points, not calibrated
   on where customers actually come from.
+
+The scored demand gives every lounge the median lounge's reviews and rating, so its own review count
+moves only its served women and performance vs site (context, not scored).
 
 Capture (the lounge's share of its premium substitutes' reviews) and the rating gap are still
 computed and shown on the lounge page, but they are **not scored**: served demand already uses both
@@ -72,11 +75,13 @@ has one, from the best source its emirate offers:
   emirates carry their emirate's figure, not their own.
 - The JLL mall-class bands used before 2026-10-11 are dropped.
 
-The index compares a site only with **its own emirate's typical lounge** (the median lounge where the
-emirate has 2+ with a cost; else the median evaluated growth area), so mixing sources across emirates
-never compares a Dubai contract with a northern-emirates asking rent directly. It does mean an
-emirate with one lounge (Ras Al Khaimah) is judged against areas, which measure net new women, not
-served women; Fujairah has no qualifying area, so al-taif-mall has no index and its cost scores neutral.
+The index compares every site with **one UAE-wide anchor**, frozen at baseline (`COST_ANCHOR` =
+14.34 site-served women per AED 1k, the median over the 23 scored lounges), so it never moves when a
+lounge opens, closes or grows. The old emirate-median baseline did, and left al-taif-mall (Fujairah)
+with no index; it now has one (3.86). The cost: a Dubai contract rent is compared directly with a
+northern-emirates asking rent, and **dear Dubai sites score low on cost** (four of the five Dubai
+lounges are SHRINK, mirdif-35 HOLD). The anchor must be re-frozen if the served model or site cost
+changes.
 
 - **Touches:** the cost signal (half the composite) and the growth cost check.
 - **Fix:** the actual leases; ADREC data through its API; contract (not asking) rents in the north.
@@ -152,7 +157,7 @@ Growth areas are populated cells beyond a 15-min drive of every scored lounge, o
 name (and emirate), whether its cells touch or not. Each is a **what-if: open a typical lounge** (the
 median lounge's reviews and rating) at the area's centre and count the women it would add to the
 network, net of what it takes from our own lounges. GROW needs 6,000+ net new women, worker housing
-under 50%, and cost efficiency at least the emirate's typical lounge (or unknown); WATCH is big but
+under 50%, and cost efficiency at least the UAE-wide anchor (or unknown); WATCH is big but
 dearer, big but mostly worker housing, or 3,000+ net new women; SKIP otherwise, or under 5,000 women,
 or a non-residential name. Saturation (premium reviews per 1k women) is shown as context, not tested.
 
@@ -192,8 +197,9 @@ uncalibrated elasticity.
 
 ## 10. The scorecard's anchors were calibrated on the data they score
 
-The fixed scales (0 → 20k served women, 0.5 → 1.5 cost index, and the PROTECT/SHRINK lines at
-0.65/0.35) are a quick first cut (2026-10-11) from these 23 lounges at baseline levels. They are
+The fixed scales (0 → 20k site-served women, 0.5 → 1.5 cost index around the frozen anchor, and the
+PROTECT/SHRINK lines at 0.65/0.35) are a quick first cut (2026-10-11) from these 23 lounges at
+baseline levels. They are
 judgement, not benchmarks. A different, equally defensible anchor moves lounges near the lines.
 That is why the low-confidence flag exists.
 

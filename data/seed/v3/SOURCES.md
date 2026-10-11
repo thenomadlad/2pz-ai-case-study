@@ -220,8 +220,9 @@ feature's 0.20. `rent_predicted` stays in `cell_affluence.csv` for the record an
 
 **Shop rent is our cost** (what a lounge pays for its site), not customer affluence. It feeds the
 **cost index**: site cost = shop rent x the assumed 150 m² unit (`REF_UNIT_M2`) + an assumed fit-out
-of AED 3,000/m² over 5 years (`FITOUT_WHY` in `src/features/lounges.py`); cost index = served women
-per AED 1k of site cost against the emirate's typical lounge (`COST_BASELINE_WHY`). It is one of the
+of AED 3,000/m² over 5 years (`FITOUT_WHY` in `src/features/lounges.py`); cost index = site-served
+women (areas: net new women) per AED 1k of site cost against one frozen UAE-wide anchor,
+`COST_ANCHOR` = 14.34, the median over the 23 scored lounges at baseline (`COST_ANCHOR_WHY`). It is one of the
 two scorecard signals and part of the GROW rule. Every cell gets a rent, in this order
 (`SHOP_RENT_WHY` in `src/data_v3.py`, column `shop_rent_source`):
 
@@ -277,17 +278,19 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
 4. **Served demand (Huff, `src/model/served.py`):** each cell's addressable women split across the
    premium suppliers that reach it within 20 min (our lounges + premium salons), pull = reviews x
    (rating / 4.6)^5 x drive-time decay (10 / 15 / 20 min: 1 / 0.5 / 0.25), plus an outside option
-   (the median supplier's pull). A lounge's **served women** is its share summed over cells. First
-   cut, uncalibrated.
+   (the median supplier's pull). A lounge's **served women** is its share summed over cells. Its
+   **site served** is what a typical lounge (median reviews and rating) would serve at its site, with
+   it closed and siblings and rivals open (`site_served`). First cut, uncalibrated.
 5. **Capture** = lounge reviews ÷ (lounge reviews + substitutes' reviews x recall multiplier).
    Multiplier = 1 + (share of the catchment's search circles that hit Google's cap) x
    (1 / `search_recall` − 1), with `search_recall` = 0.66 (an estimate). Shown, not scored; so are
    the rating gap, estimated customers and the absorbed share (served women siblings take over if it
    closes).
 6. **Lounge scorecard** (`src/model/scorecard.py`): two signals, each on a fixed 0-1 scale, weight 1
-   each. **Demand** = served women (0 → 20k). **Cost** = cost index, served women per AED 1k of site
-   cost against the emirate's typical lounge (0.5 → 1.5; see "Shop rent"); missing scores 0.5.
-   Composite ≥ 0.65 is PROTECT, ≤ 0.35 is SHRINK, HOLD between.
+   each, both on the site. **Demand** = site served (0 → 20k). **Cost** = cost index, site-served
+   women per AED 1k of site cost against the UAE-wide anchor (0.5 → 1.5; see "Shop rent"); missing
+   scores 0.5. Composite ≥ 0.65 is PROTECT, ≤ 0.35 is SHRINK, HOLD between. Served women / site
+   served is shown as **performance vs site**, context, not scored.
 7. **Low confidence** when the composite is within 0.05 of a line, the call **flips** in a third or
    more (27+) of the 81 combinations of the four assumption levels (travel time, coverage,
    worker-housing share, affluence elasticity), or a signal weight ±25% changes it. High confidence
@@ -298,7 +301,7 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
    (`src/features/lounges.py`, `src/model/growth.py`). Each is a **what-if: open a typical lounge**
    (median reviews and rating) at its centre. GROW = at least 6,000 **net new** women (served minus
    what it takes from our lounges) with worker housing under 50% of adults, **and** a cost index ≥ 1
-   (or unknown). WATCH = big but dearer, big but mostly worker housing, or 3,000+ net new women. SKIP
+   (net new women per AED 1k against the same UAE-wide anchor, or unknown). WATCH = big but dearer, big but mostly worker housing, or 3,000+ net new women. SKIP
    otherwise, or under 5k women, or non-residential by name (industrial, free zone, military,
    airport, port). Premium reviews per 1k women (saturation) is shown as context, not tested.
 

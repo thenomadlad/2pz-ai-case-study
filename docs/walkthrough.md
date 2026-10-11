@@ -64,10 +64,12 @@ The map draws its drive polygon, catchment cells and premium substitutes, and a 
 the legend with the short pyramid, its top drivers and the caveats. Click **Open the lounge page →**
 ([`/lounge?lounge=delma`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=delma)).
 
-**What.** Kim Tower, Delma Street, Al Nahyan, Abu Dhabi. *Composite 0.04 · confidence high · the
-call changes in 0 of 81 assumption combinations.* It serves about **1,700 women** in the Huff split
-(demand scale 0 → 20k) at a cost index of **0.21**: about a fifth of the women per AED 1k of site
-cost that Abu Dhabi's typical lounge serves (scale 0.5 → 1.5). Both signals score near 0.
+**What.** Kim Tower, Delma Street, Al Nahyan, Abu Dhabi. *Composite 0.05 · confidence high · the
+call changes in 0 of 81 assumption combinations.* A typical lounge at its site would serve about
+**1,900 women** in the Huff split (demand scale 0 → 20k) at a cost index of **0.42**: under half the
+women per AED 1k of site cost of the typical lounge site, UAE-wide (scale 0.5 → 1.5). Both signals
+score near 0. The page also says *The model estimates this lounge is performing 0.9x compared to its
+site*: context, not scored.
 
 **The two signals.** *The two signals, on fixed scales* shows each value, its scale and why the
 anchors were set there; the factor table at the bottom gives each signal's contribution to the

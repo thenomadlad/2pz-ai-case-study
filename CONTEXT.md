@@ -46,9 +46,10 @@ A site's annual cost in AED 1k (`site_cost_k`): shop rent x an assumed 150 m² u
 fit-out of AED 3,000/m² written off over 5 years.
 
 **Cost index**:
-Served women (for an area: net new women) per AED 1k of site cost, against its emirate's typical
-lounge: the median lounge where the emirate has 2+ with a cost, else the median evaluated growth area
-(`cost_index`; 1 = typical). The scorecard's cost signal and part of the GROW rule.
+Site-served women (for an area: net new women) per AED 1k of site cost, against one UAE-wide
+anchor frozen at baseline (`COST_ANCHOR` = 14.34, the median over the 23 scored lounges;
+`cost_index`; 1 = typical). It never moves when lounges open, close or the levels change. The
+scorecard's cost signal and part of the GROW rule.
 _Avoid_: ROI, return, profitability
 
 **Women per rent**:
@@ -70,9 +71,18 @@ _Avoid_: premium women, target market, weighted demand (unqualified)
 **Served women**:
 The addressable women a lounge serves in the Huff split: each cell's women divided across the premium
 suppliers that reach it within 20 min (our lounges and premium salons, pull = reviews x a rating
-factor x drive-time decay) plus an outside option, summed over cells (`served_women`). The
-scorecard's demand signal.
+factor x drive-time decay) plus an outside option, summed over cells (`served_women`). Context,
+not scored.
 _Avoid_: catchment women, customers
+
+**Site served**:
+The women a typical lounge (median reviews and rating) would serve at a lounge's site, with that
+lounge closed and siblings and rivals open (`site_served`). The scorecard's demand signal: it judges
+the site, not the lounge.
+
+**Performance vs site**:
+Served women / site served (`performance_vs_site`). Context, not scored: "The model estimates this
+lounge is performing 2.7x compared to its site."
 
 **Net new women**:
 For a growth area: the women a typical new lounge at its centre would serve, minus what it takes from
