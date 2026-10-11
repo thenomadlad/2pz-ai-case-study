@@ -61,8 +61,8 @@ WEIGHT_STEPS = (0.75, 1.25)
 WEIGHT_WHY = ("The weights are a design choice, not data. Each signal's weight is moved ×0.75 and ×1.25, "
               "one at a time (8 variants); a call that changes under any of them depends on the weighting, "
               "so it is low confidence. The decision lines aren't varied: within 0.05 of one is already low.")
-NO_FINANCIALS = ("No revenue, lease or footfall data (shop rent, where shown, is context): this scores location and market position "
-                 "only, not return on invested capital.")
+NO_FINANCIALS = ("No revenue, lease or footfall data: site cost is an area shop rent (150 m² assumed) plus assumed fit-out, "
+                 "so this scores location, market and cost efficiency, not return on invested capital.")
 
 
 def score(signal: Signal, value: float | None) -> float:

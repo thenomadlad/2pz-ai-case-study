@@ -186,23 +186,26 @@ def limitations_box(r: Run) -> None:
         st.markdown("#### ⚠️ Before you trust these calls")
         st.markdown(
             "These calls are a shortlist to test with the business, not decisions.\n\n"
-            "1. **No money in the model.** No revenue, capex or lease data (shop rent, where shown, is an "
-            "area median or a published band, not the lease): it scores location "
-            "and market position only. SHRINK means *investigate*, not *close*; a SHRINK lounge can be "
-            "profitable and a PROTECT one unprofitable.\n"
-            "2. **Capture comes from lifetime Google reviews.** Older salons look bigger, so new lounges "
-            "(noya-plaza, 215 reviews) look weak partly because they are new. Reviews are a proxy for "
-            "customers, not a count.\n"
-            "3. **Affluence is observed in Dubai only.** Demand weights each woman by her cell's median "
-            f"household rent (DLD, 3 months), and only {len(data.rents())} Dubai cells have one: every lounge and growth "
-            "area outside Dubai is weighted neutral, so Dubai-vs-elsewhere comparisons mix weighted and "
-            "unweighted demand. Rent is not income or salon spend.\n"
+            "1. **No revenue or lease data in the model.** Site cost is shop rent x an assumed 150 m² unit "
+            "plus an assumed fit-out (AED 3,000/m² over 5 years); the rent is an area median, a district "
+            "rate or an asking rent, not the lease. No revenue, lease terms, actual capex or footfall: it "
+            "scores served demand and cost efficiency only. SHRINK means *investigate*, not *close*; a "
+            "SHRINK lounge can be profitable and a PROTECT one unprofitable.\n"
+            "2. **Served demand leans on lifetime Google reviews.** Each salon's pull in the Huff split is "
+            "its review count, so older salons look bigger and new lounges (noya-plaza, 215 reviews) look "
+            "weak partly because they are new. Reviews are a proxy for customers, not a count.\n"
+            "3. **Shop rent comes from different sources per emirate.** Dubai: DLD Ejari shop contracts; "
+            "Abu Dhabi: ADREC 2025 district street-retail rates, read by hand off its public map; northern "
+            "emirates: Property Finder / Bayut asking rents scraped via third-party Apify actors (a grey area "
+            "under those portals' terms; asking rents run above achieved ones); gaps take the "
+            "emirate median. The cost index only compares a site with its own emirate's typical one. "
+            "Affluence weighting is off: every woman counts the same.\n"
             f"4. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
-            "lounges are low confidence: near a threshold, a thin market, no rating gap (missing rating or no rated substitutes), a call "
+            "lounges are low confidence: near a threshold, a call "
             f"that changes in {scorecard.FLIP_LOW}+ of the {scorecard.COMBOS} assumption combinations, or one that "
             "changes when a signal weight moves ±25%. Try the what-if panel below.\n"
-            f"5. **Growth areas are a first cut.** Competitor data is partial and the saturation line "
-            f"is set from our own lounges' catchments (their lightest quarter). {sharjah} of {len(grow)} GROW areas are in Sharjah "
+            f"5. **Growth areas are a first cut.** Each is a what-if (open a typical lounge, count the net new "
+            f"women); the Huff parameters are uncalibrated starting points and competitor data is partial. {sharjah} of {len(grow)} GROW areas are in Sharjah "
             "emirate but beyond a 15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), "
             "both on the Dubai side. Why the footprint there is only two lounges is a business question: "
             "the model can't see licensing, brand fit, landlord terms or customer mix.")
@@ -235,7 +238,7 @@ def lounge_caveats(f: LoungeFeatures, d: Decision, flips: int | None) -> list[st
     if f.branch_id == "mirdif-35":
         out.append("Market overstated: worker housing not mapped as industrial in OpenStreetMap "
                    "(Dubai Investment Park, very likely Sonapur) counts as ordinary housing here.")
-    return out + d.caveats[:1]      # no money in the model, last: it applies to every lounge
+    return out + d.caveats[:1]      # no revenue or lease data, last: it applies to every lounge
 
 
 def area_caveats(a: Area, d: AreaDecision) -> list[str]:
@@ -260,8 +263,8 @@ def area_caveats(a: Area, d: AreaDecision) -> list[str]:
 
 def affluence_caveat(coverage: float) -> str:
     if not coverage:
-        return "No observed rents outside Dubai: weighted neutral."
-    return (f"Affluence unknown here: weighted neutral. Only {coverage:.0%} of these women live in "
+        return "Affluence what-if only (off at baseline): no observed rents outside Dubai, so weighted neutral."
+    return (f"Affluence what-if only (off at baseline): weighted neutral here. Only {coverage:.0%} of these women live in "
             f"cells with an observed rent (DLD rents cover {len(data.rents())} Dubai cells; nowhere else), "
             "so the rest count as average.")
 
@@ -272,10 +275,11 @@ def affluence_metrics(raw: float, addressable: float, rent: float | None, covera
     cols[0].metric("Women 15+ (raw)", f"{raw:,.0f}")
     cols[1].metric("Addressable women", f"{addressable:,.0f}", f"{addressable / raw - 1:+.0%}" if raw else None,
                    delta_color="off")
-    cols[1].caption("Weighted by affluence: the demand that counts.")
+    cols[1].caption("Women x an affluence weight. Affluence is off at baseline (weight 1), so this equals "
+                    "the raw count unless the affluence what-if is on.")
     cols[2].metric("Affluence rent (median, AED/yr)", "no data" if rent is None else f"{rent:,.0f}")
-    cols[2].caption(f"{coverage:.0%} of the women live in cells with an observed Dubai rent; "
-                    "the rest are weighted neutral.")
+    cols[2].caption(f"{coverage:.0%} of the women live in cells with an observed Dubai rent (DLD household "
+                    "rents; used only by the affluence what-if).")
 
 
 def render_caveats(title: str, items: list[str], strong: bool) -> None:

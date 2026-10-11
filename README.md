@@ -2,8 +2,8 @@
 
 A decision-support app for Bedashing Beauty Lounge's UAE network. It scores each of the 24 lounges
 **PROTECT / HOLD / SHRINK** and each populated area beyond a 15-minute drive of every lounge
-**GROW / WATCH / SKIP**, from drive-time catchments, a women-15+ market estimate (weighted by affluence where Dubai rents
-are known) and Google Places competitors. Every call comes with an AI-written explanation, and every number in that explanation
+**GROW / WATCH / SKIP**, from a women-15+ market estimate, drive-time reach, Google Places competitors
+(a Huff split of each cell's women across our lounges and premium salons) and a rent-based site cost. Every call comes with an AI-written explanation, and every number in that explanation
 is checked against the data.
 
 **Live app:** https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/
@@ -11,20 +11,20 @@ is checked against the data.
 ## Look at this in 5 minutes
 
 1. **[Overview](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the COO's
-   question, the executive summary and three at-stake figures (5 SHRINK lounges, 233,883 women in
-   shared cells; 5 GROW areas, 261,797 women).
-2. **Tick "All catchments (overlap)"** above the map: the red cells shared by 2+ lounges are the
-   SHRINK story; the PROTECT lounges sit alone.
+   question, the executive summary and three at-stake figures (at the 2026-10-11 baseline: 9 SHRINK
+   lounges, about 635k women in shared cells; 34 GROW areas, about 824k women).
+2. **Tick "All catchments (overlap)"** above the map: the Abu Dhabi city cluster, where siblings
+   and premium salons split the same women, holds 5 of the 9 SHRINKs.
 3. **[delma](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=delma)
-   (SHRINK):** the AI pyramid with *so what / now what*, the factor table's contributions, which
-   siblings share its women, and *What would change the call* (shared catchment 98% → 55% makes it
-   HOLD). High confidence: it holds in all 81 assumption combinations.
+   (SHRINK):** it serves about 1.7k women in the Huff split, at 0.21x Abu Dhabi's typical cost
+   efficiency. The AI pyramid with *so what / now what*, the factor table's contributions, which
+   siblings share its women and *What would change the call*. High confidence: it holds in all 81
+   assumption combinations.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah)
-   (GROW):** 27,638 addressable women against a 20,000 line, 44 premium reviews per 1k against 150;
-   high confidence.
-5. **The fallback:** in the Overview's **🧪 What if…?** panel set travel time to 20 min and reopen
-   mohammed-bin-zayed-city from its map panel: it turns HOLD (0.36) and the text switches to the
-   labelled template.
+   (GROW):** a typical new lounge there would add about 12.5k net new women against a 6,000 line,
+   at 2.6x Sharjah's typical cost efficiency; high confidence.
+5. **The fallback:** change anything in the Overview's **🧪 What if…?** panel (say travel time 20
+   min, or close a lounge): where the numbers change, the text switches to the labelled template.
 6. **[How it works & limitations](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how)**,
    then the limitations below.
 
@@ -36,17 +36,21 @@ The full ten-minute version, with the AI layer and where not to trust it:
 This is a first pass we will iterate on. The calls are **a shortlist to test with the business, not
 decisions**, and the limitations matter more than the calls. The biggest ones:
 
-- **No money in the model.** No revenue, capex or lease data (shop rent is shown for 9 lounges, as an area median or a published band, not scored): it scores location and market
-  position only. **SHRINK means "investigate", not "close".**
-- **Capture rests on lifetime Google review counts.** Older salons look bigger, new lounges look
-  weak, and big crowded markets show tiny shares.
-- **Affluence is observed in Dubai only.** Demand weights women by their cell's median household
-  rent (DLD, 3 months), which exists for 241 Dubai cells; everywhere else is weighted neutral, so
-  Dubai and the other emirates are not compared like for like.
-- **The calls move with the assumptions.** 10 of the 23 scored lounges are low confidence; travel
-  time (10/15/20 min) matters most.
-- **Catchments are midday drive times with no distance decay**, and the competitor search misses
-  smaller salons where Google's 20-result cap bites.
+- **No revenue or lease data in the model.** The cost signal is built from a shop rent (an area
+  median, a district rate or an asking rent, not the lease) on an assumed 150 m² unit plus an assumed
+  fit-out. No revenue, lease terms, actual capex or footfall. **SHRINK means "investigate", not
+  "close".**
+- **Served demand rests on lifetime Google review counts.** Each salon's pull in the Huff split is
+  its reviews, so older salons look bigger and new lounges look weak; the Huff parameters are an
+  uncalibrated first cut.
+- **Shop rent comes from different sources per emirate.** DLD contracts (Dubai), ADREC district
+  rates read by hand off its public map (Abu Dhabi), Property Finder / Bayut asking rents scraped
+  via third-party Apify actors, a grey area under those portals' terms (northern emirates), else the
+  emirate median. The cost index only compares a site with its own emirate.
+- **The calls move with the assumptions.** 7 of the 23 scored lounges are low confidence (mostly
+  near a line). Affluence weighting is off at baseline: every woman counts the same.
+- **Drive times are midday**, and the competitor search misses smaller salons where Google's
+  20-result cap bites.
 - **The anchors and thresholds are judgement**, set from the same data they score.
 
 The full ranked list, with which calls each limitation touches and what would fix it:
@@ -72,17 +76,16 @@ Each label maps to a decision the COO already makes (definitions: [`CONTEXT.md`]
 | **No action** | **SKIP** | Too small or already crowded. (The airport lounge is NOT SCORED: it serves travellers.) |
 
 **North star: services delivered**, the demand our lounges actually serve, bounded by their
-capacity. The model can't measure it yet. Its nearest proxy is **estimated women captured**
-(capture x addressable women), which the lounge factor table shows but the scorecard doesn't use.
-**Capacity is not modelled at all** (no chairs, hours or utilisation), so the model can't tell a
-full lounge from an empty one, and a SHRINK is driven by raw catchment overlap, not by services
-that would be lost. Read the calls with that in mind.
+capacity. The model can't measure it yet. Its nearest proxy is **served women** (the Huff split),
+the scorecard's demand signal. **Capacity is not modelled at all** (no chairs, hours or
+utilisation), so the model can't tell a full lounge from an empty one, and a SHRINK is driven by
+modelled demand and site cost, not by services that would be lost. Read the calls with that in mind.
 
 **One flow, question to action.** *"Which Abu Dhabi lounges should we review before their
-leases?"* → Overview: the summary and map show 5 SHRINKs, all in Abu Dhabi city → click
-**delma** → its page: 98% of its women are also reached by a sibling (the shared-women table
-names which: khaleej-al-arabi 73%, ministries-complex 69%), capture is 2%, and the call is high
-confidence: it holds in all 81 assumption combinations → action: put delma on the lease-review
+leases?"* → Overview: the summary and map show 9 SHRINKs, 5 of them in Abu Dhabi city → click
+**delma** → its page: it serves about 1.7k women at 0.21x Abu Dhabi's typical cost efficiency, 98%
+of its catchment women are also reached by a sibling (the shared-women table names which), and the
+call is high confidence: it holds in all 81 assumption combinations → action: put delma on the lease-review
 list with the sibling named, and ask finance for its P&L before anyone says "close".
 
 **Why a hosted web app.** The COO opens a link: nothing to install, and every lounge and area has
@@ -103,29 +106,20 @@ thinner or new. Out of scope:
 
 ## What it currently says
 
-At the baseline (medium levels: 15-min drive, 60% competitor coverage, 5.5% women in worker
-housing, affluence elasticity 0.5):
+At the baseline (2026-10-11: 15-min drive, 60% competitor coverage, 5.5% women in worker housing,
+affluence off):
 
-- **Lounges:** 3 PROTECT (al-ain, al-taif-mall, ras-al-khaimah), 15 HOLD, 5 SHRINK, 1 NOT SCORED
-  (the airport lounge serves travellers). **10 of 23** calls are low confidence.
-- **The 5 SHRINKs are all Abu Dhabi city lounges** (delma, khaleej-al-arabi,
-  mohammed-bin-zayed-city, noya-plaza, westyas): 98-100% of their women are also reached by
-  a sibling, and capture is middling to low. One of them (mohammed-bin-zayed-city) flips
-  to HOLD in 54 of the 81 assumption combinations. Investigate, don't cut. shahama was a SHRINK
-  until the airport lounge stopped counting as its sibling and substitute; it is now a
-  low-confidence HOLD, 0.03 above the line. al-maqta was a SHRINK until the rating gap moved from
-  the top-k substitutes' median to the whole premium pool's (sanity check SC4); it is now HOLD by
-  0.003 (composite 0.353), a knife-edge call flagged low confidence.
-- **Growth areas:** 5 GROW (Sharjah, Al Dhaid, Khor Fakkan and Kalba in Sharjah emirate, Al Jerf
-  in Ajman; 262k women between them), and 36 WATCH, out of 413 growth areas. The Sharjah four are beyond a 15-minute drive of Bedashing's two Sharjah
-  lounges (al-jada, zawaya-walk, both on the Dubai side); why the footprint is only two is a business
-  question the model can't answer (licensing, brand fit, landlords). **Al Awir (Dubai)** is a WATCH
-  whose size passes only on thin affluence data: 19.4k women, 20.1k addressable, from one DLD area
-  (65 villa-heavy contracts) covering 38% of its women, so it is capped at WATCH.
-- **Affluence changes no call at medium or strong.** The four big Dubai lounges sit above the 200k
-  demand anchor either way; jumeirah-park and zawaya-walk move by under 0.02 and neither crosses a
-  line. That is partly by design (see limitations 3): the weighting only reshuffles demand inside
-  Dubai, and all 5 SHRINKs are in Abu Dhabi, where it sees nothing.
+- **Lounges:** 5 PROTECT (al-ain, al-dhafra, khalifa-city-a, shakhbout-city, al-falah), 9 HOLD,
+  9 SHRINK, 1 NOT SCORED (the airport lounge serves travellers). **7 of 23** calls are low confidence.
+- **The 9 SHRINKs:** 5 Abu Dhabi city lounges (noya-plaza, delma, khaleej-al-arabi, westyas,
+  mohammed-bin-zayed-city), three Dubai lounges (city-walk, jumeirah-park, al-barsha) and al-jada in
+  Sharjah. They serve few women for what their sites cost against their emirate's typical lounge.
+  al-barsha and al-jada are low confidence, near the line. Investigate, don't cut.
+- **Growth areas:** 34 GROW and 63 WATCH out of 561. GROW is in Abu Dhabi (14), Sharjah (11), Ajman
+  (5), Ras Al Khaimah (3) and Dubai (1, Al Awir). Most of the Sharjah ones are beyond a 15-minute drive
+  of Bedashing's two Sharjah lounges (al-jada, zawaya-walk, both on the Dubai side); why the footprint
+  there is only two is a business question the model can't answer (licensing, brand fit, landlords).
+  The northern-emirates cost checks use scraped asking rents (see limitations).
 
 Treat these as the places to look first, not as answers.
 
@@ -157,10 +151,10 @@ Four pages; the loop is **Overview → click a lounge or area → its page → b
    caveats. **Compare** has a sortable **Lounges** table and a **Growth areas, ranked** table.
 2. **Lounges** (`/lounge?lounge=delma`): a picker filtered by emirate checkboxes (Abu Dhabi and
    Dubai ticked, plus any emirate with a PROTECT lounge; a link ticks its own emirate), then address and rating, the call with its pyramid
-   and caveats, raw vs addressable women, the four signals on their scales, premium substitutes,
+   and caveats, raw vs addressable women, the two signals on their scales, premium substitutes,
    which siblings share its women, *What would change the call*, and the factor table (value,
    threshold, meaning, contribution to the composite) with its sources.
-3. **Areas** (`/area?area=kalba-sharjah`): a picker of the 68 areas with 5,000+ women, with the
+3. **Areas** (`/area?area=kalba-sharjah`): a picker of the areas with 5,000+ women, with the
    same emirate checkboxes (plus any emirate with a GROW area ticked), then the call against its tests, the margins that would move it, a map
    of its cells, the nearest lounge and the factor table.
 4. **How it works & limitations:** the ranked limitations, the market model, every assumption with
@@ -364,8 +358,7 @@ supporting arguments, each backed by 2-5 data points from the fact sheet.
 - **No key needed to see it.** Explanations are cached in `data/explanations/cache.json`, keyed by a
   hash of the exact numbers, so a stale one is never served; a what-if with changed numbers gets the
   template. The committed explanations were written in a Claude Code session from the same prompts
-  the API would get, not by the API, for the current baseline (with the affluence weighting):
-  65 explanations, all passing the grounding check. NOT SCORED and SKIP always use the template.
+  the API would get, not by the API, for the current baseline, all passing the grounding check. NOT SCORED and SKIP always use the template.
 - **Regenerate** after changing the model or data: `just explain` (API, needs `ANTHROPIC_API_KEY`),
   or offline with `python -m src.explain prompts DIR` → write the answers → `check DIR` → `ingest DIR`
   (see `justfile`).
@@ -399,7 +392,7 @@ filling each gap would cost: [`docs/data-inventory.md`](docs/data-inventory.md).
 | 2,373 ~2 km cells: adults, worker-housing adults | WorldPop 2025, OSM industrial land, Dubai Statistics Center (calibration) | `cells.csv`, `emirates.csv`, `dubai_community_gender.csv` |
 | Drive-time catchments, 10/15/20 min | Mapbox isochrones | `lounge_isochrones.geojson`, `catchment_cells.csv`, `cell_isochrones.geojson` |
 | Median household rent per DLD area, mapped to 241 Dubai cells (Ejari contracts registered 2026-07-10 to 2026-10-09) | Dubai Land Department open data, downloaded by hand 2026-10-10 (captcha, 3-month cap) | `dubai_rents_by_area.csv`, `cell_affluence.csv` |
-| Shop rent: median AED/m²/yr per DLD area over 13,621 single-unit shop contracts (243 Dubai cells), plus published Abu Dhabi mall-class bands for 4 lounges | DLD open data (same download); JLL UAE Retail Market Dynamics Q2 2025 | `dubai_shop_rents_by_area.csv`, `cell_shop_rent.csv`, `retail_rent_bands.csv`, `lounge_site_class.csv` |
+| Shop rent (our site cost): Dubai, median AED/m²/yr per DLD area over 13,621 single-unit shop contracts; Abu Dhabi, ADREC 2025 street-retail rates for 111 districts; northern emirates, shop asking rents from 1,206 listings; else the emirate median | DLD open data (same download); ADREC public map, values read by hand 2026-10-11 (its data service refuses queries); Property Finder / Bayut, scraped 2026-10-11 via third-party Apify actors (a grey area under the portals' terms of service) | `dubai_shop_rents_by_area.csv`, `cell_shop_rent.csv`, `adrec_retail_rent_2025.csv`, `listing_rents_clean.csv`, `cell_listing_rent.csv` |
 | Built form per cell (residential, villa, tower, green shares; height), 2018: tested as a UAE-wide rent proxy and rejected (CV R² −0.10) | EU JRC GHSL R2023A | `cell_built_form.csv` |
 | 5,924 salons found (3,833 women's salons kept) around lounges and growth cells | Google Places nearby search | `salons.csv`, `lounge_candidates*.csv`, `growth_salons.csv`, `search_circles.csv` |
 
@@ -424,17 +417,17 @@ Tunable values: [`data/scenarios/baseline.yaml`](data/scenarios/baseline.yaml).
 
 | Chose | Gave up | Why |
 |---|---|---|
-| 15-min drive-time catchments (Mapbox, midday) | Straight-line radii; a Huff gravity model | Travel time is what a customer feels; Huff needs a decay rate we have no data to calibrate (it is the listed next step, limitations 5) |
+| Huff served demand over Mapbox drive-time bands (midday) | Hard catchments; straight-line radii | Travel time is what a customer feels, and Huff splits shared cells instead of counting them twice; its decay is uncalibrated (limitations 2, 5) |
 | ~2 km WorldPop grid cells | Official neighbourhoods | OSM neighbourhoods cover 66% of Dubai's women and none of Fujairah |
 | Google Places popularity circles (858 calls) | One text search per lounge; OSM | Small circles found 17 of the true top-20 premium salons, one text search 0-2 |
-| Capture among premium substitutes covering 60% of reviews | A fixed top-k; splitting every cell among every salon | Comparable across dense and thin markets; ~72-144 calls instead of ~2,100 |
+| Capture shown, not scored | Scoring capture beside served demand | Huff already splits each cell by reviews, so scoring capture too double-counted competition |
 | Lifetime review counts | Reviews per year | Per-year needs a full review scrape, unaffordable and against Google's terms |
 | Fixed-scale signals, absolute thresholds | Ranking into thirds (the v1 model) | No forced SHRINKs; a lounge's score doesn't move when a sibling opens or closes |
-| Affluence from DLD rents, Dubai only | A UAE-wide built-form proxy | The proxy didn't predict rent (CV R² −0.10); neutral beats wrong |
+| Affluence weighting off | DLD-rent weighting in Dubai; a UAE-wide built-form proxy | Dubai-only weighting changed no call; the proxy didn't predict rent (CV R² −0.10); every woman counting the same beats one emirate on different rules |
 | Rules decide, Claude explains | An LLM classifier (deleted in v2) | Calls are deterministic and auditable; the AI can only phrase them |
 | Explanations written offline in Claude Code | Generating via the API | No API spend; same prompts, same grounding check |
 | Search recall 0.66, estimated on one tile | A full sweep of capped circles (~$54-210) | Declined on cost; stated as an estimate and an upper bound |
-| Location and market only | Any money: revenue, ROIC (shop rent is shown, not scored) | No revenue or lease data; SHRINK means investigate |
+| A rent-based site cost, no revenue | Revenue, ROIC | No revenue or lease data; shop rent on an assumed unit and fit-out is the only money. SHRINK means investigate |
 
 ## Decisions & hardest parts
 
@@ -444,20 +437,22 @@ something end to end to critique. In hindsight that was the wrong first problem:
 Dubai "branches", 4 of which don't exist. The real data (all 24 lounges, WorldPop, Mapbox, Google
 Places) came only on 2026-10-08 to 09, and the model was rebuilt on it.
 
-**What we simplified.** Midday drive times with no distance decay; a cell is in a catchment if its
-centre is; lifetime reviews as each salon's draw; capture within the premium end only; Bedashing's
-price level assumed; affluence observed in Dubai only; one lounge format; no revenue and no capacity, and shop rent shown but not scored (Dubai area medians, Abu Dhabi mall bands, an assumed 150 m² unit);
+**What we simplified.** Midday drive times with a stepped, uncalibrated decay; lifetime reviews as
+each salon's draw; the premium end only; Bedashing's price level assumed; affluence off; one lounge
+format; no revenue and no capacity; site cost from a shop rent (Dubai contract medians, Abu Dhabi
+hand-read district rates, northern asking rents) on an assumed 150 m² unit and fit-out;
 growth areas merged by OSM place name, with cells that have no place within 3 km left out of them.
 
 **How we abstracted.** Space: ~2 km cells carrying women 15+, grouped into drive-time catchments
-and, outside them, into growth areas by OSM place name (one per name, contiguous or not). Lounges: four signals on fixed 0-1 scales,
-weighted into one composite, cut at 0.35 and 0.65 into three labels. Areas: two yes/no tests
-(big enough, unsaturated) into three labels.
+and, outside them, into growth areas by OSM place name (one per name, contiguous or not). Lounges: two signals (served demand, site cost
+efficiency) on fixed 0-1 scales, weighted into one composite, cut at 0.35 and 0.65 into three
+labels. Areas: a what-if (open a typical lounge) tested on net new women, worker housing and cost
+efficiency, into three labels.
 
 **What we trust, and what we don't.** Trusted: lounge locations (Google's pins; the store locator's
-were off by up to 16 km), adult population, drive times. Not trusted: absolute capture (lifetime
-reviews, an estimated recall correction), Google price levels (36% coverage), the women split
-outside Dubai, any affluence outside Dubai. And we didn't trust the AI to make the calls.
+were off by up to 16 km), adult population, drive times. Not trusted: absolute served women (lifetime
+reviews, uncalibrated Huff parameters, an estimated recall correction), Google price levels (36%
+coverage), the women split outside Dubai, shop rents that are asking rents or emirate medians. And we didn't trust the AI to make the calls.
 
 **What we automated.** The what-if: every call recomputes in memory, and each lounge's call is
 re-run over all 81 assumption combinations to grade confidence. The grounding check on every
@@ -471,8 +466,8 @@ Every assumption with its source (table below), every constant with its reason (
 the limitations, ranked, first.
 
 **What we shipped, and what we didn't.** Shipped: the live app on all 24 lounges in five
-emirates, 65 grounded explanations, notebooks per stage, the ranked limitations. Not shipped: any
-money or ROIC view, capacity, a free-text question box (the AI only explains precomputed calls),
+emirates, grounded explanations, notebooks per stage, the ranked limitations. Not shipped: a
+revenue or ROIC view, capacity, a free-text question box (the AI only explains precomputed calls),
 rush-hour catchments, a full competitor sweep, Bedashing's real price level.
 
 ## Repo map
@@ -482,13 +477,14 @@ streamlit_app.py         entry point; pages in src/webapp/pages/ (overview, loun
 src/webapp/              map layers, shared rendering, the what-if panel
 src/data_v3.py           loads data/seed/v3/
 src/market.py            women 15+ per cell, affluence weight, premium substitutes, capture
-src/features/lounges.py  catchments, lounge features, growth areas
+src/model/served.py      Huff served demand, leave-one-out, open-a-lounge what-if
+src/features/lounges.py  catchments, lounge features, site cost and cost index, growth areas
 src/model/scorecard.py   lounge signals, scales, weights, thresholds, confidence (with the reasons)
 src/model/growth.py      GROW / WATCH / SKIP tests (with the reasons)
 src/baseline.py          one in-memory run per what-if, and its diff against the baseline
 src/explain.py           fact sheets, prioritisation, grounding check, cache, prompts
-scripts/                 one-off fetches (Google Places, Mapbox, WorldPop/OSM cells, GHSL, DLD rents)
-notebooks/               market_size, catchments, competitors, affluence, features, decisions, explanations, branches
+scripts/                 one-off fetches and builds (Google Places, Mapbox, WorldPop/OSM cells, GHSL, DLD rents, shop rents)
+notebooks/               market_size, catchments, competitors, served_demand, rent, scorecard, growth, branches; features/: affluence, features, decisions, explanations
 docs/limitations.md      ranked limitations: read first
 docs/remaining.md        build log and decision register (historical)
 CONTEXT.md               glossary of domain terms
@@ -508,7 +504,7 @@ be replaced with better data.
 | 2 | **Where each lounge is** | Google Maps pin, not the store locator's | The locator's pins are off by up to 16 km (Shahama 15.9, Al Ain 8.4, Nad Al Sheba 4.8 km); its street addresses agree with Google | in data |
 | 3 | **Catchment = drive time** a customer will travel | 10 / **15** / 20 min (low / medium / high), Mapbox typical traffic at a weekday 12:00 departure. Competitors are searched within **2x** (30 min at medium): any salon a catchment resident can reach in 15 min is at most 30 min from the lounge | BrightLocal 2014 (US, 800+ consumers): ~14 min to a hair/beauty salon, women ~5 min more than men. Retail trade-area practice: the primary trade area (50-80% of customers) is a 5-15 min drive. No UAE-specific survey found. TomTom 2025: a Dubai trip takes ~40% longer at evening rush (27 vs 19 min per 10 km), so real catchments are smaller after work | in data |
 | 4 | **Market size** of each ~2 km grid cell | Women aged 15+ | Only relative size matters. WorldPop 2025 gives adults per 100 m but a flat 33.6% female share everywhere, so the split is redone (row 13). Grid cells, not official neighbourhoods: OSM neighbourhoods cover only 66% of Dubai's women and none of Fujairah | in data |
-| 5 | **How Bedashing's share is estimated** | **Capture** = the lounge's Google reviews ÷ (its reviews + its premium substitutes' reviews x a recall correction), inside its 15-min catchment. Estimated customers = capture x catchment women | Reviews stand in for each salon's draw (revealed preference). Other Bedashing lounges count as substitutes, so overlapping lounges split shared demand. It measures share among premium substitutes, not market penetration. Rejected: splitting every cell among every salon that reaches it (~2,100 Google calls vs 72-144) | in data |
+| 5 | **How Bedashing's share is estimated** | **Capture** = the lounge's Google reviews ÷ (its reviews + its premium substitutes' reviews x a recall correction), inside its 15-min catchment. Estimated customers = capture x catchment women. Shown, not scored: served demand (Huff) replaced it | Reviews stand in for each salon's draw (revealed preference). Other Bedashing lounges count as substitutes, so overlapping lounges split shared demand. It measures share among premium substitutes, not market penetration. Rejected: splitting every cell among every salon that reaches it (~2,100 Google calls vs 72-144) | in data |
 | 6 | **Review counts are lifetime totals** | Google `userRatingCount`, not adjusted for age | Older salons have had longer to collect reviews: a stated limitation. Partly a fair signal too: years of trading build a customer base. Per-year rates were considered and dropped: Google can't sort reviews oldest-first, so the first review needs a full scrape (unaffordable for competitors, and against Google's terms) | in data |
 | 7 | **Ratings don't separate lounges** | Not used as an absolute quality score | Google ratings for the 24 lounges span 4.4-4.9 (median 4.6, std 0.12); 17 of 24 sit at 4.5 or 4.6. No link to review count (Spearman ρ = −0.22, p = 0.30) | in data |
 | 8 | **Bedashing's price segment** | `expensive` (assumed) | Google has no price level for Bedashing's lounges; to be revisited from its own menu | set |
@@ -518,7 +514,7 @@ be replaced with better data.
 | 12 | **Airport lounge** | Gets no call (NOT SCORED), and is left out of every lounge's overlap, substitutes and nearest-lounge | It serves travellers, not a neighbourhood | set |
 | 13 | **Female share in worker housing** | Adults in OSM industrial land use are 5.5% female (low 1% / high 15%); every other cell is rebalanced so each emirate's female total is unchanged | Dubai Statistics Center 2022: 13 labour-camp communities are 0.1-27% female (5.5% population-weighted), residential ones 43-54%. Against 21 measured communities, error falls from 0.21 (WorldPop's flat 33.6%) to 0.13. Camps not mapped as industrial in OSM are missed (DIP, very likely Sonapur), so Mirdif-35's market is overstated | in data |
 | 14 | **Search recall (estimate)** | Where our search hit Google's 20-result cap, it found **66%** of premium reviews; substitutes' reviews are scaled by 1 + (share of full circles) x (1/0.66 − 1), from 1.03 to 1.39 | Calibrated on one fully swept ~8 km tile around Al Barsha (28.6k of 43.7k premium reviews found). An upper bound (that sweep missed salons too), and it assumes other dense areas behave like Al Barsha. Splitting the full circles instead was costed at ~$54-210 and declined. To be replaced if a full sweep is run | estimate |
-| 15 | **Affluence = median household rent** | DLD Ejari contracts for one flat, villa or studio (labour camps, staff housing and bulk leases out), median per DLD area, mapped to cells by name; observed for 241 Dubai cells, neutral (1) everywhere else | Free, official and recent; rent is housing cost, not income or salon spend, and covers 3 months of registrations. A UAE-wide proxy from 2018 built form failed (CV R² −0.10). Abu Dhabi's ADREC data refused queries (HTTP 403); Sharjah publishes none | in data (Dubai only) |
-| 16 | **How strongly demand follows rent** | Elasticity 0 (off) / **0.5** / 1: weight = (rent / women-weighted median) ^ e, clipped to 0.25-4 before rescaling to a mean of 1 over observed cells (final weights 0.44-2.53 at 0.5, 0.18-2.68 at 1) | No data ties salon spend to rent; 0.5 says a cell with 4x the median rent counts 2x the women of a median-rent cell, before the rescale that keeps Dubai's observed total. Off reproduces the unweighted model exactly | set |
+| 15 | **Affluence = median household rent** | DLD Ejari contracts for one flat, villa or studio (labour camps, staff housing and bulk leases out), median per DLD area, mapped to cells by name; observed for 241 Dubai cells, neutral (1) everywhere else. **Off at baseline** (row 16) | Free, official and recent; rent is housing cost, not income or salon spend, and covers 3 months of registrations. A UAE-wide proxy from 2018 built form failed (CV R² −0.10). Abu Dhabi's ADREC data refused queries (HTTP 403); Sharjah publishes none | in data (Dubai only; what-if) |
+| 16 | **How strongly demand follows rent** | Elasticity **0 (off, baseline)** / 0.5 / 1: weight = (rent / women-weighted median) ^ e, clipped to 0.25-4 before rescaling to a mean of 1 over observed cells (final weights 0.44-2.53 at 0.5, 0.18-2.68 at 1) | Off since 2026-10-11: it changed no call and only Dubai has the data (`notebooks/features/affluence.ipynb`). No data ties salon spend to rent; 0.5 says a cell with 4x the median rent counts 2x the women of a median-rent cell, before the rescale that keeps Dubai's observed total. Off reproduces the unweighted model exactly | set |
 
 What these assumptions miss, ranked: [`docs/limitations.md`](docs/limitations.md).

@@ -27,31 +27,56 @@ _Avoid_: service area, trade area, radius, nearest-branch catchment
 A cell's median annual household rent (AED): DLD Ejari contracts for one flat, villa or studio,
 registered 2026-07-10 to 2026-10-09, median per DLD area, mapped to cells. Observed for 241 Dubai
 cells only (`rent_observed`, `affluence_source`); every other cell has none and is weighted neutral.
-Housing cost, not income or salon spend.
+Housing cost, not income or salon spend. Used only by the affluence what-if: off at baseline.
 
 **Shop rent**:
 Commercial rent per m² a year (AED) at a lounge's site (`site_rent_m2`), or over a catchment or area. It is **our cost**, not customer affluence.
 - **Dubai:** DLD Ejari shop contracts.
-- **Elsewhere:** a published band for the site's mall class (JLL; Abu Dhabi malls and plazas only).
-- **Everywhere else:** none.
+- **Abu Dhabi:** ADREC 2025 street-retail rate for the cell's district, read by hand off ADREC's
+  public map (its data service refuses queries).
+- **Northern emirates:** median asking rent of nearby Property Finder / Bayut shop listings, scraped
+  via third-party Apify actors (a grey area under the portals' terms of service).
+- **Everywhere else:** the emirate median.
 
-It is display only, not scored.
+It feeds the site cost and so the cost index.
 _Avoid_: rent (unqualified); it's ambiguous with the affluence rent.
 
+**Site cost**:
+A site's annual cost in AED 1k (`site_cost_k`): shop rent x an assumed 150 m² unit + an assumed
+fit-out of AED 3,000/m² written off over 5 years.
+
+**Cost index**:
+Served women (for an area: net new women) per AED 1k of site cost, against its emirate's typical
+lounge: the median lounge where the emirate has 2+ with a cost, else the median evaluated growth area
+(`cost_index`; 1 = typical). The scorecard's cost signal and part of the GROW rule.
+_Avoid_: ROI, return, profitability
+
 **Women per rent**:
-Addressable women per AED 1,000 of a site's annual shop rent, for an assumed 150 m² unit (`women_per_rent_k`). The unit size sets the level, never the ranking.
+Addressable women per AED 1,000 of a site's annual shop rent, for an assumed 150 m² unit (`women_per_rent_k`). Shown as context; the cost index replaced it.
 _Avoid_: income, wealth, spend, affluence score (unqualified)
 
 **Addressable women**:
 Women 15+ x the cell's affluence weight, `(rent / women-weighted median rent) ^ elasticity`, clipped
 to 0.25-4 before rescaling to a mean of 1 over the observed cells (final weights 0.44-2.53 at
 medium); 1 where no rent is observed.
-Elasticity off 0 / medium 0.5 / strong 1. The demand signal and the growth size test use it;
-catchment women and an area's women stay raw. Cannibalisation (`shared_share`) and growth
+Elasticity off 0 / medium 0.5 / strong 1. **Off at baseline** (0: weight 1 everywhere, so addressable
+= raw women); kept as a what-if. Served demand is built on it; catchment women and an area's women
+stay raw. Cannibalisation (`shared_share`) and growth
 saturation (premium reviews per 1k women) also use raw women: they measure overlap and crowding
 of everyone a lounge or salon serves, and weighting them would count the same women differently
 in numerator and denominator.
 _Avoid_: premium women, target market, weighted demand (unqualified)
+
+**Served women**:
+The addressable women a lounge serves in the Huff split: each cell's women divided across the premium
+suppliers that reach it within 20 min (our lounges and premium salons, pull = reviews x a rating
+factor x drive-time decay) plus an outside option, summed over cells (`served_women`). The
+scorecard's demand signal.
+_Avoid_: catchment women, customers
+
+**Net new women**:
+For a growth area: the women a typical new lounge at its centre would serve, minus what it takes from
+our existing lounges (`new_site_net`). The GROW size test.
 
 **Growth area**:
 The populated cells beyond a 15-min drive of every open scored lounge that share an OSM place name
@@ -84,12 +109,14 @@ _Avoid_: k, top-n
 **Capture**:
 The lounge's Google reviews ÷ (its own + its substitutes' reviews, scaled up by the search-recall
 correction). A proxy for its share of premium customers in its catchment, not market penetration.
+Shown, not scored (served demand already splits by reviews).
 _Avoid_: market share, fair share
 
 **Rating gap**:
 The lounge's Google rating minus the median rating of the premium salons in its catchment with 20+
 reviews (the whole premium pool, not the substitutes: their number grows with the pool, so one added
-salon could change which ones count). Context, not a lever: the scorecard gives it half weight.
+salon could change which ones count). Shown, not scored; the rating enters served demand through
+each supplier's pull.
 _Avoid_: substitutes' median
 
 **Search recall**:
@@ -100,7 +127,9 @@ _Avoid_: coverage (a different thing)
 
 **Cannibalisation**:
 The share of a lounge's catchment women that another open scored lounge also reaches (`shared_share`);
-the NOT SCORED airport lounge is never a sibling.
+the NOT SCORED airport lounge is never a sibling. Shown, not scored, with the absorbed share (the
+share of its served women siblings would take over if it closed, `absorbed_share`); closing a lounge
+is a what-if on the lounge page.
 _Avoid_: contested share, overlap (unqualified)
 
 ### Decisions
@@ -117,22 +146,21 @@ the COO to do:
   so it can only raise the question.
 
 **Growth action**:
-GROW, WATCH or SKIP, assigned to a growth area. What each one asks the COO to do:
-- **GROW**: start a site search here. It's a shortlist for a site visit and lease search, to be
-  verified on the ground before committing.
-- **WATCH**: don't act now. Revisit when the named failing test changes (e.g. salon coverage
-  improves or the market thins).
-- **SKIP**: no action. The area is too small, already crowded, mostly worker housing (and small), or
-  non-residential by name (industrial, free zone, military, airport, port).
+GROW, WATCH or SKIP, assigned to a growth area from a what-if: open a typical lounge here.
+- **GROW**: start a site search here. 6,000+ net new women, worker housing under 50% and a cost index
+  of 1+ (or unknown). It's a shortlist for a site visit and lease search, to be verified on the
+  ground before committing.
+- **WATCH**: don't act now. Big but dearer than our typical lounge, big but mostly worker housing,
+  or 3,000+ net new women. Revisit when the named failing test changes.
+- **SKIP**: no action. Under 3,000 net new women, under 5,000 women, or non-residential by name
+  (industrial, free zone, military, airport, port).
 
 **Low confidence**:
-A lounge call within 0.05 of a threshold, with a missing input (thin premium market, no rating gap),
-or that **flips**: changes in a third or more (27+) of the 81 combinations of the four assumption
+A lounge call within 0.05 of a threshold, or that **flips**: changes in a third or more (27+) of the 81 combinations of the four assumption
 levels (travel time, coverage, worker-housing female share, affluence elasticity), or under any
 single signal weight moved ±25% (in practice that only catches calls already within 0.05 of a line).
-For a growth area, low / medium / high: low within 10% of the size or saturation line, with
-saturation unknown, under half its women searched, or size passed only on thin affluence data;
-high when 20%+ clear of both lines.
+For a growth area, low / medium / high: low within 10% of the 6,000 net-new-women line or with
+under half its women searched; high when 20%+ clear of it.
 _Avoid_: uncertain, borderline (unqualified)
 
 ### Retired terms (the old Dubai model)

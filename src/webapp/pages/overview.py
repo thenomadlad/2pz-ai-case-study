@@ -106,22 +106,20 @@ def _lounge_legend() -> None:
                 f"🔴 **SHRINK**: composite ≤ {scorecard.SHRINK_AT}  \n"
                 "⚪ **NOT SCORED**: the airport lounge  \n"
                 "◯ **Hollow** = low confidence")
-    st.caption("Composite: demand, cannibalisation, capture (weight 1 each) and rating (½), each "
-               f"0-1 on a fixed scale. Low confidence: within {scorecard.LOW_MARGIN} of a line, thin market, "
-               "no rating gap (missing rating or no rated substitutes), the call changes in "
+    st.caption("Composite: served demand and site cost efficiency (weight 1 each), each "
+               f"0-1 on a fixed scale; capture, rating and shared catchment are shown, not scored. Low confidence: within {scorecard.LOW_MARGIN} of a line, the call changes in "
                f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations, or it changes when a "
                "signal weight moves ±25%.")
 
 
 def _area_legend(r) -> None:
     st.markdown(f"**Growth areas** (cells beyond a {data.minutes(r.levels)}-min drive of every lounge)")
-    st.markdown(f"🔵 **GROW**: ≥ {growth.GROW_MIN_WOMEN:,} addressable women, worker housing under "
-                f"{growth.WORKER_CAP:.0%}, *and* under {growth.UNSATURATED_PER_1K:g} premium reviews per "
-                f"1k women, with ≥ {growth.MIN_COVERAGE:.0%} of women searched  \n"
-                "🟣 **WATCH**: one of the two, too little searched, big only on thin affluence data, or big "
-                "but mostly worker housing  \n"
-                f"⚪ **SKIP**: neither, or under {growth.SKIP_UNDER_WOMEN:,} women")
-
+    st.markdown(f"🔵 **GROW**: a typical new lounge here would add ≥ {growth.NEW_SITE_MIN:,} net new women, "
+                f"worker housing under {growth.WORKER_CAP:.0%}, *and* cost efficiency at least the emirate's "
+                "typical lounge (or unknown)  \n"
+                "🟣 **WATCH**: big but dearer, big but mostly worker housing, or "
+                f"{growth.NEW_SITE_MIN // 2:,}+ net new women  \n"
+                f"⚪ **SKIP**: otherwise, under {growth.SKIP_UNDER_WOMEN:,} women, or a non-residential name")
 
 def _lounge_panel(r, b: str) -> None:
     f = next((f for f in r.features if f.branch_id == b), None)
@@ -197,7 +195,7 @@ def _at_stake(r) -> None:
     cols[2].metric(f"To grow: {s['GROW'][0]} GROW areas", f"{s['GROW'][1]:,.0f} women")
     cols[2].caption(f"Addressable women beyond a {minutes}-min drive of every lounge; "
                     f"{s['WATCH'][0]} more areas on WATCH.")
-    st.caption("At stake is counted in women, not money: the model has no revenue, lease or capex data.")
+    st.caption("At stake is counted in women, not money: the model has a rent-based site cost but no revenue, lease or capex data.")
 
 
 def _lounge_table(r) -> None:

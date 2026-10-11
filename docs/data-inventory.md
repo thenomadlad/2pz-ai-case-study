@@ -18,7 +18,9 @@ Everything the app reads is committed in `data/seed/v3/`. Full method and caveat
 | Lounge-salon links | Derived: non-excluded salons inside each lounge's polygon; search saturation per lounge | 2026-10-09 | Derived from Places and Mapbox | `lounge_candidates.csv`, `lounge_candidates_by_level.csv`, `lounge_search_saturation*.csv` | 5,903 pairs (15 min); 19,188 (all levels); 24 / 72 |
 | Dubai rents | Dubai Land Department open data, Ejari rental contracts registered 2026-07-10 to 2026-10-09, downloaded by hand (captcha, 3-month cap) | 2026-10-10 | Free open data; no licence beyond the site's terms | `dubai_rents_by_area.csv`, `cell_affluence.csv` | 173 DLD areas; 241 Dubai cells with an observed rent (2,132 none) |
 | Shop rent (Dubai) | Dubai Land Department open data, Ejari **shop** contracts (commercial, single unit, ≥ 10 m², untrimmed), same download as the residential rents | 2026-07-10 to 2026-10-09 | DLD open data (public) | `dubai_shop_rents_by_area.csv`, `cell_shop_rent.csv` | 13,621 contracts; 170/179 areas located; 243 cells |
-| Shop rent bands (Abu Dhabi) | JLL, *United Arab Emirates: Retail Market Dynamics Q2 2025*: regional and community mall rents, read off the chart (±100 AED/m²); lounge classes by hand from Google addresses | published 2025-09 | Public report; cite JLL | `retail_rent_bands.csv`, `lounge_site_class.csv` | 2 bands; 4 lounges |
+| Shop rent (Abu Dhabi) | ADREC 2025 street-retail and community-mall rates per district. ADREC's map data service refuses queries (HTTP 403; API needs a subscription), so the values were **read by hand from its public map UI** | 2025 rates, read 2026-10-11 | Public map; no licence stated | `adrec_retail_rent_2025.csv` | 111 districts |
+| Shop rent (northern emirates) | Property Finder and Bayut shop-for-rent asking rents, scraped via third-party Apify actors. **Scraping these portals is a grey area under their terms of service**; accepted by the owner and disclosed | 2026-10-11 | Portals' terms restrict scraping | `listing_rents_clean.csv`, `cell_listing_rent.csv` (raw JSON in `data/raw/listings/`, not committed) | 1,206 listings (613 used) |
+| Shop rent bands (dropped) | JLL, *United Arab Emirates: Retail Market Dynamics Q2 2025*: Abu Dhabi mall-class rents. Unused since 2026-10-11 (superseded by ADREC) | published 2025-09 | Public report; cite JLL | `retail_rent_bands.csv`, `lounge_site_class.csv` | 2 bands; 4 lounges |
 | Built form (tested, not used) | EU JRC GHSL R2023A, epoch 2018 (settlement zone, building height) | 2018 data, fetched 2026-10-09 | CC BY 4.0 (acknowledge the European Commission, JRC) | `cell_built_form.csv` | 2,373 cells |
 | Search-recall calibration | A full sweep of one ~8 km tile around Al Barsha | 2026-10-09 | Google, as above | `data/raw/places_cache/` (not committed) | one tile |
 
@@ -26,19 +28,17 @@ Not committed, re-fetchable: `data/raw/` (API caches, the DLD download, GHSL til
 
 **Mapbox isochrones are a cache.** All the drive-time polygons are fetched once by
 `scripts/fetch_isochrones.py` and kept, so the model never calls Mapbox at run time (see the licence
-note above). `cell_isochrones.geojson` (per-cell 10/15/20-min polygons) is **not read by anything in
-`src/`** (only `notebooks/catchments.ipynb` loads it, for inspection): the model and app use `lounge_isochrones.geojson` and `catchment_cells.csv`. It is kept
-for the per-cell travel-time work (a Huff / served-demand model, `docs/limitations.md`), which
-would otherwise need ~810 Mapbox calls (one per cell) to rebuild.
+note above). `cell_isochrones.geojson` (per-cell 10/15/20-min polygons for 810 cells) is the Huff
+served-demand model's reach (`src/model/served.py`); rebuilding it would take ~810 Mapbox calls.
 
 ## Gaps
 
 | Gap | Effect on the analysis | How to fill it | Cost |
 |---|---|---|---|
-| **Revenue, rent, capex, lease terms** | Nothing measures return on capital; SHRINK means "investigate", not "close" | Bedashing's P&L, leases, fixed-asset register | Needs the client |
-| **Shop rent for 14 of 23 scored lounges** | Shop rent exists for 9: 5 Dubai (DLD shop contracts) and 4 Abu Dhabi mall/plaza lounges (JLL bands). Missing for 10 Abu Dhabi villa/street lounges (JLL publishes mall classes only) and the Sharjah, RAK and Fujairah lounges (no citable source). No actual leases either: rent and floor area are unknown, so 150 m² is assumed | Bedashing's own leases (best); else Abu Dhabi street-retail transactions (DARI / ADREC) | Needs the client; ADREC subscription, unknown price |
+| **Revenue, actual leases, capex** | Nothing measures return on capital; site cost is a shop rent on an assumed unit and fit-out. SHRINK means "investigate", not "close" | Bedashing's P&L, leases, fixed-asset register | Needs the client |
+| **Actual shop rents** | Every cell has a rent, but it is a DLD area median (Dubai), a hand-read ADREC district rate (Abu Dhabi), a scraped asking rent (north) or the emirate median. Rent and floor area per lounge are unknown, so 150 m² and the fit-out are assumed | Bedashing's own leases (best); ADREC data via its API; contract rents in the north | Needs the client; ADREC subscription, unknown price |
 | **Capacity: chairs, hours, bookings** | Services delivered can't be measured; a full lounge and an empty one look the same | Bedashing's booking system | Needs the client |
-| **Affluence outside Dubai** | Abu Dhabi and the northern emirates are weighted neutral, so they aren't compared like for like with Dubai | ADREC (Abu Dhabi) rental data needs an API subscription (public map refuses queries); Sharjah publishes none | Subscription, unknown price |
+| **Affluence outside Dubai** | Why affluence weighting is off at baseline (it exists for Dubai only); with it off, every woman counts the same everywhere | ADREC (Abu Dhabi) rental data needs an API subscription (public map refuses queries); Sharjah publishes none | Subscription, unknown price |
 | **Competitors in small growth cells** | Cells under 2,000 women outside the catchments have no competitor data | Same circles over the remaining cells: ~2,000 calls | ~$70 |
 | **Unnamed cells** | 71 cells have only their emirate's name (`name_source == "emirate"`: no OSM admin boundary or place within 3 km). The 67 outside every 15-min catchment (~33.8k women) make no growth area: nobody can act on an unnamed place | Widen the OSM place search beyond 3 km, or add `place=hamlet` / `locality` nodes, then re-run `scripts/build_cells.py` | Free |
 | **Small salons in dense areas** | Google's 20-result cap hides the long tail; corrected with an *estimated* recall of 0.66 from one tile | Split the full circles (~1,600-6,000 calls) | Free from 1 Nov for the first level; ~$54-210 now |
@@ -49,5 +49,5 @@ would otherwise need ~810 Mapbox calls (one per cell) to rebuild.
 | **Review age** | Lifetime counts favour older salons | First-review dates need a full review scrape | ~$10-65 for Bedashing; not affordable for competitors |
 | **Rush-hour travel times** | Catchments assume typical midday traffic; after-work catchments are smaller | Re-fetch isochrones with an 18:00 departure | ~860 Mapbox calls; free tier |
 | **Home-service salons** | Invisible to Google Places as shops; competition understated | No good source | n/a |
-| **Income and nationality** | Rent stands in for affluence in Dubai only; nationality mix is ignored | No public cell-level source found | n/a |
+| **Income and nationality** | Not in the model (affluence is off); nationality mix is ignored | No public cell-level source found | n/a |
 | **Data licences for production** | Mapbox and Google terms don't allow keeping this snapshot indefinitely | Re-fetch on a schedule, or license the data | Depends on the vendor |

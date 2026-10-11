@@ -172,9 +172,10 @@ Script: `scripts/fetch_salons.py`. Notebook: `notebooks/competitors.ipynb`.
 
 Scripts: `scripts/build_affluence.py` (method in its docstring), `scripts/fetch_ghsl.py`. Notebook:
 `notebooks/features/affluence.ipynb`. Weighting: `src.market.affluence_weight`, `affluence_elasticity` in
-`baseline.yaml`.
+`baseline.yaml`. **Off at baseline since 2026-10-11** (`Levels.affluence = "low"`, elasticity 0:
+every woman counts the same; why in the notebook's first cell). It stays as a what-if axis only.
 
-**DLD rents (used).** Dubai Land Department open data (dubailand.gov.ae, Open Data, "Rents"): one
+**DLD rents (used by the affluence what-if).** Dubai Land Department open data (dubailand.gov.ae, Open Data, "Rents"): one
 row per Ejari rental contract. Free, no licence terms beyond the site's.
 - **Downloaded by hand on 2026-10-10** to `data/raw/dld/rents-2026-10-10.csv` (gitignored, 75 MB):
   the page is captcha-gated, so no script fetches it, and it serves **at most 3 months** per
@@ -205,43 +206,54 @@ a rent proxy:** fitted to log rent on the 241 observed cells, cross-validated by
 feature's 0.20. `rent_predicted` stays in `cell_affluence.csv` for the record and is not used.
 
 **Tried and dropped:**
-- **ADREC (Abu Dhabi) rental index:** the public interactive map's ArcGIS service refuses data
-  queries (HTTP 403); the data needs an API subscription. Skipped: Abu Dhabi is neutral.
+- **ADREC (Abu Dhabi) residential rental index:** the public interactive map's ArcGIS service
+  refuses data queries (HTTP 403); the data needs an API subscription. Skipped for affluence (its
+  street-retail rates were later read by hand for shop rent, below).
 - **DLD Transactions (sales):** 95% freehold and 70% off-plan, with no sales at all in the old
   districts (Barsha 1, Satwa, Karama, Mirdif, Jumeira, Umm Suqeim, Qusais, Warqa, Hor Al Anz): it
   prices new towers, not where people live.
 - **Sharjah rental index:** announced, not published. **Meta Relative Wealth Index:** no UAE.
-  **Bayut / Property Finder:** scraping is against their terms. **Night lights:** everything is lit.
+  **Bayut / Property Finder residential:** not used for affluence (their shop listings are used for
+  shop rent, below, a terms-of-service grey area). **Night lights:** everything is lit.
 
-## Commercial rent (`dubai_shop_rents_by_area.csv`, `cell_shop_rent.csv`, `retail_rent_bands.csv`, `lounge_site_class.csv`, built 2026-10-10)
+## Shop rent (`cell_shop_rent.csv`, `adrec_retail_rent_2025.csv`, `cell_listing_rent.csv`, rebuilt 2026-10-11)
 
-**Shop rent is our cost** (what a lounge pays for its site). It is not customer affluence; that's the residential rent above. It is display only: it doesn't enter the scorecard or the growth rule.
+**Shop rent is our cost** (what a lounge pays for its site), not customer affluence. It feeds the
+**cost index**: site cost = shop rent x the assumed 150 m² unit (`REF_UNIT_M2`) + an assumed fit-out
+of AED 3,000/m² over 5 years (`FITOUT_WHY` in `src/features/lounges.py`); cost index = served women
+per AED 1k of site cost against the emirate's typical lounge (`COST_BASELINE_WHY`). It is one of the
+two scorecard signals and part of the GROW rule. Every cell gets a rent, in this order
+(`SHOP_RENT_WHY` in `src/data_v3.py`, column `shop_rent_source`):
 
-**Dubai, from DLD Ejari contracts** (`scripts/build_shop_rent.py`). The source is the same hand-downloaded file as the residential rents (registered 2026-07-10 to 2026-10-09).
+**1. Dubai: DLD Ejari shop contracts** (`scripts/build_shop_rent.py`). The source is the same hand-downloaded file as the residential rents (registered 2026-07-10 to 2026-10-09).
 - **Filters:** commercial usage, sub-type Shop, single unit, at least 10 m² (kiosks out). That leaves 13,621 contracts. Nothing is trimmed: the area median shrugs off a mistyped contract, and a 1% trim cut real rents (overall, it halved Downtown; per area, it emptied small areas).
-- **Placement:** the median AED/m²/yr per DLD area is placed and assigned to cells exactly as for the residential rents (inside, else nearest within 2.5 km), with a minimum of 10 contracts per area. That covers 170 of 179 areas (90% of contracts) and 243 cells, with a median of AED 1,985/m²/yr. A catchment's or area's rent is shown only when cells with a rent hold half its women.
+- **Placement:** the median AED/m²/yr per DLD area is placed and assigned to cells exactly as for the residential rents (inside, else nearest within 2.5 km), with a minimum of 10 contracts per area. That covers 170 of 179 areas (90% of contracts) and 243 cells, with a median of AED 1,985/m²/yr.
 - **Caveat:** an area median mixes mall and street shops, so a mall lounge's real rent can sit well above it.
 
-**Elsewhere, from published bands by mall class** (`retail_rent_bands.csv`). The source is JLL, *United Arab Emirates: Retail Market Dynamics Q2 2025* (published 2025-09), Abu Dhabi rental rates in AED/m²/yr:
+**2. Abu Dhabi: ADREC 2025 street-retail rates by district** (`adrec_retail_rent_2025.csv`, 111
+districts: Abu Dhabi City 55, Al Ain City 45, Al Dhafra 11; class "Street Retail and Community Mall",
+all contract types). ADREC's map data service refuses queries (HTTP 403; the API needs a
+subscription), so **the values were read by hand from its public map UI** on 2026-10-11
+(`source_note` "map panel via UI"). Matched to a cell by its normalised OSM name (one spelling
+alias; Al Bateen and Al Rawdah told apart by longitude). A district rate, not a lease, and
+hand-copied.
 
-| Class | AED/m²/yr | How we got it |
-|---|---|---|
-| Prime super regional | 5,524 | stated in the text |
-| Regional | about 2,900 | read off the chart, ±100 |
-| Community | about 1,200 | read off the chart, ±100 |
+**3. Northern emirates: Property Finder and Bayut shop asking rents** (`scripts/build_listing_rent.py`,
+method in its docstring; `listing_rents_clean.csv`, `cell_listing_rent.csv`). Scraped 2026-10-11
+through third-party Apify actors. **Scraping these portals is a grey area under their terms of
+service**; the owner accepted it, and we disclose it. 1,206 listings after validation and
+de-duplication, 613 used (industrial locations and more than 3 listings per building excluded). Per
+cell: the median AED/m² of the 10 nearest listings within 5 km in the same emirate; under 5 → the
+emirate median. **Asking rents, not contracts:** expect them above achieved rents. Bayut was
+budget-capped to its first ~200-250 results per search.
 
-As a cross-check, JLL's Dubai super-regional rent of AED 211/sqft is about 2,270/m², close to our DLD median.
+**4. Everywhere else: the emirate median** over the cells that have a rent (source `emirate_median`).
 
-Each lounge's class is assigned by hand from its Google address (`lounge_site_class.csv`):
-- **Regional mall:** shahama (Deerfields Mall).
-- **Community mall:** al-dhafra (Al Dhafra Walk), noya-plaza and westyas (neighbourhood plazas).
+**Dropped 2026-10-11:** the JLL mall-class bands (`retail_rent_bands.csv`, `lounge_site_class.csv`)
+stay in the repo, unused.
 
-**Not covered:**
-- **Ten Abu Dhabi lounges are villas or street shops.** JLL publishes mall classes only, and we don't invent a street band: al-ain, al-falah, al-maqta, baniyas, delma, khaleej-al-arabi, khalifa-city-a, ministries-complex, mohammed-bin-zayed-city, shakhbout-city.
-- **No citable mall-class figures were found for Sharjah, Ras Al Khaimah or Fujairah.** We only found listing averages and blog summaries. So al-jada, zawaya-walk, ras-al-khaimah and al-taif-mall show no shop rent.
-- **Listing portals** (Bayut, Property Finder) are against their terms (see "Affluence").
-
-**The reference unit** (`REF_UNIT_M2` = 150 m²) is an assumption: lounge floor areas aren't public. Women per AED 1,000 of rent uses it, so it sets that figure's level but never its ranking.
+**The reference unit** (`REF_UNIT_M2` = 150 m²) and the fit-out are assumptions: lounge floor areas
+and fit-out costs aren't public.
 
 ## Market model (how the pieces fit; for the app's "how it works")
 
@@ -250,61 +262,61 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
 
 1. **Market size:** women aged 15+ per ~2 km cell (WorldPop 2025 adults; female share 5.5% in
    worker housing, `worker_housing_female_share`, the rest rebalanced per emirate).
-   **Addressable women** = those women x an affluence weight, (cell rent / women-weighted median
-   rent) ^ `affluence_elasticity` (0 / **0.5** / 1), clipped to 0.25-4 before rescaling to a mean of 1 (final weights 0.44-2.54 at medium)
-   over the 241 Dubai cells with an observed DLD rent; 1 (neutral) everywhere else.
+   **Addressable women** = those women x an affluence weight. **Affluence is off at baseline**
+   (`affluence_elasticity` "low" = 0, weight 1 everywhere); the what-if levels (0.5 / 1) weight the
+   241 Dubai cells with an observed DLD rent by (cell rent / women-weighted median rent) ^ elasticity,
+   clipped to 0.25-4 and rescaled to a mean of 1; 1 (neutral) everywhere else.
 2. **Catchment:** the cells within a 15-min drive of the lounge (`travel_time_minutes`: 10/15/20;
-   Mapbox typical traffic at `isochrone_depart_at`, weekday 12:00). Catchment market = the sum of
-   its cells' addressable women (raw women shown beside it).
-3. **Competitors:** women's beauty, hair and nail salons inside the catchment; other Bedashing
-   lounges count too (so overlapping lounges split demand). **Premium** = Google price expensive or
-   very expensive, or, without a price, reviews ≥ the catchment median and rating ≥ 4.3.
-   **Substitutes** = the most-reviewed premium salons holding `competitor_coverage` (60%; 50/70) of
-   the catchment's premium reviews.
-4. **Capture** = lounge reviews ÷ (lounge reviews + substitutes' reviews x recall multiplier).
+   Mapbox typical traffic at `isochrone_depart_at`, weekday 12:00). Shown, with the shared catchment
+   (share of its women another open lounge also reaches); it sets which cells are growth areas.
+3. **Competitors:** women's beauty, hair and nail salons; other Bedashing lounges count too.
+   **Premium** = Google price expensive or very expensive, or, without a price, reviews ≥ the
+   catchment median and rating ≥ 4.3. **Substitutes** = the most-reviewed premium salons holding
+   `competitor_coverage` (60%; 50/70) of the catchment's premium reviews. Unsearched cells get
+   imputed stand-in competitors from comparable searched cells (`src/model/served.py`).
+4. **Served demand (Huff, `src/model/served.py`):** each cell's addressable women split across the
+   premium suppliers that reach it within 20 min (our lounges + premium salons), pull = reviews x
+   (rating / 4.6)^5 x drive-time decay (10 / 15 / 20 min: 1 / 0.5 / 0.25), plus an outside option
+   (the median supplier's pull). A lounge's **served women** is its share summed over cells. First
+   cut, uncalibrated.
+5. **Capture** = lounge reviews ÷ (lounge reviews + substitutes' reviews x recall multiplier).
    Multiplier = 1 + (share of the catchment's search circles that hit Google's cap) x
-   (1 / `search_recall` − 1), with `search_recall` = 0.66 (an estimate).
-5. **Estimated customers** = capture x catchment market (shown, not scored).
-6. **Lounge scorecard** (`src/model/scorecard.py`): four signals, each on a fixed 0-1 scale.
-   Demand = catchment addressable women (0 → 200k). Cannibalisation = share of them another open lounge also
-   reaches (100% → 0%). Capture (0 → 15%). Rating gap = lounge rating − substitutes' median rating
-   (−0.3 → +0.3★), at **half weight** (weights 1 / 1 / 1 / 0.5). Composite ≥ 0.65 is PROTECT,
-   ≤ 0.35 is SHRINK, HOLD between. A thin premium market scores capture 0.5; a missing rating gap
-   scores 0.5.
-7. **Low confidence** when the composite is within 0.05 of a line, an input is missing (thin
-   premium market, no rating gap), or the call **flips** in a third or more (27+) of the 81
-   combinations of the four assumption levels (travel time, coverage, worker-housing share,
-   affluence elasticity). High confidence needs
-   0.10 from both lines; medium is in between.
+   (1 / `search_recall` − 1), with `search_recall` = 0.66 (an estimate). Shown, not scored; so are
+   the rating gap, estimated customers and the absorbed share (served women siblings take over if it
+   closes).
+6. **Lounge scorecard** (`src/model/scorecard.py`): two signals, each on a fixed 0-1 scale, weight 1
+   each. **Demand** = served women (0 → 20k). **Cost** = cost index, served women per AED 1k of site
+   cost against the emirate's typical lounge (0.5 → 1.5; see "Shop rent"); missing scores 0.5.
+   Composite ≥ 0.65 is PROTECT, ≤ 0.35 is SHRINK, HOLD between.
+7. **Low confidence** when the composite is within 0.05 of a line, the call **flips** in a third or
+   more (27+) of the 81 combinations of the four assumption levels (travel time, coverage,
+   worker-housing share, affluence elasticity), or a signal weight ±25% changes it. High confidence
+   needs 0.10 from both lines; medium is in between.
 8. **Growth areas** = populated cells beyond a 15-min drive of every open lounge, one area per OSM
    place name and emirate, whether its cells touch or not; cells with no OSM place within 3 km
    (named only by their emirate) make no area but still count in catchments and totals
-   (`src/features/lounges.py`, `src/model/growth.py`). GROW = at least 20k addressable women 15+ (worker
-   housing under 50% of adults) **and** under 150 premium reviews per 1k women in the searched cells.
-   WATCH passes one test, or is big but under 50% searched, or is big only through the affluence
-   weighting with rents observed for under 50% of its women, or big but mostly worker housing (≥ 50% of adults). SKIP passes neither, or has under 5k
-   women, or is non-residential by name (industrial, free zone, military, airport, port), or is
-   small, unsaturated and mostly worker housing.
+   (`src/features/lounges.py`, `src/model/growth.py`). Each is a **what-if: open a typical lounge**
+   (median reviews and rating) at its centre. GROW = at least 6,000 **net new** women (served minus
+   what it takes from our lounges) with worker housing under 50% of adults, **and** a cost index ≥ 1
+   (or unknown). WATCH = big but dearer, big but mostly worker housing, or 3,000+ net new women. SKIP
+   otherwise, or under 5k women, or non-residential by name (industrial, free zone, military,
+   airport, port). Premium reviews per 1k women (saturation) is shown as context, not tested.
 
 **Excluded from market measures:** `zayed-international-airport` (serves travellers, not its
 catchment); kept in the data and labelled. `al-dhafra` and `al-falah` have under 10 premium salons:
 their capture is a share of a tiny pool and is flagged `thin_premium_market`.
 
 **Limitations (show these with the numbers):**
-- Capture is a share of the **premium** end, not market penetration; budget salons and the long tail
-  are left out on purpose.
-- Review counts are **lifetime** totals, so older salons look bigger; chains likely push for more
-  reviews than independents (inflating Bedashing).
+- Served demand weights suppliers by **lifetime** review counts, so older salons look bigger; chains
+  likely push for more reviews than independents (inflating Bedashing).
 - The search misses smaller salons where Google's cap bites; the recall correction is calibrated on
   one tile and is an upper bound.
-- No distance decay inside the 15 minutes; travel times are typical midday, not rush hour.
+- The Huff decay is stepped and uncalibrated; travel times are typical midday, not rush hour.
 - Worker housing not mapped as industrial in OSM is missed (DIP, very likely Sonapur): Mirdif-35's
   market is overstated.
-- Home-service salons are invisible; nationality mix is ignored; mall lounges draw from further
-  than 15 minutes.
-- Affluence is observed only in Dubai (241 cells, rent, one quarter); every other emirate is
-  weighted neutral, so Dubai and the rest are not compared like for like.
-- Nothing here measures revenue, rent or capital: no return-on-capital view.
+- Home-service salons are invisible; income and nationality mix are ignored (affluence is off).
+- Site cost is a shop rent (contract median, hand-read district rate, or scraped asking rent) on an
+  assumed unit and fit-out. No revenue, lease terms, actual capex or footfall: no return-on-capital view.
 
 ## Competitors around growth cells (`growth_salons.csv`, `search_circles.csv`, fetched 2026-10-09)
 

@@ -1,5 +1,5 @@
 """Lounge page: one Bedashing lounge. The PROTECT / HOLD / SHRINK call with this lounge's caveats
-beside it, the four signals on their scales, its catchment map, premium substitutes and the
+beside it, the two signals on their scales, its catchment map, premium substitutes and the
 lounges it shares women with."""
 import streamlit as st
 
@@ -33,9 +33,9 @@ from src.webapp.views import (
 
 
 def _signals(f, d) -> None:
-    st.markdown("##### The four signals, on fixed scales")
+    st.markdown("##### The two signals, on fixed scales")
     st.caption("Each signal scores 0 (worst) to 1 (best for the lounge); the composite is their "
-               "weighted average (rating at half weight).")
+               "weighted average. Capture, rating and shared catchment are shown below, not scored.")
     for s in scorecard.SIGNALS:
         score = d.scores[s.name]
         st.progress(score, text=f"**{s.label}:** {val(s.field, getattr(f, s.field))} → score "
@@ -122,7 +122,7 @@ def render() -> None:
     st.caption(f"Its {minutes}-min drive polygon (midday traffic), catchment cells (darker = more "
                "women), premium substitutes (grey, sized by reviews) and every lounge. Hover for data.")
 
-    st.markdown("##### Demand: raw and affluence-weighted")
+    st.markdown("##### Demand: raw and addressable")
     affluence_metrics(f.catchment_women, f.addressable_women, f.affluence_rent, f.affluence_coverage)
     if d.action != "NOT SCORED":
         _signals(f, d)

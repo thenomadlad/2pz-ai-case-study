@@ -1,18 +1,14 @@
-"""Growth areas: GROW / WATCH / SKIP from two questions (every area is already beyond the current travel-time
-catchment, 15 min at baseline, of every open scored lounge, by construction in src/features/lounges.py).
+"""Growth areas: GROW / WATCH / SKIP from a what-if (`classify`): open a typical lounge in the area
+(src/model/served.what_if_open) and count the women it would add to the network, net of those it takes
+from our own lounges.
 
-  Big enough?   at least GROW_MIN_WOMEN addressable women 15+ (affluence-weighted), and worker
-                housing under WORKER_CAP of adults.
-  Unsaturated?  premium-salon reviews per 1k women (over the cells we searched) under
-                UNSATURATED_PER_1K; None when no cell was searched.
-
-  both -> GROW, one -> WATCH (also: big but mostly worker housing), neither -> SKIP; under
-  SKIP_UNDER_WOMEN women (raw) -> SKIP; small, unsaturated and mostly worker housing -> SKIP; a
-  NON_RESIDENTIAL name (industrial, free zone, military, airport, port) -> SKIP before any test.
-  Unknown saturation, or under MIN_COVERAGE of the women searched, caps at WATCH, and so does a size
-  test passed only through the affluence weighting (raw women under GROW_MIN_WOMEN) when under
-  MIN_COVERAGE of the women have an observed rent. Thresholds reviewed by the user on 2026-10-09
-  (notebooks/features/decisions.ipynb); UNSATURATED_PER_1K recalibrated by a fixed rule on 2026-10-10.
+  GROW   net new women >= NEW_SITE_MIN, worker housing under WORKER_CAP of adults, and cost index >= 1
+         (as cost-efficient as the emirate's typical lounge) or unknown.
+  WATCH  big enough but dearer; or big enough but mostly worker housing; or NEW_SITE_MIN / 2 or more.
+  SKIP   fewer net new women; under SKIP_UNDER_WOMEN women (raw); or a NON_RESIDENTIAL name.
+  Saturation (premium reviews per 1k women vs UNSATURATED_PER_1K) is context, not a test: competition
+  already shapes the Huff split. Under MIN_COVERAGE of the women searched lowers confidence.
+  GROW_MIN_WOMEN and _confidence below belong to the retired two-test rule (no caller uses them for the call).
 """
 import re
 
@@ -30,12 +26,13 @@ NEAR_LINE = 0.10    # within 10% of the size or saturation line: low confidence
 FAR_LINE = 0.20     # 20%+ from both: high confidence
 
 WHY = {
-    "GROW_MIN_WOMEN": "Just under the smallest lounge catchment (23k women at medium levels): the least a lounge runs on today.",
+    "NEW_SITE_MIN": ("Quick first cut (2026-10-11): a new lounge should add at least about what our median "
+                     "lounge serves today (~6k women, Huff), net of what it takes from our own lounges."),
+    "GROW_MIN_WOMEN": "Retired with the two-test rule (2026-10-11; not used in the call). Was: just under the smallest lounge catchment (23k women at medium levels): the least a lounge runs on today.",
     "SKIP_UNDER_WOMEN": "Under 5,000 women an area can't carry a lounge whatever the competition.",
     "WORKER_CAP": "Where most adults live in worker housing, the women estimate rests on the worker-housing female share.",
-    "MIN_COVERAGE": ("Under half the women in searched cells, the saturation figure describes the minority. "
-                     "Likewise an area big enough only through the affluence weighting, with rents "
-                     "observed for under half its women, caps at WATCH."),
+    "MIN_COVERAGE": ("Under half the women in searched cells, the saturation figure describes the minority "
+                     "and the rest of the competition is imputed: the call is low confidence."),
     "UNSATURATED_PER_1K": (
         "Recalibrated on 2026-10-10 by a rule fixed before seeing the result: the 25th percentile of "
         "premium reviews per 1k women over the scored lounge catchments with a real premium market "
