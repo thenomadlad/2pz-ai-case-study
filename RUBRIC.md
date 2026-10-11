@@ -24,6 +24,7 @@ Anything else is **NO-GO**, and the audit log records which condition failed.
 | 3c | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO**, same open items (2.5, A3, B1, C3 structural; P1/J7 live app) | A growth area is now one named OSM place (580 → 413 areas, same 5 GROW). Unnamed emirate-fallback cells (67, ~33.8k women) make no area but stay in catchments and totals. Sanity run 4: no unexplained failure. |
 | 3d | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO**, same open items | Shop rent and women per AED 1k of rent shown for 9 of 23 scored lounges (DLD for Dubai, JLL bands for Abu Dhabi malls), display only. OB5 has a partial site-cost source. Sanity run 5: no unexplained failure. |
 | 4 | 2026-10-11 | 74/80 | 34/40 | 10/26 | **NO-GO**: 6 `[brief]` open (2.5, A3, B1, C3 structural (OB3); P1, J7 need the live app rebooted and clicked through); sanity run 6 has no unexplained failure | Full re-audit after the median fix, named-place areas and shop rent, by fresh agents. No score regressions. New, all small: stale "no rent data" text in about 10 places, knife-edge rounding (al-maqta), emirate defaults hiding every GROW area, area confidence blind to level flips (kalba), a possible name-rule overreach near al-falah. |
+| 5 | 2026-10-11 | 77/80 | 34/40 | 11/26 | **NO-GO** on B1 *(model)*: F1, a sibling opening, closing or growing flips calls through the emirate-median cost baseline; sanity run 7 has 2 unexplained failures (F1, F4), so MO5 fails | Delta audit after the served-demand (Huff) model: 2 scored signals (served women, rent-based cost index), growth = what-if new lounge (≥ 6,000 net new women, cost ≥ 1x), absorbed share, three-source shop rent, affluence off. Newly passing: 2.5, A3, C3 (`[brief]`), OB3, OB4, MO4's Huff and MCDA rows. Newly failing: MO5. New: the AI quotes two "women at stake" figures per lounge (served vs the old capture-based `est_customers`), dead retired-rule code in growth.py, stale capture/thin-market text (the text fixed after the pass; the dead code and `est_customers` remain). P1/J7: merged to `main` (d9d7d6a) and the Streamlit health check returns 200; live click-through pending, not a NO-GO reason. |
 
 
 ---
@@ -45,7 +46,7 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 
 *To improve:*
 
-- 1.4 *(model)*: the cannibalisation signal is still raw `shared_share` among scored lounges, with no capacity or demand test. Blocked on OB3.
+- 1.4 *(model)*: pass 5: raw `shared_share` is no longer scored; overlap now reaches labels only through the Huff split (siblings share a cell's women), and `absorbed_share` is shown, not scored. Still no capacity, so "capacity exceeds the demand it can reach" can't be tested (OB2).
 - Fixed (sanity run 3): the rating gap now uses the whole premium pool's median (20+ reviews), not a top-k that grew with the pool. al-maqta moved SHRINK → HOLD by 0.003: a knife-edge call, flagged low confidence and disclosed in README, walkthrough and limitations. A regression test pins it.
 
 ### Q2. Where should we consider opening new branches?
@@ -54,7 +55,7 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 - [x] `[brief]` **2.2 Every candidate gets a label** (GROW / WATCH / SKIP or our own), and each label means an action.
 - [ ] `[ours]` **2.3 Demand side:** a population or affluence proxy, plus a target-customer fit signal.
 - [x] `[brief]` **2.4 Supply side:** competitor density or saturation within the candidate's catchment.
-- [ ] `[brief]` **2.5 Our own coverage:** distance or travel time to our nearest branch. Whitespace means *unserved demand* (OB3), not "outside our catchments". An under-served area inside our footprint can still be GROW, and an area outside it can be SKIP if competitors already serve it.
+- [x] `[brief]` **2.5 Our own coverage:** distance or travel time to our nearest branch. Whitespace means *unserved demand* (OB3), not "outside our catchments". An under-served area inside our footprint can still be GROW, and an area outside it can be SKIP if competitors already serve it.
 - [x] `[ours]` **2.6 SKIP actually happens.** The model rules areas out with a stated reason. A model that only says GROW or WATCH is hedging.
 - [x] `[ours]` **2.7 WATCH has a meaning.** It says what would move an area to GROW or SKIP, e.g. "rent data missing" or "demand is OK but saturation is borderline".
 - [x] `[ours]` **2.8 Ranking.** Within GROW, candidates are ordered so leadership has a top N, not just a set.
@@ -62,8 +63,8 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 
 *To improve:*
 
-- 2.3 *(model/data)*: affluence is Dubai-only, and there's no target-customer signal elsewhere.
-- 2.5 *(model)*: areas are still only cells no lounge reaches, so whitespace isn't unserved demand.
+- 2.3 *(model/data)*: affluence is Dubai-only and now off at baseline (what-if only); there's no target-customer signal beyond women 15+ and the worker-housing cap.
+- ~~2.5 *(model)*: areas are still only cells no lounge reaches.~~ Passes since pass 5: every named place is an area, and GROW is the net new women a typical lounge would add after the Huff split with our lounges and competitors, plus the nearest-lounge distance in the why. Caveat F4 *(model)*: in 4 areas net new women exceed 2x the area's own women (manama-ajman 35.1k from 5.1k) via the fitted 12.8 km straight-line 20-min band.
 
 ### Q3. Where are we overlapping with ourselves?
 
@@ -76,7 +77,7 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 
 *To improve:*
 
-- 3.5, 3.6 *(model)*: overlap is never weighed against demand or capacity. Blocked on OB2/OB3.
+- 3.5, 3.6 *(model)*: pass 5: half of 3.5 now holds (a new site's demand is net of what our lounges already serve: `new_site_taken`). Still open: no capacity (OB2), so no "excess capacity in the shared zone" test for Q1, and cannibalisation (`absorbed_share`, ≤ 0.30 for every lounge in run 7) is shown, not a defined route to a label.
 
 ### Q4. How strong or weak is each branch relative to local competition?
 
@@ -131,7 +132,7 @@ The brief lists these as the minimum content of the product. Most of the substan
 
 - [x] `[brief]` **A1. Decision-maker named:** who they are (e.g. Head of Network / portfolio team / CEO) and what they care about.
 - [x] `[brief]` **A2. Decisions enumerated:** the specific decisions, each tied to a label set, e.g. "approve lease renewal → PROTECT/HOLD/SHRINK".
-- [ ] `[brief]` **A3. Metrics that matter:** the north-star metric (services delivered, OB1) and the proxies standing in for it are named. Each signal is listed with *why* it matters for the decision, not just *that* we computed it.
+- [x] `[brief]` **A3. Metrics that matter:** the north-star metric (services delivered, OB1) and the proxies standing in for it are named. Each signal is listed with *why* it matters for the decision, not just *that* we computed it.
 - [x] `[brief]` **A4. How the system supports the decision:** the flow from question to screen to evidence to action is stated.
 - [x] `[ours]` **A5. Out of scope** is stated: actual P&L (we only model contribution from assumptions, see OB5), in-branch staffing, quality management and operations, and anything else we deliberately don't model, with the reason. Our job ends once capacity is allocated to sites (OB4).
 - [x] `[ours]` **A6. Framing shows up up front:** in the README and the demo opening, not only in a design doc.
@@ -140,7 +141,8 @@ The brief lists these as the minimum content of the product. Most of the substan
 *To improve:*
 
 - ~~Pass 4: about 10 places still say "no rent data" while shop rent is shown for 9 lounges: README:39-40/97/321, walkthrough:188, CONTEXT:116, the limitations box (views.py:188), the overview (overview.py:200), scorecard THRESHOLDS_WHY and the NO_FINANCIALS caveat (scorecard.py:51/70), and `rent_data_available: False` (explain.py:478, so the cached UAE summary needs regenerating). Reword to "no revenue, lease or capex data".~~ Fixed 2026-10-11.
-- A3 *(model)*: the north star and its proxy are named, but `est_customers` drives no label.
+- ~~A3 *(model)*: `est_customers` drives no label.~~ Passes since pass 5: README:78 names services delivered as the north star and served women (Huff) as its proxy, and it's a scored signal; each signal's `why` is on the How page.
+- Pass 5 (non-model, needs a regeneration): the lounge fact sheet still carries `est_customers` ("Women captured", capture × women; explain.py:102, :256, :422), so the AI quotes two women-at-stake figures per lounge (khalifa-city-a: serves 16,700 in the headline, "roughly 11,500 captured" in the so-what; al-jada 5.9k vs 10,500). Drop it from the fact sheet and regenerate.
 
 ### B. Recommendation logic
 
@@ -156,7 +158,7 @@ The brief says it must be **coherent, explainable, defensible**. It does not hav
 *To improve:*
 
 - ~~Pass 4: rounding to 2 decimals hides knife-edge calls. al-maqta reads "Composite 0.35 → HOLD" and "0.00 from the SHRINK line" (it's 0.003). Show 3 decimals within 0.01 of a line (lounge.py:46, explain.what_would_change).~~ Fixed 2026-10-11: 3 decimals within 0.01 of a line; flip values one decimal finer when they'd round equal.
-- B1 *(model)*: the airport is out, and the PROTECT markets (122/113/145 per 1k) now pass the 150 line. But a growth area is a place-name group of cells, not a candidate site's catchment, so BT3 still shows no agreement on unit.
+- B1 *(model)*: pass 5: the unit problem is solved (one Huff model; `what_if_open` at a lounge's site is a same-unit test, BT2/BT3 explained). Now open on **F1** (sanity run 7): the cost index's baseline is the median of the emirate's own lounges, so a sibling closing or growing flips calls (al-jada closed → zawaya-walk HOLD → SHRINK, 0.45 → 0.15; any of 7 Abu Dhabi closures → al-falah PROTECT → HOLD). That contradicts the scorecard's own "fixed scales so a lounge's score doesn't move when a sibling opens or closes" (scorecard.py:4). Fix: a fixed cost anchor (e.g. AED per served woman frozen at baseline), not a live median.
 
 ### C. Geographic reasoning
 
@@ -164,7 +166,7 @@ The brief asks us to use geography *meaningfully*. Each item below should both e
 
 - [x] `[brief]` **C1. Catchments,** preferably travel-time based (isochrones). Radii are acceptable with a stated reason.
 - [x] `[brief]` **C2. Proximity:** distance or time to competitors and to our own branches.
-- [ ] `[brief]` **C3. Overlap:** see Q3.
+- [x] `[brief]` **C3. Overlap:** see Q3.
 - [x] `[brief]` **C4. Coverage gaps:** populated areas outside our catchments are identified, and that feeds Q2.
 - [x] `[brief]` **C5. Competitor density:** see Q4.3.
 - [x] `[brief]` **C6. Market saturation:** see Q4.4.
@@ -174,7 +176,7 @@ The brief asks us to use geography *meaningfully*. Each item below should both e
 
 *To improve:*
 
-- C3 *(model)*: overlap is still raw shared women, never weighed against capacity or the services that would be lost.
+- ~~C3 *(model)*: overlap is still raw shared women.~~ Passes since pass 5: overlap affects recommendations through the Huff split (a shared cell's women are divided between the lounges reaching it, which lowers served women and a new site's net new women), and the lounge page shows the cannibalisation what-if (`absorbed_share`). Weighing it against capacity stays under 3.6.
 
 ### D. AI-relevant design
 
@@ -214,7 +216,7 @@ From the reviewer's seat, each question below should be answerable **for any sin
 
 *To improve:*
 
-- E6 *(model)*: every explanation has what / so what / now what, but none can address the ROIC gate. As of pass 4, the so-whats that only restate figures are al-falah, al-jada, baniyas, khalifa-city-a and shakhbout-city. jumeirah-park's "we pay for a large market…" overreads an area-median rent. Tighten these on the next regeneration.
+- E6 *(model)*: every explanation has what / so what / now what, but none can address the ROIC gate. Pass 5: the regenerated so-whats now state women at stake, absorption and competition for every lounge (the pass-4 restate-only list is resolved), but see the `est_customers` double figure under A. As of pass 4, the so-whats that only restate figures are al-falah, al-jada, baniyas, khalifa-city-a and shakhbout-city. jumeirah-park's "we pay for a large market…" overreads an area-median rent. Tighten these on the next regeneration.
 
 ---
 
@@ -273,7 +275,8 @@ The brief says to source inputs from public sources and lists some combination o
 
 *To improve:*
 
-- P1: the live app deploys from `main`. Click through the live link after this push; the walkthrough describes the new model.
+- P1: merged; live click-through pending. `main` was fast-forwarded to the served-demand model (d9d7d6a) and the Streamlit health check returns 200. Click through overview → lounge → area → explanation on the live link to tick P1/J7.
+- Pass 5 (flaky test): `tests/webapp/test_pages.py::test_level_switch_is_fast_and_marks_explanations_as_template` failed once at 2.0 s against its < 2 s limit in a full `tests/webapp` run, and passed alone.
 
 ---
 
@@ -324,21 +327,24 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 - [ ] **OB1. The objective is services delivered,** meaning demand served by our capacity. It isn't branch count, and it isn't a branch's own score. Within the ROIC gate (OB5), every label traces back to it: PROTECT = capacity serving demand we'd otherwise lose; SHRINK = capacity in excess of the demand it can reach; GROW = demand that no capacity (ours or a competitor's) serves well.
 - [ ] **OB2. A branch is modeled as a bundle of capacity** (specialists × hours, which we can't observe directly). The capacity proxy is named (e.g. review volume as throughput, unit size, listed specialists), its weakness is stated, and there's an equal-capacity fallback if no proxy holds up.
-- [ ] **OB3. Demand and capacity share a spatial frame.** Demand per cell and capacity spread across cells through catchments, so served vs. unserved demand can be computed per cell. This is the Huff / IRS logic from MO4, so it should be built once and used by both models.
-- [ ] **OB4. Scope ends at the site.** We decide where capacity sits and how much of it there is (open, keep, shrink). What happens inside a branch (staffing, service quality, operations) is out of scope. Ratings enter only as *attractiveness*, i.e. how much demand a branch's capacity pulls in, never as something we tell leadership to fix.
+- [x] **OB3. Demand and capacity share a spatial frame.** Demand per cell and capacity spread across cells through catchments, so served vs. unserved demand can be computed per cell. This is the Huff / IRS logic from MO4, so it should be built once and used by both models.
+- [x] **OB4. Scope ends at the site.** We decide where capacity sits and how much of it there is (open, keep, shrink). What happens inside a branch (staffing, service quality, operations) is out of scope. Ratings enter only as *attractiveness*, i.e. how much demand a branch's capacity pulls in, never as something we tell leadership to fix.
 - [ ] **OB5. ROIC is a gate, built from stated assumptions.** Services delivered is what we grow, and return on capital decides whether a site is worth it. GROW and PROTECT require clearing the gate.
   ```
   estimated contribution = catchment demand × capture share × visit frequency × margin per visit − fixed site cost
   implied ROIC          = estimated contribution / estimated invested capital
   ```
-  - [ ] Catchment demand and capture share come from the model (OB3 / Huff). The rest (visit frequency, margin per visit, fixed site cost, invested capital) are **assumptions**. Each one is either sourced (filings, industry benchmarks, rent data) or explicitly marked **open**. *Which values we can actually find is still open.* **Fixed site cost has a partial source (2026-10-10):** shop rent per m² for 9 of 23 scored lounges (DLD shop contracts for all of Dubai; JLL mall-class bands for 4 Abu Dhabi lounges), shown but not yet used in a gate. Lounge floor area is still assumed (150 m²).
+  - [ ] Catchment demand and capture share come from the model (OB3 / Huff). The rest (visit frequency, margin per visit, fixed site cost, invested capital) are **assumptions**. Each one is either sourced (filings, industry benchmarks, rent data) or explicitly marked **open**. *Which values we can actually find is still open.* **Fixed site cost is sourced for every cell (2026-10-11):** DLD contracts (Dubai), ADREC 2025 district rates read by hand (Abu Dhabi), scraped asking rents (northern emirates), else the emirate median. It feeds the cost index (a relative efficiency, not a return). Floor area (150 m²) and fit-out are assumed; visit frequency, margin and invested capital are still unsourced and not marked open.
   - [ ] The hurdle is tiered (e.g. below hurdle / acceptable / strong), and the tiers are what the labels key off. We set levels; we don't predict exact returns.
   - [ ] Assumptions are visible next to every ROIC figure. A label that clears the gate only under optimistic assumptions is flagged as such.
 
 *To improve:*
 
-- OB1–OB3, OB5 *(model)*: unchanged. There's no capacity, no served vs. unserved demand and no ROIC.
-- OB4 *(model)*: in-branch advice is banned and enforced. Rating is still a half-weight health signal, not an attractiveness term.
+- OB1 *(model)*: pass 5: served women is the label's demand signal, but with no capacity and no ROIC gate, PROTECT/SHRINK/GROW don't yet trace to "demand we'd otherwise lose / excess capacity". Run 7's BT1 shows SHRINK now means "few served women or a dear site", not excess capacity.
+- OB2 *(model)*: capacity isn't modelled (README:80). Huff attractiveness = lifetime reviews × a rating factor, so served women largely restates review volume (F2: the same site serves 16.7k for khalifa-city-a, 6.1k for a typical lounge). No capacity proxy is named as such, and no equal-capacity fallback.
+- OB3 passes since pass 5: src/model/served.py splits each cell's women across the premium suppliers that reach it, plus an outside option, so served and unserved demand exist per cell; the scorecard and growth what-if both use it. Caveats *(model)*: uncalibrated parameters (ALPHA 1, stepped decay, OUTSIDE_PCTL 50), and F4's over-reach through the fitted straight-line bands.
+- OB4 passes since pass 5: rating enters only as Huff attractiveness ((rating / 4.6)^5) and isn't scored (limitations §9); in-branch advice stays banned.
+- OB5 *(model)*: no ROIC. The cost index is a relative efficiency, and its live emirate-median baseline is F1.
 
 ### Data: sourced, thorough, and detailed enough for the model
 
@@ -358,10 +364,15 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 *To improve:*
 
+- Pass 5:
+  - DA1: ADREC rates were read by hand off its map UI (cited, disclosed), and the northern-emirates listings were scraped via third-party Apify actors (ToS grey area, disclosed). Both are documented, not reproducible by script.
+  - DA3: most of Dubai's and Abu Dhabi's cells carry the emirate median rent (limitations:70), ADREC is matched to cells by district name, and there's no error estimate for either.
+  - SC7 (run 7): 10.8% of ADREC cells are under AED 300/m² (rural Al Dhafra), which flatters area cost indexes there (mzeer-ah GROW at 2.57x with 0% competitor search).
+  - DA5: build_listing_rent now validates rows with a drop reason; still no on-land check for salons.
 - Pass 4:
-  - DA3: 150 of 243 shop-rent cells are nearest-assigned, with no error estimate.
-  - DA6: 398 salons with a missing review_count (all also unrated) become 0, and this isn't documented.
-  - DA8: JLL Q2 2025 is missing from the freshness section.
+  - DA3: 150 of 243 shop-rent cells are nearest-assigned, with no error estimate. (Superseded by the three-source rent, pass 5.)
+  - DA6: 398 salons with a missing review_count (all also unrated) become 0 (src/market.py:70), and this isn't documented. Still open in pass 5; with Huff attractiveness = reviews they now contribute zero pull.
+  - ~~DA8: JLL Q2 2025 is missing from the freshness section.~~ Moot: JLL is dropped (data-inventory:23).
   - Name rule: zayed-military-city's OSM polygon reaches the cells next to the al-falah lounge (SANITY run 6).
 - DA1 *(model/data)*: the DLD download is manual, and search_recall rests on one tile (the clip range now has a WHY).
 - DA2-competitors *(model/data)*: recall isn't tracked per emirate.
@@ -376,14 +387,14 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 - [x] **MO2. Explainable by construction.** The score is transparent (rules or additive weights), so per-entity driver contributions (E3) fall out of the model rather than being reverse-engineered afterwards.
 - [x] **MO3. Answers the questions.** Each of Q1–Q4 maps to a specific model output field. No question is answered only by the map.
 - [ ] **MO4. Benchmarked against standard retail location methods.** For each one we can say what it does, what our model does instead, and how we've accounted for the gap (a limitation, a proxy, or a deliberate simplification):
-  - [ ] **Huff gravity model:** patronage probability ∝ attractiveness / distance^λ, shared across competing stores. *Do we cover it?* Distance decay (isochrones), attractiveness (rating/reviews), competitive share. *Gap to account for:* no calibrated λ, no probabilistic split of demand between stores, and hard catchment edges instead of decay.
+  - [x] **Huff gravity model:** patronage probability ∝ attractiveness / distance^λ, shared across competing stores. *Do we cover it?* Distance decay (isochrones), attractiveness (rating/reviews), competitive share. *Gap to account for:* no calibrated λ, no probabilistic split of demand between stores, and hard catchment edges instead of decay.
   - [ ] **Thiessen / Voronoi / nearest-facility trade areas:** each customer goes to the nearest store. Do our catchments and overlaps behave better than this baseline, and do we know where they differ?
   - [x] **Ring / drive-time analysis:** probably our core method. The mode, minutes and choice of isochrone provider are justified.
   - [x] **Index of Retail Saturation (IRS):** demand × spend ÷ supply. How our saturation measure relates to it, and what we use as stand-ins for spend and supply capacity.
-  - [ ] **Multi-criteria suitability / weighted overlay (MCDA, AHP):** likely what our whitespace model really is. Weights are justified the way MCDA requires (stated, sensitivity-tested), not just picked.
+  - [x] **Multi-criteria suitability / weighted overlay (MCDA, AHP):** likely what our whitespace model really is. Weights are justified the way MCDA requires (stated, sensitivity-tested), not just picked.
   - [x] **Location-allocation / maximal coverage (MCLP):** picks the *set* of new sites that maximises coverage. We score cells one by one, so two adjacent GROW cells could cannibalise each other. Stated, or handled.
   - [x] **Analog / sales-regression models:** these need revenue we don't have. Stated as the main reason our health score is a proxy.
-- [x] **MO5. Validated against reality.** The latest run of [`SANITY_CHECKS.md`](SANITY_CHECKS.md) (back-tests BT1–BT5, sanity checks SC1–SC6) has no unexplained failure, and each expected outcome was written down before the check ran.
+- [ ] **MO5. Validated against reality.** The latest run of [`SANITY_CHECKS.md`](SANITY_CHECKS.md) (back-tests BT1–BT5, sanity checks SC1–SC6) has no unexplained failure, and each expected outcome was written down before the check ran.
 - [ ] **MO6. Sensitivity is known** (see 1.7). We report which labels flip under reasonable changes to weights and thresholds. Labels that sit near a boundary are presented as borderline, not as confident calls.
 - [x] **MO7. Not tuned to taste.** Weights and thresholds weren't adjusted until the label mix "looked right". Where we did tune them, we say so and give the target.
 - [ ] **MO8. Branch and whitespace models are consistent** (see B1). They use the same catchment, competitor definition and demand measure, so a branch's cell scored by the whitespace model gives an answer that fits with its branch label.
@@ -393,12 +404,19 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 *To improve:*
 
+- Pass 5:
+  - MO5 *(model)*: **fails** on sanity run 7's two unexplained failures: F1 (SC4: sibling changes flip calls through the emirate-median cost baseline) and F4 (net new women > 2x the area's own women in 4 areas). F3 (one 2,000-review competitor 200 m away moves al-dhafra PROTECT → SHRINK, 0.94 → 0.07) is explained but fragile.
+  - MO1: two scored signals now. Still open: `GROW_MIN_WOMEN` and `growth._confidence` are dead code kept "for the retired rule" (growth.py:11, :17, :31, :55-69, and its WHY row shows on the How page), capture, rating gap and saturation are computed and shown but drive nothing, and affluence is kept as a what-if axis.
+  - MO8 *(model)*: one Huff model and one competitor set for both now. Open on the cross-tab: 3 of 5 PROTECT sites come out WATCH when re-opened as a typical lounge (F2), and SHRINK al-jada's site comes out GROW (F1's Sharjah baseline).
+  - MO9: the served.py parameters (ALPHA, DECAY, OUTSIDE_PCTL, RATING_ELASTICITY, the fitted km bands) and the cost baseline (`MIN_BASELINE_LOUNGES`) aren't on the How page; RATING_ELASTICITY's line carries OUTSIDE_PCTL's comment (served.py:20); NEW_SITE_MIN's WHY is duplicated (growth.py:29 and :73); the bare 0.01° tolerance is still there (lounges.py:164).
+  - MO6: still no area level flips (kalba, below).
+  - MO11 *(model)*: Huff has no competing-destinations term, so a cluster only splits demand; run 7's BT5 says the empty-area tilt got stronger (34 GROW, mostly inland Sharjah, Ajman and outer Abu Dhabi; Dubai's only GROW is al-awir).
 - Pass 4:
   - MO6: kalba and al-jerf (2 of the 5 GROWs) flip in 27 of 81 assumption combinations, yet area confidence ignores level flips: kalba shows "high". Moved to the model plan (growth notebook sensitivity): area flips need 81 area builds.
   - MO9: MIN_RATING_REVIEWS, REF_UNIT_M2 and MIN_RENT_COVERAGE are missing from the How page, and there's a bare 0.01° site-cell tolerance (lounges.py:161).
 - MO1 *(model)*: the affluence layer still "changes no call", but is kept.
-- MO4: the methods table is in limitations. Two gaps remain: Huff is not implemented, and there's no "where our catchments differ from a Voronoi split" comparison.
-- MO5 (passes since run 3): no unexplained sanity failure remains. BT2/BT3 (unit), BT4/SC3 (DIP) and BT5 (empty-area tilt) are explained and documented failures; SC4 is explained (the thin-market blend's +0.014 slope by design; the median-premium test is deferred with no label effect).
+- MO4: the methods table is in limitations. Pass 5: Huff is implemented (uncalibrated, stated) and the MCDA row states the weights and their ±25% test, so both rows tick. One gap remains: no "where our catchments differ from a Voronoi split" comparison.
+- MO5 (passed runs 3–6): no unexplained sanity failure remained then. BT2/BT3 (unit), BT4/SC3 (DIP) and BT5 (empty-area tilt) are explained and documented failures; SC4 is explained (the thin-market blend's +0.014 slope by design; the median-premium test is deferred with no label effect).
 - MO6: lounges are covered (weights ±25%, assumption levels, margin). Growth areas get near-line confidence, but no assumption-level flips.
 - MO8 *(model)*: same saturation helper for both models now, but BT3 still disagrees on unit.
 - MO9: constants are module-level with a WHY and shown on the How page, but spread over 4 modules plus baseline.yaml; views.py and explain.py still have a few bare presentation numbers.
