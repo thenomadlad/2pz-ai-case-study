@@ -142,7 +142,7 @@ uv run streamlit run streamlit_app.py     # http://localhost:8501  (or: just app
 No API key needed: the app computes everything in memory from the committed `data/seed/v3/` and
 serves the committed AI explanations. `just test` runs the tests. `just labels` prints every
 lounge and growth-area call at the baseline as CSV. `just notebook` opens the notebooks (start
-with `features/decisions.ipynb`).
+with `scorecard.ipynb`).
 
 ## Using the app
 

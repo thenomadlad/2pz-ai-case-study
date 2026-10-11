@@ -38,7 +38,7 @@ Spearman correlation of **−0.74**: big Dubai markets are crowded, so the loung
 tiny (about 1%, 0.8-1.6%, at al-barsha, city-walk, jumeirah-park and nad-al-sheba). Demand and capture
 partly cancel, and a big crowded market tends to land in HOLD. We considered replacing both with
 one "estimated customers" signal and rejected it, because, when tested on 2026-10-09, it turned four of the
-five Dubai lounges into SHRINK (`features/decisions.ipynb`, open question a). Rejecting a signal for its
+five Dubai lounges into SHRINK (`notebooks/features/decisions.ipynb`, open question a). Rejecting a signal for its
 outcome is the tuning-to-taste the rubric warns about (MO7), so we name it here.
 
 - Capture is a **proxy of a proxy**: reviews stand in for customers, and customers stand in for
@@ -55,7 +55,7 @@ compares with the women-weighted median (`(rent / median) ^ elasticity`, clipped
 rescaling to a mean of 1 over the observed cells; final weights 0.44-2.53 at medium, 0.18-2.68 at
 strong).
 The rents are DLD Ejari contracts for one flat, villa or studio, registered 2026-07-10 to
-2026-10-09 (`features/affluence.ipynb`). This is the only affluence signal in the model, and it is thin:
+2026-10-09 (`notebooks/features/affluence.ipynb`). This is the only affluence signal in the model, and it is thin:
 
 - **Dubai only.** 241 Dubai cells have an observed rent (81% of Dubai's women); the other 2,132
   cells, 73% of the UAE's women, are weighted **neutral** (1). Every Abu Dhabi, Sharjah, Fujairah
