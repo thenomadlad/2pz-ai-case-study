@@ -7,7 +7,6 @@ import posixpath
 import re
 
 import streamlit as st
-import streamlit.components.v1 as components
 
 from src.config import REPO_ROOT
 from src.features.lounges import (
@@ -90,7 +89,9 @@ def render() -> None:
             if kind == "md":
                 st.markdown(part)
             else:
-                components.html(_MERMAID.format(code=html.escape(part)), height=720, scrolling=True)
+                # st.iframe (components.v1.html is deprecated): this HTML is our own committed diagram, not
+                # user input; height grows with the diagram's size so a small chain doesn't leave a gap
+                st.iframe(_MERMAID.format(code=html.escape(part)), height=min(760, 140 + 18 * part.count("\n")))
 
     st.divider()
     st.header("Live values from the code")
