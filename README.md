@@ -1,8 +1,7 @@
 # Bedashing network right-sizing
 
 A decision-support app for Bedashing Beauty Lounge's UAE network. It scores each of the 24 lounges
-**PROTECT / HOLD / SHRINK** and each populated area beyond a 15-minute drive of every lounge
-**GROW / WATCH / SKIP**, from a women-15+ market estimate, drive-time reach, Google Places competitors
+**PROTECT / HOLD / SHRINK** and each named populated place (OSM) **GROW / WATCH / SKIP**, from a women-15+ market estimate, drive-time reach, Google Places competitors
 (a Huff split of each cell's women across our lounges and premium salons) and shop rents, each site judged against its emirate's market of competitor salon sites. Every call comes with an AI-written explanation, and every number in that explanation
 is checked against the data.
 
@@ -12,7 +11,7 @@ is checked against the data.
 
 1. **[Overview](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the COO's
    question, the executive summary and three at-stake figures (at the 2026-10-11 baseline: 3 SHRINK
-   lounges, about 323k women in shared cells; 32 GROW areas, about 784k women).
+   lounges, about 323k women in shared cells; 34 GROW areas, about 796k women).
 2. **Tick "All catchments (overlap)"** above the map: the Abu Dhabi city cluster, where siblings
    and premium salons split the same women. Overlap alone doesn't make a SHRINK: judged against Abu
    Dhabi's salon sites, only westyas there is SHRINK; delma, noya-plaza and the rest are HOLD.
@@ -24,9 +23,9 @@ is checked against the data.
    would change the call*. High confidence: it holds in all 81 assumption combinations.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah)
    (GROW):** a typical new lounge there would add about 12.5k net new women against a 6,000 line,
-   top 10% of Sharjah salon sites on demand (98th percentile UAE-wide), rent ratio 1.00; high
-   confidence. That 1.00 is Sharjah's emirate-median rent, not Kalba's own: it passes the rent test
-   by construction (limitations 3).
+   top 10% of Sharjah salon sites on demand (98th percentile UAE-wide); low confidence. Kalba has
+   no shop rent of its own (its cells take Sharjah's emirate median), so the rent test is neutral
+   rather than passed, and the call says so (limitations 3).
 5. **The fallback:** change anything in the Overview's **🧪 What if…?** panel (say travel time 20
    min, or close a lounge): where the numbers change, the text switches to the labelled template.
 6. **[How it works & limitations](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how)**,
@@ -49,11 +48,12 @@ decisions**, and the limitations matter more than the calls. The biggest ones:
 - **Shop rent comes from different sources per emirate.** DLD contracts (Dubai), ADREC district
   rates read by hand off its public map (Abu Dhabi), Property Finder / Bayut asking rents scraped
   via third-party Apify actors, a grey area under those portals' terms (northern emirates), else the
-  emirate median. The rent ratio compares a site only with its own emirate's salon sites, but a cell
-  on the emirate-median fallback lands at a ratio of about 1: all 10 Sharjah GROW areas pass the rent
-  test that way, and manama-ajman misses it by 0.3%.
-- **The calls move with the assumptions.** 9 of the 23 scored lounges are low confidence (all within
-  0.05 of a line). Affluence weighting is off at baseline: every woman counts the same.
+  emirate median. The rent ratio compares a site only with its own emirate's salon sites. A cell on
+  the emirate-median fallback has no rent of its own, so where it sets the rent the rent test is
+  neutral and the call low confidence: 17 of the 34 GROW areas (9 in Sharjah) and two PROTECT
+  lounges (al-ain, al-falah).
+- **The calls move with the assumptions.** 11 of the 23 scored lounges are low confidence: 10
+  within 0.05 of a line, plus al-ain on a fallback rent. Affluence weighting is off at baseline: every woman counts the same.
 - **Drive times are midday**, and the competitor search misses smaller salons where Google's
   20-result cap bites.
 - **The yardstick and thresholds are judgement.** Both signals rank a site within its emirate
@@ -112,8 +112,8 @@ thinner or new. Out of scope:
   data. It decides whether a SHRINK is closed; the model only says which lounges to look at.
 - **In-branch staffing and capacity.** How many chairs and stylists a lounge needs is an
   operations question, answered from bookings, not from maps.
-- **Service quality and operations.** Ratings are used only relative to nearby premium salons;
-  fixing a weak lounge's service is a management job, not a location one.
+- **Service quality and operations.** Ratings enter only as part of each salon's pull in the
+  Huff split; fixing a weak lounge's service is a management job, not a location one.
 
 ## What it currently says
 
@@ -122,8 +122,9 @@ affluence off):
 
 - **Lounges:** 6 PROTECT (al-taif-mall, al-ain, mirdif-35, al-falah, al-dhafra, nad-al-sheba),
   14 HOLD, 3 SHRINK, 1 NOT SCORED (the airport lounge serves travellers). **11 of 23** calls are low
-  confidence: 9 within 0.05 of a line (5 of them Abu Dhabi HOLDs just above the SHRINK line), and
-  al-ain and al-falah, whose site rent is the Abu Dhabi median (fallback), so rent scores neutral.
+  confidence: 10 within 0.05 of a line (5 of them Abu Dhabi HOLDs just above the SHRINK line, and
+  al-falah just above PROTECT), plus al-ain; al-ain and al-falah have the Abu Dhabi median as
+  their site rent (fallback), so rent scores neutral.
   khalifa-city-a is HOLD on its site (top 27% of Abu Dhabi salon sites on demand, but rent ratio
   0.62), though the model estimates it is performing 2.7x compared to its site (context, not scored).
 - **The 3 SHRINKs:** city-walk (bottom 30% of Dubai salon sites on demand, rent ratio 0.47), westyas
@@ -135,9 +136,10 @@ affluence off):
   have the women but a shop rent dearer than their emirate's median salon site. Most of the Sharjah ones are beyond a 15-minute drive
   of Bedashing's two Sharjah lounges (al-jada, zawaya-walk, both on the Dubai side); why the footprint
   there is only two is a business question the model can't answer (licensing, brand fit, landlords).
-  17 of the 34 GROW areas (nine in Sharjah, plus manama-ajman and mudayrah-ajman, which this
-  moved up from WATCH) have a rent that is mostly the emirate-median fallback: their rent test is
-  neutral and the call low confidence. The northern-emirates rent checks use scraped asking rents
+  17 of the 34 GROW areas (Sharjah 9, Ras Al Khaimah 4, Ajman 2, Dubai 1, Abu Dhabi 1) have a rent
+  that is mostly the emirate-median fallback: their rent test is neutral and the call low
+  confidence. Net new women are not additive across areas: each what-if runs alone, so
+  neighbouring GROW areas count the same women. The northern-emirates rent checks use scraped asking rents
   (see limitations).
 
 Treat these as the places to look first, not as answers.
@@ -212,6 +214,9 @@ flowchart LR
   SERVED["Served women per lounge"]
   UNSERVED["Unserved women per cell"]
   SITE["Site served: a typical lounge<br/>at each lounge's site"]
+  TYP["Typical lounge, frozen:<br/>757 reviews, 4.6★"]:::assume
+  FB["Fallback rent (emirate median)<br/>→ rent neutral, low confidence"]:::assume
+  UAE["UAE-wide percentiles<br/>of demand and rent"]
   REF["Frozen salon-site reference:<br/>1,123 competitor sites, per emirate"]
   DPCT["Demand percentile<br/>in its emirate's salon sites"]
   RR["Rent ratio vs its emirate's<br/>median salon site"]
@@ -230,6 +235,7 @@ flowchart LR
   RENT --> COST
   UNIT -.-> COST
   RENT --> RR
+  FB -.-> RR
   GP --> REF
   RENT --> REF
   DEM --> HUFF
@@ -240,12 +246,18 @@ flowchart LR
   HUFF --> UNSERVED
   HUFF --> SITE
   HUFF --> REF
+  TYP -.-> SITE
+  TYP -.-> OPEN
+  TYP -.-> REF
   SITE --> DPCT
   REF --> DPCT
   REF --> RR
   DPCT --> LRULE
   RR --> LRULE
-  SERVED -.->|context only| LCALL
+  SERVED -.->|context: performance vs site| LCALL
+  REF --> UAE
+  UAE -.->|context only| LCALL
+  UAE -.->|context only| GCALL
   COST -.->|display only| LCALL
   HUFF --> CANN
   CANN -.->|display only| LCALL
@@ -274,7 +286,7 @@ flowchart LR
     G1["Named OSM places, any reach"]
     G2["Non-residential name rule"]
     G3["Worker-housing cap"]
-    G4["New-lounge what-if: net new women"]
+    G4["New-lounge what-if: net new women<br/>(not additive across areas)"]
     G5["DROPPED Premium saturation gate (reviews per 1k):<br/>competitors now take their Huff share"]:::dropped
     G6["DROPPED Unreached cells only / contiguous pieces:<br/>now one area per named place"]:::dropped
     G7["DROPPED Emirate-fallback-named cells as areas:<br/>no actionable place"]:::dropped
@@ -289,14 +301,17 @@ flowchart LR
     S6["DROPPED Raw catchment overlap (shared_share):<br/>capacity-blind, penalised both lounges"]:::dropped
     S7["DROPPED 200k anchor on catchment women:<br/>demand is now site served"]:::dropped
     S8["DROPPED Estimated customers:<br/>computed, never scored; superseded by served women"]:::dropped
-    S10["DROPPED Emirate-median cost baseline:<br/>moved when siblings opened or closed"]:::dropped
-    S11["DROPPED UAE-wide cost anchor (cost index):<br/>marked down dear Dubai sites, counted served women twice;<br/>now rent ratio within the emirate"]:::dropped
+    S10["DROPPED Emirate-median-of-lounges baseline:<br/>moved when siblings opened or closed"]:::dropped
+    S11["DROPPED UAE-wide COST_ANCHOR (cost index):<br/>marked down dear Dubai sites, counted served women twice;<br/>now rent ratio within the emirate"]:::dropped
     S12["DROPPED 0 → 20k site-served scale:<br/>calibrated on our own lounges; now a percentile of salon sites"]:::dropped
+    S13["UAE-wide demand and rent percentiles:<br/>context, not scored"]:::demoted
+    S14["DROPPED Live-median typical lounge:<br/>drifted when a lounge closed; now frozen at 757 reviews, 4.6★"]:::dropped
   end
   subgraph K["Cost"]
     K1["Shop rent: DLD (Dubai), ADREC (Abu Dhabi),<br/>listings (north), emirate-median fallback"]
     K2["Site cost (150 m² unit, fit-out):<br/>display only"]:::demoted
     K4["Frozen salon-site reference:<br/>emirate median shop rent"]
+    K5["Fallback (emirate-median) rent:<br/>scores neutral, low confidence"]
     K3["DROPPED JLL mall-class rent bands:<br/>4 lounges, read off a chart, superseded by ADREC"]:::dropped
   end
   subgraph C["Competition / attractiveness"]
@@ -335,11 +350,15 @@ no longer scored.*
    `reviews^ALPHA x (rating/4.6)^RATING_ELASTICITY x DECAY[band]`, plus an **outside option** (the
    median premium supplier's weight) standing for women who go elsewhere or don't buy premium. Out
    come **served women per lounge** and **unserved women per cell**. **Site served** re-runs the
-   split with the lounge closed and a typical lounge (median reviews and rating) at its site
+   split with the lounge closed and a typical lounge at its site, frozen at 757 reviews and 4.6★
+   (the 2026-10-11 medians of our scored lounges, `TYPICAL_WHY`)
    ([`notebooks/served_demand.ipynb`](notebooks/served_demand.ipynb)).
 5. **Cost.** Commercial shop rent per cell: Dubai from DLD Ejari shop contracts; Abu Dhabi from
    ADREC's 2025 district retail rates; northern emirates from Property Finder/Bayut asking rents
    (industrial areas dropped, at most 3 listings per building); otherwise the emirate median.
+   A cell on that **fallback** has no rent of its own, so it never decides a call: a lounge whose
+   site cell is on it scores rent neutral, and an area with `RENT_FALLBACK_MIN` or more of its
+   rented women on it passes the rent test; both are low confidence (`RENT_FALLBACK_WHY`).
    Site cost = rent x `REF_UNIT_M2` + amortised fit-out (`FITOUT_AED_M2` over `FITOUT_YEARS`) is
    shown, not scored ([`notebooks/rent.ipynb`](notebooks/rent.ipynb)).
 6. **The yardstick: a frozen market of salon sites** (`SITE_REFERENCE_WHY`,
@@ -350,22 +369,28 @@ no longer scored.*
    **demand percentile** (`demand_pct`: the share of the emirate's reference sites it out-serves;
    UAE-wide for emirates under `MIN_REF_SITES`) and **rent ratio** (`rent_ratio`: the emirate's median
    reference rent ÷ the site's; above 1 = cheaper). Each comes with its UAE-wide percentile as
-   context: "top 20% of Dubai salon sites on demand · 45th percentile UAE-wide".
+   context, not scored (`demand_pct_uae`, `rent_pct_uae`): "top 20% of Dubai salon sites on demand
+   · 45th percentile UAE-wide".
 7. **Lounge call** (`src/model/scorecard.py`). A composite of the demand percentile and the rent
-   ratio scored on a frozen P10-P90 scale (`RENT_RATIO_P10`/`P90`), both judging the site: PROTECT at
-   `PROTECT_AT` or above, SHRINK at `SHRINK_AT` or below, HOLD between.
+   ratio scored on a frozen P10-P90 scale (`RENT_RATIO_P10`/`P90`), equal weights, both judging the
+   site: PROTECT at `PROTECT_AT` or above, SHRINK at `SHRINK_AT` or below, HOLD between. Confidence
+   is low within 0.05 of a line, on a fallback rent, or when a ±25% weight or a third of the 81
+   assumption combinations change the call. Dropped on the way: a UAE-wide cost anchor
+   (`COST_ANCHOR`: it marked down every dear Dubai site and counted served women twice) and an
+   emirate-median-of-our-lounges baseline (it moved when a sibling opened or closed).
    **Cannibalisation** is a display-only what-if: close the lounge, what share of its women do
    siblings absorb ([`notebooks/scorecard.ipynb`](notebooks/scorecard.ipynb)). **Performance vs
    site** (served women / site served) is context, not scored: "The model estimates this lounge is
    performing 2.7x compared to its site" (khalifa-city-a).
 8. **Growth call** (`src/model/growth.py`). Areas are named OSM places (cells with only an emirate
-   fallback name make no area). The what-if opens a typical lounge (median lounge reviews and
-   rating) at each one: women it would serve, how many it takes from our lounges, **net new**. GROW
-   if net new ≥ `NEW_SITE_MIN`, mostly not worker housing, rent ratio ≥ 1 (or unknown) and demand
+   fallback name make no area). The what-if opens the same frozen typical lounge at each one: women it would serve, how many it takes from our lounges, **net new**. GROW
+   if net new ≥ `NEW_SITE_MIN`, mostly not worker housing, rent ratio ≥ 1 (or unknown, or mostly
+   the emirate-median fallback: neutral, low confidence) and demand
    percentile ≥ `DEMAND_PCT_MIN` in its emirate's salon sites; WATCH
    if it falls short on one of those or reaches half of `NEW_SITE_MIN`; SKIP otherwise, and always for
    non-residential names or places under `SKIP_UNDER_WOMEN`
-   ([`notebooks/growth.ipynb`](notebooks/growth.ipynb)).
+   ([`notebooks/growth.ipynb`](notebooks/growth.ipynb)). Net new is not additive across areas:
+   each what-if runs alone, so neighbours claim the same women.
 9. **Explanations.** Claude narrates each call from its fact sheet; it never makes the call (below).
 
 **Key assumptions and known weaknesses** (full ranked list: [`docs/limitations.md`](docs/limitations.md)):
@@ -565,7 +590,7 @@ be replaced with better data.
 | 4 | **Market size** of each ~2 km grid cell | Women aged 15+ | Only relative size matters. WorldPop 2025 gives adults per 100 m but a flat 33.6% female share everywhere, so the split is redone (row 13). Grid cells, not official neighbourhoods: OSM neighbourhoods cover only 66% of Dubai's women and none of Fujairah | in data |
 | 5 | **How Bedashing's share is estimated** | **Capture** = the lounge's Google reviews ÷ (its reviews + its premium substitutes' reviews x a recall correction), inside its 15-min catchment. Estimated customers = capture x catchment women. Shown, not scored: served demand (Huff) replaced it | Reviews stand in for each salon's draw (revealed preference). Other Bedashing lounges count as substitutes, so overlapping lounges split shared demand. It measures share among premium substitutes, not market penetration. Rejected: splitting every cell among every salon that reaches it (~2,100 Google calls vs 72-144) | in data |
 | 6 | **Review counts are lifetime totals** | Google `userRatingCount`, not adjusted for age | Older salons have had longer to collect reviews: a stated limitation. Partly a fair signal too: years of trading build a customer base. Per-year rates were considered and dropped: Google can't sort reviews oldest-first, so the first review needs a full scrape (unaffordable for competitors, and against Google's terms) | in data |
-| 7 | **Ratings don't separate lounges** | Not used as an absolute quality score | Google ratings for the 24 lounges span 4.4-4.9 (median 4.6, std 0.12); 17 of 24 sit at 4.5 or 4.6. No link to review count (Spearman ρ = −0.22, p = 0.30) | in data |
+| 7 | **Ratings don't separate lounges** | Not a scored signal; part of each supplier's Huff pull, (rating / 4.6)^5 | Google ratings for the 24 lounges span 4.4-4.9 (median 4.6, std 0.12); 17 of 24 sit at 4.5 or 4.6. No link to review count (Spearman ρ = −0.22, p = 0.30) | in data |
 | 8 | **Bedashing's price segment** | `expensive` (assumed) | Google has no price level for Bedashing's lounges; to be revisited from its own menu | set |
 | 9 | **Premium substitutes** | Women's beauty, hair and nail salons in the catchment that Google prices expensive or very expensive; where Google has no price, those with reviews ≥ the catchment median and rating ≥ 4.3 | A shopper choosing Bedashing compares it with similar places, not budget salons. Google's price level is crowd-sourced spend per person and only 36% of the 2,824 candidates have it, so popularity and rating stand in. Salons priced expensive or above had twice the median reviews (165 vs 77) | in data |
 | 10 | **How many substitutes** | The most-reviewed premium salons that together hold **60%** of the catchment's premium reviews (50% / 70% as sensitivity): 63 around Al Barsha, 2-3 in Al Dhafra | Reviews are concentrated in thin markets and spread out in dense ones: a fixed top 20 held 22% of reviews around Al Barsha but 66% around Al Taif Mall, so capture against a fixed k meant different things in each catchment. A coverage share makes lounges comparable. (Fixed k = 20 with 10/30 was the earlier design.) | in data |
