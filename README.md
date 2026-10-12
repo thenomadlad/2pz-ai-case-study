@@ -69,6 +69,17 @@ exit) and doesn't run the branches. So every call answers "is this a good place 
 never "is this branch well run?", and each label maps onto a decision they already make: PROTECT,
 HOLD or SHRINK at a lounge's lease event, GROW as the start of a site search.
 
+**Three iterations.**
+1. **Prove a model is possible from public data:** branch locations and Google ratings ranked into
+   simple calls, with a baseline vs scenario loop. It showed the questions could be answered, and
+   where the data was too thin.
+2. **Build a proper software solution:** rebuilt as a hosted Streamlit app with a real data pipeline
+   (population per ~2 km cell, drive times, a competitor pool of about 5,900 salons), in-memory
+   what-ifs, grounded AI explanations, tests and a ranked list of limitations.
+3. **Refine the model:** demand split among competitors by how much each sells, commercial rent as
+   the cost, each site judged within its emirate, decision rules and rent quotes for scenarios, with
+   notebooks, sanity checks and a go/no-go rubric guarding each change.
+
 **Key decisions, and what each costs.**
 - **Judge each site within its emirate**, against a frozen set of 1,123 competitor salon sites. Dubai
   and Abu Dhabi markets (and rent sources) aren't comparable, and a UAE-wide yardstick sank every dear
