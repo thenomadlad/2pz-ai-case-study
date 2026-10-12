@@ -12,7 +12,7 @@ Record each run in the log at the bottom.
 
 ## Rules
 
-1. **Write the expected outcome before running.** Every check below states one. If the expectation changes, change it in a commit of its own, with the reason.
+1. **Write the prediction before running.** Every check below states one. If the expectation changes, change it in a commit of its own, with the reason.
 2. **Don't tune to pass.** A failing check means one of three things: a model bug, a data bug, or a real finding that needs explaining. Record which. Moving a threshold until the check goes green is tuning to taste (rubric MO7). The 24 lounges are both our calibration set and our validation set, so treat them with suspicion.
 3. **A failure is only unexplained until we write it up.** "BT2: al-ain reads saturated because the market filled in after it opened; we accept that" is an explained failure. It counts toward GO, but it still belongs in the limitations doc.
 
@@ -136,7 +136,7 @@ The 24 operating lounges are our only revealed-preference data: Bedashing picked
 
 ---
 
-## Expected outcomes for run 2 (written 2026-10-10, before the fixes)
+## Predictions for run 2 (written 2026-10-10, before the fixes)
 
 What the run-2 fixes are expected to do. Each fix uses the current model, with no structural change.
 
@@ -177,7 +177,7 @@ What the run-2 fixes are expected to do. Each fix uses the current model, with n
 
 What we learned: size, not saturation, is the constraint that binds for growth. The recalibration was right, but it mostly removed a contradiction rather than changing the answer.
 
-## Expected outcomes for run 3 (written 2026-10-10, before the fix)
+## Predictions for run 3 (written 2026-10-10, before the fix)
 
 **The fix (the SC4 bug).** The substitutes' median rating will be taken over the lounge's **whole premium pool**, counting only salons with at least 20 reviews (rubric 4.6). Today it's taken over the top-k by reviews, and k moves with the pool. Capture keeps its top-k, which is already monotone.
 
@@ -190,7 +190,7 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 
 **The change.** A growth area is now one area per OSM place name and emirate, contiguous or not. Cells that carry only their emirate's fallback name (no OSM boundary or place within 3 km) make no area at all. They still count in lounge catchments, overlap and population totals. That's 67 populated cells outside every catchment, about 33.8k women.
 
-**Expected outcome.** This was written *after* a local trial, so it isn't a blind prediction:
+**Prediction.** This was written *after* a local trial, so it isn't a blind prediction:
 - No lounge changes.
 - The GROW list is unchanged.
 - The fake `dubai-dubai` (scattered fallback cells) disappears.
@@ -202,7 +202,7 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
 - **SC3:** no non-residential name gets past SKIP. **New explained caveat:** habshan is WATCH with 44% worker housing and pieces spanning 39 km. That's the cost of merging by name, disclosed in the limitations. Seven non-SKIP areas span more than 20 km, including the GROW areas sharjah-sharjah (33 km) and al-dhaid (23 km). These are large OSM admin units, so an area is a place, not a site (same as BT2/BT3).
 - **Everything else:** unchanged, since lounges didn't move. No unexplained failure.
 
-## Expected outcomes for run 5 (written before the commercial-rent work)
+## Predictions for run 5 (written before the commercial-rent work)
 
 - **No label changes.** Shop rent is display only. Any change to a lounge or area label is a bug.
 - **SC7 (new): plausibility.**
@@ -224,7 +224,7 @@ What we learned: size, not saturation, is the constraint that binds for growth. 
   - Abu Dhabi bands: noya-plaza 250 and westyas 235 (both SHRINK), shahama 151 and al-dhafra 127 (both HOLD). The two SHRINKs reach *more* women per dirham than the two HOLDs.
 - **Coverage: met for Dubai** (5 of 5). Elsewhere only the 4 banded Abu Dhabi lounges (mall or plaza), so 9 of 23 scored lounges in total.
 
-## Expected outcomes for run 7 (written 2026-10-11, before running)
+## Predictions for run 7 (written 2026-10-11, before running)
 
 Model since run 6: served demand (Huff); lounge call = served women (0 → 20k) + site cost index (0.5 → 1.5 vs the emirate's typical site), equal weight; capture, rating and cannibalisation shown, not scored; growth = what-if new lounge (GROW: ≥ 6,000 net new women, worker housing < 50%, cost index ≥ 1 or unknown); areas are now every named place, not only cells outside the catchments; affluence weighting off at baseline. Written from reading the code, before any run.
 
@@ -278,7 +278,7 @@ Scripts: `src.baseline.run()` plus `src.features.lounges.build` + `scorecard.dec
 - **F3 (explained finding, fragility).** One 2,000-review premium salon 200 m away moves al-dhafra PROTECT → SHRINK (0.94 → 0.07), shahama and ras-al-khaimah HOLD → SHRINK, and al-falah and shakhbout-city PROTECT → HOLD. Thin-market lounges' calls rest on there being no big competitor nearby.
 - **F4 (unexplained, model).** In 4 non-SKIP areas net new women exceed twice the area's own women. manama-ajman: 35.1k net new from a place of 5.1k women, by reaching 71 cells through the fitted 12.8 km straight-line 20-min band, in a thin market where the new lounge takes about half of every cell against the outside option. These magnitudes aren't believable as one lounge's draw.
 
-## Expected outcomes for run 8 (written 2026-10-11, before running)
+## Predictions for run 8 (written 2026-10-11, before running)
 
 Scope: F4 only, plus the non-model changes since run 7 (`est_customers` out of the lounge fact sheet, the retired growth rule deleted, the level-switch test limit). Hypothesis from run 7: the fitted straight-line 20-min band (12.8 km) over-reaches for what-if sites with no isochrone, inflating net new women. If so, the band reaches more supplier pairs than the real isochrones on the 810 cells that have both, and the 4 areas reach mostly straight-line cells.
 
@@ -291,7 +291,7 @@ Scope: F4 only, plus the non-model changes since run 7 (`est_customers` out of t
 - **What remains is a model property, not the fallback.** A thin-market share of 55% is in line with our own isolated lounges: al-dhafra serves 17.6k of 22.9k catchment women (77%). It's the same outside-option and attractiveness calibration as F2/F3 (ALPHA 1, OUTSIDE_PCTL 50, affluence off at baseline). Also, neighbouring areas claim the same women: manama-ajman's 35.1k and al-dhaid-sharjah's 57.9k both come mostly from Al Dhaid. Each what-if opens one lounge alone, so GROW net-new figures must not be summed across areas.
 - **Non-model changes, no call moved:** the lounge fact sheet no longer carries `est_customers`, and the 23 lounge so-whats were regenerated offline to quote served women (121 cached, all grounded). The dead two-test rule is out of growth.py. The level-switch test limit is now 3 s: a new level re-runs level_flips' 82 lounge builds, which take 1.6–1.9 s warm.
 
-## Expected outcomes for run 9 (written 2026-10-11, before running SC4 and the back-tests)
+## Predictions for run 9 (written 2026-10-11, before running SC4 and the back-tests)
 
 Scope: F1 and F2 fixed by the owner's decisions. **F1 (b):** the cost index compares every lounge and area with one frozen UAE-wide anchor, `COST_ANCHOR` = 14.34 site-served women per AED 1k of site cost (the median scored lounge site at baseline). The emirate / area baseline switch is gone. **F2 (a):** the demand signal is `site_served`, what a typical lounge (median reviews and rating) would serve at the lounge's site with that lounge closed and its siblings and rivals open (`served.site_served`, equal to `what_if_open(closed={b})`). The cost signal uses site_served too, so both scored signals assess the site. The lounge's own served women are context: `performance_vs_site` = served_women ÷ site_served ("The model estimates this lounge is performing 2.7x compared to its site"). The SC2 counts and call diff below were computed before this section was written; the rest are predictions.
 
@@ -358,7 +358,7 @@ Areas: **15 WATCH → GROW, nothing else moves** (34 → 49 GROW, 63 → 48 WATC
 - **F3 (explained finding, fragility):** unchanged in kind, larger in reach: one big rival 200 m away moves 6 PROTECT sites to HOLD.
 - **F5 (new, explained, minor):** the typical lounge (median reviews and rating of open lounges) drifts with closures, so a closure far away can move a knife-edge call (al-maqta). Fix if wanted: freeze it like the anchor.
 
-## Expected outcomes for run 10 (written 2026-10-11, before running SC4 and the back-tests)
+## Predictions for run 10 (written 2026-10-11, before running SC4 and the back-tests)
 
 Scope: the owner's decision to judge labels **within each emirate, against its market of salon SITES**, frozen. Reference = the 1,123 real premium competitor salons the served model uses (no imputed, no Bedashing), each with its cell shop rent and the women a typical lounge would serve there with all our lounges open (`data/seed/v3/site_reference.csv`, built once by `scripts/build_site_reference.py` in ~9 s; Dubai 582, Abu Dhabi 304, Sharjah 143, Ajman 38, Ras Al Khaimah 33, Fujairah 18, Umm Al Quwain 5). Demand = `demand_pct`, the site's percentile among its emirate's reference sites (UAE-wide under 50). Cost = `rent_ratio` = emirate median reference rent ÷ site rent, on a frozen P10–P90 scale (0.618 → 0, 1.429 → 1). `COST_ANCHOR` and `cost_index` are gone; served women are no longer in the cost signal. GROW also needs `rent_ratio` ≥ 1 and `demand_pct` ≥ 0.5.
 
@@ -419,7 +419,7 @@ Areas: **17 GROW → WATCH, nothing else moves** (49 → 32 GROW, 48 → 65 WATC
 - **F6 (new, explained):** emirate-relative lounge calls vs an absolute growth size line: nad-al-sheba PROTECT but its site would be SKIP as a new opening.
 - **F7 (new, explained):** composites bunch around the middle on the percentile / ratio scales: 14 HOLD, 9 within 0.05 of a line.
 
-## Expected outcomes for run 11 (written 2026-10-11, before running SC4)
+## Predictions for run 11 (written 2026-10-11, before running SC4)
 
 Scope: three owner-approved fixes. (1) **Fallback rents are neutral** (`growth.RENT_FALLBACK_WHY`): an area with half or more of its rented women in emirate-median cells passes the GROW rent test, low confidence, caveat; a lounge whose site cell is on the fallback scores rent 0.5, low confidence. (2) **The typical lounge is frozen** at 757 reviews, 4.6★ (`lounges.TYPICAL_WHY`; site_reference.csv unchanged, built with the same values). (3) The keep-within-emirate vs absolute-growth-floor limitation is stated (F6), no call change.
 
