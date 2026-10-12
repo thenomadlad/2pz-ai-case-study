@@ -315,18 +315,58 @@ what it would add after our own lounges keep theirs.
 - **15 GROW areas are places our lounges already serve** (2% or more of their women), such as Sharjah
   city (3%, about 12.8k net new women for a new lounge), Kalba, Muntazy and Zakhir.
 
-### Once we have the data: how we'd judge demand, capture and return
+## The ideal model: the same decisions on Bedashing's own metrics
 
-- **Demand.** Appointments per lounge, and penetration (customers ÷ women 15+ in the catchment). Customers' home areas give the *real* catchment, which we'd use to calibrate the Huff model: fit the review weighting, distance decay and outside option to observed bookings, instead of the starting values used today.
-- **Capture.** Our appointments ÷ the catchment's total premium appointments (women × visit frequency × premium share). Track it over time and against nearby competitors, rather than inferring it from review counts.
-- **Return: the numbers that should decide calls.**
-  - **Contribution per appointment** = revenue − variable cost (staff time, products).
-  - **Lounge profit** = contribution × appointments − fixed costs (rent, service charge, fit-out depreciation).
-  - **Profit per m² per year** (and per AED of rent): the fairest comparison across sites of different size and rent, and a direct replacement for today's "demand per AED of rent" idea.
-  - **Profit per chair-hour**: how well capacity is used.
-  - **Payback and ROIC** on fit-out: the return-on-capital gate for opening and keeping sites.
+Today's model is a proxy for one we'd build with Bedashing's own data. The structure stays the same,
+**demand → what we can serve → what it costs → what it returns → the call**, but every step is
+measured instead of estimated. The two biggest upgrades are the cost side and **capacity**, which
+today isn't modelled at all.
 
-  With these, PROTECT means top-quartile profit per m² with high utilisation, SHRINK means negative profit after the site's own costs, and GROW means a new site's predicted profit per m² beats the network median within the payback period.
+| Step | Today (proxy) | Ideal (Bedashing's data) |
+|---|---|---|
+| **Demand** | Women 15+ within a 10-20 min drive, split among salons by Google reviews (Huff) | Bookings by customer home area: the real catchment, penetration (customers ÷ women 15+) and repeat rate; the Huff split calibrated to observed booking shares instead of review counts |
+| **Capture** | Share of our served market, from the same split | Our appointments ÷ the catchment's premium appointments (women × visit frequency × premium share) |
+| **Capacity** | None | Chairs × opening hours × minutes per service = appointments a lounge can do; **utilisation** (booked ÷ available chair-hours), peak-hour utilisation, **turn-aways** (requests that found no slot) and lead time to the next free slot |
+| **Cost** | Area shop rent × an assumed 150 m² unit + assumed fit-out | Per lounge: base rent, service charge and fees, fit-out depreciation (fixed); staff salaries, commissions and visas, products per service, booking-platform fees (variable per appointment) |
+| **Return** | None | Contribution per appointment (ticket − variable cost); lounge profit; **profit per m²** and per chair-hour; payback and ROIC on fit-out |
+
+### The cost side
+
+- **Contribution per appointment** = average ticket − variable cost (therapist time and commission,
+  products, platform fees). This is what one more customer is worth.
+- **Break-even appointments** = fixed costs (rent, service charge, fees, fit-out depreciation) ÷
+  contribution per appointment. The **margin of safety** is how far actual appointments sit above it.
+- **Profit per m² per year** compares sites of different size and rent fairly. It is the measured
+  version of today's "demand per AED of rent": rent stays the biggest swing factor, but now it is netted
+  against what the site actually earns.
+
+### Capacity: can a lounge take more customers?
+
+Served customers are the smaller of the demand a lounge captures and the capacity it has. That one
+line changes the calls:
+- **Full** (high utilisation, turn-aways): demand is being lost. Protect it, and test adding capacity
+  in place (more chairs or hours) before opening nearby: the marginal chair's contribution against
+  the marginal rent of the extra space.
+- **Headroom** (low utilisation): the lounge could serve more without new capital. A SHRINK here is
+  a real candidate to downsize, especially if siblings have headroom to absorb its customers.
+- **Shared catchments:** if two lounges both run full and the area still has unserved women, add
+  capacity at both (or open). If both have headroom, consolidating is worth testing. Today's model
+  can only see the second half of that (unserved women), not whether the lounges are full.
+
+### The calls, on these metrics
+
+- **PROTECT:** profit per m² in the top quartile and utilisation high (or turn-aways): a strong site
+  that is earning and is full.
+- **HOLD:** profitable but around the network median, or utilisation slipping: no capital move this cycle.
+- **SHRINK:** below break-even after its own rent and costs, with low utilisation, and customers its
+  siblings could absorb (measured from customers' booking history): review downsizing or consolidation.
+- **Expand in place:** utilisation and turn-aways high, and an extra chair's contribution beats its
+  extra rent.
+- **GROW:** predicted appointments (calibrated demand × capture, net of what it takes from our own
+  lounges) × contribution covers the quoted rent, staff and fit-out within an agreed payback period.
+
+The What-if explorer's levers carry over unchanged: a landlord's rent quote would feed the cost side
+directly, and the decision rules become hurdle rates (minimum profit per m², payback, utilisation).
 
 ## Decisions about the model
 

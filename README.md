@@ -156,6 +156,28 @@ more than the calls. The biggest ones:
 The full ranked list, with which calls each limitation touches and what would fix it:
 [`docs/limitations.md`](docs/limitations.md), also the app's **How it works & limitations** page.
 
+## The model we'd build with Bedashing's data
+
+The same decisions and the same chain (**demand → what we can serve → cost → return → the call**),
+measured instead of estimated:
+- **Demand and capture:** bookings by customer home area, to measure the real catchment and penetration,
+  and to calibrate the demand split on actual booking shares instead of Google reviews.
+- **Capacity**, which today isn't modelled: chairs × hours × minutes per service, **utilisation**, peak
+  utilisation and **turn-aways** (requests with no free slot). Served customers are the smaller of
+  captured demand and capacity, so a full lounge losing customers reads very differently from a
+  half-empty one, and two lounges in one catchment that both run full point to adding capacity, not
+  consolidating.
+- **Cost:** each lounge's base rent, service charge, fees and fit-out depreciation (fixed), and staff,
+  commissions, products and booking fees per appointment (variable). From these: **contribution per
+  appointment**, **break-even appointments** and **profit per m²**, the measured version of today's
+  "demand per AED of rent".
+- **The calls on those metrics:** PROTECT = top-quartile profit per m² and full; SHRINK = below
+  break-even with low utilisation and customers its siblings can absorb; **expand in place** when an
+  extra chair earns more than its rent; GROW = predicted appointments × contribution covers the rent
+  quote, staff and fit-out within the payback period.
+
+Full version: [docs/model.md](docs/model.md) ("The ideal model").
+
 ## Who it's for, and what it decides
 
 **Who decides:** the network and capital owner, on the retail portfolio team. They decide where
