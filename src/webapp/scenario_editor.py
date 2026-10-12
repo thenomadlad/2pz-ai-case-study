@@ -54,7 +54,7 @@ def render_panel() -> None:
                     "lounges, to competitors, or nowhere) and whether any other call moves.")
         calls = {d.branch_id: d.action for d in data.baseline().decisions}
         order = {"SHRINK": 0, "HOLD": 1, "PROTECT": 2}
-        names = {lo.branch_id: short(lo.title) for lo in data.v3().lounges}
+        names = {lo.branch_id: short(lo.title, lo.branch_id) for lo in data.v3().lounges}
         st.multiselect("Close lounges", sorted(names, key=lambda b: (order.get(calls.get(b), 3), names[b])),
                       key="wi-closed", on_change=_sync, format_func=lambda b: f"{names[b]} · {calls.get(b, '')}",
                       placeholder="SHRINK lounges first")

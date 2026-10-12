@@ -13,6 +13,7 @@ from src.webapp.views import (
     badge,
     emirate_filter,
     explanation_for,
+    render_assumptions,
     render_caveats,
     render_factor_table,
     render_pyramid,
@@ -53,7 +54,8 @@ def _area_table(r) -> None:
     by_id = {a.area_id: a for a in r.areas}
     ranked = sorted((d for d in r.area_decisions if d.action != "SKIP"),
                     key=lambda d: (ORDER[d.action], -(by_id[d.area_id].new_site_net or 0)))
-    df = pd.DataFrame([{"Rank": i, "Area": a.name, "Emirate": a.emirate, "Call": d.action,
+    df = pd.DataFrame([{"Open": f"area?area={a.area_id}", "Rank": i, "Area": a.name, "Emirate": a.emirate, "Call": d.action,
+                        "Call at 10 / 15 / 20 min": data.calls_by("travel", "area", a.area_id),
                         "Net new women": round(a.new_site_net or 0), "Demand pct (emirate)": a.demand_pct,
                         "Demand pct (UAE)": a.demand_pct_uae, "Rent ratio": a.rent_ratio, "Rent pct (UAE)": a.rent_pct_uae,
                         "Women 15+": round(a.women), "Worker housing": a.worker_share,
@@ -70,6 +72,7 @@ def _area_table(r) -> None:
     df = df[df.Call.isin(calls or df.Call) & df.Emirate.isin(emirates or df.Emirate)]
     pct = st.column_config.NumberColumn(format="percent")
     st.dataframe(df, hide_index=True, column_config={
+        "Open": st.column_config.LinkColumn(display_text="Open →", width="small"),
         "Worker housing": pct, "Searched": pct, "Demand pct (emirate)": pct, "Demand pct (UAE)": pct,
         "Rent pct (UAE)": pct, "Rent ratio": st.column_config.NumberColumn(format="%.2f"),
         "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
@@ -119,6 +122,7 @@ def render() -> None:
         render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
                        d.action != "SKIP")
     _rule(a, d)
+    render_assumptions("area", area_id)
 
     layers = [area_cells_layer(data.v3().cells, r.areas, r.area_decisions, only=area_id),
               lounge_layer(r.features, r.decisions)]

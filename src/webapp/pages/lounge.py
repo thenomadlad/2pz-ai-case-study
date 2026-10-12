@@ -22,6 +22,7 @@ from src.webapp.views import (
     explanation_for,
     lounge_caveats,
     performance_line,
+    render_assumptions,
     render_caveats,
     render_factor_table,
     render_pyramid,
@@ -91,7 +92,8 @@ WEIGHTS = {s.name: s.weight for s in scorecard.SIGNALS}
 
 
 def _lounge_table(r) -> None:
-    df = pd.DataFrame([{"Lounge": short(f.name), "Call": d.action, "Emirate": f.emirate,
+    df = pd.DataFrame([{"Open": f"lounge?lounge={f.branch_id}", "Lounge": short(f.name, f.branch_id), "Call": d.action,
+                        "Call at 10 / 15 / 20 min": data.calls_by("travel", "lounge", f.branch_id), "Emirate": f.emirate,
                         "Composite": None if f.not_scored else d.composite,
                         **{n.capitalize(): d.scores.get(n) for n in WEIGHTS},
                         "Demand pct (emirate)": None if f.not_scored else f.demand_pct,
@@ -112,6 +114,7 @@ def _lounge_table(r) -> None:
     score = st.column_config.ProgressColumn(min_value=0, max_value=1, format="%.2f")
     pct = st.column_config.NumberColumn(format="percent")
     st.dataframe(df, hide_index=True, column_config={
+        "Open": st.column_config.LinkColumn(display_text="Open →", width="small"),
         "Composite": score, **{n.capitalize(): score for n in WEIGHTS}, "Shared catchment": pct,
         "Demand pct (emirate)": pct, "Demand pct (UAE)": pct, "Rent pct (UAE)": pct,
         "Rent ratio": st.column_config.NumberColumn(format="%.2f"),
@@ -119,7 +122,8 @@ def _lounge_table(r) -> None:
         "Review share": pct, "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
         "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
         "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f")})
-    st.caption("Click a column header to sort. Signal scores are 0-1 on fixed scales (1 = good for the "
+    st.caption("Open → shows that lounge's page (in a new tab). Call at 10 / 15 / 20 min: the call at each drive "
+               "time, the other assumptions at baseline. Click a column header to sort. Signal scores are 0-1 on fixed scales (1 = good for the "
                "lounge) and both score the site within its emirate's frozen market of competitor salon sites "
                "(demand pct = share of them it out-serves, UAE-wide where the emirate has under 50; rent ratio = their "
                "median shop rent ÷ the site's, above 1 = cheaper); the UAE columns rank the same site against all "
@@ -181,6 +185,7 @@ def render() -> None:
 
     if d.action != "NOT SCORED":
         _signals(f, d)
+    render_assumptions("lounge", b)
     _substitutes(subs, f, data.assumptions().competitor_coverage[r.levels.coverage])
     _shared(r, b)
     render_factor_table(exp, explain.LOUNGE_TABLE, facts)

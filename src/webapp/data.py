@@ -101,3 +101,30 @@ def reached(levels: Levels, closed: frozenset[str]) -> dict[str, list[str]]:
 
 def address(branch_id: str) -> str:
     return next(lo.address for lo in v3().lounges if lo.branch_id == branch_id)
+
+
+AXES = (("travel", "Drive time"), ("coverage", "Competitor coverage"), ("worker_share", "Women in worker housing"))
+LEVELS = ("low", "medium", "high")
+
+
+@lru_cache(maxsize=16)
+def at_level(axis: str, level: str) -> tuple[dict, dict, float]:
+    """The baseline with one assumption moved: {lounge: (features, decision)}, {area: (area, decision)} and the
+    women our lounges serve. No confidence check (the 81 combinations), so it builds in well under 2 s."""
+    from src.features.lounges import build
+    from src.model import growth, scorecard
+    levels = Levels(**{**dataclasses.asdict(Levels()), axis: level})
+    feats, areas = build(v3(), assumptions(), levels)
+    return ({f.branch_id: (f, d) for f, d in zip(feats, scorecard.decide(feats))},
+            {a.area_id: (a, d) for a, d in zip(areas, growth.classify_all(areas))},
+            sum(f.served_women or 0 for f in feats))
+
+
+def calls_by(axis: str, kind: str, sid: str) -> str:
+    """'HOLD · HOLD · PROTECT': the call at the low, medium and high level of one assumption."""
+    out = []
+    for lv in LEVELS:
+        lounges, areas, _ = at_level(axis, lv)
+        hit = (lounges if kind == "lounge" else areas).get(sid)
+        out.append(hit[1].action if hit else "—")
+    return " · ".join(out)

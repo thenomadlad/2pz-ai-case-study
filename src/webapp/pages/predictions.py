@@ -135,7 +135,7 @@ def _lounge_panel(r, b: str) -> None:
         return
     d = next(d for d in r.decisions if d.branch_id == b)
     exp, _ = explanation_for(r, "lounge", b)
-    st.subheader(short(f.name))
+    st.subheader(short(f.name, f.branch_id))
     call, go = st.columns([1, 9], gap="small", vertical_alignment="center")
     with call:
         badge(d.action)

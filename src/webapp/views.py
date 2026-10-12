@@ -273,6 +273,46 @@ def render_caveats(title: str, items: list[str], strong: bool) -> None:
     (st.warning if strong else st.info)(f"**{title}**\n\n" + "\n".join(f"- {c}" for c in items))
 
 
-def short(name: str) -> str:
+def short(name: str, branch_id: str = "") -> str:
     """'Bedashing Beauty Lounge - Al Dhafra' -> 'Al Dhafra'."""
-    return re.sub(r"^Bedashing Beauty Lounge\s*[-–]?\s*", "", name) or name
+    rest = re.sub(r"^Bedashing Beauty Lounge\s*[-–]?\s*", "", name)
+    return rest or (branch_id.replace("-", " ").title() if branch_id else name)
+
+
+def render_assumptions(kind: str, sid: str) -> None:
+    """How this lounge's or area's key estimates and call move as each assumption moves (others at baseline)."""
+    st.markdown("##### How the estimates move with the assumptions")
+    st.caption("Each tab moves one assumption and keeps the others at their baseline. All figures are the "
+               "model's estimates.")
+    base = Levels()
+    for tab, (axis, name) in zip(st.tabs([n for _, n in data.AXES]), data.AXES):
+        rows = []
+        for lv in data.LEVELS:
+            lounges, areas, served = data.at_level(axis, lv)
+            label = level_label(axis, lv) + (" · baseline" if lv == getattr(base, axis) else "")
+            if kind == "lounge":
+                f, d = lounges.get(sid, (None, None))
+                if f is None:
+                    continue
+                rows.append({"Assumption": label, "Women in catchment": round(f.catchment_women),
+                             "Site demand": None if f.site_served is None else round(f.site_served),
+                             "Served by this lounge": round(f.served_women or 0),
+                             "Share of our market": round(100 * (f.served_women or 0) / served) if served else None,
+                             "Out-serves": None if f.demand_pct is None else round(100 * f.demand_pct),
+                             "Composite": None if d.action == "NOT SCORED" else d.composite, "Call": d.action})
+            else:
+                a, d = areas.get(sid, (None, None))
+                if a is None:
+                    rows.append({"Assumption": label, "Call": "not an area here"})
+                    continue
+                rows.append({"Assumption": label, "Women 15+": round(a.women),
+                             "Net new women": round(a.new_site_net or 0),
+                             "Est. growth": round(100 * (a.new_site_net or 0) / served) if served else None,
+                             "Out-serves": None if a.demand_pct is None else round(100 * a.demand_pct),
+                             "Call": d.action})
+        tab.dataframe(pd.DataFrame(rows), hide_index=True, column_config={
+            "Composite": st.column_config.ProgressColumn(min_value=0, max_value=1, format="%.2f"),
+            "Site demand": st.column_config.NumberColumn(help="Women a typical lounge would serve at this site"),
+            "Share of our market": st.column_config.NumberColumn(format="%d%%"),
+            "Out-serves": st.column_config.NumberColumn(format="%d%%", help="Share of its emirate's salon sites it out-serves"),
+            "Est. growth": st.column_config.NumberColumn(format="+%d%%", help="Net new women ÷ the women our lounges serve")})

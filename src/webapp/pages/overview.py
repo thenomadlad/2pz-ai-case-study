@@ -90,13 +90,13 @@ def _cards(p: dict) -> None:
     share = lambda fs: f"{sum(f.served_women or 0 for f in fs) / p['base']:.0%}"
     top = p["grow"][0] if p["grow"] else None
     cards = [("1 · Review", p["claims"]["review"], share(p["shrink"]),
-              "of our served market (model estimate)", ", ".join(short(f.name) for f in p["shrink"]), "review"),
+              "of our served market (model estimate)", ", ".join(short(f.name, f.branch_id) for f in p["shrink"]), "review"),
              ("2 · Grow", p["claims"]["grow"],
               f"+{top.new_site_net / p['base']:.0%}" if top else "none",
               f"best: {top.name} (model est.)" if top else "",
               ", ".join(a.name for a in p["grow"][:3]) + (" …" if len(p["grow"]) > 3 else ""), "grow"),
              ("3 · Protect", p["claims"]["protect"], share(p["protect"]),
-              "of our served market (model estimate)", ", ".join(short(f.name) for f in p["protect"]), "protect")]
+              "of our served market (model estimate)", ", ".join(short(f.name, f.branch_id) for f in p["protect"]), "protect")]
     for col, (label, claim, kpi, kpi_note, names, anchor) in zip(st.columns(3), cards):
         with col.container(border=True, height="stretch"):
             st.caption(label)
@@ -125,7 +125,7 @@ def _lounge_evidence(r, fs: list, claim: str, anchor: str) -> None:
     left, right = st.columns([5, 8])
     left.pydeck_chart(build_deck([lounge_layer(r.features, r.decisions, only=ids)],
                                  _fit([(f.lat, f.lng) for f in fs])), height=340)
-    df = pd.DataFrame([{"Lounge": short(f.name), "Composite": calls[f.branch_id].composite,
+    df = pd.DataFrame([{"Lounge": short(f.name, f.branch_id), "Composite": calls[f.branch_id].composite,
                         "Share of market": _pct((f.served_women or 0) / served_market(r)),
                         "Out-serves": _pct(f.demand_pct), "Rent ratio": _ratio(f.rent_ratio),
                         "Vs its site": f.performance_vs_site, "Confidence": calls[f.branch_id].confidence,
@@ -186,7 +186,7 @@ def _how_sure(r) -> None:
     near = [d for d in calls if min(abs(d.composite - scorecard.PROTECT_AT),
                                     abs(d.composite - scorecard.SHRINK_AT)) <= scorecard.LOW_MARGIN]
     low = [d for d in calls if d.confidence == "low"]
-    names = {f.branch_id: short(f.name) for f in r.features}
+    names = {f.branch_id: short(f.name, f.branch_id) for f in r.features}
     st.markdown(f"- **{_n(len(hold), 'lounge')} sit between the lines (HOLD):** no action, but "
                 f"{_n(len(near), 'call')} overall {'is' if len(near) == 1 else 'are'} within "
                 f"{scorecard.LOW_MARGIN} of a line.\n"
