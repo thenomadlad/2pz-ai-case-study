@@ -6,7 +6,8 @@ from src.features.lounges import substitutes
 from src.model import growth, scorecard
 from src.webapp import data, nav
 from src.webapp.map import (
-    affluence_layer,
+    CAPTURED_FULL,
+    CAPTURED_MIN,
     area_cells_layer,
     build_deck,
     catchment_cells_layer,
@@ -44,14 +45,12 @@ def _selection(map_state) -> tuple[str | None, str | None]:
     return st.query_params.get("lounge"), st.query_params.get("area")
 
 
-def map_layers(r, lounge: str | None, show_areas: bool, show_skip: bool, show_subs: bool,
-               show_affluence: bool = False, show_overlap: bool = False, show_all_subs: bool = False) -> list:
-    """Bottom to top: affluence, every catchment (overlap), growth areas, every lounge's premium
+def map_layers(r, lounge: str | None, show_subs: bool,
+               show_overlap: bool = False, show_all_subs: bool = False) -> list:
+    """Bottom to top: every catchment (overlap), growth areas, every lounge's premium
     substitutes, the selected lounge's catchment cells, polygon and substitutes, then every lounge
     as a pin."""
     v3, layers = data.v3(), []
-    if show_affluence:
-        layers.append(affluence_layer(v3.cells))
     if show_overlap:
         layers.append(overlap_layer(v3.cells, data.reached(r.levels, frozenset(r.closed)),
                                     data.women(r.levels.worker_share)))
@@ -59,8 +58,7 @@ def map_layers(r, lounge: str | None, show_areas: bool, show_skip: bool, show_su
         subs = {s["place_id"]: s for f in r.features
                 for s in substitutes(v3, data.assumptions(), r.levels, frozenset(r.closed), f.branch_id)}
         layers.append(substitutes_layer(list(subs.values()), "all-substitutes"))
-    if show_areas:
-        layers.append(area_cells_layer(v3.cells, r.areas, r.area_decisions, show_skip))
+    layers.append(area_cells_layer(v3.cells, r.areas, r.area_decisions))   # always: colour says what each is
     if lounge:
         f = next(f for f in r.features if f.branch_id == lounge)
         layers += [catchment_cells_layer(v3.cells, data.catchment(r.levels, lounge),
@@ -72,7 +70,7 @@ def map_layers(r, lounge: str | None, show_areas: bool, show_skip: bool, show_su
     return layers + [lounge_layer(r.features, r.decisions)]
 
 
-def _legend(r, lounge: str | None, show_affluence: bool, show_overlap: bool = False,
+def _legend(r, lounge: str | None, show_overlap: bool = False,
             show_all_subs: bool = False) -> None:
     lounges, areas = st.columns(2)
     with lounges:
@@ -86,12 +84,6 @@ def _legend(r, lounge: str | None, show_affluence: bool, show_overlap: bool = Fa
     if show_all_subs:
         st.markdown("**Every lounge's premium substitutes** (grey, sized by reviews): the premium salons each "
                     "lounge's review share is measured against.")
-    if show_affluence:
-        rent = data.rents()
-        st.markdown(f"**Affluence**: 🟧 observed median household rent per cell, pale = cheap "
-                    f"({rent.min() / 1000:,.0f}k AED/yr), deep orange = dear ({rent.max() / 1000:,.0f}k), "
-                    f"{len(rent)} Dubai cells only (DLD rents); **uncoloured cells have no data** "
-                    "and are weighted neutral.")
     if lounge:
         st.markdown(f"**{lounge}**: its {data.minutes(r.levels)}-min drive polygon, catchment cells "
                     "(darker = more women) and premium substitutes (grey, sized by reviews).")
@@ -114,13 +106,14 @@ def _lounge_legend() -> None:
 
 
 def _area_legend(r) -> None:
-    st.markdown(f"**Growth areas** (cells beyond a {data.minutes(r.levels)}-min drive of every lounge)")
-    st.markdown(f"🔵 **GROW**: a typical new lounge here would add ≥ {growth.NEW_SITE_MIN:,} net new women, "
+    st.markdown("**Areas** (every named place; colour, not checkboxes, says what each is)")
+    st.markdown(f"🟦 **GROW**: a typical new lounge here would add ≥ {growth.NEW_SITE_MIN:,} net new women, "
                 f"worker housing under {growth.WORKER_CAP:.0%}, out-serving {growth.DEMAND_PCT_MIN:.0%}+ of its emirate's "
                 "salon sites *and* rent no dearer than their median (or unknown)  \n"
-                "🟣 **WATCH**: big but dearer or weaker demand, big but mostly worker housing, or "
-                f"{growth.NEW_SITE_MIN // 2:,}+ net new women  \n"
-                f"⚪ **SKIP**: otherwise, under {growth.SKIP_UNDER_WOMEN:,} women, or a non-residential name")
+                f"🟩 **Already captured**: our lounges serve {CAPTURED_MIN:.0%}+ of its women (model estimate); "
+                f"deeper green = more, deepest at {CAPTURED_FULL:.0%}+  \n"
+                "🩵 **WATCH**: big but dearer or weaker demand, or mostly worker housing  \n"
+                f"⬜ **SKIP or no data**: under {growth.SKIP_UNDER_WOMEN:,} women, a non-residential name, or too small a gain")
 
 def _lounge_panel(r, b: str) -> None:
     f = next((f for f in r.features if f.branch_id == b), None)
@@ -144,7 +137,7 @@ def _lounge_panel(r, b: str) -> None:
         render_caveats("Caveats for this lounge" if d.action == "NOT SCORED"
                        else f"Confidence: {d.confidence}. Caveats for this lounge",
                        lounge_caveats(f, d, r.flips.get(b)), d.confidence == "low")
-    st.page_link(nav.LOUNGE, label=f"Open the lounge page{" (baseline)" if data.active() else ""} →", icon="💇", query_params={"lounge": b})
+    st.page_link(nav.LOUNGE, label=f"Open the lounge page{' (baseline)' if data.active() else ''} →", icon="💇", query_params={"lounge": b})
 
 
 def _area_panel(r, area_id: str) -> None:
@@ -168,7 +161,7 @@ def _area_panel(r, area_id: str) -> None:
     with right:
         render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
                        d.action != "SKIP")
-    st.page_link(nav.AREA, label=f"Open the area page{" (baseline)" if data.active() else ""} →", icon="📍", query_params={"area": area_id})
+    st.page_link(nav.AREA, label=f"Open the area page{' (baseline)' if data.active() else ''} →", icon="📍", query_params={"area": area_id})
 
 
 def render() -> None:
@@ -183,26 +176,22 @@ def render() -> None:
     map_key = f"uae-map-{st.session_state.get('map_nonce', 0)}"
     lounge, area_id = _selection(st.session_state.get(map_key))
     # Controls above the map and the legend below it, so the map keeps its width on narrow screens.
-    c1, c2, c3, c4 = st.columns(4)
-    show_areas = c1.checkbox("Growth areas", value=True)
-    show_skip = c2.checkbox("…including SKIP areas", value=False, disabled=not show_areas)
-    show_affluence = c3.checkbox("Affluence (Dubai rents)", value=False)
-    show_overlap = c4.checkbox("All catchments (overlap)", value=False)
-    c1, c2, c3, _ = st.columns(4)
+    c1, c2, c4, c5 = st.columns(4)
     show_subs = c1.checkbox("Premium substitutes", value=True)
     show_all_subs = c2.checkbox("…of every lounge", value=False)
+    show_overlap = c4.checkbox("All catchments (overlap)", value=False)
     # Not "Clear selection": the map's own toolbar has that button, which clears only the widget.
-    if (lounge or area_id) and c3.button("Deselect"):
+    if (lounge or area_id) and c5.button("Deselect"):
         st.query_params.pop("lounge", None)
         st.query_params.pop("area", None)
         st.session_state["map_nonce"] = st.session_state.get("map_nonce", 0) + 1
         st.rerun()
     open_ = {f.branch_id for f in r.features}
-    layers = map_layers(r, lounge if lounge in open_ else None, show_areas, show_skip, show_subs,
-                        show_affluence, show_overlap, show_all_subs)
+    layers = map_layers(r, lounge if lounge in open_ else None, show_subs,
+                        show_overlap, show_all_subs)
     st.pydeck_chart(build_deck(layers), on_select="rerun", selection_mode="single-object", key=map_key)
     # Only known ids reach markdown: the URL value is untrusted.
-    _legend(r, lounge if lounge in open_ else None, show_affluence, show_overlap, show_all_subs)
+    _legend(r, lounge if lounge in open_ else None, show_overlap, show_all_subs)
     if lounge:
         _lounge_panel(r, lounge)
     elif area_id:

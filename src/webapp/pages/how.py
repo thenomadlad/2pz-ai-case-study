@@ -12,7 +12,6 @@ from src.features.lounges import (
     SITE_REFERENCE_WHY,
     site_reference,
 )
-from src.market import AFFLUENCE_CLIP, AFFLUENCE_CLIP_WHY
 from src.model import growth, scorecard
 from src.webapp import data
 from src.webapp.views import wrapped_table
@@ -97,8 +96,6 @@ def render() -> None:
                 "(khalifa-city-a at baseline). The call scores the site; this says how the lounge does on it, "
                 "which rests on its own reviews and rating."},
         {"Constant": "NOT_SCORED", "Value": ", ".join(sorted(NOT_SCORED)), "Why": NOT_SCORED_WHY},
-        {"Constant": "AFFLUENCE_CLIP (src/market.py)", "Value": f"{AFFLUENCE_CLIP[0]:g} to {AFFLUENCE_CLIP[1]:g}",
-         "Why": AFFLUENCE_CLIP_WHY},
     ])
 
     st.header("Growth areas (src/model/growth.py)")

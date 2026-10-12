@@ -1,4 +1,3 @@
-import re
 import time
 
 from streamlit.testing.v1 import AppTest
@@ -56,7 +55,7 @@ def test_overview_full_app_leads_with_summary_then_limitations():
     from src.baseline import run
     low = sum(d.confidence == "low" for d in run().decisions if d.action != "NOT SCORED")
     assert f"**{low} of 23**" in body and "Sharjah" in body    # live low-confidence count (7, 2026-10-11)
-    assert "Shop rent comes from different sources per emirate" in body and "Affluence weighting is off" in body
+    assert "Shop rent comes from different sources per emirate" in body
     from src.model import scorecard
     assert f"{scorecard.FLIP_LOW}+ of the {scorecard.COMBOS}" in body
 
@@ -115,8 +114,7 @@ def test_level_selectors_show_actual_values():
     at = _page("predictions")
     sb = at.selectbox(key="wi-travel")
     assert sb.options == ["10 min (low)", "15 min (medium)", "20 min (high)"]
-    assert at.selectbox(key="wi-affluence").options == [
-        "off (low)", "medium: rent^0.5 (medium)", "strong: rent^1 (high)"]
+    assert not any(sb.key == "wi-affluence" for sb in at.selectbox)       # affluence isn't offered in the app
     assert at.number_input(key="wi-recall").value == 0.66
 
 
@@ -209,39 +207,6 @@ def test_area_page_follows_the_url_when_revisited_in_the_same_session():
     at.query_params["area"] = "kalba-sharjah"
     at.run()
     assert not at.exception and at.header[0].value == "Area: Kalba, Sharjah"
-
-
-def test_affluence_selector_switches_the_weighting_and_reports_what_changed():
-    at = _page("predictions")
-    # affluence is off at baseline since 82ae029, so the what-if switches it on (served-demand model 2026-10-11)
-    at.selectbox(key="wi-affluence").set_value("medium").run()
-    assert not at.exception
-    assert at.session_state["what_if"]["levels"] == Levels(affluence="medium")
-    assert any("affluence weighting medium" in w.value for w in at.warning)
-    assert re.search(r"\d+ lounge call\(s\) changed, \d+ more lounge\(s\) moved within their call", _text(at))
-
-
-def test_lounge_and_area_pages_show_raw_and_addressable_women():
-    at = _page("lounge", lounge="al-barsha")
-    labels = {m.label: m.value for m in at.metric}
-    assert labels["Women 15+ (raw)"] == labels["Addressable women"]   # affluence off at baseline: weight 1 everywhere
-    assert labels["Affluence rent (median, AED/yr)"] not in ("", "no data")   # Dubai: an observed rent
-    assert "Affluence what-if only" not in _text(at)
-    abu = _page("lounge", lounge="al-ain")
-    assert "no observed rents outside Dubai, so weighted neutral" in _text(abu)
-    assert {m.label: m.value for m in abu.metric}["Affluence rent (median, AED/yr)"] == "no data"
-    awir = _text(_page("area", area="al-awir-dubai"))
-    assert re.search(r"Only \d+% of these women live in cells with an observed rent", awir)
-    assert "no observed rents outside Dubai, so weighted neutral" in _text(_page("area", area="kalba-sharjah"))
-
-
-def test_overview_affluence_toggle_adds_the_layer_and_its_legend():
-    at = _page("predictions")
-    box = next(c for c in at.checkbox if c.label == "Affluence (Dubai rents)")
-    assert not box.value
-    box.check().run()
-    assert not at.exception
-    assert "uncoloured cells have no data" in _text(at)
 
 
 def test_untrusted_url_ids_never_reach_markdown():

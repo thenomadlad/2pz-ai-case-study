@@ -177,6 +177,7 @@ class Area(BaseModel):
     premium_reviews_per_1k: float | None
     full_circle_share: float | None
     unserved_women: float = 0.0                  # Huff: addressable women no premium supplier serves
+    served_ours: float = 0.0                     # Huff: addressable women our open lounges already serve here
     new_site_served: float | None = None         # what-if: women a typical new lounge here would serve
     new_site_taken: float | None = None          # ... of which taken from our existing lounges
     new_site_net: float | None = None            # ... net new to the network (served - taken)

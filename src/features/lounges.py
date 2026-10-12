@@ -205,7 +205,8 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     for (name, emirate), cs in groups.items():
         # one area per OSM place name, contiguous or not
         out.append(_area(_slug(f"{name} {emirate}"), name, emirate, sorted(cs, key=p["rc"].get),
-                         w, aw, rents, shop, p, a, lounges, lats, lngs, sv["cells"].unserved))
+                         w, aw, rents, shop, p, a, lounges, lats, lngs, sv["cells"].unserved,
+                         sv["cells"].served_lounges))
     out = _area_what_ifs(v3, a, aw_s, out, feats, closed)
     return feats, sorted(out, key=lambda x: -x.women)
 
@@ -365,7 +366,8 @@ def _saturation(cells: list[str], w: dict, p: dict, a: BaselineAssumptions) -> d
     return {"n": len(prem), "per_1k": per_1k, "fcs": fcs, "cw": cw}
 
 
-def _area(area_id, name, emirate, piece, w, aw, rents, shop, p, a, lounges, lats, lngs, unserved=None) -> Area:
+def _area(area_id, name, emirate, piece, w, aw, rents, shop, p, a, lounges, lats, lngs, unserved=None,
+          ours=None) -> Area:
     cell, women = p["cell"], sum(w[c] for c in piece)
     lat = sum(w[c] * cell[c]["lat"] for c in piece) / women
     lng = sum(w[c] * cell[c]["lng"] for c in piece) / women
@@ -381,6 +383,7 @@ def _area(area_id, name, emirate, piece, w, aw, rents, shop, p, a, lounges, lats
                 worker_share=sum(cell[c]["adults_worker"] for c in piece) / sum(cell[c]["adults"] for c in piece),
                 premium_salons=sat["n"], premium_reviews_per_1k=sat["per_1k"], full_circle_share=sat["fcs"],
                 unserved_women=float(sum(unserved.get(c, 0.0) for c in piece)) if unserved is not None else 0.0,
+                served_ours=float(sum(ours.get(c, 0.0) for c in piece)) if ours is not None else 0.0,
                 shop_rent_m2=a_rent, shop_rent_coverage=a_cov, shop_rent_fallback_share=fallback,
                 women_per_rent_k=women_per_rent_k(sum(aw[c] for c in piece), a_rent),
                 data_coverage=sat["cw"] / women, cell_ids=piece,

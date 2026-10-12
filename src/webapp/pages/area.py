@@ -9,7 +9,6 @@ from src.model import growth
 from src.webapp import data, nav
 from src.webapp.map import area_cells_layer, build_deck, lounge_layer, view_at
 from src.webapp.views import (
-    affluence_metrics,
     area_caveats,
     badge,
     emirate_filter,
@@ -120,7 +119,6 @@ def render() -> None:
         render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
                        d.action != "SKIP")
     _rule(a, d)
-    affluence_metrics(a.women, a.addressable_women, a.affluence_rent, a.affluence_coverage)
 
     layers = [area_cells_layer(data.v3().cells, r.areas, r.area_decisions, only=area_id),
               lounge_layer(r.features, r.decisions)]

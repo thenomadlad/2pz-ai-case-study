@@ -10,7 +10,6 @@ import math
 import pandas as pd
 import pydeck as pdk
 
-from src.model import growth
 from src.models import Area, AreaDecision, Decision, LoungeFeatures
 
 ACTION_COLORS: dict[str, list[int]] = {
@@ -18,7 +17,7 @@ ACTION_COLORS: dict[str, list[int]] = {
     "NOT SCORED": [140, 140, 140],
 }
 AREA_COLORS: dict[str, list[int]] = {"GROW": [21, 101, 192], "WATCH": [142, 36, 170], "SKIP": [176, 176, 176]}
-UAE_VIEW = pdk.ViewState(latitude=24.6, longitude=54.6, zoom=6.4)
+UAE_VIEW = pdk.ViewState(latitude=24.75, longitude=54.95, zoom=7.2)   # the UAE, not the Gulf
 _PIXELS = "'pixels'"
 
 _PIN_PATH = "M24 2C12.4 2 3 11.2 3 22.6 3 38 24 62 24 62s21-24 21-39.4C45 11.2 35.6 2 24 2z"
@@ -83,39 +82,46 @@ def catchment_cells_layer(cells: pd.DataFrame, cell_ids: list[str], women: pd.Se
                      stroked=False, pickable=True, id="catchment-cells")
 
 
-AFFLUENCE_LOW, AFFLUENCE_HIGH = [255, 243, 224], [191, 54, 12]   # pale to deep orange, cheap to dear
+CAPTURED_MIN = 0.02    # our lounges serve 2%+ of an area's women: "captured", shaded green
+CAPTURED_FULL = 0.30   # ... at 30%+ the deepest green
+GROW_BLUE, WATCH_BLUE, GREY = [21, 101, 192], [144, 202, 249], [176, 176, 176]
+CAPTURED_LOW, CAPTURED_HIGH = [178, 223, 219], [0, 105, 92]     # pale to deep teal-green (not PROTECT's green)
 
 
-def affluence_layer(cells: pd.DataFrame) -> pdk.Layer:
-    """Cells with an observed median rent (Dubai only), shaded on a log scale; every other cell
-    is left uncoloured: no data, weighted neutral."""
-    obs = cells[cells.rent_observed.notna()]
-    lo, hi = math.log(obs.rent_observed.min()), math.log(obs.rent_observed.max())
-    rows = []
-    for cid, c in obs.iterrows():
-        t = (math.log(c.rent_observed) - lo) / ((hi - lo) or 1)
-        rows.append({"polygon": _box(cells, cid), "name": f"{c['name']} ({cid})",
-                     "detail": f"Median household rent {c.rent_observed:,.0f} AED/yr (DLD, Jul-Oct 2026)",
-                     "color": [round(a + t * (b - a)) for a, b in zip(AFFLUENCE_LOW, AFFLUENCE_HIGH)] + [170]})
-    return pdk.Layer("PolygonLayer", data=rows, get_polygon="polygon", get_fill_color="color",
-                     stroked=False, pickable=True, id="affluence")
+def our_share(a: Area) -> float:
+    """Share of the area's women our open lounges already serve (Huff, model estimate)."""
+    return a.served_ours / a.addressable_women if a.addressable_women else 0.0
+
+
+def area_colour(action: str, share: float) -> tuple[str, list[int]]:
+    """(legend key, RGBA): GROW blue first (actionable); then captured, greener the more we serve;
+    then WATCH pale blue; everything else (SKIP, no data) grey."""
+    if action == "GROW":
+        return "GROW", [*GROW_BLUE, 180]
+    if share >= CAPTURED_MIN:
+        t = min(1.0, (share - CAPTURED_MIN) / (CAPTURED_FULL - CAPTURED_MIN))
+        return "CAPTURED", [round(lo + t * (hi - lo)) for lo, hi in zip(CAPTURED_LOW, CAPTURED_HIGH)] + [170]
+    if action == "WATCH":
+        return "WATCH", [*WATCH_BLUE, 160]
+    return "SKIP", [*GREY, 90]
 
 
 def area_cells_layer(cells: pd.DataFrame, areas: list[Area], decisions: list[AreaDecision],
-                     show_skip: bool = False, only: str | None = None) -> pdk.Layer:
-    """Growth areas as their grid cells, coloured GROW / WATCH / SKIP. `only`: one area."""
+                     only: str | None = None) -> pdk.Layer:
+    """Every area as its grid cells, always: GROW blue, captured green (shaded by our share), WATCH pale
+    blue, SKIP or no data grey (area_colour). `only`: one area."""
     act = {d.area_id: d.action for d in decisions}
     rows = []
     for a in areas:
-        action = act[a.area_id]
-        thin = a.women < growth.SKIP_UNDER_WOMEN   # always SKIP: not worth drawing
-        if (only and a.area_id != only) or (not only and action == "SKIP" and (not show_skip or thin)):
+        if only and a.area_id != only:
             continue
-        detail = (f"Growth area: {action}<br/>{a.women:,.0f} women 15+ · {a.worker_share:.0%} worker housing"
+        action, share = act[a.area_id], our_share(a)
+        key, colour = area_colour(action, share)
+        detail = (f"{action} · our lounges serve {share:.0%} of its women (model est.)<br/>"
+                  f"{a.women:,.0f} women 15+ · {a.worker_share:.0%} worker housing"
                   f"<br/>{a.nearest_lounge_km:.1f} km (straight line) to {a.nearest_lounge_id}")
         rows += [{"polygon": _box(cells, c), "area_id": a.area_id, "name": f"{a.name}, {a.emirate}",
-                  "action": action, "detail": detail,
-                  "color": [*AREA_COLORS[action], 90 if action == "SKIP" else 170]} for c in a.cell_ids]
+                  "action": action, "shade": key, "detail": detail, "color": colour} for c in a.cell_ids]
     return pdk.Layer("PolygonLayer", data=rows, get_polygon="polygon", get_fill_color="color",
                      get_line_color=[255, 255, 255, 120], line_width_min_pixels=0.5, stroked=True,
                      pickable=True, id="areas")

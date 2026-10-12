@@ -17,7 +17,6 @@ from src.webapp.map import (
     view_at,
 )
 from src.webapp.views import (
-    affluence_metrics,
     badge,
     emirate_filter,
     explanation_for,
@@ -180,8 +179,6 @@ def render() -> None:
     st.caption(f"Its {minutes}-min drive polygon (midday traffic), catchment cells (darker = more "
                "women), premium substitutes (grey, sized by reviews) and every lounge. Hover for data.")
 
-    st.markdown("##### Demand: raw and addressable")
-    affluence_metrics(f.catchment_women, f.addressable_women, f.affluence_rent, f.affluence_coverage)
     if d.action != "NOT SCORED":
         _signals(f, d)
     _substitutes(subs, f, data.assumptions().competitor_coverage[r.levels.coverage])
