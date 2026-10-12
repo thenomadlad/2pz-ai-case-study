@@ -7,6 +7,44 @@ is checked against the data.
 
 **Live app:** https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/
 
+## The questions it answers
+
+The app is for Bedashing's **retail portfolio team** (network, real estate, expansion), working for the
+COO, to answer the five questions in the brief. Each answer below is the model's current baseline
+(all counts of women are model estimates), and where in the app to see it.
+
+1. **Which existing branches should we protect, hold, or shrink?**
+   **6 PROTECT, 14 HOLD, 3 SHRINK** of 23 scored lounges (the airport lounge isn't scored).
+   - PROTECT: Al Ain, Al Dhafra, Al Falah, Al Taif Mall, Mirdif 35, Nad Al Sheba.
+   - SHRINK (investigate, don't close: we can't see profit): Al Jada, City Walk, West Yas.
+   - Each site is judged within its emirate on two things: how much of the market a typical lounge there would serve, and its commercial rent.
+   - **Where:** the Executive Summary's Review and Protect sections; the Lounges page for every lounge and its "What would change the call" tree.
+2. **Where should we consider opening new branches?**
+   **34 GROW areas** pass all three tests: 6,000+ net new women, demand in the emirate's top half, and rent no dearer than its median salon site.
+   - The biggest are Al Dhaid (+35% on the women our lounges serve today), Manama (+21%) and Khor Fakkan (+14%).
+   - These figures can't be added up: neighbouring areas reach the same women.
+   - About half the GROW areas are judged on the emirate's median rent, because we have no observed rent there, so they are low confidence.
+   - **Where:** the Executive Summary's Grow section; the Areas page; the What-if explorer's map (GROW areas in blue).
+3. **Where are we overlapping with ourselves?**
+   Almost everywhere on the map, yet barely in effect.
+   - 19 of 24 lounges share more than half their catchment with a sibling.
+   - If one closes, its siblings pick up a median **8%** of its customers (30% at most). The rest go to competitors or nowhere.
+   - So overlap isn't treated as a reason to shrink, and expanding both lounges in a shared catchment can be right if it raises our coverage.
+   - **Where:** each lounge page's shared-catchment table and cannibalisation what-if; the What-if explorer's "All catchments (overlap)" layer and **Test a SHRINK**.
+4. **How strong or weak is each branch relative to local competition?**
+   Each lounge's site demand comes from splitting every area's women across our lounges and the 1,100+ premium competitor salons around it (a Huff model), then ranking that against its emirate's competitor salon sites.
+   - Example: City Walk out-serves only 30% of Dubai's salon sites; Al Dhafra out-serves all of Abu Dhabi's.
+   - "The model estimates this lounge is performing N.Nx compared to its site" separates a strong lounge from a strong location.
+   - **Where:** each lounge page's signals, factor tree and competitors table; premium competitors on the What-if explorer's map.
+5. **How can decision-makers explore these answers visually and interactively?**
+   - **Executive Summary:** the answer first, then the evidence for each claim, each with its own map.
+   - **What-if explorer:**
+     - change drive time, competitor coverage or worker-housing share, or close lounges, and watch the calls move;
+     - a map that colours every area (GROW, already captured, WATCH, SKIP), with city jump buttons;
+     - the only page a what-if touches.
+   - **Lounges and Areas:** sortable tables that open each item's detail, its factor tree shaded red to green, and how its estimates move with each assumption.
+   - **How it works:** this README, with the limitations.
+
 ## Look at this in 5 minutes
 
 1. **[Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the
