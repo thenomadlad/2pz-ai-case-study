@@ -138,36 +138,6 @@ def render_factor_table(exp: Explanation, fields: tuple[str, ...], facts: dict) 
     st.caption(provenance(exp.kind))
 
 
-def url_picker(label: str, param: str, options: list[str], format_func, key: str) -> str:
-    """A selectbox driven by ?param=. The URL is the source of truth: the keyed widget is set
-    from it before rendering and writes back only on a real user change."""
-    wanted = st.query_params.get(param)
-    st.session_state[key] = wanted if wanted in options else options[0]
-
-    def _picked() -> None:
-        st.query_params[param] = st.session_state[key]
-
-    return st.selectbox(label, options, key=key, on_change=_picked, format_func=format_func)
-
-
-DEFAULT_EMIRATES = ("Abu Dhabi", "Dubai")   # where most lounges are
-
-
-def emirate_filter(options: list[str], emirate_of: dict[str, str], param: str, key: str,
-                   also: frozenset[str] = frozenset()) -> list[str]:
-    """Emirate checkboxes above a picker: Abu Dhabi and Dubai ticked, plus `also` (the emirates
-    holding the strong calls, so none is hidden) and the emirate of the item in ?param=. Returns `options` in the ticked emirates (all of them if none is ticked), always
-    keeping the linked item so a deep link never silently shows something else."""
-    wanted = st.query_params.get(param)
-    names = sorted({emirate_of[i] for i in options})
-    on = {e for e, c in zip(names, st.columns(len(names)))
-          if c.checkbox(e, value=e in DEFAULT_EMIRATES or e in also or e == emirate_of.get(wanted), key=f"{key}-{e}")}
-    kept = [i for i in options if emirate_of[i] in on or i == wanted]
-    return kept or options
-
-
-# --- limitations and caveats --------------------------------------------------------------
-
 def limitations_box(r: Run) -> None:
     """The biggest limitations, right under the executive summary."""
     from src.webapp import nav
