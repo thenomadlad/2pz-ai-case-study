@@ -2,11 +2,8 @@ import json
 import re
 from types import SimpleNamespace
 
-import pytest
-
 from src import explain
-from src.models import Explanation
-from src.models import Evidence, Reason
+from src.models import Evidence, Explanation, Reason
 
 # A HOLD lounge (two scored signals against the frozen salon-site reference: demand and rent). Weighted
 # distance of each score from neutral (0.5): demand 0.22, cost 0.17 -> both are arguments, in that order.
@@ -325,7 +322,6 @@ def test_area_gaps_agree_with_the_tests():
             assert (f["saturation_gap"] > 0) == f["unsaturated"], sid
 
 
-@pytest.mark.xfail(reason="explanations regenerate in the thorough check (drive time and coverage wired into the Huff split)")
 def test_every_committed_cache_entry_is_current_and_grounded():
     """D3/E5: the committed cache holds exactly today's AI subjects, and each passes verify()."""
     cache = explain.load_cache()

@@ -1,6 +1,5 @@
 import time
 
-import pytest
 from streamlit.testing.v1 import AppTest
 
 from src.models import Levels
@@ -61,17 +60,11 @@ def test_overview_full_app_leads_with_summary_then_limitations():
     assert f"{scorecard.FLIP_LOW}+ of the {scorecard.COMBOS}" in body
 
 
-STALE = pytest.mark.xfail(reason="explanations regenerate in the thorough check (drive time and coverage wired "
-                                 "into the Huff split: flips and the sensitivity field text changed)")
-
-
-@STALE
 def test_overview_shows_cached_ai_summary():
     at = AppTest.from_file(APP, default_timeout=30).run()
     assert any(c.value.startswith("AI-written (cached)") for c in at.caption)
 
 
-@STALE
 def test_baseline_explanations_are_all_ai_except_skip_and_not_scored():
     from src.baseline import run
     from src.webapp.views import explanation_for

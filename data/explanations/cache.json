@@ -1,69 +1,4 @@
 {
-  "01a21ef44e4ef41a": {
-    "action": "SHRINK",
-    "headline": "SHRINK: westyas's site would out-serve 45% of Abu Dhabi salon sites on demand, with a rent dearer than the median salon site in its emirate (composite 0.348).",
-    "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review downsizing or consolidating into the sibling sharing most of its catchment. Composite 0.348 is 0.002 from the HOLD line. On its own, rent ratio would have to reach 0.82 (now 0.82) to make it HOLD.",
-    "reasons": [
-      {
-        "claim": "Shop rent of AED 1,707/m² a year gives a rent ratio of 0.82, dearer than the median salon site in its emirate; dearer than 52% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 0.8166
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.5165
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1707.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.2453
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "A typical lounge at this site would serve about 3,259 women, more than it would at 45% of Abu Dhabi salon sites; 57th percentile UAE-wide.",
-        "evidence": [
-          {
-            "field": "demand_pct",
-            "label": "Site demand percentile",
-            "value": 0.4507
-          },
-          {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.5672
-          },
-          {
-            "field": "site_served",
-            "label": "Women a typical lounge would serve here",
-            "value": 3259.3995
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.4507
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "The model estimates this lounge is performing 1.0x compared to its site (context, not scored): it serves about 3,160 women against 3,259 for a typical lounge there. 98% of the 42,368 women in its catchment are also reached by another lounge, and siblings would absorb 27% of its served women if it closed.",
-    "source": "ai",
-    "subject_id": "westyas",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "01f52dd92cd4fac6": {
     "action": "WATCH",
     "headline": "WATCH Rabdan: a new lounge would add 3,662 net new women, 2,338 short of the 6,000 line.",
@@ -375,71 +310,6 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median, unless that rent is only the emirate median standing in for cells without one: then the rent test is neutral and the call low confidence.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "0a1868911cdf86c3": {
-    "action": "HOLD",
-    "headline": "HOLD: al-barsha's site would out-serve 42% of Dubai salon sites on demand, with a rent dearer than the median salon site in its emirate (composite 0.39).",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. Composite 0.39 is 0.04 from the SHRINK line. On its own, rent ratio would have to reach 0.84 (now 0.9) to make it SHRINK.",
-    "reasons": [
-      {
-        "claim": "Shop rent of AED 2,381/m² a year gives a rent ratio of 0.90, dearer than the median salon site in its emirate; dearer than 83% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 0.9045
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.8317
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 2381.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.3535
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "A typical lounge at this site would serve about 2,192 women, more than it would at 42% of Dubai salon sites; 33rd percentile UAE-wide.",
-        "evidence": [
-          {
-            "field": "demand_pct",
-            "label": "Site demand percentile",
-            "value": 0.421
-          },
-          {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.3268
-          },
-          {
-            "field": "site_served",
-            "label": "Women a typical lounge would serve here",
-            "value": 2191.6443
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.421
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "The model estimates this lounge is performing 1.0x compared to its site (context, not scored): it serves about 2,180 women against 2,192 for a typical lounge there. 86% of the 272,371 women in its catchment are also reached by another lounge, and siblings would absorb 1% of its served women if it closed.",
-    "source": "ai",
-    "subject_id": "al-barsha",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "0a93bdff02ed33e0": {
     "action": "GROW",
     "headline": "GROW Rimah: a new lounge would add about 7,300 net new women, out-serve 81% of Abu Dhabi salon sites and pay a rent no dearer than their median.",
@@ -675,70 +545,75 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "0bc9cb4c1c73a967": {
-    "action": "HOLD",
-    "headline": "HOLD: ministries-complex's site would out-serve 50% of Abu Dhabi salon sites on demand, with a rent dearer than the median salon site in its emirate (composite 0.359).",
+  "1383dce1e843782c": {
+    "action": "PROTECT",
+    "headline": "PROTECT nad-al-sheba: its site composite of 0.71 is above the 0.65 line, on cheap rent and strong Dubai demand.",
     "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. Composite 0.359 is 0.009 from the SHRINK line. On its own, rent ratio would have to reach 0.78 (now 0.79) to make it SHRINK.",
+    "now_what": "Keep and defend the site: renew at the lease event, don't relocate, and treat a competitor opening nearby as a threat to respond to. The composite is 0.06 from the HOLD line; rent ratio would have to fall to 1.12 (now 1.21) to make it HOLD.",
     "reasons": [
       {
-        "claim": "Shop rent of AED 1,756/m² a year gives a rent ratio of 0.79, dearer than the median salon site in its emirate; dearer than 54% of UAE salon sites.",
+        "claim": "Rent at the site is below the Dubai salon-site median, a rent ratio of 1.21 at AED 1,784/m²/yr.",
         "evidence": [
           {
             "field": "rent_ratio",
             "label": "Rent ratio",
-            "value": 0.7938
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.5414
+            "value": 1.2071
           },
           {
             "field": "site_rent_m2",
             "label": "Shop rent at the site",
-            "value": 1756.0
+            "value": 1784.0
+          },
+          {
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.5503
           },
           {
             "field": "score_cost",
             "label": "Cost score",
-            "value": 0.2172
+            "value": 0.7265
           }
         ],
         "topic": "cost"
       },
       {
-        "claim": "A typical lounge at this site would serve about 3,919 women, more than it would at 50% of Abu Dhabi salon sites; 65th percentile UAE-wide.",
+        "claim": "A typical lounge here would out-serve 68% of Dubai salon sites, serving about 2,670 women.",
         "evidence": [
           {
             "field": "demand_pct",
             "label": "Site demand percentile",
-            "value": 0.5
+            "value": 0.6838
           },
           {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.6536
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Dubai"
           },
           {
             "field": "site_served",
             "label": "Women a typical lounge would serve here",
-            "value": 3919.1981
+            "value": 2670.1653
           },
           {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.5
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.4809
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 247185.9676
           }
         ],
         "topic": "demand"
       }
     ],
-    "so_what": "The model estimates this lounge is performing 2.1x compared to its site (context, not scored): it serves about 8,398 women against 3,919 for a typical lounge there. 100% of the 107,722 women in its catchment are also reached by another lounge, and siblings would absorb 16% of its served women if it closed.",
+    "so_what": "About 247,000 women live in the catchment, and only 1% of the 2,229 women this lounge serves would move to siblings if it closed, though 75% of the catchment is shared with them. The model estimates this lounge is performing 0.8x compared to its site; that is context, not scored.",
     "source": "ai",
-    "subject_id": "ministries-complex",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "subject_id": "nad-al-sheba",
+    "table_caption": "Each factor scores the site, not the lounge: rent ratio compares the site's shop rent with the median salon site in its emirate (above 1 is cheaper), and demand percentile is the share of those salon sites a typical lounge would out-serve here. Composite blends the two scores from 0 to 1: 0.65 or more is PROTECT, 0.35 or less is SHRINK, and between is HOLD. Read the lounge's own performance as context only.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
   },
   "13ca37ca7b50610f": {
     "action": "GROW",
@@ -2726,6 +2601,81 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "3fb64b4180f055d6": {
+    "action": "HOLD",
+    "headline": "HOLD Ministries Complex: middling demand and above-median rent give a composite of 0.359, just above SHRINK.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite of 0.359 is 0.009 from the SHRINK line; rent ratio alone would have to fall to 0.78 (now 0.79) to flip it.",
+    "reasons": [
+      {
+        "claim": "Rent is a drag: AED 1,756/m²/yr gives a rent ratio of 0.79, dearer than the Abu Dhabi salon-site median, and a cost score of 0.22.",
+        "evidence": [
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 0.7938
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1756.0
+          },
+          {
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.5414
+          },
+          {
+            "field": "site_cost_k",
+            "label": "Site cost",
+            "value": 353.4
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.2172
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "Demand is mid-pack: a typical lounge would out-serve 50% of Abu Dhabi salon sites.",
+        "evidence": [
+          {
+            "field": "demand_pct",
+            "label": "Site demand percentile",
+            "value": 0.5
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Abu Dhabi"
+          },
+          {
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.6536
+          },
+          {
+            "field": "site_served",
+            "label": "Women a typical lounge would serve here",
+            "value": 3919.1981
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.5
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "The lounge serves about 8,398 women, and its whole catchment is shared with siblings, who would absorb 16% of its served women if it closed. The model estimates this lounge is performing 2.1x compared to its site; that is context, not scored. The call changes in 7 of 27 assumption combinations, so it holds up reasonably well.",
+    "source": "ai",
+    "subject_id": "ministries-complex",
+    "table_caption": "Demand and cost are each scored from 0 to 1 against the other salon sites in the lounge's emirate, then averaged into the composite. At or above 0.65 is PROTECT, at or below 0.35 is SHRINK, and anything between is HOLD. The call scores the site, not the lounge's own popularity.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
+  },
   "46841385c67722bc": {
     "action": "WATCH",
     "headline": "WATCH Madinat Al Riyad: a new lounge would add 5,116 net new women, 884 short of the 6,000 line.",
@@ -4562,71 +4512,6 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "6778de60ce392309": {
-    "action": "HOLD",
-    "headline": "HOLD: zawaya-walk's site would out-serve 58% of Sharjah salon sites on demand, with a rent dearer than the median salon site in its emirate (composite 0.41).",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. Composite 0.41 is 0.06 from the SHRINK line. On its own, rent ratio would have to reach 0.71 (now 0.81) to make it SHRINK.",
-    "reasons": [
-      {
-        "claim": "Shop rent of AED 1,389/m² a year gives a rent ratio of 0.81, dearer than the median salon site in its emirate; dearer than 36% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 0.8071
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.3562
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1389.1
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.2335
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "A typical lounge at this site would serve about 7,569 women, more than it would at 58% of Sharjah salon sites; 83rd percentile UAE-wide.",
-        "evidence": [
-          {
-            "field": "demand_pct",
-            "label": "Site demand percentile",
-            "value": 0.5804
-          },
-          {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.8344
-          },
-          {
-            "field": "site_served",
-            "label": "Women a typical lounge would serve here",
-            "value": 7568.9551
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.5804
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "The model estimates this lounge is performing 0.8x compared to its site (context, not scored): it serves about 6,046 women against 7,569 for a typical lounge there. 47% of the 193,382 women in its catchment are also reached by another lounge, and siblings would absorb 2% of its served women if it closed.",
-    "source": "ai",
-    "subject_id": "zawaya-walk",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "67c19dc6bfa8962e": {
     "action": "PROTECT",
     "headline": "PROTECT: al-taif-mall's site would out-serve 90% of UAE salon sites on demand, with a rent cheaper than the median salon site in its emirate (composite 0.95).",
@@ -4906,6 +4791,81 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "6bbc8a7bd834e8ca": {
+    "action": "HOLD",
+    "headline": "HOLD: Al Barsha sits just above the SHRINK line, with a composite of 0.39 held up by middling demand and dear rent.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite of 0.39 is 0.04 from the SHRINK line; the rent ratio alone would have to fall to 0.84 (now 0.9) to make it SHRINK, and the call is low confidence as it flips in 9 of 27 assumption combinations.",
+    "reasons": [
+      {
+        "claim": "Rent is a drag: shop rent of AED 2,381/m²/yr is dearer than 83% of UAE salon sites, giving a cost score of 0.35.",
+        "evidence": [
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 2381.0
+          },
+          {
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.8317
+          },
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 0.9045
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.3535
+          },
+          {
+            "field": "contrib_cost",
+            "label": "Cost contribution",
+            "value": 0.1767
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "Demand is middling: a typical lounge would serve 2,192 women here, more than at 42% of Dubai salon sites.",
+        "evidence": [
+          {
+            "field": "demand_pct",
+            "label": "Site demand percentile",
+            "value": 0.421
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Dubai"
+          },
+          {
+            "field": "site_served",
+            "label": "Women a typical lounge would serve here",
+            "value": 2191.6443
+          },
+          {
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.3268
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.2105
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "The model estimates this lounge is performing 1.0x compared to its site; that is context, not scored. It shares 86% of its catchment with sibling lounges, yet siblings would absorb only 1% of its served women if it closed, and the premium market is crowded (228 premium salons).",
+    "source": "ai",
+    "subject_id": "al-barsha",
+    "table_caption": "The demand factor ranks what a typical lounge would serve at this site against competitor salon sites; the cost factor ranks the site's shop rent against the same sites. Each is scored 0 to 1, where 1 is best, and the two contributions add up to the composite. Read the composite against the 0.65 PROTECT line and the 0.35 SHRINK line.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
+  },
   "6bd5c95000e345a9": {
     "action": "WATCH",
     "headline": "WATCH Eastern Mahadir: a new lounge would add 4,277 net new women, 1,723 short of the 6,000 line.",
@@ -5033,6 +4993,134 @@
     "subject_id": "eastern-mahadir-abu-dhabi",
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "71a4d1b214cb4fa9": {
+    "action": "SUMMARY",
+    "headline": "SUMMARY: investigate 3 lounges for SHRINK, open in 34 GROW areas, and protect 6 lounges, across 23 lounges scored.",
+    "kind": "uae",
+    "now_what": "Investigate the 3 SHRINK lounges before their lease events, scope the 34 GROW areas, and renew the 6 PROTECT sites. Confirm the thin calls against real revenue and lease data before committing capital.",
+    "reasons": [
+      {
+        "claim": "Three lounges (al-jada, city-walk, westyas) sit at or below the SHRINK line, the highest at a composite of 0.348.",
+        "evidence": [
+          {
+            "field": "shrink_count",
+            "label": "SHRINK",
+            "value": 3
+          },
+          {
+            "field": "shrink_lounges",
+            "label": "SHRINK lounges",
+            "value": "al-jada, city-walk, westyas"
+          },
+          {
+            "field": "shrink_composite_max",
+            "label": "Strongest SHRINK composite",
+            "value": 0.348
+          }
+        ],
+        "topic": "shrink"
+      },
+      {
+        "claim": "34 areas clear the GROW bar, together adding about 796,000 net new women, 1.3 to 55 km from our nearest lounge.",
+        "evidence": [
+          {
+            "field": "grow_count",
+            "label": "GROW",
+            "value": 34
+          },
+          {
+            "field": "grow_women_total",
+            "label": "Women in GROW areas",
+            "value": 796024
+          },
+          {
+            "field": "grow_nearest_km_min",
+            "label": "Closest GROW area to a lounge",
+            "value": 1.3018
+          },
+          {
+            "field": "grow_nearest_km_max",
+            "label": "Furthest GROW area from a lounge",
+            "value": 54.9537
+          },
+          {
+            "field": "growth_areas_total",
+            "label": "Growth areas",
+            "value": 561
+          }
+        ],
+        "topic": "grow"
+      },
+      {
+        "claim": "Six lounges clear the PROTECT line, the lowest at a composite of 0.6645.",
+        "evidence": [
+          {
+            "field": "protect_count",
+            "label": "PROTECT",
+            "value": 6
+          },
+          {
+            "field": "protect_lounges",
+            "label": "PROTECT lounges",
+            "value": "al-ain, al-dhafra, al-falah, al-taif-mall, mirdif-35, nad-al-sheba"
+          },
+          {
+            "field": "protect_composite_min",
+            "label": "Weakest PROTECT composite",
+            "value": 0.6645
+          }
+        ],
+        "topic": "protect"
+      },
+      {
+        "claim": "14 of 23 lounges are HOLD, and 12 calls are low confidence because they change in 9 or more of 27 assumption combinations.",
+        "evidence": [
+          {
+            "field": "hold_count",
+            "label": "HOLD",
+            "value": 14
+          },
+          {
+            "field": "low_confidence_count",
+            "label": "Low-confidence calls",
+            "value": 12
+          },
+          {
+            "field": "lounges_scored",
+            "label": "Lounges scored",
+            "value": 23
+          }
+        ],
+        "topic": "confidence"
+      },
+      {
+        "claim": "The model has no revenue data and no lounge rent data, and sees 3,833 competitor salons, so calls rest on site signals only.",
+        "evidence": [
+          {
+            "field": "revenue_data_available",
+            "label": "Revenue data",
+            "value": false
+          },
+          {
+            "field": "rent_data_available",
+            "label": "Lease data",
+            "value": false
+          },
+          {
+            "field": "salons_total",
+            "label": "Salons searched",
+            "value": 3833
+          }
+        ],
+        "topic": "data_gaps"
+      }
+    ],
+    "so_what": "Six lounges anchor the network, while three weak sites and 34 high-potential areas show where capital could move. With 12 of 23 calls low confidence, treat the map as a shortlist to investigate.",
+    "source": "ai",
+    "subject_id": "uae",
+    "table_caption": "The table counts lounges by call and lists growth areas the model would open in. Calls come from site signals only: rent and demand percentile, scored 0 to 1. Read counts as a shortlist, since many calls are low confidence.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
   "7219bc0eff03c3ee": {
     "action": "WATCH",
@@ -5269,71 +5357,6 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "755be1468c443f3f": {
-    "action": "PROTECT",
-    "headline": "PROTECT: nad-al-sheba's site would out-serve 68% of Dubai salon sites on demand, with a rent cheaper than the median salon site in its emirate (composite 0.71).",
-    "kind": "lounge",
-    "now_what": "Defend the site: renew at the lease event, don't relocate, and respond to any rival opening nearby. Composite 0.71 is 0.06 from the HOLD line. On its own, rent ratio would have to reach 1.12 (now 1.21) to make it HOLD.",
-    "reasons": [
-      {
-        "claim": "Shop rent of AED 1,784/m² a year gives a rent ratio of 1.21, cheaper than the median salon site in its emirate; dearer than 55% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 1.2071
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.5503
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1784.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.7265
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "A typical lounge at this site would serve about 2,670 women, more than it would at 68% of Dubai salon sites; 48th percentile UAE-wide.",
-        "evidence": [
-          {
-            "field": "demand_pct",
-            "label": "Site demand percentile",
-            "value": 0.6838
-          },
-          {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.4809
-          },
-          {
-            "field": "site_served",
-            "label": "Women a typical lounge would serve here",
-            "value": 2670.1653
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.6838
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "The model estimates this lounge is performing 0.8x compared to its site (context, not scored): it serves about 2,229 women against 2,670 for a typical lounge there. 75% of the 247,186 women in its catchment are also reached by another lounge, and siblings would absorb 1% of its served women if it closed.",
-    "source": "ai",
-    "subject_id": "nad-al-sheba",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "75ba599f4e5561c5": {
     "action": "WATCH",
     "headline": "WATCH Al Mizhar 2: a new lounge would add 4,411 net new women, 1,589 short of the 6,000 line.",
@@ -5440,6 +5463,76 @@
     "subject_id": "al-mizhar-2-dubai",
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "77f56aa38722ce90": {
+    "action": "HOLD",
+    "headline": "HOLD zawaya-walk: its site composite of 0.41 sits between the lines, with dear rent against above-median Sharjah demand.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite is 0.06 from the SHRINK line; rent ratio would have to fall to 0.71 (now 0.81) to make it SHRINK.",
+    "reasons": [
+      {
+        "claim": "Shop rent is dearer than the typical Sharjah salon site, a rent ratio of 0.81 at AED 1,389/m²/yr.",
+        "evidence": [
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 0.8071
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1389.1
+          },
+          {
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.3562
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.2335
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "A typical lounge here would out-serve 58% of Sharjah salon sites, serving about 7,569 women.",
+        "evidence": [
+          {
+            "field": "demand_pct",
+            "label": "Site demand percentile",
+            "value": 0.5804
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Sharjah"
+          },
+          {
+            "field": "site_served",
+            "label": "Women a typical lounge would serve here",
+            "value": 7568.9551
+          },
+          {
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.8344
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 193381.9866
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "The catchment holds about 193,000 women, 47% shared with siblings, and only 2% of the 6,046 women served here would move to siblings if it closed. The model estimates this lounge is performing 0.8x compared to its site; that is context, not scored.",
+    "source": "ai",
+    "subject_id": "zawaya-walk",
+    "table_caption": "Each factor scores the site, not the lounge: rent ratio compares the site's shop rent with the median salon site in its emirate (above 1 is cheaper), and demand percentile is the share of those salon sites a typical lounge would out-serve here. Composite blends the two scores from 0 to 1: 0.65 or more is PROTECT, 0.35 or less is SHRINK, and between is HOLD. Read the lounge's own performance as context only.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
   },
   "78f36057892325d9": {
     "action": "GROW",
@@ -6078,128 +6171,80 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "86aa7d2d5b22db75": {
-    "action": "SUMMARY",
-    "headline": "6 PROTECT, 14 HOLD and 3 SHRINK across 23 scored lounges, each judged against its own emirate's salon sites, with 34 areas to GROW.",
-    "kind": "uae",
-    "now_what": "Investigate the SHRINK lounges before their lease events and start a site search in the GROW areas; 63 more areas are on WATCH to revisit.",
+  "88dfbc1da39c84f5": {
+    "action": "HOLD",
+    "headline": "HOLD Khalifa City A: strong demand is offset by the most expensive rent scale, leaving a composite of 0.36 just above SHRINK.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite of 0.36 is 0.01 from the SHRINK line; demand alone would have to fall to 70% of salon sites (now 73%) to flip it.",
     "reasons": [
       {
-        "claim": "Investigate al-jada, city-walk, westyas: their sites are weak for their emirates on rent or demand (strongest SHRINK composite 0.35).",
+        "claim": "Rent scores zero: AED 2,257/m²/yr gives a rent ratio of 0.62, dearer than the Abu Dhabi salon-site median.",
         "evidence": [
           {
-            "field": "shrink_count",
-            "label": "SHRINK",
-            "value": 3
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 0.6176
           },
           {
-            "field": "shrink_lounges",
-            "label": "SHRINK lounges",
-            "value": "al-jada, city-walk, westyas"
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 2257.0
           },
           {
-            "field": "shrink_composite_max",
-            "label": "Strongest SHRINK composite",
-            "value": 0.348
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.7605
+          },
+          {
+            "field": "site_cost_k",
+            "label": "Site cost",
+            "value": 428.55
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.0
           }
         ],
-        "topic": "shrink"
+        "topic": "cost"
       },
       {
-        "claim": "34 areas would each add 6,000+ net new women at a site that out-serves half its emirate's salon sites and costs no more than their median rent (or has only the emirate median rent, then low confidence), 796,024 women 15+ between them.",
+        "claim": "Demand is strong: a typical lounge would out-serve 73% of Abu Dhabi salon sites, which carries the whole composite.",
         "evidence": [
           {
-            "field": "grow_count",
-            "label": "GROW",
-            "value": 34
+            "field": "demand_pct",
+            "label": "Site demand percentile",
+            "value": 0.727
           },
           {
-            "field": "grow_women_total",
-            "label": "Women in GROW areas",
-            "value": 796024
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Abu Dhabi"
           },
           {
-            "field": "grow_nearest_km_min",
-            "label": "Closest GROW area to a lounge",
-            "value": 1.3018
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.7827
           },
           {
-            "field": "grow_nearest_km_max",
-            "label": "Furthest GROW area from a lounge",
-            "value": 54.9537
+            "field": "site_served",
+            "label": "Women a typical lounge would serve here",
+            "value": 6144.209
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.727
           }
         ],
-        "topic": "grow"
-      },
-      {
-        "claim": "Defend al-ain, al-dhafra, al-falah, al-taif-mall, mirdif-35, nad-al-sheba: strong sites for their emirates (weakest PROTECT composite 0.66, al-falah, on a neutral fallback rent).",
-        "evidence": [
-          {
-            "field": "protect_count",
-            "label": "PROTECT",
-            "value": 6
-          },
-          {
-            "field": "protect_lounges",
-            "label": "PROTECT lounges",
-            "value": "al-ain, al-dhafra, al-falah, al-taif-mall, mirdif-35, nad-al-sheba"
-          },
-          {
-            "field": "protect_composite_min",
-            "label": "Weakest PROTECT composite",
-            "value": 0.6645
-          }
-        ],
-        "topic": "protect"
-      },
-      {
-        "claim": "14 of 23 lounges sit in the HOLD band and 11 calls are low confidence (near a line, sensitive to the assumptions or weights, or on an emirate-median rent).",
-        "evidence": [
-          {
-            "field": "hold_count",
-            "label": "HOLD",
-            "value": 14
-          },
-          {
-            "field": "low_confidence_count",
-            "label": "Low-confidence calls",
-            "value": 11
-          },
-          {
-            "field": "lounges_scored",
-            "label": "Lounges scored",
-            "value": 23
-          }
-        ],
-        "topic": "confidence"
-      },
-      {
-        "claim": "No revenue, lease or footfall data: these are location and market calls, built on 3,833 salons found by search.",
-        "evidence": [
-          {
-            "field": "revenue_data_available",
-            "label": "Revenue data",
-            "value": false
-          },
-          {
-            "field": "rent_data_available",
-            "label": "Lease data",
-            "value": false
-          },
-          {
-            "field": "salons_total",
-            "label": "Salons searched",
-            "value": 3833
-          }
-        ],
-        "topic": "data_gaps"
+        "topic": "demand"
       }
     ],
-    "so_what": "796,024 women live in the 34 GROW areas; 3 lounges need a closer look before their lease events.",
+    "so_what": "The lounge serves about 16,679 women, and 97% of its catchment is shared with siblings, who would absorb 20% of its served women if it closed. The model estimates this lounge is performing 2.7x compared to its site; that is context, not scored. The call changes in 15 of 27 assumption combinations, so confidence is low.",
     "source": "ai",
-    "subject_id": "uae",
-    "table_caption": "Lounge calls rank each site within its emirate's frozen market of competitor salon sites, on demand and rent; growth areas are what-if new lounges tested on net new women, demand and rent.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+    "subject_id": "khalifa-city-a",
+    "table_caption": "Demand and cost are each scored from 0 to 1 against the other salon sites in the lounge's emirate, then averaged into the composite. At or above 0.65 is PROTECT, at or below 0.35 is SHRINK, and anything between is HOLD. The call scores the site, not the lounge's own popularity.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
   },
   "8a27be24a877c373": {
     "action": "WATCH",
@@ -6415,6 +6460,81 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "8bc13bbf2d71bf04": {
+    "action": "HOLD",
+    "headline": "HOLD Mohammed Bin Zayed City: cheap rent and above-median demand put the composite at 0.61, short of PROTECT.",
+    "kind": "lounge",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite of 0.61 is 0.04 from the PROTECT line; rent ratio alone would have to reach 1.2 (now 1.13) to flip it.",
+    "reasons": [
+      {
+        "claim": "Rent is a strength: AED 1,236/m²/yr is cheaper than the Abu Dhabi salon-site median (ratio 1.13), a cost score of 0.63.",
+        "evidence": [
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 1.1278
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1236.0
+          },
+          {
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.26
+          },
+          {
+            "field": "site_cost_k",
+            "label": "Site cost",
+            "value": 275.4
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.6288
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "Demand is above the middle: a typical lounge would out-serve 59% of Abu Dhabi salon sites.",
+        "evidence": [
+          {
+            "field": "demand_pct",
+            "label": "Site demand percentile",
+            "value": 0.5855
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Abu Dhabi"
+          },
+          {
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.7026
+          },
+          {
+            "field": "site_served",
+            "label": "Women a typical lounge would serve here",
+            "value": 4580.6939
+          },
+          {
+            "field": "score_demand",
+            "label": "Demand score",
+            "value": 0.5855
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "The lounge serves about 4,057 women in a catchment of 129,056, and its whole catchment is shared with siblings, who would absorb 19% of its served women if it closed. The model estimates this lounge is performing 0.9x compared to its site; that is context, not scored. The call changes in only 1 of 27 assumption combinations, so confidence is high.",
+    "source": "ai",
+    "subject_id": "mohammed-bin-zayed-city",
+    "table_caption": "Demand and cost are each scored from 0 to 1 against the other salon sites in the lounge's emirate, then averaged into the composite. At or above 0.65 is PROTECT, at or below 0.35 is SHRINK, and anything between is HOLD. The call scores the site, not the lounge's own popularity.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
+  },
   "8c08a2830f562194": {
     "action": "GROW",
     "headline": "GROW Hamidiya: a new lounge would add about 13,400 net new women, out-serve 98% of UAE salon sites and pay a rent no dearer than their median.",
@@ -6623,6 +6743,81 @@
     "subject_id": "al-dhaid-sharjah",
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median, unless that rent is only the emirate median standing in for cells without one: then the rent test is neutral and the call low confidence.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "90bd39ec5e9d99fc": {
+    "action": "SHRINK",
+    "headline": "SHRINK: Al Jada's rent is the problem, with a cost score near zero dragging the composite to 0.34, just under the 0.35 line.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether to downsize or consolidate into the sibling that shares most of its catchment. The composite of 0.34 is 0.01 from the HOLD line; the rent ratio alone would have to reach 0.65 (now 0.63) to make it HOLD, and the call is low confidence as it flips in 12 of 27 assumption combinations.",
+    "reasons": [
+      {
+        "claim": "Rent kills the score: shop rent of AED 1,771/m²/yr is dearer than the Sharjah median (rent ratio 0.63), so the cost score is 0.02.",
+        "evidence": [
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1770.8
+          },
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 0.6331
+          },
+          {
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.5423
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.0191
+          },
+          {
+            "field": "contrib_cost",
+            "label": "Cost contribution",
+            "value": 0.0095
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "Demand is decent: a typical lounge would serve 7,912 women here, more than at 66% of Sharjah salon sites.",
+        "evidence": [
+          {
+            "field": "demand_pct",
+            "label": "Site demand percentile",
+            "value": 0.6573
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Sharjah"
+          },
+          {
+            "field": "site_served",
+            "label": "Women a typical lounge would serve here",
+            "value": 7912.2548
+          },
+          {
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.8531
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.3286
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "The model estimates this lounge is performing 0.7x compared to its site; that is context, not scored. It shares 66% of its catchment with siblings, though they would absorb only 2% of its served women if it closed, so consolidation would leave most of its 5,853 served women exposed.",
+    "source": "ai",
+    "subject_id": "al-jada",
+    "table_caption": "The demand factor ranks what a typical lounge would serve at this site against competitor salon sites; the cost factor ranks the site's shop rent against the same sites. Each is scored 0 to 1, where 1 is best, and the two contributions add up to the composite. Read the composite against the 0.65 PROTECT line and the 0.35 SHRINK line.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
   },
   "90caa306a5a8b738": {
     "action": "WATCH",
@@ -7005,70 +7200,75 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median, unless that rent is only the emirate median standing in for cells without one: then the rent test is neutral and the call low confidence.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "925b8de3ef1e6f87": {
+  "93d0005de151642c": {
     "action": "HOLD",
-    "headline": "HOLD: mohammed-bin-zayed-city's site would out-serve 59% of Abu Dhabi salon sites on demand, with a rent cheaper than the median salon site in its emirate (composite 0.61).",
+    "headline": "HOLD Khaleej Al Arabi, on the knife-edge: the composite of 0.350 sits right at the SHRINK line.",
     "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. Composite 0.61 is 0.04 from the PROTECT line. On its own, rent ratio would have to reach 1.2 (now 1.13) to make it PROTECT.",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite is 0.0004 from the SHRINK line; demand alone would flip it at 21.6% of salon sites (now 21.7%), so a small move tips it.",
     "reasons": [
       {
-        "claim": "Shop rent of AED 1,236/m² a year gives a rent ratio of 1.13, cheaper than the median salon site in its emirate; dearer than 26% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 1.1278
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.26
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1236.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.6288
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "A typical lounge at this site would serve about 4,581 women, more than it would at 59% of Abu Dhabi salon sites; 70th percentile UAE-wide.",
+        "claim": "Site demand is weak: a typical lounge would out-serve only 22% of Abu Dhabi salon sites.",
         "evidence": [
           {
             "field": "demand_pct",
             "label": "Site demand percentile",
-            "value": 0.5855
+            "value": 0.2171
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Abu Dhabi"
           },
           {
             "field": "demand_pct_uae",
             "label": "Demand percentile UAE-wide",
-            "value": 0.7026
+            "value": 0.1077
           },
           {
             "field": "site_served",
             "label": "Women a typical lounge would serve here",
-            "value": 4580.6939
+            "value": 1358.5882
           },
           {
             "field": "score_demand",
             "label": "Demand score",
-            "value": 0.5855
+            "value": 0.2171
           }
         ],
         "topic": "demand"
+      },
+      {
+        "claim": "Rent is a relative strength: AED 1,380/m²/yr is slightly cheaper than the Abu Dhabi salon-site median (ratio 1.01), a cost score of 0.48.",
+        "evidence": [
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 1.0101
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1380.0
+          },
+          {
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.3411
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.4838
+          }
+        ],
+        "topic": "cost"
       }
     ],
-    "so_what": "The model estimates this lounge is performing 0.9x compared to its site (context, not scored): it serves about 4,057 women against 4,581 for a typical lounge there. 100% of the 129,056 women in its catchment are also reached by another lounge, and siblings would absorb 19% of its served women if it closed.",
+    "so_what": "The lounge serves about 3,083 women against roughly 1,359 a typical lounge would serve at this site, and 98% of its catchment is shared with siblings. The model estimates this lounge is performing 2.3x compared to its site; that is context, not scored. The call changes in 16 of 27 assumption combinations, so confidence is low.",
     "source": "ai",
-    "subject_id": "mohammed-bin-zayed-city",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "subject_id": "khaleej-al-arabi",
+    "table_caption": "Demand and cost are each scored from 0 to 1 against the other salon sites in the lounge's emirate, then averaged into the composite. At or above 0.65 is PROTECT, at or below 0.35 is SHRINK, and anything between is HOLD. The call scores the site, not the lounge's own popularity.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
   },
   "944aeda0cadf02eb": {
     "action": "WATCH",
@@ -7600,71 +7800,6 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "9f4b202317056aba": {
-    "action": "HOLD",
-    "headline": "HOLD: noya-plaza's site would out-serve 52% of Abu Dhabi salon sites on demand, with a rent dearer than the median salon site in its emirate (composite 0.38).",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. Composite 0.38 is 0.03 from the SHRINK line. On its own, rent ratio would have to reach 0.76 (now 0.82) to make it SHRINK.",
-    "reasons": [
-      {
-        "claim": "Shop rent of AED 1,707/m² a year gives a rent ratio of 0.82, dearer than the median salon site in its emirate; dearer than 52% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 0.8166
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.5165
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1707.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.2453
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "A typical lounge at this site would serve about 4,228 women, more than it would at 52% of Abu Dhabi salon sites; 67th percentile UAE-wide.",
-        "evidence": [
-          {
-            "field": "demand_pct",
-            "label": "Site demand percentile",
-            "value": 0.523
-          },
-          {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.6741
-          },
-          {
-            "field": "site_served",
-            "label": "Women a typical lounge would serve here",
-            "value": 4227.6929
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.523
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "The model estimates this lounge is performing 0.3x compared to its site (context, not scored): it serves about 1,386 women against 4,228 for a typical lounge there. 100% of the 45,037 women in its catchment are also reached by another lounge, and siblings would absorb 30% of its served women if it closed.",
-    "source": "ai",
-    "subject_id": "noya-plaza",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
   "9fb93496eee8c6cf": {
     "action": "GROW",
     "headline": "GROW Al Batayih: a new lounge would add about 12,600 net new women and out-serve 90% of Sharjah salon sites; its rent is only the Sharjah median, so the rent test is neutral and the call low confidence.",
@@ -7788,70 +7923,150 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median, unless that rent is only the emirate median standing in for cells without one: then the rent test is neutral and the call low confidence.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "9ffa893dd4168f62": {
+  "a408ba657c7f213f": {
     "action": "HOLD",
-    "headline": "HOLD: delma's site would out-serve 38% of Abu Dhabi salon sites on demand, with a rent dearer than the median salon site in its emirate (composite 0.38).",
+    "headline": "HOLD noya-plaza: its site composite of 0.38 sits just above the SHRINK line, with dear rent offset by middling Abu Dhabi demand.",
     "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. Composite 0.38 is 0.03 from the SHRINK line. On its own, site demand percentile would have to reach 32% of salon sites (now 38% of salon sites) to make it SHRINK.",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite is 0.03 from the SHRINK line; rent ratio would have to fall to 0.76 (now 0.82) to make it SHRINK.",
     "reasons": [
       {
-        "claim": "A typical lounge at this site would serve about 1,895 women, more than it would at 38% of Abu Dhabi salon sites; 25th percentile UAE-wide.",
+        "claim": "Shop rent is dearer than the typical Abu Dhabi salon site, a rent ratio of 0.82 at AED 1,707/m²/yr.",
+        "evidence": [
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 0.8166
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1707.0
+          },
+          {
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.5165
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.2453
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "A typical lounge here would out-serve 52% of Abu Dhabi salon sites, serving about 4,228 women.",
         "evidence": [
           {
             "field": "demand_pct",
             "label": "Site demand percentile",
-            "value": 0.375
+            "value": 0.523
           },
           {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.2538
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Abu Dhabi"
           },
           {
             "field": "site_served",
             "label": "Women a typical lounge would serve here",
-            "value": 1894.7771
+            "value": 4227.6929
           },
           {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.375
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.6741
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 45036.5814
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "The catchment holds about 45,000 women, all of it shared with sibling lounges, and siblings would take 30% of the 1,386 women served here if it closed. The model estimates this lounge is performing 0.3x compared to its site; that is context, not scored.",
+    "source": "ai",
+    "subject_id": "noya-plaza",
+    "table_caption": "Each factor scores the site, not the lounge: rent ratio compares the site's shop rent with the median salon site in its emirate (above 1 is cheaper), and demand percentile is the share of those salon sites a typical lounge would out-serve here. Composite blends the two scores from 0 to 1: 0.65 or more is PROTECT, 0.35 or less is SHRINK, and between is HOLD. Read the lounge's own performance as context only.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
+  },
+  "a4563972c076163a": {
+    "action": "PROTECT",
+    "headline": "PROTECT: Al Ain's site out-serves 95% of Abu Dhabi salon sites and its rent is on the emirate median, so the composite of 0.72 clears the 0.65 bar.",
+    "kind": "lounge",
+    "now_what": "Keep and defend the site: renew at the lease event, don't relocate, and treat a competitor opening nearby as a threat to respond to. The call is 0.07 from the HOLD line; demand alone would have to fall to 80% of salon sites (now 95%) to make it HOLD, and the call is low confidence as it flips in 9 of 27 assumption combinations.",
+    "reasons": [
+      {
+        "claim": "The site is strong: a typical lounge would serve 10,173 women here, more than at 95% of Abu Dhabi salon sites.",
+        "evidence": [
+          {
+            "field": "demand_pct",
+            "label": "Site demand percentile",
+            "value": 0.9474
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Abu Dhabi"
+          },
+          {
+            "field": "site_served",
+            "label": "Women a typical lounge would serve here",
+            "value": 10173.4578
+          },
+          {
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.9323
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.4737
           }
         ],
         "topic": "demand"
       },
       {
-        "claim": "Shop rent of AED 1,507/m² a year gives a rent ratio of 0.93, dearer than the median salon site in its emirate; dearer than 40% of UAE salon sites.",
+        "claim": "Rent adds no penalty: the shop rent is the Abu Dhabi median standing in for missing data, so the cost score is a neutral 0.5.",
         "evidence": [
           {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 0.925
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.3998
+            "field": "rent_fallback",
+            "label": "Rent is the emirate median",
+            "value": true
           },
           {
             "field": "site_rent_m2",
             "label": "Shop rent at the site",
-            "value": 1507.0
+            "value": 1168.0
+          },
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 1.1935
           },
           {
             "field": "score_cost",
             "label": "Cost score",
-            "value": 0.3789
+            "value": 0.5
+          },
+          {
+            "field": "contrib_cost",
+            "label": "Cost contribution",
+            "value": 0.25
           }
         ],
         "topic": "cost"
       }
     ],
-    "so_what": "The model estimates this lounge is performing 0.9x compared to its site (context, not scored): it serves about 1,695 women against 1,895 for a typical lounge there. 98% of the 93,190 women in its catchment are also reached by another lounge, and siblings would absorb 11% of its served women if it closed.",
+    "so_what": "The model estimates this lounge is performing 1.8x compared to its site; that is context, not scored, since it reflects the lounge's own reviews. The lounge serves 18,652 women with none shared with sibling lounges, and 49 cells (102,439 women) are at stake, so losing the site would cost real reach (UAE-wide the site still ranks at 93%).",
     "source": "ai",
-    "subject_id": "delma",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "subject_id": "al-ain",
+    "table_caption": "The demand factor ranks what a typical lounge would serve at this site against competitor salon sites; the cost factor ranks the site's shop rent against the same sites. Each is scored 0 to 1, where 1 is best, and the two contributions add up to the composite. Read the composite against the 0.65 PROTECT line and the 0.35 SHRINK line.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
   },
   "a5c1059df549e7dd": {
     "action": "WATCH",
@@ -8067,6 +8282,76 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "a90559025efe7b9e": {
+    "action": "SHRINK",
+    "headline": "SHRINK westyas: its site composite of 0.348 is just under the 0.35 line, on dear rent and below-median Abu Dhabi demand.",
+    "kind": "lounge",
+    "now_what": "Investigate, don't close: before the lease event, review whether to downsize or consolidate into the sibling that shares most of its catchment. The call is marginal, with the composite only 0.002 from the HOLD line (rent ratio of 0.82, now 0.82), and 9 of 27 assumption combinations change it, so confidence is low.",
+    "reasons": [
+      {
+        "claim": "Shop rent is dearer than the typical Abu Dhabi salon site, a rent ratio of 0.82 at AED 1,707/m²/yr.",
+        "evidence": [
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 0.8166
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1707.0
+          },
+          {
+            "field": "rent_pct_uae",
+            "label": "Rent percentile UAE-wide",
+            "value": 0.5165
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.2453
+          }
+        ],
+        "topic": "cost"
+      },
+      {
+        "claim": "A typical lounge here would out-serve only 45% of Abu Dhabi salon sites, serving about 3,259 women.",
+        "evidence": [
+          {
+            "field": "demand_pct",
+            "label": "Site demand percentile",
+            "value": 0.4507
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Abu Dhabi"
+          },
+          {
+            "field": "site_served",
+            "label": "Women a typical lounge would serve here",
+            "value": 3259.3995
+          },
+          {
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.5672
+          },
+          {
+            "field": "catchment_women",
+            "label": "Women 15+ in catchment",
+            "value": 42368.0713
+          }
+        ],
+        "topic": "demand"
+      }
+    ],
+    "so_what": "About 98% of the catchment's 42,000 women are shared with sibling lounges, and siblings would absorb 27% of the 3,160 women served here if it closed. The model estimates this lounge is performing 1.0x compared to its site; that is context, not scored.",
+    "source": "ai",
+    "subject_id": "westyas",
+    "table_caption": "Each factor scores the site, not the lounge: rent ratio compares the site's shop rent with the median salon site in its emirate (above 1 is cheaper), and demand percentile is the share of those salon sites a typical lounge would out-serve here. Composite blends the two scores from 0 to 1: 0.65 or more is PROTECT, 0.35 or less is SHRINK, and between is HOLD. Read the lounge's own performance as context only.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
+  },
   "a9fa98c638afde72": {
     "action": "PROTECT",
     "headline": "PROTECT: mirdif-35's site would out-serve 98% of Dubai salon sites on demand, with a rent cheaper than the median salon site in its emirate (composite 0.79).",
@@ -8129,71 +8414,6 @@
     "so_what": "The model estimates this lounge is performing 1.0x compared to its site (context, not scored): it serves about 5,214 women against 5,388 for a typical lounge there. 52% of the 241,393 women in its catchment are also reached by another lounge, and siblings would absorb 1% of its served women if it closed.",
     "source": "ai",
     "subject_id": "mirdif-35",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "abdf82245dc98f3d": {
-    "action": "HOLD",
-    "headline": "HOLD: khalifa-city-a's site would out-serve 73% of Abu Dhabi salon sites on demand, with a rent dearer than the median salon site in its emirate (composite 0.36).",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. Composite 0.36 is 0.01 from the SHRINK line. On its own, site demand percentile would have to reach 70% of salon sites (now 73% of salon sites) to make it SHRINK.",
-    "reasons": [
-      {
-        "claim": "Shop rent of AED 2,257/m² a year gives a rent ratio of 0.62, dearer than the median salon site in its emirate; dearer than 76% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 0.6176
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.7605
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 2257.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.0
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "A typical lounge at this site would serve about 6,144 women, more than it would at 73% of Abu Dhabi salon sites; 78th percentile UAE-wide.",
-        "evidence": [
-          {
-            "field": "demand_pct",
-            "label": "Site demand percentile",
-            "value": 0.727
-          },
-          {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.7827
-          },
-          {
-            "field": "site_served",
-            "label": "Women a typical lounge would serve here",
-            "value": 6144.209
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.727
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "The model estimates this lounge is performing 2.7x compared to its site (context, not scored): it serves about 16,679 women against 6,144 for a typical lounge there. 97% of the 91,432 women in its catchment are also reached by another lounge, and siblings would absorb 20% of its served women if it closed.",
-    "source": "ai",
-    "subject_id": "khalifa-city-a",
     "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
     "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
@@ -8303,136 +8523,6 @@
     "subject_id": "al-warqa-dubai",
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
-  },
-  "b255ef7f174ec17f": {
-    "action": "HOLD",
-    "headline": "HOLD: jumeirah-park's site would out-serve 44% of Dubai salon sites on demand, with a rent about level with the median salon site in its emirate (composite 0.47).",
-    "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event. Composite 0.47 is 0.12 from the SHRINK line. On its own, site demand percentile would have to reach 21% of salon sites (now 44% of salon sites) to make it SHRINK.",
-    "reasons": [
-      {
-        "claim": "A typical lounge at this site would serve about 2,234 women, more than it would at 44% of Dubai salon sites; 34th percentile UAE-wide.",
-        "evidence": [
-          {
-            "field": "demand_pct",
-            "label": "Site demand percentile",
-            "value": 0.445
-          },
-          {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.3393
-          },
-          {
-            "field": "site_served",
-            "label": "Women a typical lounge would serve here",
-            "value": 2233.9451
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.445
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "Shop rent of AED 2,118/m² a year gives a rent ratio of 1.02, about level with the median salon site in its emirate; dearer than 66% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 1.0168
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.6625
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 2118.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.4919
-          }
-        ],
-        "topic": "cost"
-      }
-    ],
-    "so_what": "The model estimates this lounge is performing 0.7x compared to its site (context, not scored): it serves about 1,636 women against 2,234 for a typical lounge there. 73% of the 171,595 women in its catchment are also reached by another lounge, and siblings would absorb 1% of its served women if it closed.",
-    "source": "ai",
-    "subject_id": "jumeirah-park",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
-  },
-  "b2c5c8a38ef91db4": {
-    "action": "SHRINK",
-    "headline": "SHRINK: al-jada's site would out-serve 66% of Sharjah salon sites on demand, with a rent dearer than the median salon site in its emirate (composite 0.34).",
-    "kind": "lounge",
-    "now_what": "Investigate, don't close: before the lease event, review downsizing or consolidating into the sibling sharing most of its catchment. Composite 0.34 is 0.01 from the HOLD line. On its own, rent ratio would have to reach 0.65 (now 0.63) to make it HOLD.",
-    "reasons": [
-      {
-        "claim": "Shop rent of AED 1,771/m² a year gives a rent ratio of 0.63, dearer than the median salon site in its emirate; dearer than 54% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 0.6331
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.5423
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1770.8
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.0191
-          }
-        ],
-        "topic": "cost"
-      },
-      {
-        "claim": "A typical lounge at this site would serve about 7,912 women, more than it would at 66% of Sharjah salon sites; 85th percentile UAE-wide.",
-        "evidence": [
-          {
-            "field": "demand_pct",
-            "label": "Site demand percentile",
-            "value": 0.6573
-          },
-          {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.8531
-          },
-          {
-            "field": "site_served",
-            "label": "Women a typical lounge would serve here",
-            "value": 7912.2548
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.6573
-          }
-        ],
-        "topic": "demand"
-      }
-    ],
-    "so_what": "The model estimates this lounge is performing 0.7x compared to its site (context, not scored): it serves about 5,853 women against 7,912 for a typical lounge there. 66% of the 141,330 women in its catchment are also reached by another lounge, and siblings would absorb 2% of its served women if it closed.",
-    "source": "ai",
-    "subject_id": "al-jada",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "b2ee8d5ebe4d2091": {
     "action": "WATCH",
@@ -8770,71 +8860,6 @@
     "subject_id": "ghalilah-ras-al-khaimah",
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median, unless that rent is only the emirate median standing in for cells without one: then the rent test is neutral and the call low confidence.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
-  },
-  "bcbc0350cdc770c6": {
-    "action": "PROTECT",
-    "headline": "PROTECT: al-ain's site would out-serve 95% of Abu Dhabi salon sites on demand; its rent is only the Abu Dhabi median, scored neutral, so the call is low confidence (composite 0.72).",
-    "kind": "lounge",
-    "now_what": "Defend the site: renew at the lease event, don't relocate, and respond to any rival opening nearby. Composite 0.72 is 0.07 from the HOLD line. On its own, site demand percentile would have to reach 80% of salon sites (now 95% of salon sites) to make it HOLD. An observed rent for the site would firm up or move the call.",
-    "reasons": [
-      {
-        "claim": "A typical lounge at this site would serve about 10,173 women, more than it would at 95% of Abu Dhabi salon sites; 93rd percentile UAE-wide.",
-        "evidence": [
-          {
-            "field": "demand_pct",
-            "label": "Site demand percentile",
-            "value": 0.9474
-          },
-          {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.9323
-          },
-          {
-            "field": "site_served",
-            "label": "Women a typical lounge would serve here",
-            "value": 10173.4578
-          },
-          {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.9474
-          }
-        ],
-        "topic": "demand"
-      },
-      {
-        "claim": "Its site rent of AED 1,168/m² a year is the Abu Dhabi median standing in for a cell with no rent of its own, not the site's, so rent scores neutral (0.5); for context it is dearer than 22% of UAE salon sites.",
-        "evidence": [
-          {
-            "field": "rent_fallback",
-            "label": "Rent is the emirate median",
-            "value": true
-          },
-          {
-            "field": "site_rent_m2",
-            "label": "Shop rent at the site",
-            "value": 1168.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.5
-          },
-          {
-            "field": "rent_pct_uae",
-            "label": "Rent percentile UAE-wide",
-            "value": 0.2155
-          }
-        ],
-        "topic": "cost"
-      }
-    ],
-    "so_what": "The model estimates this lounge is performing 1.8x compared to its site (context, not scored): it serves about 18,652 women against 10,173 for a typical lounge there. No other lounge reaches the 102,439 women in its catchment.",
-    "source": "ai",
-    "subject_id": "al-ain",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
   },
   "c3afe73bcda524e7": {
     "action": "GROW",
@@ -9194,70 +9219,80 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "c58f670ea6b98998": {
+  "c57dd40e8da14798": {
     "action": "HOLD",
-    "headline": "HOLD: khaleej-al-arabi sits right on the SHRINK line (composite 0.350): its site would out-serve only 22% of Abu Dhabi salon sites, at a rent about level with its emirate's median salon site.",
+    "headline": "HOLD: Delma's site is weak on both demand and rent, and its composite of 0.38 sits just above the SHRINK line.",
     "kind": "lounge",
-    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite is 0.0004 above the SHRINK line: site demand slipping from 21.7% to 21.6% of salon sites would make it SHRINK.",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite of 0.38 is 0.03 from the SHRINK line; demand alone would have to fall to 32% of salon sites (now 38%) to make it SHRINK, and the call is low confidence as it flips in 9 of 27 assumption combinations.",
     "reasons": [
       {
-        "claim": "A typical lounge at this site would serve about 1,359 women, more than at 22% of Abu Dhabi salon sites and 11% of UAE salon sites, so site demand is weak.",
+        "claim": "Demand is weak: a typical lounge would serve 1,895 women here, more than at only 38% of Abu Dhabi salon sites.",
         "evidence": [
           {
             "field": "demand_pct",
             "label": "Site demand percentile",
-            "value": 0.2171
+            "value": 0.375
           },
           {
-            "field": "demand_pct_uae",
-            "label": "Demand percentile UAE-wide",
-            "value": 0.1077
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Abu Dhabi"
           },
           {
             "field": "site_served",
             "label": "Women a typical lounge would serve here",
-            "value": 1358.5882
+            "value": 1894.7771
           },
           {
-            "field": "score_demand",
-            "label": "Demand score",
-            "value": 0.2171
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.2538
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.1875
           }
         ],
         "topic": "demand"
       },
       {
-        "claim": "Rent is about level with the median Abu Dhabi salon site (rent ratio 1.01, AED 1,380 per m² a year), cheaper than 34% of UAE salon sites, so it scores near neutral.",
+        "claim": "Rent is slightly dear: AED 1,507/m²/yr gives a rent ratio of 0.93, a cost score of 0.38.",
         "evidence": [
-          {
-            "field": "rent_ratio",
-            "label": "Rent ratio",
-            "value": 1.0101
-          },
           {
             "field": "site_rent_m2",
             "label": "Shop rent at the site",
-            "value": 1380.0
+            "value": 1507.0
+          },
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 0.925
           },
           {
             "field": "rent_pct_uae",
             "label": "Rent percentile UAE-wide",
-            "value": 0.3411
+            "value": 0.3998
           },
           {
             "field": "score_cost",
             "label": "Cost score",
-            "value": 0.4838
+            "value": 0.3789
+          },
+          {
+            "field": "contrib_cost",
+            "label": "Cost contribution",
+            "value": 0.1895
           }
         ],
         "topic": "cost"
       }
     ],
-    "so_what": "The lounge serves about 3,083 women; The model estimates this lounge is performing 2.3x compared to its site, which is context, not scored. 98% of its catchment is shared with sibling lounges, and the call changes at 1 of 3 worker-housing share levels, so it is low confidence.",
+    "so_what": "The model estimates this lounge is performing 0.9x compared to its site; that is context, not scored. It shares 98% of its catchment with siblings, who would absorb 11% of its served women if it closed, and 29 premium substitutes compete for the rest.",
     "source": "ai",
-    "subject_id": "khaleej-al-arabi",
-    "table_caption": "Each factor scores the site from 0 to 1 against Abu Dhabi's competitor salon sites: demand is the share of them a typical lounge here would out-serve, rent compares their median rent with this site's. The composite averages the two; at 0.350 it is on the SHRINK line, so small changes move the call.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes at 1 or more (a third) of the 3 levels of worker-housing share depends on that assumption more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied. Drive time and competitor coverage don't reach the served-demand (Huff) scoring yet: drive time only draws the displayed catchment and coverage changes nothing scored (to be wired back: README, Potential improvements). Affluence weighting is off. So the check varies worker-housing share alone."
+    "subject_id": "delma",
+    "table_caption": "The demand factor ranks what a typical lounge would serve at this site against competitor salon sites; the cost factor ranks the site's shop rent against the same sites. Each is scored 0 to 1, where 1 is best, and the two contributions add up to the composite. Read the composite against the 0.65 PROTECT line and the 0.35 SHRINK line.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
   },
   "c78db9dcb5f797bd": {
     "action": "GROW",
@@ -10324,70 +10359,75 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
-  "d95158bf104e8bc7": {
-    "action": "PROTECT",
-    "headline": "PROTECT: al-falah's site would out-serve 83% of Abu Dhabi salon sites on demand; its rent is only the Abu Dhabi median, scored neutral, so the call is low confidence (composite 0.66).",
+  "d6b65ea4ff6a714f": {
+    "action": "HOLD",
+    "headline": "HOLD Jumeirah Park: its site is mid-pack on both demand and rent, with a composite of 0.47.",
     "kind": "lounge",
-    "now_what": "Defend the site: renew at the lease event, don't relocate, and respond to any rival opening nearby. Composite 0.66 is 0.01 from the HOLD line. On its own, site demand percentile would have to reach 80% of salon sites (now 83% of salon sites) to make it HOLD. An observed rent for the site would firm up or move the call.",
+    "now_what": "No portfolio action this cycle: revisit at the next lease event, or sooner if a signal crosses a line. The composite of 0.47 is 0.12 from the SHRINK line; demand alone would have to fall to 21% of salon sites (now 44%) to flip it.",
     "reasons": [
       {
-        "claim": "A typical lounge at this site would serve about 7,866 women, more than it would at 83% of Abu Dhabi salon sites; 85th percentile UAE-wide.",
+        "claim": "A typical lounge here would out-serve 44% of Dubai salon sites, a middling demand score.",
         "evidence": [
           {
             "field": "demand_pct",
             "label": "Site demand percentile",
-            "value": 0.8289
+            "value": 0.445
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Dubai"
           },
           {
             "field": "demand_pct_uae",
             "label": "Demand percentile UAE-wide",
-            "value": 0.8522
+            "value": 0.3393
           },
           {
             "field": "site_served",
             "label": "Women a typical lounge would serve here",
-            "value": 7865.5012
+            "value": 2233.9451
           },
           {
             "field": "score_demand",
             "label": "Demand score",
-            "value": 0.8289
+            "value": 0.445
           }
         ],
         "topic": "demand"
       },
       {
-        "claim": "Its site rent of AED 1,168/m² a year is the Abu Dhabi median standing in for a cell with no rent of its own, not the site's, so rent scores neutral (0.5); for context it is dearer than 22% of UAE salon sites.",
+        "claim": "Shop rent of AED 2,118/m²/yr is about the Dubai salon-site median (ratio 1.02), giving a cost score of 0.49.",
         "evidence": [
           {
-            "field": "rent_fallback",
-            "label": "Rent is the emirate median",
-            "value": true
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 1.0168
           },
           {
             "field": "site_rent_m2",
             "label": "Shop rent at the site",
-            "value": 1168.0
-          },
-          {
-            "field": "score_cost",
-            "label": "Cost score",
-            "value": 0.5
+            "value": 2118.0
           },
           {
             "field": "rent_pct_uae",
             "label": "Rent percentile UAE-wide",
-            "value": 0.2155
+            "value": 0.6625
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.4919
           }
         ],
         "topic": "cost"
       }
     ],
-    "so_what": "The model estimates this lounge is performing 1.2x compared to its site (context, not scored): it serves about 9,510 women against 7,866 for a typical lounge there. 57% of the 49,947 women in its catchment are also reached by another lounge, and siblings would absorb 15% of its served women if it closed.",
+    "so_what": "The lounge serves about 1,636 women out of 171,595 in its catchment, and 73% of that catchment is shared with sibling lounges, though siblings would absorb only 0.5% of its served women if it closed. The model estimates this lounge is performing 0.7x compared to its site; that is context, not scored. The call is sensitive to assumptions: it changes in 9 of 27 combinations, so confidence is low.",
     "source": "ai",
-    "subject_id": "al-falah",
-    "table_caption": "Both scored signals rank this lounge's site within its emirate's frozen market of competitor salon sites: demand is the share of them a typical lounge here would out-serve, and the rent ratio is their median shop rent over this site's (above 1 is cheaper). The UAE-wide percentiles are context; served women, capture, rating and the shared catchment are shown, not scored.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 27 or more (a third) of the 81 combinations of travel time, competitor coverage, worker-housing share and affluence weighting depends on the assumptions more than on the data, so its call is low confidence."
+    "subject_id": "jumeirah-park",
+    "table_caption": "Demand and cost are each scored from 0 to 1 against the other salon sites in the lounge's emirate, then averaged into the composite. At or above 0.65 is PROTECT, at or below 0.35 is SHRINK, and anything between is HOLD. The call scores the site, not the lounge's own popularity.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
   },
   "dddbfe8e4ca4fb52": {
     "action": "HOLD",
@@ -10704,6 +10744,81 @@
     "subject_id": "khatt-ras-al-khaimah",
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median, unless that rent is only the emirate median standing in for cells without one: then the rent test is neutral and the call low confidence.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
+  "e1097d28d69d10a8": {
+    "action": "PROTECT",
+    "headline": "PROTECT: Al Falah's site out-serves 83% of Abu Dhabi salon sites, but at a composite of 0.66 it only just clears the 0.65 line.",
+    "kind": "lounge",
+    "now_what": "Keep and defend the site: renew at the lease event, don't relocate, and treat a competitor opening nearby as a threat to respond to. The composite of 0.66 is only 0.01 from the HOLD line; demand alone falling to 80% of salon sites (now 83%) would flip it.",
+    "reasons": [
+      {
+        "claim": "The site is strong: a typical lounge would serve 7,866 women here, more than at 83% of Abu Dhabi salon sites.",
+        "evidence": [
+          {
+            "field": "demand_pct",
+            "label": "Site demand percentile",
+            "value": 0.8289
+          },
+          {
+            "field": "demand_ref",
+            "label": "Demand ranked among",
+            "value": "Abu Dhabi"
+          },
+          {
+            "field": "site_served",
+            "label": "Women a typical lounge would serve here",
+            "value": 7865.5012
+          },
+          {
+            "field": "demand_pct_uae",
+            "label": "Demand percentile UAE-wide",
+            "value": 0.8522
+          },
+          {
+            "field": "contrib_demand",
+            "label": "Demand contribution",
+            "value": 0.4144
+          }
+        ],
+        "topic": "demand"
+      },
+      {
+        "claim": "Rent is neutral: the shop rent is the Abu Dhabi median standing in for missing data, so the cost score is 0.5 and adds 0.25 to the composite.",
+        "evidence": [
+          {
+            "field": "rent_fallback",
+            "label": "Rent is the emirate median",
+            "value": true
+          },
+          {
+            "field": "site_rent_m2",
+            "label": "Shop rent at the site",
+            "value": 1168.0
+          },
+          {
+            "field": "rent_ratio",
+            "label": "Rent ratio",
+            "value": 1.1935
+          },
+          {
+            "field": "score_cost",
+            "label": "Cost score",
+            "value": 0.5
+          },
+          {
+            "field": "contrib_cost",
+            "label": "Cost contribution",
+            "value": 0.25
+          }
+        ],
+        "topic": "cost"
+      }
+    ],
+    "so_what": "The model estimates this lounge is performing 1.2x compared to its site; that is context, not scored. It shares 57% of its catchment with siblings, who would absorb 15% of its served women if it closed, and the premium market is thin (6 premium salons), so the call is low confidence.",
+    "source": "ai",
+    "subject_id": "al-falah",
+    "table_caption": "The demand factor ranks what a typical lounge would serve at this site against competitor salon sites; the cost factor ranks the site's shop rent against the same sites. Each is scored 0 to 1, where 1 is best, and the two contributions add up to the composite. Read the composite against the 0.65 PROTECT line and the 0.35 SHRINK line.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. A lounge whose action changes in 9 or more (a third) of the 27 combinations of drive time, competitor coverage and worker-housing share depends on the assumptions more than on the data, so its call is low confidence. Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). Affluence weighting is off, so it stays at baseline."
   },
   "e4ae2d26d0c9ef6e": {
     "action": "WATCH",
