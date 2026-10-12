@@ -165,7 +165,7 @@ SKIP areas and the NOT SCORED airport lounge always use the template.
 
 ## 6. Where not to trust it
 
-These matter more than the calls. The full ranked list is the **How it works & limitations** page
+These matter more than the calls. The full ranked list is the app's **README** page
 (`docs/limitations.md`).
 
 - **No capacity, no revenue, no ROIC.** No chairs, hours, utilisation, revenue, actual lease or

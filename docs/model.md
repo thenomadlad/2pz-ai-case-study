@@ -330,6 +330,27 @@ today isn't modelled at all.
 | **Cost** | Area shop rent × an assumed 150 m² unit + assumed fit-out | Per lounge: base rent, service charge and fees, fit-out depreciation (fixed); staff salaries, commissions and visas, products per service, booking-platform fees (variable per appointment) |
 | **Return** | None | Contribution per appointment (ticket − variable cost); lounge profit; **profit per m²** and per chair-hour; payback and ROIC on fit-out |
 
+### The objective: services rendered, per catchment
+
+The number to optimise is **services rendered**: appointments delivered to the women in a catchment.
+Branches are how capacity gets there, and **service providers** (therapists, stylists) are the
+capacity itself. So the ideal model allocates at the level of a **catchment region**, not a branch:
+- **Match providers to demand.** For each region: demand (bookings plus measured turn-aways and
+  unserved women) against the **total capacity of every branch serving it** (providers × hours ×
+  services per hour). Under capacity: add providers or hours where branches have room, then a
+  branch. Over capacity: move providers to busier branches before closing one.
+- **Judge cost per region:** **total capacity of the region's branches ÷ total rent of those
+  branches** (services we can render per AED of rent), and services actually rendered per AED of
+  total cost. Two lounges in one catchment are judged as one system: a dear branch can be right if it
+  lifts the region's services per AED, and a cheap one wrong if its providers sit idle while a sibling
+  turns customers away.
+- **Branch decisions follow.** Open, resize, consolidate or exit are the moves that change a region's
+  capacity and rent; the call on any one branch is whether that move raises services rendered per AED
+  for its region.
+
+This is today's per-site question (demand per AED of rent, within the emirate) lifted to the level the
+business actually runs: the network of branches and providers serving one market.
+
 ### The cost side
 
 - **Contribution per appointment** = average ticket − variable cost (therapist time and commission,

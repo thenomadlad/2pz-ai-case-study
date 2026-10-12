@@ -20,6 +20,6 @@ def pages(default: str = "overview") -> list[st.Page]:
     LOUNGE = st.Page(lounge.render, title="Lounges", icon="💇", url_path="lounge",
                      default=default == "lounge")
     AREA = st.Page(area.render, title="Areas", icon="📍", url_path="area", default=default == "area")
-    HOW = st.Page(how.render, title="How it works & limitations", icon="⚠️", url_path="how",
+    HOW = st.Page(how.render, title="README", icon="📖", url_path="how",
                   default=default == "how")
     return [OVERVIEW, PREDICTIONS, LOUNGE, AREA, HOW]

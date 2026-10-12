@@ -120,7 +120,7 @@ Every call comes with a pyramid: a one-sentence answer, 2-5 arguments, each back
 3. **[City Walk](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk) (SHRINK):** the AI pyramid, *What would change the call*, the factor tree and which siblings share its women.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah) (GROW, low confidence):** about 12.5k net new women, but no shop rent of its own, and the call says so.
 5. **Back on the What-if explorer:** open the 🧪 panel, quote City Walk a rent of 2,200 and watch its call move.
-6. **[How it works & limitations](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how):** this page, the model and the implementation notes.
+6. **[README](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how):** this page, the model and the implementation notes.
 
 The full ten-minute version, with the AI layer and where not to trust it:
 [`docs/walkthrough.md`](docs/walkthrough.md).
@@ -154,12 +154,17 @@ more than the calls. The biggest ones:
   UAE-wide percentile as context.
 
 The full ranked list, with which calls each limitation touches and what would fix it:
-[`docs/limitations.md`](docs/limitations.md), also the app's **How it works & limitations** page.
+[`docs/limitations.md`](docs/limitations.md), also the app's **README** page.
 
 ## The model we'd build with Bedashing's data
 
 The same decisions and the same chain (**demand → what we can serve → cost → return → the call**),
-measured instead of estimated:
+measured instead of estimated, and optimised for **services rendered per catchment**, not per branch:
+- **The objective:** for each catchment region, match the **total capacity of all its branches**
+  (service providers × hours × services per hour) to its demand, at the best **total capacity ÷ total
+  rent** of those branches. Service providers are the capacity, so the first lever is allocating them
+  to where demand is (add providers or hours where branches are full, move them from idle ones);
+  opening, resizing or closing a branch is the move when that isn't enough.
 - **Demand and capture:** bookings by customer home area, to measure the real catchment and penetration,
   and to calibrate the demand split on actual booking shares instead of Google reviews.
 - **Capacity**, which today isn't modelled: chairs × hours × minutes per service, **utilisation**, peak
@@ -267,7 +272,7 @@ Five pages; the loop is **Executive Summary → click a lounge or area → its p
 2. **What-if explorer** (`/explore`): your decision rules, rent quotes, closures and the model's assumptions; the scenario summary and the map. The only page that reads a what-if.
 3. **Lounges** (`/lounge?lounge=delma`): a sortable table of all 24; select one for its call, explanation, factor tree, competitors and shared catchment.
 4. **Areas** (`/area?area=kalba-sharjah`): GROW and WATCH areas ranked by net new women, with the same detail.
-5. **How it works & limitations** (`/how`): this README, the model and the implementation notes, then every assumption and constant read live from the code.
+5. **README** (`/how`): this README, the model and the implementation notes, then every assumption and constant read live from the code.
 
 Links carry the selection, so any page can be shared directly. Page by page in detail:
 [docs/implementation.md](docs/implementation.md); guided tour: [`docs/walkthrough.md`](docs/walkthrough.md).
@@ -276,7 +281,7 @@ Links carry the selection, so any page can be shared directly. Page by page in d
 
 ```
 streamlit_app.py         entry point; five pages in src/webapp/pages/: overview (Executive Summary),
-                         predictions (What-if explorer), lounge, area, how (How it works & limitations)
+                         predictions (What-if explorer), lounge, area, how (README)
 src/webapp/              map layers, shared rendering, the what-if panel
 src/data_v3.py           loads data/seed/v3/
 src/market.py            women 15+ per cell (worker-housing rebalance), which Places results count as

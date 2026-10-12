@@ -1,4 +1,4 @@
-"""How it works & limitations: the README, docs/model.md and docs/implementation.md themselves (one source
+"""README page: the README, docs/model.md and docs/implementation.md themselves (one source
 of truth; Mermaid diagrams drawn in the browser, links between the three as in-page anchors, other repo
 links pointed at GitHub), then live tables of every assumption in baseline.yaml and every
 scorecard / growth constant with why it was chosen."""
