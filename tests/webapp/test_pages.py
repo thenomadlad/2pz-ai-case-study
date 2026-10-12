@@ -195,16 +195,20 @@ def test_pages_default_to_the_top_row_and_ignore_unknown_links():
     assert first.Call.iloc[0] == "GROW" and at.query_params["area"] == first.index[0]
 
 
-def test_how_page_renders_limitations_market_model_and_every_assumption():
+def test_how_page_is_the_readme_then_live_values():
+    from src.webapp.pages.how import README, readme_parts
     at = _page("how")
     assert not at.exception
     text = _text(at)
-    assert "No revenue or lease data in the model" in text and "Market model" not in at.title[0].value
-    assert "Capture** = lounge reviews" in text            # SOURCES.md "Market model"
-    assumptions = at.table[0].value
+    assert text.lstrip().startswith("# Bedashing network right-sizing")   # the README, from its own title
+    assert "Every factor we ignore, and why" in text and "Why commercial rent stands in for cost" in text
+    parts = readme_parts(README.read_text())
+    assert sum(k == "mermaid" for k, _ in parts) == 2                     # both diagrams drawn, not shown as code
+    md = " ".join(p for k, p in parts if k == "md")
+    assert "](https://github.com/thenomadlad/2pz-ai-case-study/blob/main/RUBRIC.md)" in md   # repo links work
+    assumptions = at.table[0].value                                       # live values from the code
     assert {"travel_time_minutes", "search_recall", "worker_housing_female_share"} <= set(assumptions.index)
     assert "low: 10 · medium: 15 · high: 20" in assumptions.loc["travel_time_minutes"].iloc[0]
-    assert "Baseline assumptions" not in assumptions.loc["travel_time_minutes"].iloc[0]
     assert any("UNSATURATED_PER_1K" in t.value.index for t in at.table)
 
 

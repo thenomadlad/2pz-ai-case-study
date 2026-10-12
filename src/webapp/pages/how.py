@@ -1,8 +1,11 @@
-"""How it works & limitations: docs/limitations.md, the "Market model" section of SOURCES.md, every
-assumption in baseline.yaml and every scorecard / growth constant with why it was chosen."""
+"""How it works & limitations: the README itself (one source of truth; Mermaid diagrams drawn in the
+browser, repo links pointed at GitHub), then live tables of every assumption in baseline.yaml and every
+scorecard / growth constant with why it was chosen."""
+import html
 import re
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from src.config import REPO_ROOT
 from src.features.lounges import (
@@ -52,18 +55,33 @@ def _const(v) -> str:
     return f"{v:g}" if isinstance(v, float) else f"{v:,}" if isinstance(v, int) else getattr(v, "pattern", str(v))
 
 
+README = REPO_ROOT / "README.md"
+REPO_URL = "https://github.com/thenomadlad/2pz-ai-case-study/blob/main/"
+_MERMAID = """<div class="mermaid">{code}</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({{startOnLoad: true, theme: "neutral", securityLevel: "strict"}});</script>"""
+
+
+def readme_parts(text: str) -> list[tuple[str, str]]:
+    """The README as ("md", markdown) and ("mermaid", diagram) parts, with repo-relative links pointing at
+    GitHub so they work inside the app."""
+    text = re.sub(r"\]\((?!https?://|#|mailto:)([^)\s]+)\)", lambda m: f"]({REPO_URL}{m.group(1)})", text)
+    parts = re.split(r"^```mermaid\n(.*?)^```\n?", text, flags=re.DOTALL | re.MULTILINE)
+    return [("mermaid" if i % 2 else "md", p) for i, p in enumerate(parts) if p.strip()]
+
+
 def render() -> None:
-    st.title("How it works & limitations")
-    st.markdown("We will iterate on this model: **the limitations matter more than the calls.** "
-                "Below: the limitations, how the model fits together, and every assumption and "
-                "threshold it uses.")
-    st.markdown(LIMITATIONS.read_text().split("\n", 1)[1])     # without its own title
+    # The README is this page: one source of truth for the model, its limitations and its trade-offs
+    for kind, part in readme_parts(README.read_text()):
+        if kind == "md":
+            st.markdown(part)
+        else:
+            components.html(_MERMAID.format(code=html.escape(part)), height=720, scrolling=True)
 
     st.divider()
-    st.header("How the market model fits together")
-    st.markdown(section(SOURCES.read_text(), "Market model"))
-
-    st.header("Every assumption (data/scenarios/baseline.yaml)")
+    st.header("Live values from the code")
+    st.caption("Read from the code and data/scenarios/baseline.yaml each time the page loads, so they can't go stale.")
+    st.subheader("Every assumption (data/scenarios/baseline.yaml)")
     st.caption("The What-if explorer switches the four levelled assumptions and the "
                "search recall.")
     notes = yaml_notes(data.BASELINE_YAML.read_text())
@@ -71,7 +89,7 @@ def render() -> None:
                     "Why / source": notes.get(k) or "See the row above."}
                    for k, v in data.assumptions().model_dump().items()])
 
-    st.header("Lounge scorecard (src/model/scorecard.py)")
+    st.subheader("Lounge scorecard (src/model/scorecard.py)")
     wrapped_table([{"Signal": s.label, "Scale": f"{s.worst:g} → 0, {s.best:g} → 1", "Weight": f"{s.weight:g}",
                     "Why": s.why} for s in scorecard.SIGNALS])
     wrapped_table([
@@ -103,5 +121,5 @@ def render() -> None:
         {"Constant": "NOT_SCORED", "Value": ", ".join(sorted(NOT_SCORED)), "Why": NOT_SCORED_WHY},
     ])
 
-    st.header("Growth areas (src/model/growth.py)")
+    st.subheader("Growth areas (src/model/growth.py)")
     wrapped_table([{"Constant": k, "Value": _const(getattr(growth, k)), "Why": why} for k, why in growth.WHY.items()])
