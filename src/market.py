@@ -112,7 +112,7 @@ def weighted_median(values, weights) -> float | None:
 AFFLUENCE_CLIP = (0.25, 4.0)
 AFFLUENCE_CLIP_WHY = ("A cell's weight before rescaling stays between a quarter and four times the "
                       "median-rent cell's: a few luxury or very cheap cells can't swamp a catchment's demand "
-                      "(final weights 0.44-2.54 at medium elasticity, CONTEXT.md).")
+                      "(final weights 0.44-2.54 at medium elasticity, docs/glossary.md).")
 
 
 def affluence_weight(rent, women, elasticity: float):

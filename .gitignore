@@ -10,3 +10,6 @@ data/raw/
 .playwright-mcp/
 .ipynb_checkpoints/
 .cache/
+.claude/
+.ropeproject/
+.superpowers/

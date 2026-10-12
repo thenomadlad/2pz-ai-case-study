@@ -120,7 +120,7 @@ The full ranked list, with which calls each limitation touches and what would fi
 | **Decision-maker** | COO, accountable for lounge operations and return on capital | approve or question the recommendation from the headline and the reasons |
 | **Board** | PE owner's board / operating partner | judge whether the call is defensible: evidence, thresholds, caveats |
 
-Each label maps to a decision the COO already makes (definitions: [`CONTEXT.md`](CONTEXT.md), "Decisions"):
+Each label maps to a decision the COO already makes (definitions: [`docs/glossary.md`](docs/glossary.md), "Decisions"):
 
 | COO decision | Label | What it asks |
 |---|---|---|
@@ -587,8 +587,8 @@ supporting arguments, each backed by 2-5 data points from the fact sheet.
 Built with **Claude Code** throughout: 119 of the first 149 commits carry a Claude co-author (Opus,
 Sonnet and Haiku). Claude wrote the code and tests, the fetch scripts and notebooks, ran
 the review passes (the "Fix N" and "review fixes" commits), and wrote the committed explanations
-offline in a session from the app's own prompts. The specs and plans it executed are in
-`docs/superpowers/`; the audits are `docs/rubric.md` and `docs/sanity-checks.md`. The human set the
+offline in a session from the app's own prompts. The audits are `docs/rubric.md` and
+`docs/sanity-checks.md`. The human set the
 direction and signed off the judgement calls: the scorecard scales and the salon-site reference, every paid API run (e.g.
 282 Places calls, ~$7) and the ones declined (a ~$54-210 full sweep).
 
@@ -730,8 +730,7 @@ src/explain.py           fact sheets, prioritisation, grounding check, cache, pr
 scripts/                 one-off fetches and builds (Google Places, Mapbox, WorldPop/OSM cells, GHSL, DLD rents, shop rents)
 notebooks/               market_size, catchments, competitors, served_demand, rent, scorecard, growth, branches; features/: affluence, features, decisions, explanations
 docs/limitations.md      ranked limitations: read first
-docs/remaining.md        build log and decision register (historical)
-CONTEXT.md               glossary of domain terms
+docs/glossary.md         glossary of domain terms and decisions
 ```
 
 Commands: `just app` · `just test` · `just labels` · `just notebook` · `just explain`.

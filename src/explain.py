@@ -697,7 +697,7 @@ _TEMPLATE_CAPTIONS = {
 }
 
 
-# What each call asks the COO to do (CONTEXT.md, Decisions). verify() requires the phrase in now_what.
+# What each call asks the COO to do (docs/glossary.md, Decisions). verify() requires the phrase in now_what.
 ACTIONS = {
     "PROTECT": ("defend", ("Keep and defend the site: renew at the lease event, don't relocate, "
                            "and treat a competitor opening nearby as a threat to respond to.")),
