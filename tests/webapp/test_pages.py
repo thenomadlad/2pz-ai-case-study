@@ -288,7 +288,7 @@ def test_overview_overlap_toggle_adds_its_legend():
 
 def test_shop_rent_shows_as_cost_with_the_unit_assumption():
     lounge = _tree(_page("lounge", lounge="al-barsha")).to_string()                          # factor tree
-    assert "Shop rent at the site" in lounge and "AED/m²/yr" in lounge
+    assert "Shop rent at this site" in lounge and "AED/m²/yr" in lounge
     lounges, areas = _page("lounge"), _page("area")
     assert "Shop rent (AED/m²/yr)" in lounges.dataframe[0].value.columns
     assert "Shop rent is our cost; women per AED 1k assumes a 150 m² unit." in _text(lounges)
