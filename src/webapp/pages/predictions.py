@@ -201,8 +201,8 @@ def render() -> None:
     st.caption("Change the model's assumptions, your decision rules or a site's rent, or close lounges, and watch "
                "the calls move; then click a lounge or an area on the map. **Only this page changes:** the "
                "Executive Summary, Lounges and Areas pages always show the baseline. Every number is the model's estimate.")
-    render_summary()
     render_panel()
+    render_summary()     # under the form: the form stays in place, the results follow it
     st.markdown("##### The map: click a lounge or an area")
     city = st.pills("Jump to", list(CITIES), default="UAE", key="map-city") or "UAE"
     # the city is in the key: a new key is a new map, so deck.gl takes the new initial view
