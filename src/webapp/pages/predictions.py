@@ -114,7 +114,7 @@ def _lounge_legend() -> None:
     st.caption("Composite: site demand (share of its emirate's competitor salon sites a typical lounge there would out-serve) "
                "and site rent (its emirate's median salon-site rent ÷ its own), weight 1 each, each "
                f"0-1 on a fixed scale against a frozen reference; review share, rating and shared catchment are shown, not scored. Low confidence: within {scorecard.LOW_MARGIN} of a line, the call changes in "
-               f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations, or it changes when a "
+               f"at {scorecard.FLIP_LOW}+ of {scorecard.COMBOS} worker-housing share levels, or it changes when a "
                "signal weight moves ±25%.")
 
 

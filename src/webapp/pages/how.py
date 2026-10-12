@@ -77,7 +77,7 @@ def render() -> None:
     wrapped_table([
         {"Constant": "PROTECT_AT / SHRINK_AT", "Value": f"{scorecard.PROTECT_AT} / {scorecard.SHRINK_AT}",
          "Why": scorecard.THRESHOLDS_WHY},
-        {"Constant": "FLIP_LOW_SHARE", "Value": f"a third: {scorecard.FLIP_LOW} of {scorecard.COMBOS}",
+        {"Constant": "FLIP_LOW_SHARE", "Value": f"a third: {scorecard.FLIP_LOW} of {scorecard.COMBOS} ({', '.join(scorecard.LIVE_AXES)})",
          "Why": scorecard.FLIP_WHY},
         {"Constant": "NEUTRAL", "Value": f"{scorecard.NEUTRAL}",
          "Why": "A missing signal value (e.g. no shop rent) scores neutral, never the worst."},
@@ -85,7 +85,7 @@ def render() -> None:
          "Why": scorecard.WEIGHT_WHY},
         {"Constant": "LOW_MARGIN / HIGH_MARGIN",
          "Value": f"low within {scorecard.LOW_MARGIN} of a line; high from {scorecard.HIGH_MARGIN}",
-         "Why": f"Low also when the call flips {scorecard.FLIP_LOW}+ times or a signal weight ±25% changes it."},
+         "Why": f"Low also when the call flips at {scorecard.FLIP_LOW}+ worker-housing level(s) or a signal weight ±25% changes it."},
         {"Constant": "Site reference (src/features/lounges.py)",
          "Value": " · ".join(f"{e}: {n}" for e, n in site_reference().emirate.value_counts().items())
          + f" salon sites; under {MIN_REF_SITES}: demand ranked UAE-wide", "Why": SITE_REFERENCE_WHY},

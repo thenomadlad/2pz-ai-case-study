@@ -350,7 +350,7 @@ def test_site_served_is_a_typical_lounge_at_the_site_with_this_one_closed(real_v
                          not_scored=frozenset(NOT_SCORED))
         assert x.site_served == pytest.approx(w["served"])
         assert x.performance_vs_site == pytest.approx(x.served_women / x.site_served)
-    assert _SERVED   # cached: level_flips' 81 builds reuse it
+    assert _SERVED   # cached: level_flips' builds reuse it
     air = next(x for x in f if x.not_scored)
     assert air.site_served is None and air.performance_vs_site is None
 

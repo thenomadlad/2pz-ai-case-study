@@ -6,15 +6,15 @@ lounge's own served women are context (performance_vs_site), not scored.
 Fixed scales so a lounge's score doesn't move when a sibling opens or closes. Each `why` says how its
 anchors were set (2026-10-11, served-demand model). Capture and rating are shown, not scored;
 cannibalisation is a what-if on the lounge page, not a signal. Affluence weighting is off at baseline
-(Levels.affluence = "low", elasticity 0: notebooks/features/affluence.ipynb); it stays one of the four
-assumption axes the flip count varies.
+(Levels.affluence = "low", elasticity 0: notebooks/features/affluence.ipynb). The flip count varies only
+LIVE_AXES (LIVE_AXES_WHY).
 """
 from collections import Counter
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, replace
 from itertools import product
 
 from src.model.growth import rent_fallback
-from src.models import Decision, Levels, LoungeFeatures
+from src.models import Decision, LoungeFeatures
 
 
 @dataclass(frozen=True)
@@ -62,13 +62,17 @@ THRESHOLDS_WHY = (
     f"signals, not just one. SHRINK at {SHRINK_AT} or less means it is weak on most signals. "
     "Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree."
 )
-AXES = tuple(f.name for f in fields(Levels))     # travel, coverage, worker_share, affluence
-COMBOS = 3 ** len(AXES)                          # 81 level combinations
+LIVE_AXES = ("worker_share",)   # LIVE_AXES_WHY
+LIVE_AXES_WHY = ("Only the assumptions that reach the scoring are varied. Drive time and competitor coverage "
+                 "don't reach the served-demand (Huff) scoring yet: drive time only draws the displayed "
+                 "catchment and coverage changes nothing scored (to be wired back: README, Potential improvements). "
+                 "Affluence weighting is off. So the check varies worker-housing share alone.")
+COMBOS = 3 ** len(LIVE_AXES)                     # 3 levels
 FLIP_LOW_SHARE = 1 / 3   # of the combinations: a call that flips this often is low confidence
-FLIP_LOW = round(FLIP_LOW_SHARE * COMBOS)        # 27 of 81
-FLIP_WHY = (f"A lounge whose action changes in {FLIP_LOW} or more (a third) of the {COMBOS} "
-            "combinations of travel time, competitor coverage, worker-housing share and affluence "
-            "weighting depends on the assumptions more than on the data, so its call is low confidence.")
+FLIP_LOW = round(FLIP_LOW_SHARE * COMBOS)        # 1 of 3
+FLIP_WHY = (f"A lounge whose action changes at {FLIP_LOW} or more (a third) of the {COMBOS} levels of "
+            "worker-housing share depends on that assumption more than on the data, so its call is low "
+            f"confidence. {LIVE_AXES_WHY}")
 NEUTRAL = 0.5  # a missing rating gap never scores as the worst; thin-market capture is pulled toward it
 THIN_MARKET = 10
 THIN_MARKET_WHY = ("Under 10 premium salons, capture is a share of a tiny pool, so it is noisy: its score keeps "
@@ -136,7 +140,7 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
                        "its cell): rent scores neutral.")
     flippy = flips is not None and flips >= FLIP_LOW
     if flippy:
-        caveats.append(f"The call changes in {flips} of {COMBOS} assumption combinations.")
+        caveats.append(f"The call changes at {flips} of {COMBOS} worker-housing share levels.")
     wflips = weight_flips(scores)
     if wflips:
         caveats.append("The call depends on the signal weights: it changes with " + "; ".join(wflips) + ".")
@@ -150,12 +154,13 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
 
 
 def decide(features: list[LoungeFeatures], flips: dict[str, int] | None = None) -> list[Decision]:
-    """`flips`: per lounge, how many of the 81 level combinations change its action (level_flips)."""
+    """`flips`: per lounge, how many of the COMBOS live-axis level combinations change its action (level_flips)."""
     return [_decide(f, (flips or {}).get(f.branch_id)) for f in features]
 
 
 def level_flips(v3, assumptions, levels, closed=frozenset()) -> dict[str, int]:
-    """How many of the 81 level combinations give each lounge a different action than `levels`."""
+    """How many of the COMBOS combinations of LIVE_AXES levels (other axes as in `levels`) give each
+    lounge a different action than `levels`."""
     from src.features.lounges import build  # here, not at the top: build doesn't need the scorecard
 
     def actions(lv):
@@ -163,8 +168,8 @@ def level_flips(v3, assumptions, levels, closed=frozenset()) -> dict[str, int]:
 
     base = actions(levels)
     out = Counter()
-    for lv in product(("low", "medium", "high"), repeat=len(AXES)):
-        for b, a in actions(Levels(*lv)).items():
+    for lv in product(("low", "medium", "high"), repeat=len(LIVE_AXES)):
+        for b, a in actions(replace(levels, **dict(zip(LIVE_AXES, lv, strict=True)))).items():
             out[b] += a != base[b]
     return {b: out[b] for b in base}
 

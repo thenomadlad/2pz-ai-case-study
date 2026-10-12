@@ -54,7 +54,6 @@ def _area_table(r) -> str | None:
     ranked = sorted((d for d in r.area_decisions if d.action != "SKIP"),
                     key=lambda d: (ORDER[d.action], -(by_id[d.area_id].new_site_net or 0)))
     df = pd.DataFrame([{"id": a.area_id, "Rank": i, "Area": a.name, "Emirate": a.emirate, "Call": d.action,
-                        "Call at 10 / 15 / 20 min": data.calls_by("travel", "area", a.area_id),
                         "Net new women": round(a.new_site_net or 0), "Demand pct (emirate)": a.demand_pct,
                         "Demand pct (UAE)": a.demand_pct_uae, "Rent ratio": a.rent_ratio, "Rent pct (UAE)": a.rent_pct_uae,
                         "Women 15+": round(a.women), "Worker housing": a.worker_share,

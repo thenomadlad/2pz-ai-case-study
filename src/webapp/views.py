@@ -171,7 +171,7 @@ def limitations_box(r: Run) -> None:
             "Ras Al Khaimah, Fujairah, Umm Al Quwain) rank demand UAE-wide.\n"
             f"4. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
             "lounges are low confidence: near a threshold, a call "
-            f"that changes in {scorecard.FLIP_LOW}+ of the {scorecard.COMBOS} assumption combinations, or one that "
+            f"that changes at {scorecard.FLIP_LOW}+ of the {scorecard.COMBOS} worker-housing share levels, or one that "
             "changes when a signal weight moves ±25%. Try the what-if panel below.\n"
             f"5. **Growth areas are a first cut.** Each is a what-if (open a typical lounge, count the net new "
             f"women); the Huff parameters are uncalibrated starting points and competitor data is partial. {sharjah} of {len(grow)} GROW areas are in Sharjah "
@@ -207,7 +207,7 @@ def lounge_caveats(f: LoungeFeatures, d: Decision, flips: int | None) -> list[st
                               "catchment is open to growth areas.")]
     out = [c for c in (near_threshold(d),) if c] + d.caveats[1:]
     if flips and flips < scorecard.FLIP_LOW:
-        out.append(f"The call changes in {flips} of {scorecard.COMBOS} assumption combinations (low "
+        out.append(f"The call changes at {flips} of {scorecard.COMBOS} worker-housing share levels (low "
                    f"confidence from {scorecard.FLIP_LOW}).")
     if f.demand_ref == "UAE":
         out.append(f"{f.emirate} has under 50 reference salon sites: its demand is ranked against all UAE salon sites.")

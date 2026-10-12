@@ -92,7 +92,7 @@ WEIGHTS = {s.name: s.weight for s in scorecard.SIGNALS}
 def _lounge_table(r) -> str | None:
     """The comparison table, which is also the picker: returns the selected row's lounge, if any."""
     df = pd.DataFrame([{"id": f.branch_id, "Lounge": short(f.name, f.branch_id), "Call": d.action,
-                        "Call at 10 / 15 / 20 min": data.calls_by("travel", "lounge", f.branch_id), "Emirate": f.emirate,
+                        "Emirate": f.emirate,
                         "Composite": None if f.not_scored else d.composite,
                         **{n.capitalize(): d.scores.get(n) for n in WEIGHTS},
                         "Demand pct (emirate)": None if f.not_scored else f.demand_pct,
@@ -121,8 +121,7 @@ def _lounge_table(r) -> str | None:
         "Review share": pct, "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
         "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
         "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f")})
-    st.caption("Select a row to show that lounge below. Call at 10 / 15 / 20 min: the call at each drive "
-               "time, the other assumptions at baseline. Click a column header to sort. Signal scores are 0-1 on fixed scales (1 = good for the "
+    st.caption("Select a row to show that lounge below. Click a column header to sort. Signal scores are 0-1 on fixed scales (1 = good for the "
                "lounge) and both score the site within its emirate's frozen market of competitor salon sites "
                "(demand pct = share of them it out-serves, UAE-wide where the emirate has under 50; rent ratio = their "
                "median shop rent ÷ the site's, above 1 = cheaper); the UAE columns rank the same site against all "
@@ -161,8 +160,8 @@ def render() -> None:
                "reviews. Services offered and price tier per lounge aren't in the data.")
     badge(d.action)
     if d.action != "NOT SCORED":
-        st.caption(f"Composite {d.composite:.2f} · confidence {d.confidence} · the call changes in "
-                   f"{flips} of {scorecard.COMBOS} assumption combinations")
+        st.caption(f"Composite {d.composite:.2f} · confidence {d.confidence} · the call changes at "
+                   f"{flips} of {scorecard.COMBOS} worker-housing share levels")
         st.markdown(performance_line(f))
     left, right = st.columns([3, 2])
     with left:

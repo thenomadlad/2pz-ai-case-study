@@ -79,12 +79,12 @@ def test_baseline_explanations_are_all_ai_except_skip_and_not_scored():
 def test_level_switch_is_fast_and_marks_explanations_as_template():
     at = _page("predictions", lounge="al-barsha")
     start = time.perf_counter()
-    at.selectbox(key="wi-travel").set_value("high").run()
-    # 3 s: a new level re-runs level_flips' 82 lounge builds (~20 ms each, 1.6-1.9 s warm); memoising them across levels would be one more cache to clear on parameter sweeps
+    at.selectbox(key="wi-worker_share").set_value("high").run()
+    # 3 s: a new level re-runs the build plus level_flips' 3 lounge builds
     assert time.perf_counter() - start < 3
     assert not at.exception
-    assert at.session_state["what_if"]["levels"] == Levels(travel="high")
-    assert any("What-if view" in w.value and "20 min (high)" in w.value for w in at.warning)
+    assert at.session_state["what_if"]["levels"] == Levels(worker_share="high")
+    assert any("What-if view" in w.value and "women (high)" in w.value for w in at.warning)
     assert any("numbers changed by the what-if" in c.value for c in at.caption)
     assert any("What changed from the baseline" in m.value for m in at.markdown)
     at.button(key="wi-reset").click().run()
@@ -93,7 +93,7 @@ def test_level_switch_is_fast_and_marks_explanations_as_template():
 
 def test_what_if_never_leaks_into_the_other_pages():
     from src.baseline import run
-    closed = {"levels": Levels(travel="high"), "closed": frozenset({"al-barsha"}), "recall": None}
+    closed = {"levels": Levels(worker_share="high"), "closed": frozenset({"al-barsha"}), "recall": None}
     summary = _page("overview", what_if=closed)
     assert not summary.exception and not any("What-if view" in w.value for w in summary.warning)
     from src.webapp.pages.overview import pyramid
@@ -112,8 +112,10 @@ def test_closing_lounges_from_the_panel_shows_what_changed():
 
 def test_level_selectors_show_actual_values():
     at = _page("predictions")
-    sb = at.selectbox(key="wi-travel")
-    assert sb.options == ["10 min (low)", "15 min (medium)", "20 min (high)"]
+    sb = at.selectbox(key="wi-worker_share")
+    assert [o.split()[-1] for o in sb.options] == ["(low)", "(medium)", "(high)"] and "% women" in sb.options[0]
+    # drive time and competitor coverage don't reach the scoring (scorecard.LIVE_AXES_WHY): not offered
+    assert not any(s.key in ("wi-travel", "wi-coverage") for s in at.selectbox)
     assert not any(sb.key == "wi-affluence" for sb in at.selectbox)       # affluence isn't offered in the app
     assert at.number_input(key="wi-recall").value == 0.66
 
@@ -246,6 +248,7 @@ def test_lounge_and_area_pages_open_on_their_full_tables_with_filters():
     assert len(lounges) == 24 and {"Composite", "Demand", "Shared catchment", "Confidence",
                                    "Premium reviews per 1k women"} <= set(lounges.columns)
     assert "Confidence" in areas.columns
+    assert not any(c.startswith("Call at") for c in [*lounges.columns, *areas.columns])   # owner: column dropped
     assert list(areas.Call) == sorted(areas.Call) and set(areas.Call) == {"GROW", "WATCH"}   # GROW first
     grow = areas[areas.Call == "GROW"]["Net new women"]
     assert list(grow) == sorted(grow, reverse=True) and areas.Why.str.len().min() > 0
