@@ -12,15 +12,18 @@ Data sources and their own caveats: `data/seed/v3/SOURCES.md`. The notebooks sho
 
 ## 1. No revenue or lease data in the model
 
-The lounge scorecard has two signals, both on the site: **site served** (the women a typical lounge
-would serve there in a Huff split) and **site cost efficiency** (`cost_index`: site-served women per
-AED 1,000 of annual site cost, against one frozen UAE-wide anchor). Site cost is built, not observed: shop rent x an **assumed** 150 m² unit,
-plus an **assumed** fit-out of AED 3,000/m² written off over 5 years. There is no revenue, no actual
-lease (rent, floor area, terms), no actual capex, no staffing and no footfall. SHRINK means "serves
-few women for what its site costs, investigate", not "loses money". A lounge can be SHRINK and
+The lounge scorecard has two signals, both on the site and both ranked within its emirate's frozen
+market of competitor salon sites (`data/seed/v3/site_reference.csv`, see 10): **demand percentile**
+(`demand_pct`: the share of those sites a typical lounge here would out-serve in a Huff split) and
+**rent ratio** (`rent_ratio`: the emirate's median shop rent at those sites ÷ this site's). Each is
+shown with its UAE-wide percentile as context. The only money is a shop rent; site cost (rent x an
+**assumed** 150 m² unit plus an **assumed** fit-out of AED 3,000/m² over 5 years) is display only.
+There is no revenue, no actual lease (rent, floor area, terms), no actual capex, no staffing and no
+footfall. SHRINK means "a weak site for its emirate, on demand and rent, investigate", not "loses
+money". A lounge can be SHRINK and
 profitable (a cheap lease, loyal clients), and PROTECT and unprofitable.
 
-- **Touches:** every lounge call, and every growth area's cost check.
+- **Touches:** every lounge call, and every growth area's rent check.
 - **Fix:** per-lounge revenue and the actual leases, even banded. With those, the scorecard becomes a
   return-on-capital view, and the market signals explain *why* a lounge earns what it does.
 
@@ -49,14 +52,14 @@ Capture (the lounge's share of its premium substitutes' reviews) and the rating 
 computed and shown on the lounge page, but they are **not scored**: served demand already uses both
 reviews and rating.
 
-- **Touches:** the demand signal (half the composite), the cost index (its numerator) and every
-  growth area's net new women.
+- **Touches:** the demand signal (half the composite), the frozen salon-site reference it is ranked
+  against, and every growth area's net new women and demand test.
 - **Fix:** a better share-of-customers measure: booking-platform data, card-spend panels, or
   footfall (e.g. mobile location data); a customer postcode sample to calibrate the Huff decay.
 
 ## 3. Shop rent comes from different sources per emirate
 
-The cost index needs a shop rent (AED/m²/yr) for every lounge and area. Since 2026-10-11 every cell
+The rent ratio needs a shop rent (AED/m²/yr) for every lounge, area and reference salon site. Since 2026-10-11 every cell
 has one, from the best source its emirate offers:
 
 - **Dubai: DLD Ejari shop contracts** (registered 2026-07-10 to 2026-10-09), the per-area median.
@@ -75,15 +78,27 @@ has one, from the best source its emirate offers:
   emirates carry their emirate's figure, not their own.
 - The JLL mall-class bands used before 2026-10-11 are dropped.
 
-The index compares every site with **one UAE-wide anchor**, frozen at baseline (`COST_ANCHOR` =
-14.34 site-served women per AED 1k, the median over the 23 scored lounges), so it never moves when a
-lounge opens, closes or grows. The old emirate-median baseline did, and left al-taif-mall (Fujairah)
-with no index; it now has one (3.86). The cost: a Dubai contract rent is compared directly with a
-northern-emirates asking rent, and **dear Dubai sites score low on cost** (four of the five Dubai
-lounges are SHRINK, mirdif-35 HOLD). The anchor must be re-frozen if the served model or site cost
-changes.
+The rent ratio compares a site only with **its own emirate's reference salon sites** (their median
+shop rent), so a Dubai contract rent is never set against a northern asking rent, and dear Dubai
+sites are no longer marked down for being in Dubai (the UAE-wide cost anchor used before 2026-10-11
+put four of the five Dubai lounges on SHRINK; now only city-walk is, at its DLD area's AED 4,561/m²,
+rent ratio 0.47). The UAE-wide rent percentile is shown beside it as context, not scored. What is
+still wrong:
 
-- **Touches:** the cost signal (half the composite) and the growth cost check.
+- **An emirate-median rent passes the GROW rent test by construction.** A cell with no rent of its
+  own gets the emirate median of the cells that have one; in Sharjah that equals the reference
+  median (AED 1,121/m²), so the rent ratio is exactly 1.00. **All 10 Sharjah GROW areas** (Kalba,
+  Khor Fakkan, Al Dhaid, ...) pass the rent test this way, on no rent of their own. In Ajman the two
+  medians differ by AED 2/m², so manama-ajman (about 35,000 net new women) and mudayrah-ajman are
+  WATCH at a rent ratio of 0.997 while hamidiya-ajman is GROW at 1.001. Treat a ratio within a
+  percent of 1 as "unknown", not as a pass or a fail.
+- **The reference medians mix sources too**: Dubai's is contract rents, Abu Dhabi's district rates,
+  the north's asking rents or emirate medians, so "cheaper than the median salon site" means
+  different things per emirate.
+- The reference and the rent scale (P10 0.62, P90 1.43) are frozen; rebuild them
+  (`scripts/build_site_reference.py`) and say so if the rents change.
+
+- **Touches:** the cost signal (half the composite) and the GROW rent test.
 - **Fix:** the actual leases; ADREC data through its API; contract (not asking) rents in the north.
 
 ## 4. The calls depend on the assumptions
@@ -96,7 +111,8 @@ time sets the catchments shown and which cells are growth areas.
 
 - A lounge is **low confidence** when its composite is within 0.05 of a line, its call changes in a
   third or more (27+) of the 81 level combinations, or it changes when one signal weight moves ±25%.
-  At baseline, 7 of 23 are low (2026-10-11); most calls don't change in any combination.
+  At baseline, 9 of 23 are low (2026-10-11), all within 0.05 of a line; only
+  khaleej-al-arabi flips (27 of 81), and most calls don't change in any combination.
 - The app's what-if panel switches the levels, so you can watch a lounge move.
 - **Fix:** evidence on how far UAE women actually travel to a salon (a customer postcode sample
   from Bedashing's bookings would settle it).
@@ -157,8 +173,10 @@ Growth areas are populated cells beyond a 15-min drive of every scored lounge, o
 name (and emirate), whether its cells touch or not. Each is a **what-if: open a typical lounge** (the
 median lounge's reviews and rating) at the area's centre and count the women it would add to the
 network, net of what it takes from our own lounges. GROW needs 6,000+ net new women, worker housing
-under 50%, and cost efficiency at least the UAE-wide anchor (or unknown); WATCH is big but
-dearer, big but mostly worker housing, or 3,000+ net new women; SKIP otherwise, or under 5,000 women,
+under 50%, a rent ratio of 1+ (no dearer than its emirate's median salon site, or unknown) and a
+demand percentile of 0.5+ (the what-if lounge would out-serve at least half its emirate's reference
+salon sites; UAE-wide for emirates with under 50); WATCH is big but dearer or with weaker demand, big
+but mostly worker housing, or 3,000+ net new women; SKIP otherwise, or under 5,000 women,
 or a non-residential name. Saturation (premium reviews per 1k women) is shown as context, not tested.
 
 - **One site per area, at its centre.** A big or scattered area may hold more than one site, or none
@@ -178,9 +196,14 @@ or a non-residential name. Saturation (premium reviews per 1k women) is shown as
   zones, military bases, airports and ports; areas with such names are SKIP before any test. Camps
   without such a name get through on their worker share alone (Dubai Investments Park is mixed-use
   and stays in; WATCH there means "revisit", not "open").
-- **The cost check uses northern-emirates asking rents and many emirate medians** (see 3), and the
-  6,000 line is a first cut (about what our median lounge serves today).
-- **Many GROW areas are in Sharjah emirate**, beyond a 15-minute drive of Bedashing's two Sharjah
+- **The rent check uses northern-emirates asking rents and many emirate medians** (see 3: every
+  Sharjah GROW passes it on the emirate median), and the 6,000 line is a first cut (about what our
+  median lounge serves today).
+- **The demand test is easy to pass far from salons.** The reference sites are where competitors
+  already trade, each ranked with that competitor still open beside the what-if lounge; an area with
+  no salons nearby out-serves most of them by construction (Al Dhaid: top 1% of Sharjah's). Net new
+  women stay the real size test; the demand percentile mostly screens out crowded spots.
+- **10 of the 32 GROW areas are in Sharjah emirate**, beyond a 15-minute drive of Bedashing's two Sharjah
   lounges (al-jada, zawaya-walk), both on the Dubai side. The business question is why the Sharjah
   footprint is only two lounges. The model can't see licensing, brand fit, landlord terms or
   customer mix.
@@ -195,13 +218,31 @@ median rating of the premium salons in its catchment with 20+ reviews) is shown,
 moves served demand through the Huff attractiveness ((rating / 4.6)^5: 4.8★ ~1.24x, 4.3★ ~0.71x), an
 uncalibrated elasticity.
 
-## 10. The scorecard's anchors were calibrated on the data they score
+## 10. The scorecard is judged against a frozen market of competitor salon sites
 
-The fixed scales (0 → 20k site-served women, 0.5 → 1.5 cost index around the frozen anchor, and the
-PROTECT/SHRINK lines at 0.65/0.35) are a quick first cut (2026-10-11) from these 23 lounges at
-baseline levels. They are
-judgement, not benchmarks. A different, equally defensible anchor moves lounges near the lines.
-That is why the low-confidence flag exists.
+Since 2026-10-11 both signals rank a site within its emirate against a **frozen reference of 1,123
+real premium competitor salon sites** (no imputed competitors, no Bedashing; built once by
+`scripts/build_site_reference.py`): Dubai 582, Abu Dhabi 304, Sharjah 143, Ajman 38, Ras Al Khaimah
+33, Fujairah 18, Umm Al Quwain 5. Per site: its cell's shop rent and the women a typical lounge (757
+reviews, 4.6★) would serve there with all our lounges open. Our own lounges are never in it, and
+nothing we open or close moves it. This replaced scales calibrated on our 23 lounges (0 → 20k
+site-served women, and a cost index against one UAE-wide anchor), which judged the network against
+itself.
+
+- **Demand** = the site's empirical percentile among its emirate's reference sites; the 0..1
+  percentile is the score. Emirates with under 50 reference sites (Ajman, Ras Al Khaimah, Fujairah,
+  Umm Al Quwain) are ranked UAE-wide: a percentile among 5-38 sites jumps several points per site.
+  So al-taif-mall (Fujairah) and ras-al-khaimah are ranked against Dubai and Abu Dhabi sites.
+- **Rent** = the emirate's median reference rent ÷ the site's, on a frozen P10-P90 scale (0.62 → 0,
+  1.43 → 1; the median site, ratio 1, scores about 0.47).
+- **Still judgement.** Who counts as a reference site (premium competitors only), the 50-site floor,
+  the P10-P90 rent scale and the PROTECT/SHRINK lines at 0.65/0.35 are choices, not benchmarks. The
+  reference inherits every served-demand weakness (see 2) and every rent-source mix (see 3), and a
+  "typical lounge at a competitor's door" is not a typical lounge site. A different, equally
+  defensible choice moves lounges near the lines; that is why the low-confidence flag exists.
+- **The UAE-wide percentiles are context only**: a top-quartile Fujairah site can be a middling one
+  UAE-wide, and the page says so ("top 10% of UAE salon sites (Fujairah has under 50) on demand ·
+  90th percentile UAE-wide").
 
 ## 11. Cannibalisation is shown, not scored
 
@@ -241,9 +282,9 @@ form is 2018.
 
 - **The 150 m² unit and the fit-out are assumptions.** Lounge floor areas aren't public; the fit-out
   (AED 3,000/m², 5 years) is not sourced. Fit-out is the same per site, so it narrows the cost gap
-  between dear and cheap sites.
-- **Rent is not a pure cost.** Shop rent also tracks footfall and affluence, i.e. revenue. The cost
-  index marks down prime sites, and without revenue (see 1) the model can't tell whether the
+  between dear and cheap sites. Neither is scored now: site cost is display only.
+- **Rent is not a pure cost.** Shop rent also tracks footfall and affluence, i.e. revenue. The rent
+  ratio marks down prime sites within their emirate, and without revenue (see 1) the model can't tell whether the
   footfall pays for the rent.
 - **Rents are medians, rates or asking rents** (see 3), not the lounge's lease.
 - **Fix:** the actual leases (rent and floor area per lounge) and fit-out costs.
@@ -255,6 +296,6 @@ form is 2018.
 | **Huff gravity** | Each customer's patronage split across stores by attractiveness ÷ distance^λ | **Implemented, uncalibrated.** Each cell's women split across the premium suppliers within 20 min (reviews x rating factor x stepped drive-time decay) plus an outside option. The decay and exponents are starting points, not fitted on customer origins (see 2) |
 | **Voronoi / nearest-facility** | Each customer goes to the nearest store; trade areas never overlap | We use **drive-time isochrones**, which overlap, and the Huff split shares an overlapping cell between the suppliers that reach it. `shared_share` still shows the raw overlap (see 11) |
 | **Index of Retail Saturation** | Demand × spend ÷ supply | The growth areas' **premium reviews per 1k women** is an IRS-like supply ÷ demand ratio, inverted, with **no spend term**. It is shown as context, not tested |
-| **MCDA / weighted overlay** | Score sites on several criteria with stated weights | The lounge scorecard **is** one: two signals on fixed anchors, equal weights. The anchors and weights are judgement (see 10); the confidence flag tests the four assumption levels and each weight ±25%, not the anchors |
+| **MCDA / weighted overlay** | Score sites on several criteria with stated weights | The lounge scorecard **is** one: two signals (demand percentile, rent ratio) ranked within each emirate's frozen market of competitor salon sites, equal weights. The reference set, scales and weights are judgement (see 10); the confidence flag tests the four assumption levels and each weight ±25%, not the reference |
 | **MCLP / location-allocation** | Pick the *set* of new sites that maximises coverage together | We score each growth area **independently** with a one-site what-if, so two GROW areas near each other could cannibalise each other, and a big area may hold more than one site (see 8) |
 | **Analog / sales regression** | Predict a site's sales from comparable stores' revenue | Needs per-lounge revenue, which we don't have. **This is the main reason the scorecard is a proxy** (see 1) |

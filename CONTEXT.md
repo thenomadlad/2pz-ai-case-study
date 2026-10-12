@@ -38,22 +38,39 @@ Commercial rent per m² a year (AED) at a lounge's site (`site_rent_m2`), or ove
   via third-party Apify actors (a grey area under the portals' terms of service).
 - **Everywhere else:** the emirate median.
 
-It feeds the site cost and so the cost index.
+It feeds the rent ratio (the scorecard's cost signal and the GROW rent test) and the site cost (display only).
 _Avoid_: rent (unqualified); it's ambiguous with the affluence rent.
 
 **Site cost**:
 A site's annual cost in AED 1k (`site_cost_k`): shop rent x an assumed 150 m² unit + an assumed
-fit-out of AED 3,000/m² written off over 5 years.
+fit-out of AED 3,000/m² written off over 5 years. Display context only: no call uses it.
 
-**Cost index**:
-Site-served women (for an area: net new women) per AED 1k of site cost, against one UAE-wide
-anchor frozen at baseline (`COST_ANCHOR` = 14.34, the median over the 23 scored lounges;
-`cost_index`; 1 = typical). It never moves when lounges open, close or the levels change. The
-scorecard's cost signal and part of the GROW rule.
-_Avoid_: ROI, return, profitability
+**Site reference**:
+The frozen market of salon SITES every lounge and area label is judged against
+(`data/seed/v3/site_reference.csv`, built once 2026-10-11 by `scripts/build_site_reference.py`):
+1,123 real premium competitor salons (no imputed ones, no Bedashing), each with its emirate, cell
+shop rent and `ref_served`, the women a typical lounge (757 reviews, 4.6 stars) would serve there
+with all our lounges open. Dubai 582, Abu Dhabi 304, Sharjah 143, Ajman 38, Ras Al Khaimah 33,
+Fujairah 18, Umm Al Quwain 5. Never our own lounges; nothing we open or close moves it.
+_Avoid_: benchmark, peer group (our lounges are not in it)
+
+**Demand percentile**:
+The share of its emirate's reference sites a site out-serves (`demand_pct`, 0..1; for a lounge on
+site served, for an area on the what-if lounge's served women). It is the scorecard's demand score
+and a GROW test (0.5+). Emirates with under 50 reference sites (Ajman, Ras Al Khaimah, Fujairah,
+Umm Al Quwain) are ranked UAE-wide (`demand_ref` = "UAE"). Shown with its UAE-wide percentile
+(`demand_pct_uae`) as context: "top 20% of Dubai salon sites on demand · 45th percentile UAE-wide".
+
+**Rent ratio**:
+The emirate's median shop rent at its reference sites ÷ the site's shop rent (`rent_ratio`; above 1 =
+cheaper than the median salon site in its emirate). Always against its own emirate, even under 50
+sites. The scorecard's cost signal on a frozen scale (P10 0.62 → 0, P90 1.43 → 1) and a GROW test
+(1+, unknown passes). Rent only: served women are not in it. Shown with its UAE-wide rent percentile
+(`rent_pct_uae`, higher = dearer) as context.
+_Avoid_: ROI, return, profitability, cost efficiency
 
 **Women per rent**:
-Addressable women per AED 1,000 of a site's annual shop rent, for an assumed 150 m² unit (`women_per_rent_k`). Shown as context; the cost index replaced it.
+Addressable women per AED 1,000 of a site's annual shop rent, for an assumed 150 m² unit (`women_per_rent_k`). Shown as context; not scored.
 _Avoid_: income, wealth, spend, affluence score (unqualified)
 
 **Addressable women**:
@@ -77,8 +94,8 @@ _Avoid_: catchment women, customers
 
 **Site served**:
 The women a typical lounge (median reviews and rating) would serve at a lounge's site, with that
-lounge closed and siblings and rivals open (`site_served`). The scorecard's demand signal: it judges
-the site, not the lounge.
+lounge closed and siblings and rivals open (`site_served`). Ranked against the site reference, it is
+the scorecard's demand signal (see Demand percentile): it judges the site, not the lounge.
 
 **Performance vs site**:
 Served women / site served (`performance_vs_site`). Context, not scored: "The model estimates this
@@ -157,10 +174,10 @@ the COO to do:
 
 **Growth action**:
 GROW, WATCH or SKIP, assigned to a growth area from a what-if: open a typical lounge here.
-- **GROW**: start a site search here. 6,000+ net new women, worker housing under 50% and a cost index
-  of 1+ (or unknown). It's a shortlist for a site visit and lease search, to be verified on the
+- **GROW**: start a site search here. 6,000+ net new women, worker housing under 50%, a rent ratio
+  of 1+ (or unknown) and a demand percentile of 0.5+ in its emirate's salon sites. It's a shortlist for a site visit and lease search, to be verified on the
   ground before committing.
-- **WATCH**: don't act now. Big but dearer than our typical lounge, big but mostly worker housing,
+- **WATCH**: don't act now. Big but dearer than its emirate's median salon site or with weaker demand, big but mostly worker housing,
   or 3,000+ net new women. Revisit when the named failing test changes.
 - **SKIP**: no action. Under 3,000 net new women, under 5,000 women, or non-residential by name
   (industrial, free zone, military, airport, port).

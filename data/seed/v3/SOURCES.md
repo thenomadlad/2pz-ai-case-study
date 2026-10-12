@@ -219,11 +219,10 @@ feature's 0.20. `rent_predicted` stays in `cell_affluence.csv` for the record an
 ## Shop rent (`cell_shop_rent.csv`, `adrec_retail_rent_2025.csv`, `cell_listing_rent.csv`, rebuilt 2026-10-11)
 
 **Shop rent is our cost** (what a lounge pays for its site), not customer affluence. It feeds the
-**cost index**: site cost = shop rent x the assumed 150 m² unit (`REF_UNIT_M2`) + an assumed fit-out
-of AED 3,000/m² over 5 years (`FITOUT_WHY` in `src/features/lounges.py`); cost index = site-served
-women (areas: net new women) per AED 1k of site cost against one frozen UAE-wide anchor,
-`COST_ANCHOR` = 14.34, the median over the 23 scored lounges at baseline (`COST_ANCHOR_WHY`). It is one of the
-two scorecard signals and part of the GROW rule. Every cell gets a rent, in this order
+**rent ratio** = the median shop rent at the emirate's reference salon sites (`site_reference.csv`,
+below) ÷ the site's shop rent (above 1 = cheaper), one of the two scorecard signals and a GROW test.
+Site cost = shop rent x the assumed 150 m² unit (`REF_UNIT_M2`) + an assumed fit-out of AED 3,000/m²
+over 5 years (`FITOUT_WHY` in `src/features/lounges.py`) is display only. Every cell gets a rent, in this order
 (`SHOP_RENT_WHY` in `src/data_v3.py`, column `shop_rent_source`):
 
 **1. Dubai: DLD Ejari shop contracts** (`scripts/build_shop_rent.py`). The source is the same hand-downloaded file as the residential rents (registered 2026-07-10 to 2026-10-09).
@@ -256,6 +255,24 @@ stay in the repo, unused.
 **The reference unit** (`REF_UNIT_M2` = 150 m²) and the fit-out are assumptions: lounge floor areas
 and fit-out costs aren't public.
 
+## Site reference (`site_reference.csv`, built 2026-10-11)
+
+The frozen market of salon SITES that every lounge and area label is judged against
+(`SITE_REFERENCE_WHY` in `src/features/lounges.py`). Built once by `scripts/build_site_reference.py`
+from committed data, no fetch: every real premium competitor salon in the served model
+(`served._competitors`; no imputed stand-ins, no Bedashing) at baseline levels, 1,123 of 1,129 in a
+cell. Per site: `emirate`, `cell_id`, the cell's `shop_rent_m2` (above) and `ref_served`, the women a
+typical lounge (757 reviews, 4.6★, the scored lounges' medians) would serve at that point with all
+our lounges open (`what_if_open`). Dubai 582, Abu Dhabi 304, Sharjah 143, Ajman 38, Ras Al Khaimah 33,
+Fujairah 18, Umm Al Quwain 5. Median reference rent (AED/m²/yr): Dubai 2,154, Abu Dhabi 1,394,
+Sharjah 1,121, Ras Al Khaimah 853, Ajman 753, Fujairah 745, Umm Al Quwain 543. Nothing we open or
+close moves it; rebuild (and say so) only when the served model, demand or salon data change.
+
+**Caveats:** competitor sites are where salons already trade, and each is valued with that
+competitor still open beside the typical lounge, so a site far from any salon out-serves most of
+them. Its rents carry every source mix of "Shop rent" above. Emirates under 50 sites are ranked
+UAE-wide on demand.
+
 ## Market model (how the pieces fit; for the app's "how it works")
 
 Notebooks: `market_size.ipynb` (structure, market size), `catchments.ipynb`, `competitors.ipynb`.
@@ -287,9 +304,13 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
    the rating gap, estimated customers and the absorbed share (served women siblings take over if it
    closes).
 6. **Lounge scorecard** (`src/model/scorecard.py`): two signals, each on a fixed 0-1 scale, weight 1
-   each, both on the site. **Demand** = site served (0 → 20k). **Cost** = cost index, site-served
-   women per AED 1k of site cost against the UAE-wide anchor (0.5 → 1.5; see "Shop rent"); missing
-   scores 0.5. Composite ≥ 0.65 is PROTECT, ≤ 0.35 is SHRINK, HOLD between. Served women / site
+   each, both on the site and both judged within its emirate against the frozen reference of
+   competitor salon sites ("Site reference"), never against our own lounges. **Demand** = the share
+   of the emirate's reference sites its site served beats (the 0..1 percentile is the score;
+   UAE-wide for emirates with under 50 sites). **Cost** = rent ratio, the emirate's median reference
+   rent ÷ the site's, scored from 0 at 0.62 (P10) to 1 at 1.43 (P90); missing scores 0.5. Each is
+   shown with its UAE-wide percentile as context, e.g. "top 20% of Dubai salon sites on demand ·
+   45th percentile UAE-wide". Composite ≥ 0.65 is PROTECT, ≤ 0.35 is SHRINK, HOLD between. Served women / site
    served is shown as **performance vs site**, context, not scored.
 7. **Low confidence** when the composite is within 0.05 of a line, the call **flips** in a third or
    more (27+) of the 81 combinations of the four assumption levels (travel time, coverage,
@@ -300,8 +321,10 @@ Every tunable value is in `data/scenarios/baseline.yaml`.
    (named only by their emirate) make no area but still count in catchments and totals
    (`src/features/lounges.py`, `src/model/growth.py`). Each is a **what-if: open a typical lounge**
    (median reviews and rating) at its centre. GROW = at least 6,000 **net new** women (served minus
-   what it takes from our lounges) with worker housing under 50% of adults, **and** a cost index ≥ 1
-   (net new women per AED 1k against the same UAE-wide anchor, or unknown). WATCH = big but dearer, big but mostly worker housing, or 3,000+ net new women. SKIP
+   what it takes from our lounges) with worker housing under 50% of adults, **and** a rent ratio ≥ 1
+   (no dearer than its emirate's median reference salon site, or unknown), **and** a demand
+   percentile ≥ 0.5 (the what-if lounge would out-serve half its emirate's reference sites). WATCH =
+   big but dearer or with weaker demand, big but mostly worker housing, or 3,000+ net new women. SKIP
    otherwise, or under 5k women, or non-residential by name (industrial, free zone, military,
    airport, port). Premium reviews per 1k women (saturation) is shown as context, not tested.
 
@@ -318,8 +341,13 @@ their capture is a share of a tiny pool and is flagged `thin_premium_market`.
 - Worker housing not mapped as industrial in OSM is missed (DIP, very likely Sonapur): Mirdif-35's
   market is overstated.
 - Home-service salons are invisible; income and nationality mix are ignored (affluence is off).
-- Site cost is a shop rent (contract median, hand-read district rate, or scraped asking rent) on an
-  assumed unit and fit-out. No revenue, lease terms, actual capex or footfall: no return-on-capital view.
+- The cost signal is a shop rent (contract median, hand-read district rate, or scraped asking rent)
+  against its emirate's median salon site; a cell on the emirate-median fallback scores a ratio of
+  about 1, so it passes the GROW rent test on no rent of its own. Site cost (assumed unit and fit-out)
+  is display only. No revenue, lease terms, actual capex or footfall: no return-on-capital view.
+- Both signals rank a site against a frozen set of competitor salon sites valued by the same
+  uncalibrated served model; Ajman, Ras Al Khaimah, Fujairah and Umm Al Quwain (under 50 sites) are
+  ranked UAE-wide on demand. The UAE-wide percentiles shown beside each score are context only.
 
 ## Competitors around growth cells (`growth_salons.csv`, `search_circles.csv`, fetched 2026-10-09)
 
