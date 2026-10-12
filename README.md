@@ -441,6 +441,10 @@ We have no bookings, revenue, lease or capacity data, so every signal is a **pro
 | **Capacity**: how much we can serve | None | Chairs × opening hours; utilisation (booked ÷ available chair-hours) | Scheduling system |
 | **Return**: whether a site pays | None (the brief's ROIC gate can't be built from rent alone) | Profit per appointment, profit per m² per year, payback on fit-out, ROIC | P&L + capex per lounge |
 
+### Why commercial rent stands in for cost
+
+**Assumption: commercial rent is the biggest swing factor in what a branch costs to run, so it is the cost signal.** It may not be the largest cost line (staff often is), but it's the one that differs most *between* branches, and the calls compare branches. Shop rent at our lounge sites ranges **9.5x**, from about AED 480/m²/yr (Al Taif Mall, Fujairah) to AED 4,560 (City Walk, Dubai), around a median of about AED 1,730. Staff, products and utilities per appointment vary far less from site to site, and fit-out is assumed the same per m² everywhere, so those would shift every branch by a similar amount and barely change a ranking. If staff costs turn out to differ a lot between emirates (for example, Dubai wages or service charges), the per-lounge P&L in the table above replaces this assumption.
+
 ### What healthy and unhealthy look like
 
 | | **Today, with proxies** | **With the data** (thresholds to agree with the business) |
