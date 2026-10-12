@@ -45,7 +45,7 @@ served-demand model's reach (`src/model/served.py`); rebuilding it would take ~8
 | **Worker housing not mapped as industrial** | Labour camps in DIP and (very likely) Sonapur are missed, so **Mirdif-35's market is overstated** | DSC community sex splits for all Dubai communities (~220 pages), or manual tagging | Free |
 | **Female share outside Dubai** | Calibrated on Dubai only; applied UAE-wide | Abu Dhabi (SCAD) and other emirates rarely publish below region level | Probably unavailable |
 | **Bedashing's price level** | Assumed `expensive`; drives which competitors count as premium | Its own menu (Phorest booking pages) | Free; one browser session |
-| **Competitor prices** | Only ~36% of candidates have a Google price; popularity and rating stand in for the rest | Fresha menus (partial coverage, scraping) | Free but slow; matching needed |
+| **Competitor prices** | Only ~36% of candidates have a Google price; review count and rating stand in for the rest | Fresha menus (partial coverage, scraping) | Free but slow; matching needed |
 | **Review age** | Lifetime counts favour older salons | First-review dates need a full review scrape | ~$10-65 for Bedashing; not affordable for competitors |
 | **Rush-hour travel times** | Catchments assume typical midday traffic; after-work catchments are smaller | Re-fetch isochrones with an 18:00 departure | ~860 Mapbox calls; free tier |
 | **Home-service salons** | Invisible to Google Places as shops; competition understated | No good source | n/a |
