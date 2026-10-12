@@ -54,7 +54,7 @@ def what_if_summary() -> str:
 def banner() -> None:
     if data.active():
         st.warning(f"**What-if view**, not the baseline: {what_if_summary()}. Reset it in the "
-                   "Overview's what-if panel.", icon="🧪")
+                   "what-if panel on Model predictions.", icon="🧪")
 
 
 # --- explanations -------------------------------------------------------------------------
@@ -302,3 +302,8 @@ def affluence_metrics(raw: float, addressable: float, rent: float | None, covera
 def render_caveats(title: str, items: list[str], strong: bool) -> None:
     """Caveats as a visible box: a warning when they weaken the call, else an info box."""
     (st.warning if strong else st.info)(f"**{title}**\n\n" + "\n".join(f"- {c}" for c in items))
+
+
+def short(name: str) -> str:
+    """'Bedashing Beauty Lounge - Al Dhafra' -> 'Al Dhafra'."""
+    return re.sub(r"^Bedashing Beauty Lounge\s*[-–]?\s*", "", name) or name

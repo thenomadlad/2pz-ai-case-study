@@ -1,4 +1,4 @@
-"""What the app shows: the baseline run, or the what-if the user set on the Overview.
+"""What the app shows: the baseline run, or the what-if the user set on Model predictions.
 
 The what-if lives in st.session_state["what_if"] (not in widget keys, which Streamlit drops on
 pages that don't render the widget), so every page sees it."""

@@ -1,4 +1,4 @@
-"""The what-if panel (Overview): four assumption levels, search recall and closed lounges. Widgets
+"""The what-if panel (Model predictions): four assumption levels, search recall and closed lounges. Widgets
 write into data.what_if() on change; everything recomputes through baseline.run()."""
 import streamlit as st
 

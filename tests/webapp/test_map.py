@@ -1,7 +1,7 @@
 from src.baseline import run
 from src.data_v3 import load_v3
 from src.webapp.map import ACTION_COLORS, AREA_COLORS, area_cells_layer, substitutes_layer
-from src.webapp.pages.overview import map_layers
+from src.webapp.pages.predictions import map_layers
 
 
 def test_lounge_layer_colours_by_action_and_hollows_low_confidence():

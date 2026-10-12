@@ -26,7 +26,8 @@ def _text(at: AppTest) -> str:
                     for e in getattr(at, kind))
 
 
-PAGES = [("overview", {}), ("overview", {"lounge": "al-barsha"}), ("overview", {"area": "sharjah-sharjah"}),
+PAGES = [("overview", {}), ("predictions", {}), ("predictions", {"lounge": "al-barsha"}),
+         ("predictions", {"area": "sharjah-sharjah"}),
          ("lounge", {"lounge": "al-barsha"}), ("lounge", {"lounge": "zayed-international-airport"}),
          ("area", {"area": "sharjah-sharjah"}), ("area", {"area": "madinat-hind-4-dubai"}), ("how", {})]
 
@@ -76,7 +77,7 @@ def test_baseline_explanations_are_all_ai_except_skip_and_not_scored():
 
 
 def test_level_switch_is_fast_and_marks_explanations_as_template():
-    at = _page("overview", lounge="al-barsha")
+    at = _page("predictions", lounge="al-barsha")
     start = time.perf_counter()
     at.selectbox(key="wi-travel").set_value("high").run()
     # 3 s: a new level re-runs level_flips' 82 lounge builds (~20 ms each, 1.6-1.9 s warm); memoising them across levels would be one more cache to clear on parameter sweeps
@@ -91,7 +92,7 @@ def test_level_switch_is_fast_and_marks_explanations_as_template():
 
 
 def test_closing_lounges_from_the_panel_shows_what_changed():
-    at = _page("overview")
+    at = _page("predictions")
     at.multiselect(key="wi-closed").set_value(["al-barsha", "city-walk"]).run()
     assert not at.exception
     assert at.session_state["what_if"]["closed"] == frozenset({"al-barsha", "city-walk"})
@@ -99,7 +100,7 @@ def test_closing_lounges_from_the_panel_shows_what_changed():
 
 
 def test_level_selectors_show_actual_values():
-    at = _page("overview")
+    at = _page("predictions")
     sb = at.selectbox(key="wi-travel")
     assert sb.options == ["10 min (low)", "15 min (medium)", "20 min (high)"]
     assert at.selectbox(key="wi-affluence").options == [
@@ -199,7 +200,7 @@ def test_area_page_follows_the_url_when_revisited_in_the_same_session():
 
 
 def test_affluence_selector_switches_the_weighting_and_reports_what_changed():
-    at = _page("overview")
+    at = _page("predictions")
     # affluence is off at baseline since 82ae029, so the what-if switches it on (served-demand model 2026-10-11)
     at.selectbox(key="wi-affluence").set_value("medium").run()
     assert not at.exception
@@ -223,7 +224,7 @@ def test_lounge_and_area_pages_show_raw_and_addressable_women():
 
 
 def test_overview_affluence_toggle_adds_the_layer_and_its_legend():
-    at = _page("overview")
+    at = _page("predictions")
     box = next(c for c in at.checkbox if c.label == "Affluence (Dubai rents)")
     assert not box.value
     box.check().run()
@@ -233,7 +234,7 @@ def test_overview_affluence_toggle_adds_the_layer_and_its_legend():
 
 def test_untrusted_url_ids_never_reach_markdown():
     evil = "[click](https://evil.example)"
-    for page, key in (("overview", "lounge"), ("overview", "area"), ("area", "area"), ("lounge", "lounge")):
+    for page, key in (("predictions", "lounge"), ("predictions", "area"), ("area", "area"), ("lounge", "lounge")):
         at = _page(page, **{key: evil})
         assert not at.exception
         shown = [e.value for kind in ("markdown", "caption", "info") for e in getattr(at, kind)]
@@ -262,9 +263,9 @@ def test_overview_opens_on_the_question_and_its_pyramid():
     assert evidence[1]["Est. growth"].iloc[0] == round(100 * p["grow"][0].new_site_net / p["base"])
 
 
-def test_overview_compares_lounges_and_ranks_growth_areas_with_filters():
-    at = _page("overview")
-    lounges, areas = at.dataframe[-2].value, at.dataframe[-1].value
+def test_lounge_and_area_pages_open_on_their_full_tables_with_filters():
+    at, ar = _page("lounge"), _page("area")
+    lounges, areas = at.dataframe[0].value, ar.dataframe[0].value
     assert len(lounges) == 24 and {"Composite", "Demand", "Shared catchment", "Confidence",
                                    "Premium reviews per 1k women"} <= set(lounges.columns)
     assert "Confidence" in areas.columns
@@ -272,9 +273,9 @@ def test_overview_compares_lounges_and_ranks_growth_areas_with_filters():
     grow = areas[areas.Call == "GROW"]["Net new women"]
     assert list(grow) == sorted(grow, reverse=True) and areas.Why.str.len().min() > 0
     at.multiselect(key="cmp-call").set_value(["SHRINK"]).run()
-    at.multiselect(key="cmp-area-emirate").set_value(["Sharjah"]).run()
-    assert not at.exception
-    assert set(at.dataframe[-2].value.Call) == {"SHRINK"} and set(at.dataframe[-1].value.Emirate) == {"Sharjah"}
+    ar.multiselect(key="cmp-area-emirate").set_value(["Sharjah"]).run()
+    assert not at.exception and not ar.exception
+    assert set(at.dataframe[0].value.Call) == {"SHRINK"} and set(ar.dataframe[0].value.Emirate) == {"Sharjah"}
 
 
 def test_overview_panels_show_top_drivers_and_area_tests():
@@ -283,10 +284,10 @@ def test_overview_panels_show_top_drivers_and_area_tests():
     r = run()
     d = next(d for d in r.decisions if d.branch_id == "al-barsha")
     f = next(f for f in r.features if f.branch_id == "al-barsha")
-    text = _text(_page("overview", lounge="al-barsha"))
+    text = _text(_page("predictions", lounge="al-barsha"))
     assert "**Top drivers:** " + " · ".join(f"{n} {d.scores[n]:.2f} (weight 1)" for n in d.key_drivers) in text
     assert performance_sentence(f.performance_vs_site) in text and "Context, not scored" in text
-    assert "**The tests:** ✅ big enough" in _text(_page("overview", area="sharjah-sharjah"))
+    assert "**The tests:** ✅ big enough" in _text(_page("predictions", area="sharjah-sharjah"))
 
 
 def test_lounge_page_shows_address_and_says_services_are_missing():
@@ -295,7 +296,7 @@ def test_lounge_page_shows_address_and_says_services_are_missing():
 
 
 def test_overview_overlap_toggle_adds_its_legend():
-    at = _page("overview")
+    at = _page("predictions")
     next(c for c in at.checkbox if c.label == "All catchments (overlap)").check().run()
     assert not at.exception and "shared** by 2+ lounges" in _text(at)
 
@@ -303,9 +304,9 @@ def test_overview_overlap_toggle_adds_its_legend():
 def test_shop_rent_shows_as_cost_with_the_unit_assumption():
     lounge = " ".join(t.value.to_string() for t in _page("lounge", lounge="al-barsha").table)   # factor table
     assert "Shop rent at the site" in lounge and "AED/m²/yr" in lounge
-    overview = _page("overview")
-    assert "Shop rent (AED/m²/yr)" in overview.dataframe[-2].value.columns
-    assert "Shop rent is our cost; women per AED 1k assumes a 150 m² unit." in _text(overview)
+    lounges, areas = _page("lounge"), _page("area")
+    assert "Shop rent (AED/m²/yr)" in lounges.dataframe[0].value.columns
+    assert "Shop rent is our cost; women per AED 1k assumes a 150 m² unit." in _text(lounges)
     # review I2: the area table carries the unit assumption too; I3: the mall/street caveat is shown
-    assert _text(overview).count("assumes a 150 m² unit") >= 2
+    assert "assumes a 150 m² unit" in _text(areas)
     assert "mixes mall and street shops" in lounge

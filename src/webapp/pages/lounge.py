@@ -1,6 +1,7 @@
 """Lounge page: one Bedashing lounge. The PROTECT / HOLD / SHRINK call with this lounge's caveats
 beside it, the two signals on their scales, its catchment map, premium substitutes and the
 lounges it shares women with."""
+import pandas as pd
 import streamlit as st
 
 from src import explain
@@ -26,6 +27,7 @@ from src.webapp.views import (
     render_caveats,
     render_factor_table,
     render_pyramid,
+    short,
     url_picker,
     val,
     wrapped_table,
@@ -87,16 +89,67 @@ def _substitutes(subs: list[dict], f, coverage: float) -> None:
                         "Premium because": s["premium_because"]} for s in subs])
 
 
+WEIGHTS = {s.name: s.weight for s in scorecard.SIGNALS}
+
+
+def _lounge_table(r) -> None:
+    df = pd.DataFrame([{"Lounge": short(f.name), "Call": d.action, "Emirate": f.emirate,
+                        "Composite": None if f.not_scored else d.composite,
+                        **{n.capitalize(): d.scores.get(n) for n in WEIGHTS},
+                        "Demand pct (emirate)": None if f.not_scored else f.demand_pct,
+                        "Demand pct (UAE)": None if f.not_scored else f.demand_pct_uae,
+                        "Rent ratio": None if f.not_scored else f.rent_ratio,
+                        "Rent pct (UAE)": None if f.not_scored else f.rent_pct_uae,
+                        "Performance vs site": None if f.not_scored else f.performance_vs_site,
+                        "Shared catchment": f.shared_share, "Review share": f.capture,
+                        "Premium reviews per 1k women": f.premium_reviews_per_1k,
+                        "Shop rent (AED/m²/yr)": f.site_rent_m2, "Women per AED 1k rent": f.women_per_rent_k,
+                        "Google rating": f.rating,
+                        "Reviews": f.review_count, "Confidence": "n/a" if f.not_scored else d.confidence}
+                       for f, d in zip(r.features, r.decisions)]).sort_values("Composite", ascending=False)
+    c1, c2 = st.columns(2)
+    calls = c1.multiselect("Call", list(dict.fromkeys(df.Call)), key="cmp-call", placeholder="All calls")
+    emirates = c2.multiselect("Emirate", sorted(df.Emirate.unique()), key="cmp-emirate", placeholder="All emirates")
+    df = df[df.Call.isin(calls or df.Call) & df.Emirate.isin(emirates or df.Emirate)]
+    score = st.column_config.ProgressColumn(min_value=0, max_value=1, format="%.2f")
+    pct = st.column_config.NumberColumn(format="percent")
+    st.dataframe(df, hide_index=True, column_config={
+        "Composite": score, **{n.capitalize(): score for n in WEIGHTS}, "Shared catchment": pct,
+        "Demand pct (emirate)": pct, "Demand pct (UAE)": pct, "Rent pct (UAE)": pct,
+        "Rent ratio": st.column_config.NumberColumn(format="%.2f"),
+        "Performance vs site": st.column_config.NumberColumn(format="%.1fx"),
+        "Review share": pct, "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
+        "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
+        "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f")})
+    st.caption("Click a column header to sort. Signal scores are 0-1 on fixed scales (1 = good for the "
+               "lounge) and both score the site within its emirate's frozen market of competitor salon sites "
+               "(demand pct = share of them it out-serves, UAE-wide where the emirate has under 50; rent ratio = their "
+               "median shop rent ÷ the site's, above 1 = cheaper); the UAE columns rank the same site against all "
+               "UAE salon sites (rent pct: higher = dearer). Performance vs site = women the lounge serves ÷ women a typical "
+               "lounge would serve there (2.7x reads 'The model estimates this lounge is performing 2.7x compared "
+               "to its site'): context, not scored; shared catchment = share of its women another open lounge also reaches; review "
+               "share = its share of its premium substitutes' Google reviews; premium reviews per 1k women = "
+               "catchment saturation, the growth areas' measure (shown, not scored). "
+               "Shop rent is our cost; women per AED 1k assumes a 150 m² unit. Rent sources: DLD shop "
+               "contracts (Dubai), ADREC district rates (Abu Dhabi), shop listings (northern emirates), "
+               "else the emirate median.")
+
+
 def render() -> None:
     r = data.current()
+    st.title("Lounges")
+    banner()
+    st.subheader("All lounges")
+    _lounge_table(r)
+    st.divider()
+    st.subheader("One lounge")
     labels = {f.branch_id: f"{f.name} · {d.action}" for f, d in zip(r.features, r.decisions)}
     wanted = st.query_params.get("lounge")
     protect = frozenset(f.emirate for f, d in zip(r.features, r.decisions) if d.action == "PROTECT")
     options = emirate_filter(sorted(labels), {f.branch_id: f.emirate for f in r.features}, "lounge", "lounge-em",
                              also=protect)
     b = url_picker("Lounge", "lounge", options, labels.get, "lounge-pick")
-    st.page_link(nav.OVERVIEW, label="Back to overview", icon="⬅️", query_params={"lounge": b})
-    banner()
+    st.page_link(nav.PREDICTIONS, label="Show on the map", icon="🗺️", query_params={"lounge": b})
     if wanted in r.closed:
         st.info(f"{wanted} is closed in this what-if; showing {b}.")
 

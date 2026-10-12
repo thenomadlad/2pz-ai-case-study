@@ -1,6 +1,7 @@
 """Area page: one growth area (populated cells beyond the current travel-time catchment, 15 min at
 baseline, of every open lounge). The GROW / WATCH / SKIP call (what-if: open a typical lounge here) with
 its rule and caveats, net new women, demand percentile and rent ratio (salon-site reference), worker share, nearest lounge and the cell map."""
+import pandas as pd
 import streamlit as st
 
 from src import explain
@@ -50,8 +51,49 @@ def _rule(a, d) -> None:
             f"{growth.NEW_SITE_MIN // 2:,}+ net new women; **SKIP** otherwise. Under "
             f"{growth.SKIP_UNDER_WOMEN:,} women or a non-residential name is always SKIP. {d.rationale}")
 
+def _area_table(r) -> None:
+    by_id = {a.area_id: a for a in r.areas}
+    ranked = sorted((d for d in r.area_decisions if d.action != "SKIP"),
+                    key=lambda d: (ORDER[d.action], -(by_id[d.area_id].new_site_net or 0)))
+    df = pd.DataFrame([{"Rank": i, "Area": a.name, "Emirate": a.emirate, "Call": d.action,
+                        "Net new women": round(a.new_site_net or 0), "Demand pct (emirate)": a.demand_pct,
+                        "Demand pct (UAE)": a.demand_pct_uae, "Rent ratio": a.rent_ratio, "Rent pct (UAE)": a.rent_pct_uae,
+                        "Women 15+": round(a.women), "Worker housing": a.worker_share,
+                        "Premium reviews per 1k women": a.premium_reviews_per_1k, "Searched": a.data_coverage,
+                        "Shop rent (AED/m²/yr)": a.shop_rent_m2, "Women per AED 1k rent": a.women_per_rent_k,
+                        "Nearest lounge": a.nearest_lounge_id, "km (straight line)": round(a.nearest_lounge_km, 1),
+                        "Confidence": d.confidence,
+                        "Why": d.rationale.split(" Nearest lounge:")[0]}
+                       for i, d in enumerate(ranked, start=1) for a in [by_id[d.area_id]]])
+    c1, c2 = st.columns(2)
+    calls = c1.multiselect("Call", ["GROW", "WATCH"], key="cmp-area-call", placeholder="GROW and WATCH")
+    emirates = c2.multiselect("Emirate", sorted(df.Emirate.unique()), key="cmp-area-emirate",
+                              placeholder="All emirates")
+    df = df[df.Call.isin(calls or df.Call) & df.Emirate.isin(emirates or df.Emirate)]
+    pct = st.column_config.NumberColumn(format="percent")
+    st.dataframe(df, hide_index=True, column_config={
+        "Worker housing": pct, "Searched": pct, "Demand pct (emirate)": pct, "Demand pct (UAE)": pct,
+        "Rent pct (UAE)": pct, "Rent ratio": st.column_config.NumberColumn(format="%.2f"),
+        "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
+        "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
+        "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f"),
+        "Why": st.column_config.TextColumn(width="large")})
+    st.caption("Ranked GROW first, then WATCH, each by net new women (what a typical new lounge would add to the "
+               "network, net of what it takes from our lounges). Demand pct: share of its emirate's salon sites a new lounge here would out-serve (GROW needs "
+               f"{growth.DEMAND_PCT_MIN:.0%}; UAE-wide where the emirate has under 50); rent ratio: their median shop rent ÷ the "
+               "area's (GROW needs 1+); UAE columns: the same against all UAE salon sites. Why: the tests it passed or "
+               "failed. SKIP areas are left out. Shop rent is our cost; women per AED 1k assumes a 150 m² "
+               "unit (and counts the whole area's women against one unit's rent).")
+
+
 def render() -> None:
     r = data.current()
+    st.title("Areas")
+    banner()
+    st.subheader("All growth areas, ranked")
+    _area_table(r)
+    st.divider()
+    st.subheader("One area")
     act = {d.area_id: d.action for d in r.area_decisions}
     by_id = {a.area_id: a for a in r.areas}
     # areas under the SKIP floor are noise: always SKIP, whatever the competition, so not listed
@@ -62,8 +104,7 @@ def render() -> None:
     wanted = st.query_params.get("area")
     area_id = url_picker("Growth area", "area", options,
                          lambda i: f"{by_id[i].name}, {by_id[i].emirate} · {act[i]}", "area-pick")
-    st.page_link(nav.OVERVIEW, label="Back to overview", icon="⬅️", query_params={"area": area_id})
-    banner()
+    st.page_link(nav.PREDICTIONS, label="Show on the map", icon="🗺️", query_params={"area": area_id})
     if wanted and wanted not in options:
         st.info(f"That area isn't listed in this view (a lounge reaches it, it has under "
                 f"{growth.SKIP_UNDER_WOMEN:,} women, or the link is wrong); "

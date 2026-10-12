@@ -68,7 +68,7 @@ def render() -> None:
     st.markdown(section(SOURCES.read_text(), "Market model"))
 
     st.header("Every assumption (data/scenarios/baseline.yaml)")
-    st.caption("The what-if panel on the Overview switches the four levelled assumptions and the "
+    st.caption("The what-if panel on Model predictions switches the four levelled assumptions and the "
                "search recall.")
     notes = yaml_notes(data.BASELINE_YAML.read_text())
     wrapped_table([{"Assumption": k, "Value (levels)": _fmt(v),
