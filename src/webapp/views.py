@@ -15,8 +15,9 @@ from src.webapp import data
 
 BADGE_COLORS = {"PROTECT": "green", "HOLD": "orange", "SHRINK": "red", "NOT SCORED": "gray",
                 "GROW": "blue", "WATCH": "violet", "SKIP": "gray"}
-FEW_REVIEWS = 300   # under this many lifetime reviews, capture understates a lounge (noya-plaza: 215)
+FEW_REVIEWS = 300   # under this many lifetime reviews, served demand understates a lounge (noya-plaza: 215)
 WORKER_NOTE = 0.25  # from this share of adults in worker housing, the women estimate leans on that assumption
+SHARJAH_LOUNGES = ("al-jada", "zawaya-walk")
 FULLY_SEARCHED = 0.99  # under this share of women in searched cells, say saturation covers only part of the area
 
 
@@ -146,15 +147,34 @@ def _fetched(csv: str) -> str:
     return days[0] if len(days) == 1 else f"{days[0]} to {days[-1]}"
 
 
+def rent_source(kind: str, subject_id: str, facts: dict) -> str:
+    """Where this subject's shop rent comes from: a lounge's site cell source (dld | adrec | listings |
+    emirate_median | none); an area's from its emirate, or the fallback when that sets its rent."""
+    if kind == "lounge":
+        return next((f.site_rent_source for f in data.baseline().features if f.branch_id == subject_id), "none")
+    if facts.get("rent_ratio") is None:
+        return "none"
+    if facts.get("rent_fallback"):
+        return "emirate_median"
+    return {"Dubai": "dld", "Abu Dhabi": "adrec"}.get(facts.get("emirate"), "listings")
+
+
 @cache
-def provenance(kind: str) -> str:
-    """Where the factor table's numbers come from, with snapshot dates read from the data (S7)."""
-    rents = re.search(r"registered (\d{4}-\d\d-\d\d) to (\d{4}-\d\d-\d\d)",
+def provenance(kind: str, rent: str) -> str:
+    """Where the factor table's numbers come from, with snapshot dates read from the data (S7);
+    `rent` is the subject's shop-rent source (rent_source)."""
+    dates = re.search(r"registered (\d{4}-\d\d-\d\d) to (\d{4}-\d\d-\d\d)",
                       (settings.v3_dir / "SOURCES.md").read_text())
+    rents = {"dld": "DLD Ejari shop contracts" + (f" registered {dates[1]} to {dates[2]}" if dates else ""),
+             "adrec": "ADREC 2025 street-retail district rates, read off its public map",
+             "listings": "Property Finder / Bayut shop asking rents, scraped 2026-10-11",
+             "emirate_median": "none observed here: the emirate's median shop rent stands in",
+             "quote": "the quoted rent"}
     parts = [f"competitors: Google Places, fetched {_fetched('salons.csv')}",
              "women 15+: WorldPop 2025 (R2025A), rebalanced for OSM worker housing",
-             f"drive times: Mapbox isochrones, typical traffic at {data.assumptions().isochrone_depart_at.replace('T', ' ')}",
-             "rents: DLD Ejari contracts" + (f" registered {rents[1]} to {rents[2]}" if rents else "")]
+             f"drive times: Mapbox isochrones, typical traffic at {data.assumptions().isochrone_depart_at.replace('T', ' ')}"]
+    if rent in rents:
+        parts.append(f"shop rent: {rents[rent]}")
     if kind == "lounge":
         parts.insert(0, f"lounge rating and reviews: Google Places, fetched {_fetched('branches.csv')}")
     return "Sources: " + "; ".join(parts) + ". Details in data/seed/v3/SOURCES.md."
@@ -167,11 +187,11 @@ def render_factor_table(exp: Explanation, fields: tuple[str, ...], facts: dict) 
         st.markdown("**What would change the call.** " + " ".join(changes))
     from src.webapp import factor_tree
     factor_tree.render(exp.kind, {**facts, "action": exp.action})
-    st.caption(provenance(exp.kind))
+    st.caption(provenance(exp.kind, rent_source(exp.kind, exp.subject_id, facts)))
 
 
 def limitations_box(r: Run) -> None:
-    """The three caveats that matter most, right under the executive summary; the README holds the full list."""
+    """The three caveats that matter most, right under the executive summary; docs/limitations.md holds the full list."""
     scored = [d for d in r.decisions if d.action != "NOT SCORED"]
     low = sum(d.confidence == "low" for d in scored)
     with st.container(border=True):
@@ -180,7 +200,7 @@ def limitations_box(r: Run) -> None:
             "A shortlist to test with the business, not decisions: **No revenue or lease data in the model** "
             "(SHRINK means *investigate*, not *close*), services sold are measured by lifetime Google reviews, "
             f"and **{low} of {len(scored)}** lounge calls are low confidence.  \n"
-            "[All the limitations, and the model we'd build with Bedashing's data →](/how#limitations)")
+            "[All the limitations →](/limitations) · [The model we'd build with Bedashing's data →](/decision-model#the-ideal-model-the-same-decisions-on-bedashings-own-metrics)")
 
 
 def performance_line(f) -> str:
@@ -213,8 +233,9 @@ def lounge_caveats(f: LoungeFeatures, d: Decision, flips: int | None) -> list[st
     if f.demand_ref == "UAE":
         out.append(f"{f.emirate} has under 50 reference salon sites: its demand is ranked against all UAE salon sites.")
     if f.review_count < FEW_REVIEWS:
-        out.append(f"Only {f.review_count:,} lifetime Google reviews. Capture uses lifetime reviews, "
-                   "so a newer lounge looks weaker than it is.")
+        out.append(f"Only {f.review_count:,} lifetime Google reviews. Served demand splits each cell by "
+                   "lifetime reviews, so a newer lounge's served women (and performance vs site) look weaker "
+                   "than they are.")
     if f.branch_id == "mirdif-35":
         out.append("Market overstated: worker housing not mapped as industrial in OpenStreetMap "
                    "(Dubai Investment Park, very likely Sonapur) counts as ordinary housing here.")
@@ -230,8 +251,12 @@ def area_caveats(a: Area, d: AreaDecision) -> list[str]:
         out.append(f"{a.worker_share:.0%} of adults live in worker housing: the women estimate rests "
                    "on the worker-housing female share assumption.")
     if a.emirate == "Sharjah":
-        out.append(f"Bedashing's only Sharjah lounges (al-jada, zawaya-walk) are on the Dubai side; "
-                   f"this area is beyond the drive time of both ({a.nearest_lounge_id} is nearest). Why the "
+        reach, women = data.reached(Levels(), frozenset()), data.women(Levels().worker_share)
+        near = [c for c in a.cell_ids if set(reach.get(c, ())) & set(SHARJAH_LOUNGES)]
+        where = (f"they already reach {women[near].sum() / women[a.cell_ids].sum():.0%} of this area's women within "
+                 f"a {data.minutes(Levels())}-min drive" if near else
+                 f"this area is beyond the drive time of both ({a.nearest_lounge_id} is nearest)")
+        out.append(f"Bedashing's only Sharjah lounges (al-jada, zawaya-walk) are on the Dubai side; {where}. Why the "
                    "footprint is only two lounges is a business question: the model can't see licensing, "
                    "brand fit, landlord terms or customer mix.")
     out.append(f"Distance to the nearest lounge ({a.nearest_lounge_km:.1f} km to {a.nearest_lounge_id}) "

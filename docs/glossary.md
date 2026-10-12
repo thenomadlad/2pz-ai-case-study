@@ -1,8 +1,7 @@
-# Bedashing network right-sizing
+# Glossary
 
-Decision support for Bedashing Beauty Lounge's UAE network: which lounges to protect, hold or
-investigate, and where to grow. The calls are a shortlist to test, not decisions
-(`docs/limitations.md`).
+The terms used across the app and these docs, and what each call means. The calls are a shortlist
+to test, not decisions ([Limitations](limitations.md)).
 
 ## Language
 
@@ -38,12 +37,13 @@ Commercial rent per m² a year (AED) at a lounge's site (`site_rent_m2`), or ove
   via third-party Apify actors (a grey area under the portals' terms of service).
 - **Everywhere else:** the emirate median.
 
-It feeds the rent ratio (the scorecard's cost signal and the GROW rent test) and the site cost (display only).
+It feeds the rent ratio (the scorecard's cost signal and the GROW rent test): rent per m² is the only cost the model scores.
 _Avoid_: rent (unqualified); it's ambiguous with the affluence rent.
 
-**Site cost**:
-A site's annual cost in AED 1k (`site_cost_k`): shop rent x an assumed 150 m² unit + an assumed
-fit-out of AED 3,000/m² written off over 5 years. Display context only: no call uses it.
+**Site cost** (context only):
+An illustrative annual cost in AED 1k (`site_cost_k`): shop rent x an assumed 150 m² unit + an assumed
+fit-out. Left over from an earlier model; no call uses it (the score uses rent per m² only), and it
+appears only in the explanations' fact sheets.
 
 **Site reference**:
 The frozen market of salon SITES every lounge and area label is judged against
@@ -54,7 +54,7 @@ with all our lounges open. Dubai 582, Abu Dhabi 304, Sharjah 143, Ajman 38, Ras 
 Fujairah 18, Umm Al Quwain 5. Never our own lounges; nothing we open or close moves it.
 _Avoid_: benchmark, peer group (our lounges are not in it)
 
-**Demand percentile**:
+**Site demand (demand percentile)**:
 The share of its emirate's reference sites a site out-serves (`demand_pct`, 0..1; for a lounge on
 site served, for an area on the what-if lounge's served women). It is the scorecard's demand score
 and a GROW test (0.5+). Emirates with under 50 reference sites (Ajman, Ras Al Khaimah, Fujairah,
@@ -65,12 +65,12 @@ Umm Al Quwain) are ranked UAE-wide (`demand_ref` = "UAE"). Shown with its UAE-wi
 The emirate's median shop rent at its reference sites ÷ the site's shop rent (`rent_ratio`; above 1 =
 cheaper than the median salon site in its emirate). Always against its own emirate, even under 50
 sites. The scorecard's cost signal on a frozen scale (P10 0.62 → 0, P90 1.43 → 1) and a GROW test
-(1+, unknown passes). Rent only: served women are not in it. Shown with its UAE-wide rent percentile
+(1+; unknown or the emirate-median fallback passes, low confidence). Rent only: served women are not in it. Shown with its UAE-wide rent percentile
 (`rent_pct_uae`, higher = dearer) as context.
 _Avoid_: ROI, return, profitability, cost efficiency
 
 **Women per rent**:
-Addressable women per AED 1,000 of a site's annual shop rent, for an assumed 150 m² unit (`women_per_rent_k`). Shown as context; not scored.
+Addressable women per AED 1,000 of a site's annual shop rent, on an assumed 150 m² unit (`women_per_rent_k`). Context only, in the lounge and area tables; no call uses it.
 _Avoid_: income, wealth, spend, affluence score (unqualified)
 
 **Addressable women**:
@@ -100,10 +100,16 @@ premium salons, weight = services sold, measured by reviews, x a rating factor x
 plus an outside option, summed over cells (`served_women`). Context, not scored.
 _Avoid_: catchment women, customers
 
+**Typical lounge**:
+The lounge every what-if opens (area what-ifs, site served, the site reference): frozen at 757
+lifetime reviews and a 4.6★ rating, the medians over the scored lounges at the 2026-10-11 baseline
+(`TYPICAL_REVIEWS`, `TYPICAL_RATING` in `src/features/lounges.py`). Frozen so the bar doesn't move
+when a lounge opens, closes or collects reviews.
+
 **Site served**:
-The women a typical lounge (median reviews and rating) would serve at a lounge's site: its share of
+The women a typical lounge would serve at a lounge's site: its share of
 the market, weighted by services sold, with that lounge closed and siblings and rivals open (`site_served`). Ranked against the site reference, it is
-the scorecard's demand signal (see Demand percentile): it judges the site, not the lounge.
+the scorecard's demand signal (see Site demand): it judges the site, not the lounge.
 
 **Performance vs site**:
 Served women / site served (`performance_vs_site`). Context, not scored: "The model estimates this
@@ -115,8 +121,10 @@ For a growth area: the women a typical new lounge at its centre would serve, min
 our existing lounges (`new_site_net`). The GROW size test.
 
 **Growth area**:
-The populated cells beyond a 15-min drive of every open scored lounge that share an OSM place name
-(and emirate): one area per named place, whether its cells touch or not. Cells named only by their
+The populated cells that share an OSM place name (and emirate): one area per named place, whether its
+cells touch or not. Cells an open lounge already reaches stay in the area (Sharjah city: 62% of its
+women are within a 15-min drive of al-jada, zawaya-walk or mirdif-35); the what-if's net new women
+take that overlap off. Cells named only by their
 emirate (no OSM admin boundary or place within 3 km, `name_source == "emirate"`) make no area:
 nothing actionable is known about where they are. They still count in catchments, overlap and
 population totals. Labelled GROW / WATCH / SKIP.
@@ -171,32 +179,49 @@ _Avoid_: contested share, overlap (unqualified)
 ### Decisions
 
 **Lounge action**:
-PROTECT, HOLD or SHRINK from the scorecard; NOT SCORED for the airport lounge. What each one asks
+PROTECT, HOLD or SHRINK from the scorecard's composite; NOT SCORED for the airport lounge. What each one asks
 the network and capital owner to do:
 - **PROTECT**: keep and defend the site. Renew at the lease event, don't relocate, and treat a
   competitor opening nearby as a threat to respond to.
 - **HOLD**: no portfolio action this cycle. Revisit at the next lease event, or sooner if a signal
   crosses a line (the lounge page names which one is closest).
 - **SHRINK**: investigate, don't close. Before the lease event, review whether to downsize or
-  consolidate into the sibling that shares most of its catchment. The model has no revenue or lease data,
+  consolidate, but consolidate only where a sibling would take most of its customers (the absorbed
+  share if it closed: City Walk's siblings would take about 1%). The model has no revenue or lease data,
   so it can only raise the question.
+
+**Composite**:
+The average of the site demand score and the site rent score (each 0-1, weight 1 each). PROTECT at
+0.65 or more, SHRINK at 0.35 or less, HOLD between (`PROTECT_AT`, `SHRINK_AT` in
+`src/model/scorecard.py`). With two equal signals, a perfect score on one needs 0.3+ on the other to
+reach PROTECT: the two have to broadly agree.
+
+**NOT SCORED**:
+The airport lounge (`zayed-international-airport`): it serves travellers, so its catchment says
+nothing about its market. It stays on the map but gets no call and is no lounge's sibling or
+substitute and no area's nearest lounge.
 
 **Growth action**:
 GROW, WATCH or SKIP, assigned to a growth area from a what-if: open a typical lounge here.
 - **GROW**: start a site search here. 6,000+ net new women, worker housing under 50%, a rent ratio
-  of 1+ (or unknown) and a demand percentile of 0.5+ in its emirate's salon sites. It's a shortlist for a site visit and lease search, to be verified on the
+  of 1+ (unknown or the emirate-median fallback passes, low confidence) and a demand percentile of 0.5+ in its emirate's salon sites. It's a shortlist for a site visit and lease search, to be verified on the
   ground before committing.
 - **WATCH**: don't act now. Big but dearer than its emirate's median salon site or with weaker demand, big but mostly worker housing,
   or 3,000+ net new women. Revisit when the named failing test changes.
 - **SKIP**: no action. Under 3,000 net new women, under 5,000 women, or non-residential by name
   (industrial, free zone, military, airport, port).
 
-**Low confidence**:
-A lounge call within 0.05 of a threshold, or that **flips**: changes in a third or more (27+) of the 81 combinations of the four assumption
-levels (travel time, coverage, worker-housing female share, affluence elasticity), or under any
-single signal weight moved ±25% (in practice that only catches calls already within 0.05 of a line).
-For a growth area, low / medium / high: low within 10% of the 6,000 net-new-women line or with
-under half its women searched; high when 20%+ clear of it.
+**Confidence (low / medium / high)**:
+How much a call depends on things the data can't pin down.
+- **Lounge, low:** the composite is within 0.05 of a line; or the call **flips**, changing in a third
+  or more (9+) of the 27 combinations of three assumption levels (drive time, competitor coverage,
+  worker-housing female share; affluence is off at baseline and isn't varied); or it changes under
+  any single signal weight moved ±25% (in practice that only catches calls already within 0.05 of a
+  line); or its site rent is the emirate-median fallback (no rent of its own). **High:** 0.10+ from
+  both lines; **medium** in between.
+- **Growth area, low:** within 10% of the 6,000 net-new-women line, under half its women searched for
+  competitors, or big enough (6,000+ net new women, worker housing under 50%) with its rent on the
+  emirate-median fallback. **High:** 20%+ clear of the line; **medium** in between.
 _Avoid_: uncertain, borderline (unqualified)
 
 ### Retired terms (the old Dubai model)

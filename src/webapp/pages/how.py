@@ -1,7 +1,7 @@
-"""README page: the README, docs/model.md and docs/implementation.md themselves (one source
-of truth; Mermaid diagrams drawn in the browser, links between the three as in-page anchors, other repo
-links pointed at GitHub), then live tables of every assumption in baseline.yaml and every
-scorecard / growth constant with why it was chosen."""
+"""The documentation pages: the README, docs/decision-model.md, docs/llm-explanations.md,
+docs/app-and-implementation.md, docs/limitations.md and docs/glossary.md themselves (one source of truth; Mermaid diagrams drawn in the browser, links between
+the docs pointed at their pages, other repo links at GitHub). The Decision model page ends with live tables of
+every assumption in baseline.yaml and every scorecard / growth constant with why it was chosen."""
 import html
 import posixpath
 import re
@@ -19,9 +19,6 @@ from src.features.lounges import (
 from src.model import growth, scorecard, served
 from src.webapp import data
 from src.webapp.views import wrapped_table
-
-LIMITATIONS = REPO_ROOT / "docs" / "limitations.md"
-SOURCES = REPO_ROOT / "data" / "seed" / "v3" / "SOURCES.md"
 
 
 def section(markdown: str, heading: str) -> str:
@@ -57,42 +54,68 @@ def _const(v) -> str:
 
 
 README = REPO_ROOT / "README.md"
-ANCHORS = {"the-model-wed-build-with-bedashings-data": "the-model-we-d-build-with-bedashings-data"}  # GitHub → Streamlit
-DOCS = {"README.md": "/how#bedashing-network-right-sizing"}   # the page shows the README only; the
-# detailed docs (docs/model.md, docs/implementation.md) are linked on GitHub
+# repo path -> (url path, sidebar title, icon): each doc is a page under "Documentation"
+DOC_PAGES = {"README.md": ("how", "README", "📖"),
+             "docs/decision-model.md": ("decision-model", "Decision model", "🧮"),
+             "docs/llm-explanations.md": ("llm-explanations", "LLM explanations model", "🤖"),
+             "docs/app-and-implementation.md": ("app-and-implementation", "App and implementation", "🛠️"),
+             "docs/limitations.md": ("limitations", "Limitations", "⚠️"), "docs/glossary.md": ("glossary", "Glossary", "🔤")}
+ANCHORS = {}  # GitHub heading slug -> Streamlit's, where they differ (Streamlit slugs an apostrophe as "-")
 REPO_URL = "https://github.com/thenomadlad/2pz-ai-case-study/blob/main/"
 _MERMAID = """<div class="mermaid">{code}</div>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>mermaid.initialize({{startOnLoad: true, theme: "neutral", securityLevel: "strict"}});</script>"""
 
 
+def _anchor(url: str, frag: str) -> str:
+    return f"/{url}" + (f"#{ANCHORS.get(frag, frag)}" if frag else "")
+
+
 def _link(path: str, base: str) -> str:
-    """A repo-relative link from a file in `base`: an in-page anchor for the docs on this page, else GitHub."""
+    """A repo-relative link from a file in `base`: its page if it's one of the docs, else GitHub."""
+    path, _, frag = path.partition("#")
     target = posixpath.normpath(posixpath.join(base, path))
-    return DOCS.get(target, REPO_URL + target)
+    if target in DOC_PAGES:
+        return _anchor(DOC_PAGES[target][0], frag)
+    return REPO_URL + target + (f"#{frag}" if frag else "")
 
 
-def readme_parts(text: str, base: str = "") -> list[tuple[str, str]]:
+def readme_parts(text: str, base: str = "", url: str = "how") -> list[tuple[str, str]]:
     """A doc as ("md", markdown) and ("mermaid", diagram) parts, its repo-relative links (relative to the
-    directory `base`) rewritten by _link so they work inside the app."""
+    directory `base`) rewritten by _link so they work inside the app; `url` is the doc's own page."""
     text = re.sub(r"\]\((?!https?://|#|mailto:)([^)\s]+)\)", lambda m: f"]({_link(m.group(1), base)})", text)
-    # in-page anchors only scroll as page URLs in the app, and Streamlit slugs an apostrophe as "-"
-    text = re.sub(r"\]\(#([^)]+)\)", lambda m: f"](/how#{ANCHORS.get(m.group(1), m.group(1))})", text)
+    # in-page anchors only scroll as page URLs in the app
+    text = re.sub(r"\]\(#([^)]+)\)", lambda m: f"]({_anchor(url, m.group(1))})", text)
     parts = re.split(r"^```mermaid\n(.*?)^```\n?", text, flags=re.DOTALL | re.MULTILINE)
     return [("mermaid" if i % 2 else "md", p) for i, p in enumerate(parts) if p.strip()]
 
 
-def render() -> None:
-    # The README is this page (one source of truth); the detailed docs it links to open on GitHub
-    for doc in DOCS:
-        for kind, part in readme_parts((REPO_ROOT / doc).read_text(), posixpath.dirname(doc)):
-            if kind == "md":
-                st.markdown(part)
-            else:
-                # st.iframe (components.v1.html is deprecated): this HTML is our own committed diagram, not
-                # user input; height grows with the diagram's size so a small chain doesn't leave a gap
-                st.iframe(_MERMAID.format(code=html.escape(part)), height=max(150, min(760, 40 + 11 * part.count("\n"))))
+def render_doc(path: str) -> None:
+    """One doc, as written in the repo (one source of truth)."""
+    for kind, part in readme_parts((REPO_ROOT / path).read_text(), posixpath.dirname(path), DOC_PAGES[path][0]):
+        if kind == "md":
+            st.markdown(part)
+        else:
+            # st.iframe (components.v1.html is deprecated): this HTML is our own committed diagram, not
+            # user input; height grows with the diagram's size so a small chain doesn't leave a gap
+            st.iframe(_MERMAID.format(code=html.escape(part)), height=max(150, min(760, 40 + 11 * part.count("\n"))))
 
+
+def render() -> None:
+    render_doc("README.md")
+
+
+def doc_page(path: str):
+    """The page function for a doc; the Decision model page ends with the live values."""
+    def page() -> None:
+        render_doc(path)
+        if path == "docs/decision-model.md":
+            live_values()
+    page.__name__ = f"doc_{DOC_PAGES[path][0]}"   # st.Page needs a distinct name per page
+    return page
+
+
+def live_values() -> None:
     st.divider()
     st.header("Live values from the code")
     st.caption("Read from the code and data/scenarios/baseline.yaml each time the page loads, so they can't go stale.")

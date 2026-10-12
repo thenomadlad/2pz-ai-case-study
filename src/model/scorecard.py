@@ -41,8 +41,8 @@ RENT_RATIO_WHY = (
 SIGNALS: tuple[Signal, ...] = (
     Signal("demand", "demand_pct", "Site demand: share of its emirate's salon sites it out-serves",
            0, 1,
-           "Scores the SITE, not how much the lounge itself sells: the women a typical lounge (median reviews and "
-           "rating) would serve there, this lounge closed and rivals and siblings open, ranked among the "
+           "Scores the SITE, not how much the lounge itself sells: the women a typical lounge (frozen at 757 reviews, "
+           "4.6★: TYPICAL_WHY in src/features/lounges.py) would serve there, this lounge closed and rivals and siblings open, ranked among the "
            "frozen reference of competitor salon sites in the same emirate (each with a typical lounge "
            "there and all our lounges open; UAE-wide where an emirate has under 50: SITE_REFERENCE_WHY "
            "in src/features/lounges.py). The 0..1 percentile is the score. The lounge's own served "
@@ -61,9 +61,11 @@ RULES = Rules()          # the baseline's decision rules; a what-if passes its o
 PROTECT_AT = RULES.protect_at
 SHRINK_AT = RULES.shrink_at
 THRESHOLDS_WHY = (
-    f"PROTECT at a composite of {PROTECT_AT} or more means the lounge clears the bar on most "
-    f"signals, not just one. SHRINK at {SHRINK_AT} or less means it is weak on most signals. "
-    "Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree."
+    f"PROTECT at a composite of {PROTECT_AT} or more, SHRINK at {SHRINK_AT} or less: {PROTECT_AT - 0.5:.2f} "
+    "either side of a neutral 0.5. With two equal signals, even a perfect score on one needs at least "
+    f"{2 * PROTECT_AT - 1:.1f} on the other to reach PROTECT (and a zero on one needs {2 * SHRINK_AT:.1f} on the other "
+    "to escape SHRINK): the two have to broadly agree. Everything between is HOLD: with no revenue or lease "
+    "data, a strong call needs both signals behind it."
 )
 LIVE_AXES = ("travel", "coverage", "worker_share")   # LIVE_AXES_WHY
 LIVE_AXES_WHY = ("Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min "
@@ -75,18 +77,18 @@ FLIP_LOW = round(FLIP_LOW_SHARE * COMBOS)        # 9 of 27
 FLIP_WHY = (f"A lounge whose action changes in {FLIP_LOW} or more (a third) of the {COMBOS} combinations of "
             "drive time, competitor coverage and worker-housing share depends on the assumptions more than on "
             f"the data, so its call is low confidence. {LIVE_AXES_WHY}")
-NEUTRAL = 0.5  # a missing rating gap never scores as the worst; thin-market capture is pulled toward it
+NEUTRAL = 0.5  # a missing or fallback rent scores here, never as the worst
 THIN_MARKET = 10
-THIN_MARKET_WHY = ("Under 10 premium salons, capture is a share of a tiny pool, so it is noisy: its score keeps "
-                   "only premium_pool / 10 of its distance from neutral (0 salons: neutral). A blend replaces "
-                   "the old cliff, where three 5-review salons swung al-dhafra by 0.14 (docs/sanity-checks.md SC4). "
-                   "A thin market stays a low-confidence reason.")
+THIN_MARKET_WHY = ("Under 10 premium salons in the catchment (al-dhafra, al-falah), capture is a share of a tiny "
+                   "pool, so it is noisy: the lounge page flags it (thin_premium_market). Capture is shown, not "
+                   "scored, so a thin market changes no call; served demand already splits each cell by reviews.")
 WEIGHT_STEPS = (0.75, 1.25)
 WEIGHT_WHY = ("The weights are a design choice, not data. Each signal's weight is moved ×0.75 and ×1.25, "
               "one at a time (8 variants); a call that changes under any of them depends on the weighting, "
               "so it is low confidence. The decision lines aren't varied: within 0.05 of one is already low.")
-NO_FINANCIALS = ("No revenue, lease or footfall data: site cost is an area shop rent (150 m² assumed) plus assumed fit-out, "
-                 "so this scores location, market and rent, not return on invested capital.")
+NO_FINANCIALS = ("No revenue, lease or footfall data: the only money scored is the site's shop rent per m² against "
+                 "its emirate's median salon site, so this scores location, market and rent, not return on invested "
+                 "capital.")
 
 
 def score(signal: Signal, value: float | None) -> float:

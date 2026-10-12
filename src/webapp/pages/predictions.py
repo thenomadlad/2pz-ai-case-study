@@ -102,14 +102,15 @@ def _lounge_legend(rules) -> None:
                f"{1 - rules.demand_weight:.0%}, each "
                f"0-1 on a fixed scale against a frozen reference; review share, rating and shared catchment are shown, not scored. Low confidence: within {scorecard.LOW_MARGIN} of a line, the call changes in "
                f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations, or it changes when a "
-               "signal weight moves ±25%.")
+               "signal weight moves ±25%, or its site rent is the emirate-median fallback.")
 
 
 def _cells_help(r) -> str:
     """The cell colours in full: the hover help on CELLS_KEY."""
     return (f"🟦 **GROW**: a typical new lounge here would add ≥ {r.rules.grow_min:,} net new women, "
             f"worker housing under {growth.WORKER_CAP:.0%}, out-serving {r.rules.demand_pct_min:.0%}+ of its emirate's "
-            "salon sites *and* rent no dearer than their median (or unknown)  \n"
+            "salon sites *and* rent no dearer than their median (unknown, or on the emirate-median fallback, "
+            "passes as neutral with low confidence)  \n"
             f"🟩 **Already captured**: our lounges serve {CAPTURED_MIN:.0%}+ of its women (model estimate); "
             f"deeper green = more, deepest at {CAPTURED_FULL:.0%}+  \n"
             "🟪 **WATCH**: big but dearer or weaker demand, or mostly worker housing  \n"

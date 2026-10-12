@@ -706,8 +706,8 @@ ACTIONS = {
     "HOLD": ("no portfolio action", ("No portfolio action this cycle: revisit at the next lease "
                                      "event, or sooner if a signal crosses a line.")),
     "SHRINK": ("investigate", ("Investigate, don't close: before the lease event, review whether "
-                               "to downsize or consolidate into the sibling that shares most of "
-                               "its catchment.")),
+                               "to downsize; consolidate only where a sibling would take most of "
+                               "its customers (the absorbed share if it closed).")),
     "GROW": ("site search", ("Start a site search here: a shortlist for a site visit and lease "
                              "search, verified on the ground before committing.")),
     "WATCH": ("revisit", "Don't act now: revisit when the failing test changes."),

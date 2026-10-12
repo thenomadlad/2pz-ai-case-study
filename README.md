@@ -2,30 +2,66 @@
 
 Bedashing runs 24 beauty lounges across the UAE and has to decide which sites to keep, which to
 look at again before their leases come up, and where a new lounge would win women it doesn't
-reach today. This app estimates how many women a lounge at each site would serve, given the
-competing salons nearby and what a shop there costs, and compares each site with the other salon
-sites in its own emirate. At today's settings it says: protect 6 lounges, review 3 (not close)
-and run a site search in 34 areas, each call with a written explanation whose numbers are checked
-against the data.
+reach today. This app helps with both: what to do with each lounge (protect, hold or shrink) and
+where to open next (grow, watch or skip). It is built from three parts:
+
+1. **A decision model** that makes every call from public data: how many women a typical lounge
+   would serve at each site, against the competing salons, and what the site costs in rent, judged
+   against the other salon sites in its emirate ([Decision model](docs/decision-model.md)).
+2. **An LLM explanations model** that turns each call into a short, checked explanation for the
+   decision-maker and the board: the answer first, then the reasons, every number verified against
+   the data ([LLM explanations model](docs/llm-explanations.md)).
+3. **A what-if loop:** change the assumptions, the decision rules or a site's rent, or close a
+   lounge, and every call is re-run on the spot, with what moved shown against the baseline (the
+   What-if explorer).
+
+At today's settings it is surest about three moves: review 1 lounge (City Walk; review, not close),
+defend 3 and run a site search in 12 areas. Counting its lower-confidence calls too, that is 3, 6
+and 34. Terms such as site demand and rent ratio are defined in the [Glossary](docs/glossary.md).
 
 **Live app:** https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/
-
-Two terms used throughout. **Site demand**: the women a typical Bedashing lounge would serve at a
-spot, after sharing them with every competing salon and sibling lounge they can reach, ranked
-against the competitor salon sites in the same emirate. **Rent ratio**: the emirate's median salon-site
-shop rent divided by this site's (above 1 = cheaper than a typical salon site there).
 
 ## Walkthrough (5 minutes)
 
 A guided path through the live app: the answer, one lounge decision, one growth call and a scenario.
 
-
-1. **[Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the answer in one line, then the Review, Grow and Protect cards and their evidence maps.
-2. **[What-if explorer](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/explore):** pick Abu Dhabi, tick "All catchments (overlap)": heavy overlap, yet only West Yas is SHRINK.
+1. **[Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the answer in one line, then the Review, Protect and Grow cards (high-confidence calls only) and their evidence maps and tables.
+2. **[What-if explorer](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/explore):** pick Abu Dhabi: every lounge's catchment is drawn, shared cells in red. Heavy overlap, yet only West Yas is SHRINK.
 3. **[City Walk](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk) (SHRINK):** the AI pyramid, *What would change the call*, the factor tree and which siblings share its women. *Action:* lease review, with finance's P&L before anyone says "close"; a prime rent may be buying footfall the model can't see.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah) (GROW, low confidence):** about 12.5k net new women, but no shop rent of its own, and the call says so.
 5. **Back on the What-if explorer:** open the 🧪 panel, quote City Walk a rent of 2,200 and watch its call move.
-6. **[README](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how):** this README in the app, with the detailed docs linked.
+6. **Documentation** (sidebar): this [README](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how), then the Decision model, LLM explanations model, App and implementation, Limitations and Glossary pages.
+
+## Who it's for, and what it decides
+
+**Who decides:** the network and capital owner, on the retail portfolio team. They decide where
+Bedashing is present and how much capital each site ties up: open, renew, resize, relocate or exit.
+How much capacity each catchment needs (service providers and hours) is their call too. They don't
+run the branches: service quality, rosters, hiring and day-to-day performance belong to operations.
+
+| Role | Who | Uses it to |
+|---|---|---|
+| **Primary user** | Bedashing's retail portfolio team (network, real estate, expansion) | form recommendations, stress-test them with what-ifs, lift the explanations into memos |
+| **Decision-maker** | The network and capital owner, on the portfolio team | open, renew, resize, relocate or exit, from the headline and the reasons |
+| **Operations** (out of scope) | Whoever runs the branches: service quality, rosters and hiring, day-to-day performance | nothing here: the tool never judges how a branch is run |
+| **Board / investors** | Bedashing's board and investors | judge whether the call is defensible: evidence, thresholds, caveats |
+
+Each label maps to a decision the network and capital owner already makes (definitions: [`docs/glossary.md`](docs/glossary.md), "Decisions"):
+
+| Their decision | Label | What it asks |
+|---|---|---|
+| **Lease renewal, resize or exit** (each lounge, at its lease event) | **PROTECT** | Keep and defend: renew, don't relocate, respond to a competitor opening nearby |
+| | **HOLD** | No portfolio action this cycle; revisit at the next lease event, or sooner if a signal crosses a line |
+| | **SHRINK** | Investigate, don't close: before the lease event, review downsizing; consolidate only where a sibling would take most of its customers (City Walk's siblings would take about 1%) |
+| **Open** (site search, expansion plan) | **GROW** | Start a site search: a shortlist for site visits, verified on the ground before committing |
+| **Revisit later** | **WATCH** | Don't act now; revisit when the named failing test changes |
+| **No action** | **SKIP** | Too small or already crowded. (The airport lounge is NOT SCORED: it serves travellers.) |
+
+**North star: services sold** (completed appointments), judged per catchment and capped by
+capacity. The model can't measure it yet: its nearest proxy is served women (a model
+estimate of the customers behind the services a lounge sells), shown as context, and
+**capacity is not modelled at all** (no chairs, hours or utilisation), so a SHRINK is driven by
+modelled demand and shop rent, not by services that would be lost.
 
 ## The questions it helps answer
 
@@ -77,76 +113,6 @@ assumptions (drive time, competitor coverage, worker housing), and sees the base
 scenario with every call that moved. For example, a rent quote of AED 2,200/m² turns City Walk from
 SHRINK to HOLD, and a GROW bar of 10,000 net new women cuts GROW from 34 areas to 16.
 
-## How I approached it
-
-**The framing.** I started from the person who decides: the network and capital owner, who decides
-where Bedashing is present and how much capital each site ties up (open, renew, resize, relocate or
-exit) and doesn't run the branches. So every call answers "is this a good place for our capital?",
-never "is this branch well run?", and each label maps onto a decision they already make: PROTECT,
-HOLD or SHRINK at a lounge's lease event, GROW as the start of a site search.
-
-**Three iterations.**
-1. **Prove a model is possible from public data:** branch locations and Google ratings ranked into
-   simple calls, with a baseline vs scenario loop. It showed the questions could be answered, and
-   where the data was too thin.
-2. **Build a proper software solution:** rebuilt as a hosted Streamlit app with a real data pipeline
-   (population per ~2 km cell, drive times, a competitor pool of about 5,900 salons), in-memory
-   what-ifs, grounded AI explanations, tests and a ranked list of limitations.
-3. **Refine the model:** demand split among competitors by how much each sells, commercial rent as
-   the cost, each site judged within its emirate, decision rules and rent quotes for scenarios, with
-   notebooks, sanity checks and a go/no-go rubric guarding each change.
-
-**Key decisions, and their limitations.**
-- **Judge each site within its emirate**, against a frozen set of 1,123 competitor salon sites. Dubai
-  and Abu Dhabi markets (and rent sources) aren't comparable, and a UAE-wide yardstick sank every dear
-  Dubai site. Limitation: a site is only as good as its emirate's yardstick; emirates with under 50 salon
-  sites are ranked UAE-wide on demand.
-- **Score the site, not how much the lounge itself sells.** Site demand puts a typical lounge (757 reviews,
-  4.6★) at each spot, so a strong lounge can't hide a weak site. Limitation: a well-run lounge on a weak
-  site still reads SHRINK; its own performance is shown as context.
-- **Rent as the cost signal.** It is the cost that differs most between sites (9.5x across our
-  lounges) and the one a negotiation can move. Limitation: no revenue, lease or capex, so SHRINK means
-  "investigate".
-- **Rules decide, AI explains.** Calls must be reproducible and defensible to a board; the AI drafts
-  the memo, it never makes the call.
-- **A hosted app with no keys.** The decision-maker opens a link; every lounge and area has its own
-  URL, so a recommendation can be sent as a link to its evidence. Limitation: the data is a committed
-  snapshot, refreshed by re-running scripts.
-
-**What I simplified, and why.** Midday drive times; lifetime Google reviews as each salon's services sold;
-one lounge format; no capacity; affluence off (household rents exist only for Dubai, and weighting
-by them changes no lounge call). Each is there because the better data is Bedashing's own or not
-public; [docs/model.md](docs/model.md) lists every one with its evidence.
-
-**What I'd do next with Bedashing's data.** Bookings per lounge, to calibrate the demand model
-(which today may under-read Dubai) and check the calls; actual leases and P&L, to turn SHRINK into a
-return test; chairs and hours, to add capacity; then opening several sites at once and saving named
-scenarios side by side ([docs/implementation.md](docs/implementation.md), Potential improvements).
-
-## The AI layer, and why it's built this way
-
-**The business case.** A footprint or capital call made on large amounts of data and a model built on
-stand-in signals (reviews for services sold, area rents for leases) and judgement thresholds is easy
-to misread: a 0.47 rent score, a low-confidence HOLD or a 4% growth figure each needs its context.
-So every call comes with its interpretation, not just its numbers: an LLM writes the executive
-summary and each lounge's and area's explanation, and code vets it before anyone sees it. The
-decision-maker gets the data *and* the correct reading of it.
-
-Every explanation is a pyramid: a one-sentence answer, 2-5 arguments, each backed by data points.
-- **The code picks the arguments** (`src/explain.py:prioritize`): which signals matter and in what order is computed, not left to the model.
-- **The model writes the prose; `verify()` checks it.** Every cited value must match the fact sheet and every number in the text must be a fact or a published threshold, correctly rounded. A failure falls back to a labelled template.
-- **Precomputed for this prototype.** The explanations for the baseline are generated ahead of time (offline, from the app's own prompts), verified and cached, keyed by a hash of the exact numbers, so the app needs no API key. In production, changing an assumption in the What-if explorer would have the LLM write new conclusions and summaries on the spot, through the same checks; here a changed what-if shows the labelled template instead of a stale text.
-- **Rules decide, the AI explains.** A lease or capital call has to be defensible and reproducible: the same data must give the same call and the same reasons, so an earlier LLM classifier was removed. That doesn't rule out a chatbot; it sets its guardrails. A chat could take "what if rent at City Walk were 3,000?" or "be stricter on GROW", set those assumptions in the same engine the What-if explorer uses, and have the LLM explain the new calls, with `verify()` checking every answer. The chat changes inputs; the rules still make the call.
-- **How AI built it:** agentic coding with Claude Code, with the human setting direction and signing off judgement calls, and every change gated by the tests, review passes and the sanity checks ([docs/implementation.md](docs/implementation.md)).
-
-## How we checked it
-
-- **Sanity checks and back-tests** ([`docs/sanity-checks.md`](docs/sanity-checks.md), re-run and logged after each model change): closing any sibling never pushes another lounge toward SHRINK (23 closures, 0 violations); +50% women in a catchment never lowers its call; 5 of 6 industrial, free-zone and military negative controls come out SKIP (the sixth, mixed-use Dubai Investments Park, is WATCH).
-- **Tests:** 196, about 45 s (`just test`), including: default decision rules reproduce the baseline exactly; a rent quote rescores only that site; tightening the GROW minimum never adds a GROW.
-- **Speed guards:** a full baseline run must stay under 8 s warm and 10 s cold (`tests/test_speed.py`).
-- **No paid API by accident:** the only paid path must be asked for by name, and a test proves unknown arguments never reach it.
-- **What we can't check:** there is no ground truth. Without bookings data the demand model is uncalibrated, so the calls are a ranked shortlist, not a forecast.
-
 ## Limitations
 
 The calls are **a shortlist to test with the business, not decisions**, and the limitations matter
@@ -156,8 +122,8 @@ more than the calls. The biggest ones:
   needs to serve its catchment; the model only has a shop rent per m² (an area median, a district
   rate or an asking rent, not the lease), compared with its emirate's median salon site. The model
   has none of the revenue, fixed cost base, profitability, capacity, capacity utilization and other
-  branch health KPIs which are key for this model to provide more definitive recommendations; [the next section](#the-model-wed-build-with-bedashings-data)
-  sets out the model we'd build with them. **SHRINK means "investigate", not "close".**
+  branch health KPIs which are key for this model to provide more definitive recommendations; [the model we'd build with them](docs/decision-model.md#the-ideal-model-the-same-decisions-on-bedashings-own-metrics)
+  is in the model notes. **SHRINK means "investigate", not "close".**
 - **Services sold are measured by lifetime Google reviews.** Each review is a trace of past
   appointments, so a salon's reviews stand in for how much it has sold, and its share of the Huff
   split follows them. Lifetime counts favour older salons and new lounges look weak; review rates
@@ -183,72 +149,14 @@ more than the calls. The biggest ones:
   growth area needs an absolute 6,000 net new women, so a PROTECT site can fail the growth test as a
   new opening: Nad Al Sheba is PROTECT (it out-serves 68% of Dubai salon sites), yet a typical lounge
   there would serve about 2,700 women.
-- **Sharjah's GROW areas are beyond our footprint.** 10 of the 34 GROW areas are in Sharjah emirate but
-  beyond a 15-minute drive of our two Sharjah lounges (Al Jada, Zawaya Walk), both on the Dubai side.
+- **Sharjah's GROW areas are mostly beyond our footprint.** 10 of the 34 GROW areas are in Sharjah
+  emirate, and 9 of them are beyond a 15-minute drive of our two Sharjah lounges (Al Jada, Zawaya
+  Walk), both on the Dubai side; only Sharjah city itself is close (2.5 km from Al Jada).
   Why the footprint there is only two lounges is a business question: the model can't see licensing,
   brand fit, landlord terms or customer mix.
 
 The full ranked list, with which calls each limitation touches and what would fix it:
-[`docs/limitations.md`](docs/limitations.md), also the app's **README** page.
-
-## The model we'd build with Bedashing's data
-
-The same decisions and the same chain (**demand → what we can serve → cost → return → the call**),
-measured instead of estimated, and optimised for **services sold per catchment**, not per branch:
-- **The objective:** for each catchment region, match the **total capacity of all its branches**
-  (service providers × hours × services per hour) to its demand, at the best **total capacity ÷ total
-  rent** of those branches. Service providers are the capacity, so the first lever is allocating them
-  to where demand is (add providers or hours where branches are full, move them from idle ones);
-  opening, resizing or closing a branch is the move when that isn't enough.
-- **Demand and capture:** bookings by customer home area, to measure the real catchment and penetration,
-  and, since bookings measure services sold directly, to calibrate the demand split on actual
-  booking shares instead of Google reviews.
-- **Capacity**, which today isn't modelled: chairs × hours × minutes per service, **utilisation**, peak
-  utilisation and **turn-aways** (requests with no free slot: services we failed to sell). Capacity caps services sold: they are
-  the smaller of captured demand and capacity, so a full lounge losing customers reads very differently from a
-  half-empty one, and two lounges in one catchment that both run full point to adding capacity, not
-  consolidating.
-- **Cost:** each lounge's base rent, service charge, fees and fit-out depreciation (fixed), and staff,
-  commissions, products and booking fees per appointment (variable). From these: **contribution per
-  appointment**, **break-even appointments** and **profit per m²**, the measured version of today's
-  "demand per AED of rent".
-- **The calls on those metrics:** PROTECT = top-quartile profit per m² and full; SHRINK = below
-  break-even with low utilisation and customers its siblings can absorb; **expand in place** when an
-  extra chair earns more than its rent; GROW = predicted appointments × contribution covers the rent
-  quote, staff and fit-out within the payback period.
-
-Full version: [docs/model.md](docs/model.md) ("The ideal model").
-
-## Who it's for, and what it decides
-
-**Who decides:** the network and capital owner, on the retail portfolio team. They decide where
-Bedashing is present and how much capital each site ties up: open, renew, resize, relocate or exit.
-How much capacity each catchment needs (service providers and hours) is their call too. They don't
-run the branches: service quality, rosters, hiring and day-to-day performance belong to operations.
-
-| Role | Who | Uses it to |
-|---|---|---|
-| **Primary user** | Bedashing's retail portfolio team (network, real estate, expansion) | form recommendations, stress-test them with what-ifs, lift the explanations into memos |
-| **Decision-maker** | The network and capital owner, on the portfolio team | open, renew, resize, relocate or exit, from the headline and the reasons |
-| **Operations** (out of scope) | Whoever runs the branches: service quality, rosters and hiring, day-to-day performance | nothing here: the tool never judges how a branch is run |
-| **Board / investors** | Bedashing's board and investors | judge whether the call is defensible: evidence, thresholds, caveats |
-
-Each label maps to a decision the network and capital owner already makes (definitions: [`docs/glossary.md`](docs/glossary.md), "Decisions"):
-
-| Their decision | Label | What it asks |
-|---|---|---|
-| **Lease renewal, resize or exit** (each lounge, at its lease event) | **PROTECT** | Keep and defend: renew, don't relocate, respond to a competitor opening nearby |
-| | **HOLD** | No portfolio action this cycle; revisit at the next lease event, or sooner if a signal crosses a line |
-| | **SHRINK** | Investigate, don't close: before the lease event, review downsizing; consolidate only where a sibling would take most of its customers (City Walk's siblings would take about 1%) |
-| **Open** (site search, expansion plan) | **GROW** | Start a site search: a shortlist for site visits, verified on the ground before committing |
-| **Revisit later** | **WATCH** | Don't act now; revisit when the named failing test changes |
-| **No action** | **SKIP** | Too small or already crowded. (The airport lounge is NOT SCORED: it serves travellers.) |
-
-**North star: services sold** (completed appointments), judged per catchment and capped by
-capacity. The model can't measure it yet: its nearest proxy is served women (a model
-estimate of the customers behind the services a lounge sells), shown as context, and
-**capacity is not modelled at all** (no chairs, hours or utilisation), so a SHRINK is driven by
-modelled demand and shop rent, not by services that would be lost.
+[`docs/limitations.md`](docs/limitations.md).
 
 ## Out of scope, and why
 
@@ -260,253 +168,25 @@ thinner or new. Out of scope:
 - **Running a branch day to day: rosters, shifts, hiring and managing individual staff.** How much
   capacity each catchment needs (service providers × hours) is in scope, since it decides where
   branches and providers go, but today's model can't measure it: that needs bookings and headcount
-  data (see "The model we'd build with Bedashing's data").
+  data (see [the model we'd build with Bedashing's data](docs/decision-model.md#the-ideal-model-the-same-decisions-on-bedashings-own-metrics)).
 - **Service quality and operations.** Ratings enter only as a factor on each salon's services sold
   in the Huff split; fixing a weak lounge's service is a management job, not a location one.
 
-## How the model works
+## Documentation
 
-One chain: **where the women are → who can reach them → who they go to → what a site costs → the
-call.** The rules make every call; the AI only explains it.
+The detail lives in five documents, each a page under **Documentation** in the app's sidebar:
 
-```mermaid
-flowchart LR
-  A["Women 15+<br/>where they live"] --> B["Who can reach them<br/>(drive time)"]
-  B --> C["Split with competing salons<br/>(Huff model)"]
-  C --> D["Site demand + rent,<br/>against the emirate's salon sites"]
-  D --> E(["The call"])
-```
+- **[Decision model](docs/decision-model.md):** the model we'd build with Bedashing's data, the proxies
+  that stand in for it today, and what we built: how a call is made step by step, the diagrams, every
+  factor we ignore and why, and every assumption with its evidence (with live values from the code in
+  the app).
+- **[LLM explanations model](docs/llm-explanations.md):** why every call comes with a written
+  explanation, how it is made and checked, and why it is precomputed here and live in production.
+- **[App and implementation](docs/app-and-implementation.md):** running the app, how I approached it,
+  how we checked it, the data, tools, trade-offs, potential improvements and a repo map.
+- **[Limitations](docs/limitations.md):** the full ranked list, which calls each one touches and what
+  would fix it.
+- **[Glossary](docs/glossary.md):** the domain terms and what each call means.
 
-In detail, from data to calls:
-
-```mermaid
-flowchart LR
-  subgraph SRC["Data"]
-    WP["Population + worker housing"]
-    MB["Drive times"]
-    GP["Salons + our lounges"]
-    RENT["Shop rents"]
-    OSM["OSM place names"]
-  end
-  subgraph DER["Derived per ~2 km cell"]
-    DEM["Demand: women 15+"]
-    REACH["Reach: suppliers within 20 min"]
-    SUP["Suppliers"]
-    IMP["Imputed competitors<br/>for unsearched cells"]:::assume
-    COST["Site cost"]
-    UNIT["Unit size, fit-out"]:::assume
-  end
-  HUFF{{"Huff split by attractiveness x distance decay"}}
-  OUT["Outside option"]:::assume
-  SERVED["Served women per lounge"]
-  UNSERVED["Unserved women per cell"]
-  SITE["Site served: a typical lounge<br/>at each lounge's site"]
-  TYP["Typical lounge, frozen:<br/>757 reviews, 4.6★"]:::assume
-  FB["Fallback rent (emirate median)<br/>→ rent neutral, low confidence"]:::assume
-  UAE["UAE-wide percentiles<br/>of demand and rent"]
-  REF["Frozen salon-site reference:<br/>1,123 competitor sites, per emirate"]
-  DPCT["Demand percentile<br/>in its emirate's salon sites"]
-  RR["Rent ratio vs its emirate's<br/>median salon site"]
-  CANN["What-if: close a lounge"]:::whatif
-  OPEN["What-if: open a typical lounge<br/>at each named place"]:::whatif
-  LRULE["Lounge rule"]
-  GRULE["Growth rule"]
-  LCALL(["PROTECT / HOLD / SHRINK"])
-  GCALL(["GROW / WATCH / SKIP"])
-  AI["AI explanation"]
-
-  WP --> DEM
-  MB --> REACH
-  GP --> SUP
-  IMP -.-> SUP
-  RENT --> COST
-  UNIT -.-> COST
-  RENT --> RR
-  FB -.-> RR
-  GP --> REF
-  RENT --> REF
-  DEM --> HUFF
-  REACH --> HUFF
-  SUP --> HUFF
-  OUT -.-> HUFF
-  HUFF --> SERVED
-  HUFF --> UNSERVED
-  HUFF --> SITE
-  HUFF --> REF
-  TYP -.-> SITE
-  TYP -.-> OPEN
-  TYP -.-> REF
-  SITE --> DPCT
-  REF --> DPCT
-  REF --> RR
-  DPCT --> LRULE
-  RR --> LRULE
-  SERVED -.->|context: performance vs site| LCALL
-  REF --> UAE
-  UAE -.->|context only| LCALL
-  UAE -.->|context only| GCALL
-  COST -.->|display only| LCALL
-  HUFF --> CANN
-  CANN -.->|display only| LCALL
-  UNSERVED --> OPEN
-  OSM --> OPEN
-  OPEN --> GRULE
-  OPEN --> DPCT
-  DPCT --> GRULE
-  RR --> GRULE
-  LRULE --> LCALL
-  GRULE --> GCALL
-  LCALL --> AI
-  GCALL --> AI
-
-  classDef assume stroke-dasharray: 5 5,fill:#fff4e0,stroke:#c77700,color:#000
-  classDef whatif stroke-dasharray: 2 2,fill:#e8f0ff,stroke:#3b6fd6,color:#000
-```
-
-*Dashed orange = an assumption, not data. Dashed blue = a what-if the model simulates.*
-
-**At a glance**
-- **Demand:** women 15+ per ~2 km cell (WorldPop 2025, corrected for worker housing), reaching sites
-  within a 10-20 minute drive (Mapbox).
-- **Competition:** each area's women are split among our lounges and ~1,100 premium salons by how much
-  each sells (Google reviews as the proxy for services sold) and how far away it is (a Huff model).
-- **Scored signals (two):** *site demand*, the share of its emirate's competitor salon sites a typical
-  lounge here would out-serve; and *rent ratio*, the emirate's median salon-site rent ÷ this site's.
-  Each is scored 0-1 and averaged; PROTECT at 0.65+, SHRINK at 0.35 or less.
-- **Growth:** open a typical lounge at each named place and count the women it would add net of our
-  own lounges; GROW needs 6,000+, demand in the emirate's top half and rent no dearer than its median.
-- **Shown as context, not scored:** how much the lounge itself sells against its site, the share its
-  siblings would absorb if it closed, and UAE-wide percentiles.
-- **Key assumptions:** a typical lounge frozen at 757 reviews and 4.6★; a 150 m² unit with assumed
-  fit-out; rent from DLD, ADREC or listings, else the emirate median (scored neutral, low confidence);
-  confidence from 27 drive-time × coverage × worker-share combinations and ±25% weights.
-
-```mermaid
-flowchart LR
-  subgraph G["Growth universe"]
-    G1["Named OSM places, any reach"]
-    G2["Non-residential name rule"]
-    G3["Worker-housing cap"]
-    G4["New-lounge what-if: net new women<br/>(not additive across areas)"]
-    G5["DROPPED Premium saturation gate (reviews per 1k):<br/>competitors now take their Huff share"]:::dropped
-    G6["DROPPED Unreached cells only / contiguous pieces:<br/>now one area per named place"]:::dropped
-    G7["DROPPED Emirate-fallback-named cells as areas:<br/>no actionable place"]:::dropped
-  end
-  subgraph S["Decision rules / scores"]
-    S1["Site served, as a percentile of its<br/>emirate's salon sites (scored)"]
-    S9["Served women, performance vs site:<br/>context, not scored"]:::demoted
-    S2["Rent ratio vs its emirate's<br/>median salon site (scored)"]
-    S3["Cannibalisation what-if:<br/>display only, no longer scored"]:::demoted
-    S4["DROPPED Capture share:<br/>double-counted competition with Huff"]:::dropped
-    S5["DROPPED Rating gap:<br/>moved into attractiveness"]:::dropped
-    S6["DROPPED Raw catchment overlap (shared_share):<br/>capacity-blind, penalised both lounges"]:::dropped
-    S7["DROPPED 200k anchor on catchment women:<br/>demand is now site served"]:::dropped
-    S8["DROPPED Estimated customers:<br/>computed, never scored; superseded by served women"]:::dropped
-    S10["DROPPED Emirate-median-of-lounges baseline:<br/>moved when siblings opened or closed"]:::dropped
-    S11["DROPPED UAE-wide COST_ANCHOR (cost index):<br/>marked down dear Dubai sites, counted served women twice;<br/>now rent ratio within the emirate"]:::dropped
-    S12["DROPPED 0 → 20k site-served scale:<br/>calibrated on our own lounges; now a percentile of salon sites"]:::dropped
-    S13["UAE-wide demand and rent percentiles:<br/>context, not scored"]:::demoted
-    S14["DROPPED Live-median typical lounge:<br/>drifted when a lounge closed; now frozen at 757 reviews, 4.6★"]:::dropped
-  end
-  subgraph K["Cost"]
-    K1["Shop rent: DLD (Dubai), ADREC (Abu Dhabi),<br/>listings (north), emirate-median fallback"]
-    K2["Site cost (150 m² unit, fit-out):<br/>display only"]:::demoted
-    K4["Frozen salon-site reference:<br/>emirate median shop rent"]
-    K5["Fallback (emirate-median) rent:<br/>scores neutral, low confidence"]
-    K3["DROPPED JLL mall-class rent bands:<br/>4 lounges, read off a chart, superseded by ADREC"]:::dropped
-  end
-  subgraph C["Competition / attractiveness"]
-    C1["Premium competitor salons (Google Places)"]
-    C2["Reviews x (rating/4.6)^k = Huff attractiveness"]
-    C3["Imputed competitors for unsearched cells"]
-    C4["Outside option"]
-  end
-  subgraph R["Reach"]
-    R1["Drive-time bands 10/15/20 min:<br/>Mapbox cell isochrones, straight-line fallback"]
-  end
-  subgraph D["Demand"]
-    D1["Women 15+ per cell (WorldPop 2025)"]
-    D2["Worker-housing correction (OSM industrial)"]
-    D3["DROPPED Affluence weighting from DLD home rents:<br/>Dubai-only; changes no lounge call"]:::dropped
-    D4["DROPPED GHSL built-form rent proxy:<br/>CV R² −0.10"]:::dropped
-  end
-
-  classDef dropped stroke:#d32f2f,stroke-width:3px,color:#d32f2f
-  classDef demoted stroke-dasharray: 5 5,stroke:#757575,stroke-width:2px,color:#757575
-```
-
-*Plain = in use. Red = dropped, with the reason. Grey dashed = demoted: still computed and shown,
-no longer scored.*
-
-Every step, threshold, proxy, ignored factor and assumption, with its evidence:
-[docs/model.md](docs/model.md).
-
-## Implementation at a glance
-
-- **Stack:** Python 3.11+, Streamlit (hosted on Streamlit Community Cloud), pydeck maps, pandas,
-  numpy and shapely; managed with uv. The whole model runs in memory in about 2 s, so every what-if
-  is a full re-run.
-- **Data:** committed snapshots in `data/seed/v3/`, built by scripts in `scripts/`: WorldPop and
-  OpenStreetMap (population, worker housing, place names), Mapbox isochrones (drive times), Google
-  Places (our lounges and ~5,900 salons), DLD, ADREC and listings (shop rents). No key is needed to
-  run the app.
-- **AI:** grounded explanations written offline and cached (see the AI layer above); Claude Code was
-  used to build it, gated by tests, review passes and sanity checks.
-- **Quality:** 196 tests (about 40 s), speed guards, sanity checks and back-tests after every model
-  change.
-
-Data sources and licences, tool choices, trade-offs and potential improvements:
-[docs/implementation.md](docs/implementation.md).
-
-## Run it
-
-Prerequisites: Python ≥ 3.11, [uv](https://docs.astral.sh/uv/) and (optional)
-[just](https://just.systems/).
-
-```bash
-uv sync --extra dev
-uv run streamlit run streamlit_app.py     # http://localhost:8501  (or: just app)
-```
-
-No API key needed: the app computes everything in memory from the committed `data/seed/v3/` and
-serves the committed AI explanations. `just test` runs the tests. `just labels` prints every
-lounge and growth-area call at the baseline as CSV. `just notebook` opens the notebooks (start
-with `scorecard.ipynb`).
-
-## Using the app
-
-Five pages; the loop is **Executive Summary → click a lounge or area → its page → back**.
-
-1. **Executive Summary** (`/`): the answer, three cards (Review, Grow, Protect) with their evidence maps and tables, then *How sure we are*.
-2. **What-if explorer** (`/explore`): your decision rules, rent quotes, closures and the model's assumptions; the scenario summary and the map. The only page that reads a what-if.
-3. **Lounges** (`/lounge?lounge=delma`): a sortable table of all 24; select one for its call, explanation, factor tree, competitors and shared catchment.
-4. **Areas** (`/area?area=kalba-sharjah`): GROW and WATCH areas ranked by net new women, with the same detail.
-5. **README** (`/how`): this README, then every assumption and constant read live from the code; the detailed docs are linked.
-
-Links carry the selection, so any page can be shared directly. Page by page in detail:
-[docs/implementation.md](docs/implementation.md); guided tour: the Walkthrough at the top of this README.
-
-## Repo map
-
-```
-streamlit_app.py         entry point; five pages in src/webapp/pages/: overview (Executive Summary),
-                         predictions (What-if explorer), lounge, area, how (README)
-src/webapp/              map layers, shared rendering, the what-if panel
-src/data_v3.py           loads data/seed/v3/
-src/market.py            women 15+ per cell (worker-housing rebalance), which Places results count as
-                         women's salons, which competitors count as premium, the search-recall correction
-src/model/served.py      Huff served demand, leave-one-out, open-a-lounge what-if
-src/features/lounges.py  catchments, lounge features, site cost, salon-site reference signals (demand percentile, rent ratio), growth areas
-src/model/scorecard.py   lounge signals, scales, weights, thresholds, confidence (with the reasons)
-src/model/growth.py      GROW / WATCH / SKIP tests (with the reasons)
-src/baseline.py          one in-memory run per what-if, and its diff against the baseline
-src/explain.py           fact sheets, prioritisation, grounding check, cache, prompts
-scripts/                 one-off fetches and builds (Google Places, Mapbox, WorldPop/OSM cells, GHSL, DLD rents, shop rents)
-notebooks/               market_size, catchments, competitors, served_demand, rent, scorecard, growth, branches; features/: affluence, features, decisions, explanations
-docs/limitations.md      ranked limitations: read first
-docs/model.md            the model in detail: steps, proxies, ignored factors, assumptions and evidence
-docs/implementation.md   the AI layer, data, tools, trade-offs, potential improvements
-docs/glossary.md         glossary of domain terms and decisions
-```
-
-Commands: `just app` · `just test` · `just labels` · `just notebook` · `just explain`.
+To run it locally: `uv sync --extra dev`, then `uv run streamlit run streamlit_app.py`
+([details](docs/app-and-implementation.md#running-this-app)).

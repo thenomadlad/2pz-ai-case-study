@@ -29,7 +29,7 @@ def _text(at: AppTest) -> str:
 PAGES = [("overview", {}), ("predictions", {}), ("predictions", {"lounge": "al-barsha"}),
          ("predictions", {"area": "sharjah-sharjah"}),
          ("lounge", {"lounge": "al-barsha"}), ("lounge", {"lounge": "zayed-international-airport"}),
-         ("area", {"area": "sharjah-sharjah"}), ("area", {"area": "madinat-hind-4-dubai"}), ("how", {})]
+         ("area", {"area": "sharjah-sharjah"}), ("area", {"area": "madinat-hind-4-dubai"}), ("how", {}), ("decision-model", {})]
 
 
 def test_every_page_loads_at_baseline_and_with_two_lounges_closed():
@@ -56,7 +56,7 @@ def test_overview_full_app_leads_with_summary_then_limitations():
     from src.baseline import run
     low = sum(d.confidence == "low" for d in run().decisions if d.action != "NOT SCORED")
     assert f"**{low} of 23**" in body                          # live low-confidence count
-    assert "](/how#limitations)" in body                         # the full list lives in the README
+    assert "](/limitations)" in body                             # the full list has its own page
     readme = (Path(__file__).parents[2] / "README.md").read_text()
     assert "## Limitations" in readme and "Keep and grow use different bars" in readme
 
@@ -160,7 +160,7 @@ def test_lounge_specific_caveats():
 
 def test_area_page_caveats():
     sharjah = _text(_page("area", area="sharjah-sharjah"))
-    assert "only Sharjah lounges (al-jada, zawaya-walk)" in sharjah and "al-jada is nearest" in sharjah and "straight line" in sharjah
+    assert "only Sharjah lounges (al-jada, zawaya-walk)" in sharjah and "already reach 62% of this area's women" in sharjah and "straight line" in sharjah
     assert "Only 3% of its women were searched for competitors" in _text(_page("area", area="madinat-hind-4-dubai"))
 
 
@@ -189,28 +189,53 @@ def test_pages_default_to_the_top_row_and_ignore_unknown_links():
     assert first.Call.iloc[0] == "GROW" and at.query_params["area"] == first.index[0]
 
 
-def test_how_page_is_the_readme_then_live_values():
+def test_documentation_pages_are_the_docs_with_live_values_on_the_model_page():
     import re
 
     from src.config import REPO_ROOT
-    from src.webapp.pages.how import readme_parts
-    at = _page("how")
-    assert not at.exception
-    text = _text(at)
+    from src.webapp.pages.how import DOC_PAGES, readme_parts
+    readme = _page("how")
+    assert not readme.exception
+    text = _text(readme)
     assert text.lstrip().startswith("# Bedashing network right-sizing")   # the README, from its own title
-    assert "The model in detail" not in text and "Implementation notes" not in text   # README only on this page
-    assert "At a glance" in text and "Implementation at a glance" in text
-    parts = readme_parts((REPO_ROOT / "README.md").read_text())
+    assert "## Documentation" in text and not readme.table                # README only: no live tables here
+    md = " ".join(p for k, p in readme_parts((REPO_ROOT / "README.md").read_text()) if k == "md")
+    assert "](/decision-model#" in md and "](/app-and-implementation#running-this-app)" in md   # doc links open the doc's page
+    for path, (url, _, _) in DOC_PAGES.items():                           # every doc page loads, from its own file
+        at = _page(url)
+        assert not at.exception, path
+        assert not re.search(r"\bbrief\b|case study|interview|take-home|assignment", _text(at), re.IGNORECASE)
+        assert not re.search(r"\bCOO\b", _text(at))                        # the audience is the network and capital owner
+    model = _page("decision-model")
+    parts = readme_parts((REPO_ROOT / "docs/decision-model.md").read_text(), "docs", "decision-model")
     assert sum(k == "mermaid" for k, _ in parts) == 3                     # chain + data-to-calls + signals, drawn
-    md = " ".join(p for k, p in parts if k == "md")
-    gh = "](https://github.com/thenomadlad/2pz-ai-case-study/blob/main/docs/"
-    assert gh + "model.md)" in md and gh + "implementation.md)" in md     # the detailed docs open on GitHub
-    assert not re.search(r"\bbrief\b|case study|interview|take-home|assignment", text, re.IGNORECASE)   # internal wording only
-    assert not re.search(r"\bCOO\b", text)                                   # the audience is the network and capital owner
-    assumptions = at.table[0].value                                       # live values from the code
+    assumptions = model.table[0].value                                    # live values from the code
     assert {"travel_time_minutes", "search_recall", "worker_housing_female_share"} <= set(assumptions.index)
     assert "low: 10 · medium: 15 · high: 20" in assumptions.loc["travel_time_minutes"].iloc[0]
-    assert any("UNSATURATED_PER_1K" in t.value.index for t in at.table)
+    assert any("UNSATURATED_PER_1K" in t.value.index for t in model.table)
+    impl = " ".join(p for k, p in readme_parts((REPO_ROOT / "docs/app-and-implementation.md").read_text(), "docs",
+                                                "app-and-implementation") if k == "md")
+    assert "](/app-and-implementation#potential-improvements)" in impl           # in-page anchors stay on their page
+
+
+def test_every_doc_link_resolves_to_a_file_and_heading():
+    """Relative links between the docs (GitHub's view) must land on a real file and heading."""
+    import os
+    import re
+
+    from src.config import REPO_ROOT
+    from src.webapp.pages.how import DOC_PAGES
+    slug = lambda h: re.sub(r"[^\w\- ]", "", h.strip().lower()).replace(" ", "-")
+    for doc in DOC_PAGES:
+        for link in re.findall(r"\]\(([^)\s]+)\)", (REPO_ROOT / doc).read_text()):
+            if link.startswith(("http", "mailto")):
+                continue
+            path, _, frag = link.partition("#")
+            target = os.path.normpath(os.path.join(os.path.dirname(doc), path)) if path else doc
+            assert (REPO_ROOT / target).exists(), (doc, link)
+            if frag and target.endswith(".md"):
+                heads = [slug(h) for h in re.findall(r"(?m)^#+ (.*)$", (REPO_ROOT / target).read_text())]
+                assert frag in heads, (doc, link)
 
 
 def test_area_page_follows_the_url_when_revisited_in_the_same_session():

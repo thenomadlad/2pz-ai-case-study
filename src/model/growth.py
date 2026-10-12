@@ -32,14 +32,12 @@ WHY = {
     "MIN_COVERAGE": ("Under half the women in searched cells, the saturation figure describes the minority "
                      "and the rest of the competition is imputed: the call is low confidence."),
     "UNSATURATED_PER_1K": (
-        "Recalibrated on 2026-10-10 by a rule fixed before seeing the result: the 25th percentile of "
-        "premium reviews per 1k women over the scored lounge catchments with a real premium market "
-        "(10+ premium salons), at baseline levels, rounded to the nearest 10. Those 21 catchments run "
-        "88-630 (al-jada 88, median 220), p25 152.8 -> 150; the two thin ones (al-dhafra 10, al-falah 27) "
-        "are left out. Why not the old 50, under every working catchment: back-test BT5 found clustering "
-        "doesn't hurt (isolated premium salons have a median 126 reviews, those with 3+ neighbours within "
-        "1.5 km about 220), so a market as crowded as the lighter quarter of the ones our lounges "
-        "succeed in is not a reason to stay out. Same measure as the lounges' (one helper, rubric MO8)."),
+        "Context only, not a test: no call uses it. Competition already shapes the Huff split behind net new "
+        "women and the demand percentile, so testing saturation too would count it twice. The line marks an "
+        "area as unsaturated for display: the 25th percentile of premium reviews per 1k women over the scored "
+        "lounge catchments with 10+ premium salons, at baseline levels, rounded to the nearest 10 (2026-10-10: "
+        "21 catchments, 88-630, p25 152.8 -> 150; al-dhafra and al-falah left out as thin). Same measure as "
+        "the lounges' (one helper, rubric MO8)."),
     "NON_RESIDENTIAL": (
         "Areas named industrial, free zone, military, airport or port (and the Arabic equivalents) are "
         "not where customers live, whatever WorldPop counts there: SKIP before any test. Port Saeed is "

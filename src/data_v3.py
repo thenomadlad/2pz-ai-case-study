@@ -47,7 +47,7 @@ def _lounges(path) -> list[Lounge]:
 
 ADREC_SPELLINGS = {"ghiyathi": "ghayathi"}   # OSM spelling -> ADREC spelling, after normalising
 SHOP_RENT_WHY = (
-    "Shop rent (AED/m2/yr, our site cost) per cell, one column for every emirate, 2026-10-11. Dubai: DLD "
+    "Shop rent (AED/m2/yr, the cost signal) per cell, one column for every emirate, 2026-10-11. Dubai: DLD "
     "Ejari shop contracts (cell_shop_rent.csv). Abu Dhabi: ADREC 2025 street-retail contract rates by "
     "district (adrec_retail_rent_2025.csv), matched on the cell's OSM name. Northern emirates: median "
     "asking rent of nearby shop listings (cell_listing_rent.csv; asking, so above achieved rents). A cell "
