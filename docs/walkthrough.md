@@ -45,14 +45,14 @@ their pages. Growth percentages can't be added up: neighbouring areas reach the 
 KPIs with what each rests on today and the data that would make us surer, and the **⚠️ Before you trust
 these calls** limitations.
 
-**The What-if explorer** is a separate page and the only one that reads a what-if. On top, always, a
-**scenario summary**: Baseline | This scenario | Change for the lounge calls, low-confidence calls,
-GROW/WATCH/SKIP counts, the women our lounges serve and their share in PROTECT and SHRINK lounges, and
-the best GROW area's growth; under it **What changed**, each moved call as ~~old~~ → **new** with the
-signal that moved it. Then the panel (collapsed at baseline): the model's assumptions, **Your decision
-rules** (weight on demand vs rent, the PROTECT and SHRINK lines, the GROW minimum and demand line),
-**Plug in a quote** (a rent for any lounge or GROW/WATCH area) and **Test a SHRINK** (close lounges);
-then the full map. Every area is coloured: GROW blue, already captured green (our lounges serve 2%+ of
+**The What-if explorer** is a separate page and the only one that reads a what-if. At the top, the
+panel (collapsed at baseline): **Your decision rules** first (weight on demand vs rent, the PROTECT and
+SHRINK lines, the GROW minimum and demand line), then the model's assumptions, **Plug in a quote** (a
+rent for any lounge or GROW/WATCH area) and **Test a SHRINK** (close lounges). Once anything differs
+from the baseline, a **scenario summary** appears under it: Baseline | This scenario | Change for the
+lounge calls, low-confidence calls, GROW/WATCH/SKIP counts, the women our lounges serve and their share
+in PROTECT and SHRINK lounges, and the best GROW area's growth; then **What changed**, each moved call
+as ~~old~~ → **new** with the signal that moved it. Then the full map. Every area is coloured: GROW blue, already captured green (our lounges serve 2%+ of
 its women), WATCH purple, SKIP or no data grey; lounges are pins in their call's colour, hollow when low
 confidence. *Jump to* pills re-centre on a city, and the legend is a collapsed section under the map.
 

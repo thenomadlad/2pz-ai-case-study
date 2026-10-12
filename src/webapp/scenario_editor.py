@@ -193,19 +193,10 @@ def _quote_box(w: dict) -> None:
 def render_panel() -> None:
     w = data.what_if()
     _mirror(w)
-    with st.expander("🧪 Change the assumptions, your decision rules or a rent, or test a SHRINK",
+    with st.expander("🧪 Change your decision rules, a rent or the model's assumptions, or test a SHRINK",
                      expanded=data.active()):
         if "wi-error" in st.session_state:
             st.error(f"Not applied: {st.session_state['wi-error']}")
-        st.markdown("**The model's assumptions**")
-        cols = st.columns(len(_AXES))
-        for col, (axis, label) in zip(cols, _AXES):
-            col.selectbox(label, LEVELS, key=f"wi-{axis}", on_change=_sync,
-                          format_func=lambda lv, a=axis: level_label(a, lv))
-        st.number_input("Search recall", min_value=0.3, max_value=1.0, step=0.01, key="wi-recall",
-                        on_change=_sync, help="Share of premium reviews the search finds where Google's "
-                        "20-result cap bites. Baseline 0.66, from one fully swept tile (an upper bound).")
-
         st.markdown("**Your decision rules** (risk appetite): how demand and rent trade off, where the lounge "
                     "lines sit, and what a new site must clear. The confidence check is unchanged.")
         a, b, c = st.columns(3)
@@ -220,6 +211,15 @@ def render_panel() -> None:
                        key="wi-growmin", on_change=_sync, help="Baseline 6,000: about what our median lounge serves.")
         b.slider("GROW: out-serve at least this share of its emirate's salon sites", 0, 100, step=5,
                  key="wi-growpct", format="%d%%", on_change=_sync, help="Baseline 50%: the median salon site.")
+
+        st.markdown("**The model's assumptions**")
+        cols = st.columns(len(_AXES))
+        for col, (axis, label) in zip(cols, _AXES):
+            col.selectbox(label, LEVELS, key=f"wi-{axis}", on_change=_sync,
+                          format_func=lambda lv, a=axis: level_label(a, lv))
+        st.number_input("Search recall", min_value=0.3, max_value=1.0, step=0.01, key="wi-recall",
+                        on_change=_sync, help="Share of premium reviews the search finds where Google's "
+                        "20-result cap bites. Baseline 0.66, from one fully swept tile (an upper bound).")
 
         _quote_box(w)
 

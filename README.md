@@ -70,47 +70,16 @@ network and capital owner on it, to answer five questions. Each answer below is 
    (GROW):** a typical new lounge there would add about 12.5k net new women against a 6,000 line,
    top 10% of Sharjah salon sites on demand (98th percentile UAE-wide); low confidence. Kalba has
    no shop rent of its own (its cells take Sharjah's emirate median), so the rent test is neutral
-   rather than passed, and the call says so (limitations 3).
-5. **The fallback:** on the What-if explorer, open **🧪 Change the assumptions, or test a SHRINK**
+   rather than passed, and the call says so ([`docs/limitations.md`](docs/limitations.md)).
+5. **The fallback:** on the What-if explorer, open **🧪 Change your decision rules, a rent or the model's assumptions, or test a SHRINK**
    (say drive time 20 min, or close a lounge) and click a lounge on the map: where the numbers
    change, the text switches to the labelled template. Only that page reads the what-if; the other
    pages always show the baseline.
 6. **[How it works & limitations](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how)**,
-   then the limitations below.
+   and the ranked limitations in [`docs/limitations.md`](docs/limitations.md).
 
 The full ten-minute version, with the AI layer and where not to trust it:
 [`docs/walkthrough.md`](docs/walkthrough.md).
-
-## Read this first: limitations
-
-This is a first pass we will iterate on. The calls are **a shortlist to test with the business, not
-decisions**, and the limitations matter more than the calls. The biggest ones:
-
-- **No revenue or lease data in the model.** The cost signal is a shop rent (an area median, a
-  district rate or an asking rent, not the lease) against its emirate's median salon site. No revenue, lease terms, actual capex or footfall. **SHRINK means "investigate", not
-  "close".**
-- **Served demand rests on lifetime Google review counts.** Each salon's pull in the Huff split is
-  its reviews, so older salons look bigger and new lounges look weak; the Huff parameters are an
-  uncalibrated first cut.
-- **Shop rent comes from different sources per emirate.** DLD contracts (Dubai), ADREC district
-  rates read by hand off its public map (Abu Dhabi), Property Finder / Bayut asking rents scraped
-  via third-party Apify actors, a grey area under those portals' terms (northern emirates), else the
-  emirate median. The rent ratio compares a site only with its own emirate's salon sites. A cell on
-  the emirate-median fallback has no rent of its own, so where it sets the rent the rent test is
-  neutral and the call low confidence: 17 of the 34 GROW areas (9 in Sharjah) and two PROTECT
-  lounges (al-ain, al-falah).
-- **The calls move with the assumptions.** 12 of the 23 scored lounges are low confidence: 10
-  within 0.05 of a line, plus al-ain (fallback rent) and jumeirah-park, whose calls change in 9 of
-  the 27 drive-time x coverage x worker-share combinations. Affluence weighting is off at baseline: every woman counts the same.
-- **Drive times are midday**, and the competitor search misses smaller salons where Google's
-  20-result cap bites.
-- **The yardstick and thresholds are judgement.** Both signals rank a site within its emirate
-  against a frozen set of 1,123 competitor salon sites, valued by the same uncalibrated served model;
-  emirates with under 50 such sites are ranked UAE-wide on demand. Every score is shown with its
-  UAE-wide percentile as context.
-
-The full ranked list, with which calls each limitation touches and what would fix it:
-[`docs/limitations.md`](docs/limitations.md), also the app's **How it works & limitations** page.
 
 ## Who it's for, and what it decides
 
@@ -226,13 +195,14 @@ Five pages; the loop is **Executive Summary → click a lounge or area → its p
    calls by name, a branch-health KPI box (what each KPI rests on today and the data that would make
    us surer) and the limitations box.
 2. **What-if explorer** (`/explore?lounge=delma` or `?area=kalba-sharjah` preselects): the only page
-   that reads the what-if. On top, always, the **scenario summary** (Baseline | This scenario |
-   Change: lounge calls, low confidence, GROW/WATCH/SKIP, women served, best growth) and **What
-   changed** (~~HOLD~~ → **SHRINK**, with the signal that moved). **🧪 Change the assumptions, your
-   decision rules or a rent, or test a SHRINK** (collapsed at baseline): drive time, competitor
-   coverage, worker housing and search recall; *Your decision rules* (demand vs rent weight, PROTECT
-   and SHRINK lines, GROW minimum and demand line); *Plug in a quote* (a rent for a lounge or growth
-   area); *Test a SHRINK* closes lounges. Example: a landlord quote of AED 2,200/m² for City Walk
+   that reads the what-if. **🧪 Change your decision rules, a rent or the model's assumptions, or test a
+   SHRINK** (collapsed at baseline): *Your decision rules* first (demand vs rent weight, PROTECT and
+   SHRINK lines, GROW minimum and demand line); the model's assumptions (drive time, competitor
+   coverage, worker housing, search recall); *Plug in a quote* (a rent for a lounge or growth area);
+   *Test a SHRINK* closes lounges. Once anything differs from the baseline, the **scenario summary**
+   appears under the form (Baseline | This scenario | Change: lounge calls, low confidence,
+   GROW/WATCH/SKIP, women served, best growth) with **What changed** (~~HOLD~~ → **SHRINK**, with the
+   signal that moved). Example: a landlord quote of AED 2,200/m² for City Walk
    (today 4,561) turns it ~~SHRINK~~ → **HOLD** (low confidence; the line is about 2,290); a GROW
    minimum of 10,000 net new women cuts GROW from 34 to 16 areas. Then the map: every area coloured by its call (GROW blue,
    already captured green, WATCH purple, SKIP grey), lounge pins in their call's colour (hollow =
