@@ -427,6 +427,49 @@ Other modelling choices that still hold:
   26°N, where 97% of UAE adults live, and nothing computes an area in degrees: distances are
   haversine, sizes are people counts.
 
+## Proxies today, and the signals we'd use with real data
+
+We have no bookings, revenue, lease or capacity data, so every signal is a **proxy** for a business quantity. This section names each proxy and what replaces it, what healthy looks like with and without the data, and how we'd judge demand and capture once we have it.
+
+### What each signal stands in for
+
+| What we want to know | Proxy we use today (source) | Better signal once we have the data | Data needed |
+|---|---|---|---|
+| **Demand**: how many customers would book at this site | **Site demand**: women 15+ within a 10-20 min drive, split across premium salons by the Huff model (each salon's pull = its lifetime Google reviews × rating), ranked against the emirate's salon sites (WorldPop, Google Places, Mapbox) | Appointments per lounge per week; how many of the catchment's women book (penetration); new vs repeat customers | Booking-system export per lounge; customers' home area (postcode or loyalty data) |
+| **Capture**: our share of the market we can reach | **Share of our served market** and **performance vs its site**, both from the same Huff split, which counts women, not customers, and uses reviews as popularity | Our appointments ÷ all premium salon appointments in the catchment (women × visit frequency × premium share) | Bookings; visit frequency and premium share from a survey or industry benchmark |
+| **Cost to run** | **Site rent**: the area's shop rent × an assumed 150 m² unit + assumed fit-out of AED 3,000/m² over 5 years (DLD contracts, ADREC district rates, listings) | Each lounge's actual lease, service charge, staff, products and utilities, and fit-out depreciation | Per-lounge P&L and lease terms from finance |
+| **Capacity**: how much we can serve | None | Chairs × opening hours; utilisation (booked ÷ available chair-hours) | Scheduling system |
+| **Return**: whether a site pays | None (the brief's ROIC gate can't be built from rent alone) | Profit per appointment, profit per m² per year, payback on fit-out, ROIC | P&L + capex per lounge |
+
+### What healthy and unhealthy look like
+
+| | **Today, with proxies** | **With the data** (thresholds to agree with the business) |
+|---|---|---|
+| **Healthy (PROTECT)** | The site out-serves most of its emirate's salon sites and its rent is at or below their median: composite 0.65+ | Profit per m² above the network median, chairs well used, appointments flat or growing, fit-out paid back |
+| **Watch (HOLD)** | Mixed: strong on one signal, weak on the other, composite 0.35-0.65 | Profitable but below the network median, or utilisation slipping |
+| **Unhealthy (SHRINK)** | Weak demand for its emirate or rent well above the median: composite 0.35 or less. **Investigate, don't close**: we can't see profit | Loses money after its own rent and costs, low utilisation, appointments falling; and few of its customers would move to a sibling if it closed |
+| **Lounge vs location** | Performance vs its site: above 1x, the lounge beats what a typical lounge would do there (popularity, from reviews); below 1x, it trails its site | The same comparison on appointments and profit, which separates a good site badly run from a bad site well run |
+| **Grow** | A typical new lounge would add 6,000+ net new women, out-serve half the emirate's salon sites, at rent no dearer than their median | Predicted appointments × contribution per appointment covers rent and fit-out within an agreed payback period |
+
+### Shared catchments aren't a reason to shrink
+
+Two lounges whose catchments overlap compete for the same women. That doesn't mean one is redundant. **19 of 24 lounges share more than half their catchment with a sibling** (the median is 85%). Yet if one closes, its siblings pick up a median of only **8%** of its customers, and never more than 30%. The rest go to competitors or to nobody. In crowded markets, overlap mostly means we're both competing with other salons, not with each other.
+
+So **expanding both lounges in a shared catchment can be right** if it raises our coverage of that market: when both are near capacity and the area still has unserved demand, more chairs at either lounge win customers from competitors rather than from each other. That's why cannibalisation is shown as a what-if on each lounge page, not scored. With capacity and booking data we'd judge it directly: utilisation at both lounges, and our combined share of the shared area before and after.
+
+### Once we have the data: how we'd judge demand, capture and return
+
+- **Demand.** Appointments per lounge, and penetration (customers ÷ women 15+ in the catchment). Customers' home areas give the *real* catchment, which we'd use to calibrate the Huff model: fit the review weighting, distance decay and outside option to observed bookings, instead of the starting values used today.
+- **Capture.** Our appointments ÷ the catchment's total premium appointments (women × visit frequency × premium share). Track it over time and against nearby competitors, rather than inferring it from review counts.
+- **Return: the numbers that should decide calls.**
+  - **Contribution per appointment** = revenue − variable cost (staff time, products).
+  - **Lounge profit** = contribution × appointments − fixed costs (rent, service charge, fit-out depreciation).
+  - **Profit per m² per year** (and per AED of rent): the fairest comparison across sites of different size and rent, and a direct replacement for today's "demand per AED of rent" idea.
+  - **Profit per chair-hour**: how well capacity is used.
+  - **Payback and ROIC** on fit-out: the brief's gate for opening and keeping sites.
+
+  With these, PROTECT means top-quartile profit per m² with high utilisation, SHRINK means negative profit after the site's own costs, and GROW means a new site's predicted profit per m² beats the network median within the payback period.
+
 ## The AI layer
 
 The rules make every call; Claude **explains** them as a pyramid: a one-sentence answer, 2-5
