@@ -13,6 +13,7 @@ import json
 
 import numpy as np
 import pandas as pd
+import shapely
 from shapely.geometry import Point, shape
 from shapely.strtree import STRtree
 
@@ -111,9 +112,11 @@ def _imputed(v3, prem: list[dict]) -> pd.DataFrame:
     searched = c[c.covered & (c.women > 0)]
     g = searched.groupby(["emirate", "tier"])
     rate = g.prem_reviews.sum() / (g.women.sum() / 1000)   # aggregate: most single cells hold no premium salon
+    ge = searched.groupby("emirate")
+    rate_e = ge.prem_reviews.sum() / (ge.women.sum() / 1000)   # a tier with no searched cells: the emirate's
     out = []
     for cid, x in c[~c.covered & (c.women > 0)].iterrows():
-        r = rate.get((x.emirate, x.tier), (searched.groupby('emirate').prem_reviews.sum() / (searched.groupby('emirate').women.sum() / 1000)).get(x.emirate, 0.0))
+        r = rate.get((x.emirate, x.tier), rate_e.get(x.emirate, 0.0))
         if r * x.women / 1000 >= 1:
             out.append({"id": f"IMP:{cid}", "lat": float(x.lat), "lng": float(x.lng), "reviews": r * x.women / 1000,
                         "rating": None, "lounge": False})
@@ -167,7 +170,7 @@ def _access(v3, a, not_scored) -> pd.DataFrame:
             fit[b] += list(_km(clat[cid], clng[cid], slat[new], slng[new]))
     # straight-line band edges: the 75th pct km of pairs reached within each band (cumulative)
     # no isochrone pairs only happens on a toy V3 (tests): fall back to KM_NO_FIT
-    km = {b: float(np.percentile(sum((fit[x] for x in BANDS if x <= b), []), 75)) if fit[10] else KM_NO_FIT[b]
+    km = {b: float(np.percentile([k for x in BANDS if x <= b for k in fit[x]], 75)) if fit[10] else KM_NO_FIT[b]
           for b in BANDS}
     rest = cells[~cells.index.isin(iso)]
     for cid, lat, lng in zip(rest.index, rest.lat.to_numpy(float), rest.lng.to_numpy(float)):
@@ -198,9 +201,14 @@ def _arrays(acc: pd.DataFrame, sup: pd.DataFrame, minutes: float = BASE_MINUTES,
     ws = sup.reviews.clip(lower=1).to_numpy(float) ** ALPHA * (stars / 4.6) ** RATING_ELASTICITY
     codes, cell_ids = pd.factorize(acc.cell_id.to_numpy()[keep])
     lounge = sup.lounge.to_numpy(bool)[j]
-    w = ws[j] * acc.minutes.map(decay(minutes)).to_numpy(float)[keep] * np.where(lounge, 1.0, cscale)
-    return {"w": w, "code": codes, "cells": pd.Index(cell_ids), "minutes": minutes,
-            "sup": j, "lounge": lounge, "ids": sup.id.to_numpy(), "reviews": sup.reviews.to_numpy(float)}
+    band = acc.minutes.to_numpy()[keep]
+    return {"w": _weights(ws[j], band, lounge, minutes, cscale), "code": codes, "cells": pd.Index(cell_ids),
+            "minutes": minutes, "ws": ws[j], "band": band, "sup": j, "lounge": lounge, "ids": sup.id.to_numpy(), "reviews": sup.reviews.to_numpy(float)}
+
+
+def _weights(ws: np.ndarray, band: np.ndarray, lounge: np.ndarray, minutes: float, cscale: float) -> np.ndarray:
+    """Per access row: supplier attractiveness x band decay at this drive time x competitor scale."""
+    return ws * pd.Series(band).map(decay(minutes)).to_numpy(float) * np.where(lounge, 1.0, cscale)
 
 
 def _outside(reviews: np.ndarray) -> float:
@@ -231,8 +239,12 @@ def _base(v3, a, closed, not_scored, minutes=BASE_MINUTES, cscale=1.0) -> tuple[
     hit = _BASE.get(key)
     if hit and hit[0] is acc and hit[1] is comp:
         return hit[2], hit[3]
-    sup = _suppliers(v3, a, closed, not_scored)
-    x = _arrays(acc[acc.id.isin(sup.id)], sup, minutes, cscale)
+    if (minutes, cscale) != (BASE_MINUTES, 1.0):   # same rows as the baseline levels, new weights
+        sup, x = _base(v3, a, closed, not_scored)
+        x = {**x, "minutes": minutes, "w": _weights(x["ws"], x["band"], x["lounge"], minutes, cscale)}
+    else:
+        sup = _suppliers(v3, a, closed, not_scored)
+        x = _arrays(acc[acc.id.isin(sup.id)], sup, minutes, cscale)
     _BASE[key] = (acc, comp, sup, x)
     return sup, x
 
@@ -286,63 +298,100 @@ def site_access(v3, a, lat: float, lng: float, not_scored=frozenset()) -> pd.Dat
     fetched, else the fitted straight-line bands."""
     _access(v3, a, not_scored)
     km = _ACCESS[id(v3)][2]
-    iso = _iso(v3)
-    pt, rows, cells = Point(lng, lat), [], v3.cells
-    for cid, poly in iso.items():
-        b = next((b for b in BANDS if poly[b].contains(pt)), None)
+    hit = _SITE_GEOM.get(id(v3))
+    if not (hit and hit[0] is v3):
+        iso, cells = _iso(v3), v3.cells
+        other = cells[~cells.index.isin(iso)]
+        _SITE_GEOM[id(v3)] = hit = (v3, list(iso), {b: np.array([p[b] for p in iso.values()], dtype=object) for b in BANDS},
+                                    other.index, other.lat.to_numpy(float), other.lng.to_numpy(float))
+    _, ids, polys, oid, olat, olng = hit
+    inside = {b: shapely.contains_xy(polys[b], lng, lat) for b in BANDS}   # = poly.contains(Point(lng, lat))
+    rows = []
+    for i, cid in enumerate(ids):
+        b = next((b for b in BANDS if inside[b][i]), None)
         if b:
             rows.append((cid, b))
-    other = cells[~cells.index.isin(iso)]
-    d = _km(lat, lng, other.lat.values, other.lng.values)
+    d = _km(lat, lng, olat, olng)
     for i in np.flatnonzero(d <= km[20]):
-        rows.append((other.index[i], next(b for b in BANDS if d[i] <= km[b])))
+        rows.append((oid[i], next(b for b in BANDS if d[i] <= km[b])))
     return pd.DataFrame(rows, columns=["cell_id", "minutes"])
 
 
-def _with_site(x: dict, new: pd.DataFrame, lat: float, lng: float, reviews: float, rating: float | None) -> dict:
-    """x with a typical lounge "NEW" at (lat, lng) appended (as allocate on the concatenated tables);
-    `new` is its site_access."""
-    y = _arrays(new.assign(id="NEW"), pd.DataFrame([{"id": "NEW", "lat": lat, "lng": lng, "reviews": reviews,
-                                                     "rating": rating, "lounge": True}]), x["minutes"])
-    code = x["cells"].get_indexer(y["cells"])
-    fresh = code < 0
-    code[fresh] = len(x["cells"]) + np.arange(fresh.sum())
-    return {"w": np.concatenate([x["w"], y["w"]]), "code": np.concatenate([x["code"], code[y["code"]]]),
-            "cells": x["cells"].append(y["cells"][fresh]), "minutes": x["minutes"], "sup": np.concatenate([x["sup"], y["sup"] + len(x["ids"])]),
-            "lounge": np.concatenate([x["lounge"], y["lounge"]]), "ids": np.append(x["ids"], "NEW"),
-            "reviews": np.append(x["reviews"], y["reviews"])}
+_SITE_GEOM: dict[int, tuple] = {}
+
+
+_SITE_ACCESS: dict[tuple, tuple] = {}
+_NEW: dict[tuple, tuple] = {}
+_OPEN: dict[tuple, tuple] = {}
+
+
+def _site_access(v3, a, lat, lng, not_scored) -> pd.DataFrame:
+    """site_access, cached per V3 and point (it doesn't depend on the levels or closures)."""
+    hit = _SITE_ACCESS.get((id(v3), lat, lng))
+    if not (hit and hit[0] is v3):
+        _SITE_ACCESS[(id(v3), lat, lng)] = hit = (v3, site_access(v3, a, lat, lng, not_scored))
+    return hit[1]
+
+
+def _new_site(x: dict, new: pd.DataFrame, lat: float, lng: float, reviews: float, rating: float | None,
+              demand: pd.Series) -> dict:
+    """A typical lounge "NEW" at (lat, lng), `new` its site_access. Per NEW access row: its weight, its
+    cell's code in x (-1: a cell x doesn't reach), that cell's demand and NEW's total weight there."""
+    key = (id(new), x["minutes"], reviews, rating)
+    hit = _NEW.get(key)
+    if not (hit and hit[0] is new):   # new is _site_access's cached table: one NEW per point and drive time
+        _NEW[key] = hit = (new, _arrays(new.assign(id="NEW"), pd.DataFrame([{
+            "id": "NEW", "lat": lat, "lng": lng, "reviews": reviews, "rating": rating, "lounge": True}]), x["minutes"]))
+    y = hit[1]
+    return {"w": y["w"], "code": x["cells"].get_indexer(y["cells"])[y["code"]],
+            "dem": demand.reindex(y["cells"]).fillna(0.0).to_numpy(float)[y["code"]],
+            "wcell": np.bincount(y["code"], y["w"], len(y["cells"]))[y["code"]], "reviews": y["reviews"]}
+
+
+def _new_served(n: dict, other: np.ndarray, outside: float) -> float:
+    """Women NEW serves; `other` is every other supplier's weight per x cell code."""
+    rest = np.where(n["code"] >= 0, other[np.maximum(n["code"], 0)], 0.0) if len(other) else 0.0
+    return float((n["w"] / (rest + n["wcell"] + outside) * n["dem"]).sum())
 
 
 def what_if_open(v3, a, demand: pd.Series, lat: float, lng: float, reviews: float, rating: float | None,
                  closed=frozenset(), not_scored=frozenset(), minutes: float = BASE_MINUTES, cscale: float = 1.0) -> dict:
     """Open a typical lounge at (lat, lng): the women it would serve, and how many of them it takes
-    from our existing lounges (the rest is new to the network)."""
+    from our existing lounges (the rest is new to the network). As allocate with NEW's rows appended,
+    summed by cell: a cell's lounge women are its lounge weight x demand / its denominator."""
     _, x = _base(v3, a, frozenset(closed), frozenset(not_scored), minutes, cscale)
-    before = _by_lounge(x, _alloc(x, demand, x["w"], _outside(x["reviews"]))[0])
-    x2 = _with_site(x, site_access(v3, a, lat, lng, not_scored), lat, lng, reviews, rating)
-    after = _by_lounge(x2, _alloc(x2, demand, x2["w"], _outside(x2["reviews"]))[0])
-    served = float(after.get("NEW", 0.0))
-    taken = float(before.sum() - after.drop("NEW", errors="ignore").sum())
+    n = _new_site(x, _site_access(v3, a, lat, lng, not_scored), lat, lng, reviews, rating, demand)
+    hit = _OPEN.get((id(x), id(demand)))
+    if not (hit and hit[0] is x and hit[1] is demand):   # once per scenario: every area shares it
+        m, lo = len(x["cells"]), x["lounge"]
+        total = np.bincount(x["code"], x["w"], m)
+        ours = np.bincount(x["code"][lo], x["w"][lo], m) * demand.reindex(x["cells"]).fillna(0.0).to_numpy(float)
+        _OPEN.clear()   # keeps the last scenario only
+        _OPEN[(id(x), id(demand))] = hit = (x, demand, total, ours, (ours / (total + _outside(x["reviews"]))).sum())
+    _, _, total, ours, before = hit
+    inx = n["code"] >= 0
+    added = np.bincount(n["code"][inx], n["w"][inx], len(total))
+    out2 = _outside(np.append(x["reviews"], n["reviews"]))
+    served = _new_served(n, total, out2)
+    taken = float(before - (ours / (total + added + out2)).sum())
     return {"served": served, "taken_from_lounges": taken, "net_new": served - taken}
-
-
-_SITE_ACCESS: dict[tuple, tuple] = {}
 
 
 def site_served(v3, a, demand: pd.Series, reviews: float, rating: float | None,
                 closed=frozenset(), not_scored=frozenset(), minutes: float = BASE_MINUTES,
                 cscale: float = 1.0) -> dict[str, float]:
     """Per open scored lounge: the women a typical lounge (these reviews and rating) would serve at its
-    site with that lounge closed and the rest open. Same as what_if_open(closed=closed | {b}), but b's
-    rows are zeroed (as the leave-one-out in `served`) instead of rebuilding the arrays: ~3 ms a lounge."""
+    site with that lounge closed and the rest open. Same as what_if_open(closed=closed | {b}), but only
+    NEW's cells are touched: their denominators lose b's weight and gain NEW's."""
     sup, x = _base(v3, a, frozenset(closed), frozenset(not_scored), minutes, cscale)
+    m = len(x["cells"])
+    total = np.bincount(x["code"], x["w"], m)
+    lo = np.flatnonzero(x["lounge"])
     out = {}
     for b, lat, lng in sup.loc[sup.lounge, ["id", "lat", "lng"]].itertuples(index=False):
         k = int(np.flatnonzero(x["ids"] == b)[0])
-        hit = _SITE_ACCESS.get((id(v3), lat, lng))
-        if not (hit and hit[0] is v3):
-            _SITE_ACCESS[(id(v3), lat, lng)] = hit = (v3, site_access(v3, a, lat, lng, not_scored))
-        x2 = _with_site({**x, "w": np.where(x["sup"] == k, 0.0, x["w"])}, hit[1], lat, lng, reviews, rating)
-        women, _ = _alloc(x2, demand, x2["w"], _outside(np.delete(x2["reviews"], k)))
-        out[b] = float(women[x2["sup"] == len(x2["ids"]) - 1].sum())
+        rows = lo[x["sup"][lo] == k]
+        n = _new_site(x, _site_access(v3, a, lat, lng, not_scored), lat, lng, reviews, rating, demand)
+        other = total - np.bincount(x["code"][rows], x["w"][rows], m)
+        out[b] = _new_served(n, other, _outside(np.delete(np.append(x["reviews"], n["reviews"]), k)))
     return out

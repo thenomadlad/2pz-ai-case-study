@@ -1,5 +1,5 @@
 """Regression guard: a baseline run() must stay fast. Measured 2026-10-11 on an M-series Mac:
-~4.1 s with the on-disk access table, ~4.3 s without it (was ~44 s before the numpy allocate).
+~0.9 s with the on-disk access table, ~1.7 s without it (was ~44 s before the numpy allocate, ~4 s before the cell-level what-ifs).
 Thresholds keep ~2x headroom."""
 import time
 
@@ -13,7 +13,7 @@ COLD_S = 10.0   # and no disk access table
 
 def _timed_run() -> float:
     baseline._run.cache_clear()
-    for c in (L._SERVED, L._PREP, S._ACCESS, S._IMPUTED, S._COMPETITORS, S._BASE):
+    for c in (L._SERVED, L._PREP, S._ACCESS, S._IMPUTED, S._COMPETITORS, S._BASE, S._SITE_GEOM):
         c.clear()
     t = time.perf_counter()
     baseline.run()
