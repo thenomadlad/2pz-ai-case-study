@@ -328,7 +328,7 @@ flowchart LR
   subgraph D["Demand"]
     D1["Women 15+ per cell (WorldPop 2025)"]
     D2["Worker-housing correction (OSM industrial)"]
-    D3["DROPPED Affluence weighting from DLD home rents:<br/>changed no call, Dubai-only"]:::dropped
+    D3["DROPPED Affluence weighting from DLD home rents:<br/>Dubai-only; changes no lounge call"]:::dropped
     D4["DROPPED GHSL built-form rent proxy:<br/>CV R² −0.10"]:::dropped
   end
 
@@ -338,6 +338,29 @@ flowchart LR
 
 *Plain = in use. Red = dropped, with the reason. Grey dashed = demoted: still computed and shown,
 no longer scored.*
+
+#### Every factor we ignore, and why
+
+| Factor | What it was | Why it isn't used | What took its place |
+|---|---|---|---|
+| **Affluence weighting** | Women counted more where household rents are higher (DLD home rents as an income proxy) | Observed home rents exist for only **241 of 2,373 cells, all in Dubai**, so everywhere else would count as "average": it would tilt the model toward Dubai because of where the data happens to be, not where the money is. Switched on, it changes **no lounge call** and 1-3 of 561 area calls (notebooks/features/affluence.ipynb). It also barely relates to what we can observe (ρ ≈ 0.05-0.15 against reviews and ratings). We keep it only to correlate with other metrics | Every woman 15+ counts the same; a UAE-wide income proxy would let it back in (Potential improvements) |
+| **Capture share** | The lounge's Google reviews as a share of its own plus its premium competitors' | The served-demand split already uses reviews to divide the market among competitors, so scoring capture as well counted competition twice. It also measures the lounge's popularity, not its site | Site demand (the site, scored); performance vs its site (the lounge, shown as context) |
+| **Rating gap** | Its Google rating minus its competitors' median | Ratings sit in a narrow band (-0.2 to +0.3 stars), and in-branch quality is outside the brief's scope: we decide where capacity sits, not how a branch is run | Rating enters only as attractiveness in the demand split: (rating / 4.6)^5 |
+| **Raw catchment overlap** (shared catchment) | The share of a lounge's catchment that another of our lounges also reaches, scored as cannibalisation | It penalised both lounges for any overlap, but overlap isn't cannibalisation: 19 of 24 lounges share 50%+ of their catchment, yet if one closes its siblings absorb a median 8% of its customers (30% at most). It also ignores capacity | The demand split shares women between lounges directly; the cannibalisation what-if is shown on each lounge page |
+| **Catchment size on a 0-200k scale** | Women 15+ within the 15-min drive, scored by absolute size | Bigger catchments in crowded markets serve *fewer* women (ρ = -0.33 between catchment size and served women): size without competition misleads | Site demand, which accounts for competitors |
+| **Estimated customers** | Capture × catchment women | Computed but never scored, and it gave a second, conflicting "women at stake" figure in the explanations | Served women (model estimate) |
+| **Lounge's own served women as the demand score** | How many women this lounge serves | It largely restated the lounge's review count, so PROTECT meant "busy lounge" rather than "good site" | Site served: what a *typical* lounge would serve at the site |
+| **0 → 20k site-served scale** | Site demand scored on a fixed scale | Calibrated on our own lounges, so it compared Dubai's crowded market with Abu Dhabi's | A percentile among the emirate's competitor salon sites |
+| **Emirate-median-of-lounges cost baseline** | Cost judged against the median of the emirate's own lounges | Sharjah's two lounges were graded against each other, and closing a sibling flipped other calls (Zawaya Walk went HOLD → SHRINK when Al Jada closed) | A frozen reference of competitor salon sites |
+| **UAE-wide cost anchor** | Served women per AED 1k of site cost against one UAE-wide number | Marked every dear Dubai site down without crediting Dubai's higher prices, and counted demand in both signals | Rent ratio within the emirate (rent only) |
+| **Live-median "typical lounge"** | The what-if lounge took the median reviews and rating of whichever lounges were open | It drifted when a lounge closed (757 → 755 reviews), enough to tip Al Maqta's call | Frozen at 757 reviews and 4.6★ |
+| **Premium saturation gate** (growth) | Reviews per 1,000 women as an "unsaturated" test | The demand split already gives competitors their share, so the gate counted competition twice | Net new women from the new-lounge what-if |
+| **Unreached cells only** (growth) | Growth areas had to be beyond every lounge's drive time | An under-served area inside our footprint can still deserve a lounge | Every named place, judged by net new women |
+| **Emirate-named cells as areas** | Cells with no place name, only an emirate | No actionable place to open in | Dropped from the growth list |
+| **JLL mall-class rent bands** | Mall rent bands read off a chart | Covered 4 lounges, and were superseded by observed rents | DLD contracts, ADREC district rates, listings |
+| **GHSL built-form rent proxy** | Predicting rent from building height and density | Cross-validated R² of -0.10: worse than guessing the average | Observed rents, else the emirate median (scored neutral) |
+
+Demoted rather than dropped, so still shown as context: the lounge's own served women and performance vs its site, the cannibalisation what-if, the UAE-wide percentiles, and site cost in AED.
 
 1. **Demand.** Women 15+ per ~2 km cell: WorldPop 2025 adults, rebalanced so OSM worker housing
    counts few women. Affluence weighting is **off**: it changed no call and was Dubai-only
