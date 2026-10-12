@@ -91,7 +91,7 @@ def render() -> None:
             else:
                 # st.iframe (components.v1.html is deprecated): this HTML is our own committed diagram, not
                 # user input; height grows with the diagram's size so a small chain doesn't leave a gap
-                st.iframe(_MERMAID.format(code=html.escape(part)), height=min(760, 140 + 18 * part.count("\n")))
+                st.iframe(_MERMAID.format(code=html.escape(part)), height=max(150, min(760, 40 + 11 * part.count("\n"))))
 
     st.divider()
     st.header("Live values from the code")
