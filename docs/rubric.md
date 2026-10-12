@@ -137,7 +137,7 @@ These are the layers the product must show. Most of the substance is covered in 
 
 - [x] `[core]` **A1. Decision-maker named:** who they are (e.g. the network and capital owner, the portfolio team, the board) and what they care about.
 - [x] `[core]` **A2. Decisions enumerated:** the specific decisions, each tied to a label set, e.g. "approve lease renewal → PROTECT/HOLD/SHRINK".
-- [x] `[core]` **A3. Metrics that matter:** the north-star metric (services delivered, OB1) and the proxies standing in for it are named. Each signal is listed with *why* it matters for the decision, not just *that* we computed it.
+- [x] `[core]` **A3. Metrics that matter:** the north-star metric (services sold, OB1) and the proxies standing in for it are named. Each signal is listed with *why* it matters for the decision, not just *that* we computed it.
 - [x] `[core]` **A4. How the system supports the decision:** the flow from question to screen to evidence to action is stated.
 - [x] `[ours]` **A5. Out of scope** is stated: actual P&L (we only model contribution from assumptions, see OB5), in-branch staffing, quality management and operations, and anything else we deliberately don't model, with the reason. Our job ends once capacity is allocated to sites (OB4).
 - [x] `[ours]` **A6. Framing shows up up front:** in the README and the demo opening, not only in a design doc.
@@ -331,13 +331,13 @@ Each should have a one-paragraph answer somewhere a reader will find it, such as
 
 Parts 1–6 ask whether the product does what it must. This part asks whether the thing underneath is any good. All items here are `[ours]`.
 
-### Objective: services delivered, not branches
+### Objective: services sold, not branches
 
-- [ ] **OB1. The objective is services delivered,** meaning demand served by our capacity. It isn't branch count, and it isn't a branch's own score. Within the ROIC gate (OB5), every label traces back to it: PROTECT = capacity serving demand we'd otherwise lose; SHRINK = capacity in excess of the demand it can reach; GROW = demand that no capacity (ours or a competitor's) serves well.
+- [ ] **OB1. The objective is services sold** (a service sold = one completed appointment), meaning demand served by our capacity, per catchment. It isn't branch count, and it isn't a branch's own score. Within the ROIC gate (OB5), every label traces back to it: PROTECT = capacity serving demand we'd otherwise lose; SHRINK = capacity in excess of the demand it can reach; GROW = demand that no capacity (ours or a competitor's) serves well.
 - [ ] **OB2. A branch is modeled as a bundle of capacity** (specialists × hours, which we can't observe directly). The capacity proxy is named (e.g. review volume as throughput, unit size, listed specialists), its weakness is stated, and there's an equal-capacity fallback if no proxy holds up.
 - [x] **OB3. Demand and capacity share a spatial frame.** Demand per cell and capacity spread across cells through catchments, so served vs. unserved demand can be computed per cell. This is the Huff / IRS logic from MO4, so it should be built once and used by both models.
 - [x] **OB4. Scope ends at the site.** We decide where capacity sits and how much of it there is (open, keep, shrink). What happens inside a branch (staffing, service quality, operations) is out of scope. Ratings enter only as *attractiveness*, i.e. how much demand a branch's capacity pulls in, never as something we tell leadership to fix.
-- [ ] **OB5. ROIC is a gate, built from stated assumptions.** Services delivered is what we grow, and return on capital decides whether a site is worth it. GROW and PROTECT require clearing the gate.
+- [ ] **OB5. ROIC is a gate, built from stated assumptions.** Services sold is what we grow, and return on capital decides whether a site is worth it. GROW and PROTECT require clearing the gate.
   ```
   estimated contribution = catchment demand × capture share × visit frequency × margin per visit − fixed site cost
   implied ROIC          = estimated contribution / estimated invested capital

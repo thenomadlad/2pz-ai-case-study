@@ -178,8 +178,8 @@ These matter more than the calls. The full ranked list is the app's **README** p
   third-party Apify actors, a grey area under those portals' terms (northern emirates), else the
   emirate median. The rent ratio compares a site only with its own emirate's salon sites, and a
   site on the emirate-median fallback lands at a ratio of about 1.
-- **Served demand rests on lifetime Google reviews** and uncalibrated Huff parameters, so new
-  lounges look weak and the split is a first cut.
+- **Services sold are measured by lifetime Google reviews** (our proxy until bookings data) and
+  the Huff parameters are uncalibrated, so new lounges look weak and the split is a first cut.
 - **Calls move with assumptions.** 12 of 23 lounge calls are low confidence, most within 0.05 of a
   line; 14 lounges flip in some of the 27 drive-time x coverage x worker-share combinations (khaleej-al-arabi most, 16). Affluence weighting is off at baseline.
 - **Growth areas are one typical lounge at each area's centre**, judged independently, and the

@@ -85,21 +85,30 @@ of everyone a lounge or salon serves, and weighting them would count the same wo
 in numerator and denominator.
 _Avoid_: premium women, target market, weighted demand (unqualified)
 
+**Services sold**:
+The north star: a service sold = one completed appointment, judged per catchment and capped by
+capacity. We can't count it yet. Google reviews are our proxy: each review is a trace of past
+appointments, so a salon's lifetime reviews stand in for how much it has sold (lifetime counts favour
+older salons, and review rates differ between salons and services). Bookings would measure it
+directly.
+_Avoid_: services rendered, services delivered, popularity
+
 **Served women**:
-The addressable women a lounge serves in the Huff split: each cell's women divided across the premium
-suppliers that reach it within 20 min (our lounges and premium salons, pull = reviews x a rating
-factor x drive-time decay) plus an outside option, summed over cells (`served_women`). Context,
-not scored.
+A model estimate of the customers behind the services a lounge sells, from the Huff split: each
+cell's women divided across the premium suppliers that reach it within 20 min (our lounges and
+premium salons, weight = services sold, measured by reviews, x a rating factor x drive-time decay)
+plus an outside option, summed over cells (`served_women`). Context, not scored.
 _Avoid_: catchment women, customers
 
 **Site served**:
-The women a typical lounge (median reviews and rating) would serve at a lounge's site, with that
-lounge closed and siblings and rivals open (`site_served`). Ranked against the site reference, it is
+The women a typical lounge (median reviews and rating) would serve at a lounge's site: its share of
+the market, weighted by services sold, with that lounge closed and siblings and rivals open (`site_served`). Ranked against the site reference, it is
 the scorecard's demand signal (see Demand percentile): it judges the site, not the lounge.
 
 **Performance vs site**:
 Served women / site served (`performance_vs_site`). Context, not scored: "The model estimates this
-lounge is performing 2.7x compared to its site."
+lounge is performing 2.7x compared to its site": the lounge sells 2.7x what a typical lounge would
+at its site.
 
 **Net new women**:
 For a growth area: the women a typical new lounge at its centre would serve, minus what it takes from
@@ -143,7 +152,7 @@ _Avoid_: market share, fair share
 The lounge's Google rating minus the median rating of the premium salons in its catchment with 20+
 reviews (the whole premium pool, not the substitutes: their number grows with the pool, so one added
 salon could change which ones count). Shown, not scored; the rating enters served demand through
-each supplier's pull.
+each supplier's Huff weight.
 _Avoid_: substitutes' median
 
 **Search recall**:

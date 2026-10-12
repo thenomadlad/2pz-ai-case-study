@@ -16,10 +16,10 @@ The full write-up behind the README's short overview ([README](../README.md)): h
 4. **Huff split.** Each cell's women are shared among the suppliers it reaches, by weight
    `reviews^ALPHA x (rating/4.6)^RATING_ELASTICITY x DECAY[band]`, plus an **outside option** (the
    median premium supplier's weight) standing for women who go elsewhere or don't buy premium.
-   Google reviews are our proxy for **services sold**: each review is a trace of past appointments,
+   Google reviews are our proxy for **services sold** (a service sold = one completed appointment): each review is a trace of past appointments,
    so a salon's lifetime reviews stand in for how much it has sold, and its share of the market
    follows how much it sells. Out come **served women per lounge** (a model estimate of the
-   customers behind the services a lounge renders) and **unserved women per cell**. **Site served** re-runs the
+   customers behind the services a lounge sells) and **unserved women per cell**. **Site served** re-runs the
    split with the lounge closed and a typical lounge at its site, frozen at 757 reviews and 4.6★
    (the 2026-10-11 medians of our scored lounges, `TYPICAL_WHY`)
    ([`notebooks/served_demand.ipynb`](../notebooks/served_demand.ipynb)).
@@ -323,8 +323,8 @@ what it would add after our own lounges keep theirs.
 
 Today's model is a proxy for one we'd build with Bedashing's own data. The structure stays the same,
 **demand → what we can serve → what it costs → what it returns → the call**, but every step is
-measured instead of estimated: bookings measure services sold and rendered directly, so reviews
-are no longer needed as a proxy. The objective is services rendered per catchment, against the
+measured instead of estimated: bookings measure services sold directly, so reviews
+are no longer needed as a proxy. The objective is services sold per catchment, against the
 total capacity and total rent of its branches. The two biggest upgrades are the cost side and **capacity**, which
 today isn't modelled at all.
 
@@ -336,9 +336,10 @@ today isn't modelled at all.
 | **Cost** | Area shop rent × an assumed 150 m² unit + assumed fit-out | Per lounge: base rent, service charge and fees, fit-out depreciation (fixed); staff salaries, commissions and visas, products per service, booking-platform fees (variable per appointment) |
 | **Return** | None | Contribution per appointment (ticket − variable cost); lounge profit; **profit per m²** and per chair-hour; payback and ROIC on fit-out |
 
-### The objective: services rendered, per catchment
+### The objective: services sold, per catchment
 
-The number to optimise is **services rendered**: appointments delivered to the women in a catchment.
+The number to optimise is **services sold**: completed appointments for the women in a catchment.
+Capacity caps services sold, and turn-aways are services we failed to sell.
 Branches are how capacity gets there, and **service providers** (therapists, stylists) are the
 capacity itself. So the ideal model allocates at the level of a **catchment region**, not a branch:
 - **Match providers to demand.** For each region: demand (bookings plus measured turn-aways and
@@ -346,12 +347,12 @@ capacity itself. So the ideal model allocates at the level of a **catchment regi
   services per hour). Under capacity: add providers or hours where branches have room, then a
   branch. Over capacity: move providers to busier branches before closing one.
 - **Judge cost per region:** **total capacity of the region's branches ÷ total rent of those
-  branches** (services we can render per AED of rent), and services actually rendered per AED of
+  branches** (services we can sell per AED of rent), and services actually sold per AED of
   total cost. Two lounges in one catchment are judged as one system: a dear branch can be right if it
   lifts the region's services per AED, and a cheap one wrong if its providers sit idle while a sibling
   turns customers away.
 - **Branch decisions follow.** Open, resize, consolidate or exit are the moves that change a region's
-  capacity and rent; the call on any one branch is whether that move raises services rendered per AED
+  capacity and rent; the call on any one branch is whether that move raises services sold per AED
   for its region.
 
 This is today's per-site question (demand per AED of rent, within the emirate) lifted to the level the

@@ -49,7 +49,7 @@ estimate.
    - So overlap isn't a reason to shrink, and expanding both lounges in a shared catchment can be right if it raises our coverage.
    - **Where:** each lounge page's shared-catchment table and cannibalisation what-if; the What-if explorer's "All catchments (overlap)" layer and **Test a SHRINK**.
 4. **How does each lounge stand against the salons around it?**
-   Site demand shares every area's women among our lounges and the 1,100+ premium competitor salons around them, in proportion to how much each sells (measured by its Google reviews, our proxy for services sold), then ranks the site against its emirate's competitor salon sites.
+   Site demand shares every area's women among our lounges and the 1,100+ premium competitor salons around them, in proportion to how much each sells (measured by its Google reviews, our proxy for services sold; a service sold = one completed appointment), then ranks the site against its emirate's competitor salon sites.
    - Example: City Walk out-serves only 30% of Dubai's salon sites; Al Dhafra out-serves all of Abu Dhabi's.
    - How much a lounge sells against its site is shown beside the call, not scored: "The model estimates this lounge is performing 2.7x compared to its site" (Khalifa City A, a HOLD): it sells 2.7x what a typical lounge would at its site, which separates a strong lounge from a strong location.
    - **Where:** each lounge page's signals, factor tree and competitors table; premium competitors on the What-if explorer's map.
@@ -161,17 +161,18 @@ The full ranked list, with which calls each limitation touches and what would fi
 ## The model we'd build with Bedashing's data
 
 The same decisions and the same chain (**demand → what we can serve → cost → return → the call**),
-measured instead of estimated, and optimised for **services rendered per catchment**, not per branch:
+measured instead of estimated, and optimised for **services sold per catchment**, not per branch:
 - **The objective:** for each catchment region, match the **total capacity of all its branches**
   (service providers × hours × services per hour) to its demand, at the best **total capacity ÷ total
   rent** of those branches. Service providers are the capacity, so the first lever is allocating them
   to where demand is (add providers or hours where branches are full, move them from idle ones);
   opening, resizing or closing a branch is the move when that isn't enough.
 - **Demand and capture:** bookings by customer home area, to measure the real catchment and penetration,
-  and to calibrate the demand split on actual booking shares instead of Google reviews.
+  and, since bookings measure services sold directly, to calibrate the demand split on actual
+  booking shares instead of Google reviews.
 - **Capacity**, which today isn't modelled: chairs × hours × minutes per service, **utilisation**, peak
-  utilisation and **turn-aways** (requests with no free slot). Served customers are the smaller of
-  captured demand and capacity, so a full lounge losing customers reads very differently from a
+  utilisation and **turn-aways** (requests with no free slot: services we failed to sell). Capacity caps services sold: they are
+  the smaller of captured demand and capacity, so a full lounge losing customers reads very differently from a
   half-empty one, and two lounges in one catchment that both run full point to adding capacity, not
   consolidating.
 - **Cost:** each lounge's base rent, service charge, fees and fit-out depreciation (fixed), and staff,
@@ -210,9 +211,9 @@ Each label maps to a decision the network and capital owner already makes (defin
 | **Revisit later** | **WATCH** | Don't act now; revisit when the named failing test changes |
 | **No action** | **SKIP** | Too small or already crowded. (The airport lounge is NOT SCORED: it serves travellers.) |
 
-**North star: services rendered** (appointments delivered to customers), judged per catchment and
-bounded by capacity. The model can't measure it yet: its nearest proxy is served women (a model
-estimate of the customers behind the services a lounge renders), shown as context, and
+**North star: services sold** (completed appointments), judged per catchment and capped by
+capacity. The model can't measure it yet: its nearest proxy is served women (a model
+estimate of the customers behind the services a lounge sells), shown as context, and
 **capacity is not modelled at all** (no chairs, hours or utilisation), so a SHRINK is driven by
 modelled demand and shop rent, not by services that would be lost.
 

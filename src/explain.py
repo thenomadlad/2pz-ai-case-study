@@ -149,7 +149,7 @@ GLOSSARY: dict[str, Field] = {
                          "with this lounge closed and its siblings and rivals open (Huff). The demand signal: it "
                          "scores the site, not how much the lounge itself sells."),
     "served_women": Field("Women served (Huff)", "women",
-                          "Model estimate of the customers behind the services this lounge renders: its Huff share of "
+                          "Model estimate of the customers behind the services this lounge sells: its Huff share of "
                           "every cell it reaches within 20 min. It rests on the lounge's own reviews (our proxy for "
                           "services sold) and rating, so it is context, not scored."),
     "performance_vs_site": Field("Performance vs site", "x its site",

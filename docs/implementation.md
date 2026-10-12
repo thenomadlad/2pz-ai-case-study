@@ -124,7 +124,7 @@ Tunable values: [`data/scenarios/baseline.yaml`](../data/scenarios/baseline.yaml
 | ~2 km WorldPop grid cells | Official neighbourhoods | OSM neighbourhoods cover 66% of Dubai's women and none of Fujairah |
 | Google Places popularity circles (858 calls) | One text search per lounge; OSM | Small circles found 17 of the true top-20 premium salons, one text search 0-2 |
 | Capture shown, not scored | Scoring capture beside served demand | Huff already splits each cell by reviews, so scoring capture too double-counted competition |
-| Lifetime review counts | Reviews per year | Per-year needs a full review scrape, unaffordable and against Google's terms |
+| Lifetime review counts as the proxy for services sold | Reviews per year | Per-year needs a full review scrape, unaffordable and against Google's terms |
 | Fixed-scale signals, absolute thresholds | Ranking into thirds (the v1 model) | No forced SHRINKs; a lounge's score doesn't move when a sibling opens or closes |
 | A frozen market of competitor salon sites, per emirate | Scales calibrated on our own 23 lounges; one UAE-wide cost anchor | Our network isn't its own benchmark, and a Dubai contract rent isn't set against a northern asking rent; the reference carries the served model's and the rents' biases (limitations 3, 10) |
 | Affluence weighting off | DLD-rent weighting in Dubai; a UAE-wide built-form proxy | Dubai-only weighting changes no lounge call; the proxy didn't predict rent (CV R² −0.10); every woman counting the same beats one emirate on different rules |
