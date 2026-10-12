@@ -28,6 +28,7 @@ Anything else is **NO-GO**, and the audit log records which condition failed.
 | 6 | 2026-10-11 | 78/80 | 34/40 | 13/26 | **NO-GO** only on P1/J7: their boxes stay open until this build is merged to `main` and clicked through live (AppTest renders overview, a lounge, an area and How with no exception). The model conditions are met: B1 passes, sanity run 9 has no unexplained failure (MO5) | Owner decisions on F1 and F2 implemented: one frozen UAE-wide cost anchor (14.34 women per AED 1k) and site_served (a typical lounge at the site, this lounge closed) as demand; served women are context as performance vs site ("performing 2.7x compared to its site"). Calls: lounges 10/4/9/1 (14 changed), areas 49/48/464 (15 WATCH → GROW). Newly passing: B1 (`[brief]`), MO5, MO8. New finding F5 (typical lounge drifts with closures; al-maqta knife edge). run() 4.1–4.4 s. |
 | 7 | 2026-10-11 | 78/80 | 34/40 | 13/26 | **NO-GO** only on P1/J7, as pass 6 (live app not yet merged to `main` and clicked through; AppTest renders overview, a lounge, an area and How with no exception). Model conditions still met: B1 passes, sanity run 10 has no unexplained failure (MO5) | Owner decision: labels judged within each emirate against a frozen reference of 1,123 competitor salon sites (demand percentile, UAE-wide under 50 sites; rent ratio vs the emirate's median salon-site rent on a frozen P10–P90 scale), never against our own lounges. `COST_ANCHOR` / cost index gone; served women leave the cost signal. Calls: lounges 6/14/3/1 (15 changed: Dubai up, dear Abu Dhabi/Sharjah/RAK sites down), areas 32/65/464 (17 GROW → WATCH on rent). UAE-wide percentiles shown wherever a score is. New explained findings: F6 (an emirate-relative PROTECT can fail the absolute 6,000 growth line: nad-al-sheba), F7 (composites bunch in the middle: 14 HOLD, 9 within 0.05 of a line). |
 | 8 | 2026-10-11 | 78/80 | 34/40 | 13/26 | **NO-GO** only on P1/J7, as pass 7 (live app not yet merged to `main` and clicked through; AppTest renders overview, a lounge, an area and How with no exception). Model conditions still met: B1 passes (F5 gone: the typical lounge is frozen, so no closure moves another lounge through it), sanity run 11 has no unexplained failure (MO5) | Three owner fixes. Fallback rents are neutral: an area with half or more of its rented women on the emirate median passes the rent test at low confidence; a lounge on a fallback site cell scores rent 0.5 at low confidence (manama-ajman, mudayrah-ajman WATCH → GROW: 34/63/464; al-ain, al-falah stay PROTECT, low). Typical lounge frozen at 757 reviews, 4.6★ (site_reference.csv unchanged). F6 stated plainly (keep within emirate vs the absolute 6,000 growth floor; nad-al-sheba). 23 explanations regenerated offline. Residual: sharjah-sharjah (15% fallback) keeps ratio 1.000 because its median lands on the fallback value. |
+| 9 | 2026-10-12 | 80/80 | 34/40 | 13/26 | **GO**: P1/J7 pass. `main` is at bef0960 and the live link (after a reboot) renders overview (6/14/3, 34 GROW, judged against each emirate's salon sites), lounge (mirdif-35 PROTECT 0.79 with 'performing 1.0x compared to its site'), area (sharjah-sharjah GROW, out-serves 90% of Sharjah salon sites) and How, with no tracebacks (Playwright). Model conditions as pass 8 | Live click-through only; no model or data change. |
 
 
 ---
@@ -249,7 +250,7 @@ The brief says to source inputs from public sources and lists some combination o
 
 ### Working product
 
-- [ ] `[brief]` **P1. Usable end to end:** a reviewer can go from overview to a recommendation to its explanation without help.
+- [x] `[brief]` **P1. Usable end to end:** a reviewer can go from overview to a recommendation to its explanation without help.
 - [x] `[brief]` **P2. The format is justified:** why a web app, notebook, agent or whatever we picked suits this decision-maker.
 - [x] `[brief]` **P3. Easy to run:** one or two commands, or a hosted link.
 
@@ -281,6 +282,7 @@ The brief says to source inputs from public sources and lists some combination o
 *To improve:*
 
 - ~~P1: merged; live click-through pending.~~ Passes since 2026-10-11: `main` is at b53e319, and the live link renders overview (5/9/9, 34 GROW), lounge (khalifa-city-a with its AI explanation), area (sharjah-sharjah GROW) and how, with no tracebacks (Playwright).
+- P1/J7 re-checked 2026-10-12 on bef0960 (emirate-relative build) after a Streamlit reboot: overview, lounge, area and How render live with the new wording and no tracebacks. Note: Streamlit Cloud stopped auto-redeploying on push; reboot from the dashboard after merging.
 - ~~Pass 5 (flaky test)~~ Fixed after pass 5: the limit is 3 s. A level switch re-runs level_flips' 82 lounge builds (1.6–1.9 s warm). Was: `tests/webapp/test_pages.py::test_level_switch_is_fast_and_marks_explanations_as_template` failed once at 2.0 s against its < 2 s limit in a full `tests/webapp` run, and passed alone.
 
 ---
@@ -303,7 +305,7 @@ The brief says *"this is not a coding test"*. Each lens needs a visible artifact
 - [x] `[brief]` **J4. Tech-stack decision:** see R3.
 - [x] `[brief]` **J5. Trade-offs:** a written list of what we chose, what we gave up and why.
 - [x] `[brief]` **J6. Responsible and effective AI use:** see D8, covering both AI in the product and AI in the build.
-- [ ] `[brief]` **J7. Usable delivery:** see P1–P3.
+- [x] `[brief]` **J7. Usable delivery:** see P1–P3.
 
 ### The closing "hardest part" questions
 
