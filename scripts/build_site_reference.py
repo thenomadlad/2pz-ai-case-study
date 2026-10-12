@@ -35,7 +35,7 @@ def main():
     a = load_baseline_assumptions(REPO_ROOT / "data" / "scenarios" / "baseline.yaml")
     women = women_15plus(v3.cells, v3.emirates, a.worker_housing_female_share[lv.worker_share])
     aw = women * affluence_weight(v3.cells.rent_observed, women, a.affluence_elasticity[lv.affluence])
-    reviews, rating = L._typical(v3.lounges)
+    reviews, rating = L.TYPICAL_REVIEWS, L.TYPICAL_RATING
     comp = S._competitors(v3, a)
     real = comp[~comp.id.str.startswith("IMP:")]
     c = v3.cells

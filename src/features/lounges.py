@@ -148,7 +148,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     aw_s = women * affluence_weight(rent, women, a.affluence_elasticity[levels.affluence])
     aw = aw_s.to_dict()
     sv = _served(v3, a, aw_s, levels, closed, leave_one_out=areas)
-    site = _site_served(v3, a, aw_s, closed, [lo for lo in v3.lounges if lo.branch_id not in closed])
+    site = _site_served(v3, a, aw_s, closed)
     lounges = [lo for lo in v3.lounges if lo.branch_id not in closed]
     catch = {lo.branch_id: p["catch"].get(levels.travel, {}).get(lo.branch_id, []) for lo in lounges}
     reach = Counter(c for b, cs in catch.items() if b not in NOT_SCORED for c in cs)   # scored lounges only
@@ -281,20 +281,21 @@ def _lounge_costs(feats):
                                  **site_signals(f.emirate, f.site_served, f.site_rent_m2)}) for f in feats]
 
 
-def _typical(lounges) -> tuple[float, float | None]:
-    """The typical lounge for what-ifs: median reviews and median rating over the scored ones."""
-    scored = [lo for lo in lounges if lo.branch_id not in NOT_SCORED]
-    rated = [lo.rating for lo in scored if lo.rating is not None]
-    return statistics.median(lo.review_count for lo in scored), statistics.median(rated) if rated else None
+TYPICAL_REVIEWS = 757
+TYPICAL_RATING = 4.6
+TYPICAL_WHY = ("The typical lounge every what-if opens (area what-ifs, site_served, the salon-site reference) is "
+               "frozen at the 2026-10-11 baseline: the median reviews (757) and rating (4.6) over the open scored "
+               "lounges, as data/seed/v3/site_reference.csv was built. A live median drifted when a lounge "
+               "closed (khaleej-al-arabi 0.3504 -> 0.3488 with no change of its own), so closing one lounge "
+               "could move another's call; frozen, it can't. Re-freeze only with a rebuilt reference.")
 
 
-def _site_served(v3, a, aw_s, closed, lounges) -> dict[str, float]:
+def _site_served(v3, a, aw_s, closed) -> dict[str, float]:
     """site_served per open scored lounge (src/model/served.site_served); cached on the demand and closures."""
     from src.model.served import site_served
-    reviews, rating = _typical(lounges)
-    key = ("site", id(v3), hash(aw_s.to_numpy().tobytes()), closed, reviews, rating)
+    key = ("site", id(v3), hash(aw_s.to_numpy().tobytes()), closed)
     if key not in _SERVED:
-        _SERVED[key] = site_served(v3, a, aw_s, reviews, rating, closed=closed, not_scored=frozenset(NOT_SCORED))
+        _SERVED[key] = site_served(v3, a, aw_s, TYPICAL_REVIEWS, TYPICAL_RATING, closed=closed, not_scored=frozenset(NOT_SCORED))
     return _SERVED[key]
 
 
@@ -303,7 +304,6 @@ def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
     what it takes from our lounges, and its demand and rent against the salon-site reference."""
     from src.model.growth import NON_RESIDENTIAL, SKIP_UNDER_WOMEN
     from src.model.served import what_if_open
-    reviews, rating = _typical(feats)
     out = []
     for ar in areas:
         if ar.women < SKIP_UNDER_WOMEN or NON_RESIDENTIAL.search(ar.name):
@@ -312,7 +312,7 @@ def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
         # keyed on the demand itself: affluence weighting keeps the total, so a sum would collide across levels
         key = ("open", id(v3), ar.area_id, hash(aw_s.to_numpy().tobytes()), closed)
         if key not in _SERVED:
-            _SERVED[key] = what_if_open(v3, a, aw_s, ar.lat, ar.lng, reviews, rating, closed=closed,
+            _SERVED[key] = what_if_open(v3, a, aw_s, ar.lat, ar.lng, TYPICAL_REVIEWS, TYPICAL_RATING, closed=closed,
                                         not_scored=frozenset(NOT_SCORED))
         w = _SERVED[key]
         cost = site_cost_k(ar.shop_rent_m2)

@@ -292,10 +292,21 @@ def test_signals_rank_the_site_in_the_frozen_salon_site_reference(real_v3):
     assert (RENT_RATIO_P10, RENT_RATIO_P90) == pytest.approx(tuple(np.percentile(ratio, [10, 90])), abs=1e-4)
 
 
-def test_closing_a_lounge_never_moves_another_lounges_reference(real_v3):
+def test_closing_a_lounge_never_moves_another_lounges_reference(real_v3, monkeypatch):
     # Frozen reference: closing any lounge never changes another lounge's rent ratio or the salon sites
     # its demand is ranked against; its demand percentile moves only with its own site-served women.
+    # Frozen typical lounge (TYPICAL_WHY): every closure's site_served opens the same 757-review 4.6 lounge,
+    # so no closure moves another lounge's call through the typical lounge (khaleej-al-arabi drifted before).
     from src.features import lounges
+    from src.model import served
+    typicals = set()
+    real_site_served = served.site_served
+
+    def spy(v3, a, aw, reviews, rating, **kw):
+        typicals.add((reviews, rating))
+        return real_site_served(v3, a, aw, reviews, rating, **kw)
+    monkeypatch.setattr(served, "site_served", spy)
+    monkeypatch.setattr(lounges, "_SERVED", {k: v for k, v in lounges._SERVED.items() if k[0] != "site"})
     ref = lounges.site_reference().copy()
     base = {x.branch_id: x for x in build(real_v3, ASSUMPTIONS, areas=False)[0] if not x.not_scored}
     for gone in base:
@@ -307,19 +318,30 @@ def test_closing_a_lounge_never_moves_another_lounges_reference(real_v3):
             same = lounges.site_signals(x.emirate, x.site_served, x.site_rent_m2)
             assert (x.demand_pct, x.demand_pct_uae) == (same["demand_pct"], same["demand_pct_uae"]), (gone, x.branch_id)
     assert lounges.site_reference().equals(ref)
+    assert typicals == {(lounges.TYPICAL_REVIEWS, lounges.TYPICAL_RATING)}
+
+
+def test_typical_lounge_is_frozen_at_the_baseline_median():
+    # the frozen values are today's all-open medians, and the ones the salon-site reference was built with
+    import statistics
+
+    from src.data_v3 import load_v3
+    from src.features import lounges
+    scored = [lo for lo in load_v3().lounges if lo.branch_id not in lounges.NOT_SCORED]
+    assert statistics.median(lo.review_count for lo in scored) == lounges.TYPICAL_REVIEWS
+    assert statistics.median(lo.rating for lo in scored if lo.rating is not None) == lounges.TYPICAL_RATING
+    head = lounges.SITE_REFERENCE.read_text().splitlines()[0]
+    assert f"typical lounge {lounges.TYPICAL_REVIEWS} reviews, {lounges.TYPICAL_RATING} stars" in head
 
 
 def test_site_served_is_a_typical_lounge_at_the_site_with_this_one_closed(real_v3):
     # F2 (2026-10-11): the demand signal scores the site, not the lounge's own reviews
-    import statistics
-
-    from src.features.lounges import NOT_SCORED, _SERVED
+    from src.features.lounges import NOT_SCORED, TYPICAL_RATING, TYPICAL_REVIEWS, _SERVED
     from src.market import affluence_weight, women_15plus
     from src.model.served import what_if_open
     f, _ = build(real_v3, ASSUMPTIONS, areas=False)
     scored = [x for x in f if not x.not_scored]
-    reviews = statistics.median(x.review_count for x in scored)
-    rating = statistics.median(x.rating for x in scored if x.rating is not None)
+    reviews, rating = TYPICAL_REVIEWS, TYPICAL_RATING
     a, lv = ASSUMPTIONS, Levels()
     women = women_15plus(real_v3.cells, real_v3.emirates, a.worker_housing_female_share[lv.worker_share])
     demand = women * affluence_weight(real_v3.cells.rent_observed, women, a.affluence_elasticity[lv.affluence])
