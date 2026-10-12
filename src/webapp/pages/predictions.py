@@ -28,6 +28,7 @@ from src.webapp.views import (
     performance_line,
     render_caveats,
     render_pyramid,
+    short,
 )
 
 WEIGHTS = {s.name: s.weight for s in scorecard.SIGNALS}
@@ -134,8 +135,12 @@ def _lounge_panel(r, b: str) -> None:
         return
     d = next(d for d in r.decisions if d.branch_id == b)
     exp, _ = explanation_for(r, "lounge", b)
-    st.subheader(f.name)
-    badge(d.action)
+    st.subheader(short(f.name))
+    call, go = st.columns([1, 9], gap="small", vertical_alignment="center")
+    with call:
+        badge(d.action)
+    go.page_link(nav.LOUNGE, label=f"Open the lounge page{' (baseline)' if data.active() else ''} →", icon="💇",
+                 query_params={"lounge": b})
     left, right = st.columns([3, 2])
     with left:
         render_pyramid(exp)
@@ -149,7 +154,6 @@ def _lounge_panel(r, b: str) -> None:
         render_caveats("Caveats for this lounge" if d.action == "NOT SCORED"
                        else f"Confidence: {d.confidence}. Caveats for this lounge",
                        lounge_caveats(f, d, r.flips.get(b)), d.confidence == "low")
-    st.page_link(nav.LOUNGE, label=f"Open the lounge page{' (baseline)' if data.active() else ''} →", icon="💇", query_params={"lounge": b})
 
 
 def _area_panel(r, area_id: str) -> None:
@@ -160,7 +164,11 @@ def _area_panel(r, area_id: str) -> None:
     d = next(d for d in r.area_decisions if d.area_id == area_id)
     exp, _ = explanation_for(r, "area", area_id)
     st.subheader(f"{a.name}, {a.emirate}")
-    badge(d.action)
+    call, go = st.columns([1, 9], gap="small", vertical_alignment="center")
+    with call:
+        badge(d.action)
+    go.page_link(nav.AREA, label=f"Open the area page{' (baseline)' if data.active() else ''} →", icon="📍",
+                 query_params={"area": area_id})
     left, right = st.columns([3, 2])
     with left:
         render_pyramid(exp)
@@ -173,7 +181,6 @@ def _area_panel(r, area_id: str) -> None:
     with right:
         render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
                        d.action != "SKIP")
-    st.page_link(nav.AREA, label=f"Open the area page{' (baseline)' if data.active() else ''} →", icon="📍", query_params={"area": area_id})
 
 
 def render() -> None:
