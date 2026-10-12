@@ -300,6 +300,21 @@ Two lounges whose catchments overlap compete for the same women. That doesn't me
 
 So **expanding both lounges in a shared catchment can be right** if it raises our coverage of that market: when both are near capacity and the area still has unserved demand, more chairs at either lounge win customers from competitors rather than from each other. That's why cannibalisation is shown as a what-if on each lounge page, not scored. With capacity and booking data we'd judge it directly: utilisation at both lounges, and our combined share of the shared area before and after.
 
+**How the model handles several lounges in one catchment.** The demand split shares each area's women
+among every salon that reaches them, our lounges included. So a sibling only counts against a site for
+the women it actually wins; women left unserved, or with competitors, still count toward what a lounge
+at that site would serve. Two lounges in one catchment therefore both keep a healthy call as long as
+women there go unserved, and a new lounge can still be GROW, because it is judged on **net new women**:
+what it would add after our own lounges keep theirs.
+
+- Of the 18 lounges sharing more than half their catchment with a sibling, **15 are HOLD or PROTECT**.
+  The 3 SHRINKs (City Walk, Al Jada, West Yas) are there for dear rent or weak demand for their
+  emirate, not for overlap.
+- Khalifa City A, Shakhbout City and Mohammed Bin Zayed City share 97-100% of their catchments and are
+  all HOLD; if any one closed, its siblings would absorb only 19-20% of its customers.
+- **15 GROW areas are places our lounges already serve** (2% or more of their women), such as Sharjah
+  city (3%, about 12.8k net new women for a new lounge), Kalba, Muntazy and Zakhir.
+
 ### Once we have the data: how we'd judge demand, capture and return
 
 - **Demand.** Appointments per lounge, and penetration (customers ÷ women 15+ in the catchment). Customers' home areas give the *real* catchment, which we'd use to calibrate the Huff model: fit the review weighting, distance decay and outside option to observed bookings, instead of the starting values used today.

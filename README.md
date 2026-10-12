@@ -44,7 +44,9 @@ estimate.
    Almost everywhere on the map, yet barely in effect.
    - 19 of 24 lounges share more than half their catchment with a sibling.
    - If one closes, its siblings pick up a median **8%** of its customers (30% at most). The rest go to competitors or nowhere.
-   - So overlap isn't treated as a reason to shrink, and expanding both lounges in a shared catchment can be right if it raises our coverage.
+   - **Lounges sharing a catchment both keep their call while women there go unserved.** A sibling only counts against a site for the women it actually wins; women still unserved, or with competitors, still count toward the site's demand. Of the 18 lounges sharing more than half their catchment, 15 are HOLD or PROTECT, and the 3 SHRINKs are there for rent or weak demand, not overlap. Khalifa City A, Shakhbout City and Mohammed Bin Zayed City share 97-100% of their catchments and are all HOLD.
+   - **A new lounge can still be GROW inside our footprint**, judged on net new women only: 15 GROW areas are places our lounges already reach, such as Sharjah city (we serve 3% of its women; a new lounge would add about 12.8k net new).
+   - So overlap isn't a reason to shrink, and expanding both lounges in a shared catchment can be right if it raises our coverage.
    - **Where:** each lounge page's shared-catchment table and cannibalisation what-if; the What-if explorer's "All catchments (overlap)" layer and **Test a SHRINK**.
 4. **How does each lounge stand against the salons around it?**
    Site demand shares every area's women among our lounges and the 1,100+ premium competitor salons around them, then ranks the site against its emirate's competitor salon sites.
