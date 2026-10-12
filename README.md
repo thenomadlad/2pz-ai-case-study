@@ -9,25 +9,34 @@ is checked against the data.
 
 ## Look at this in 5 minutes
 
-1. **[Overview](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the COO's
-   question, the executive summary and three at-stake figures (at the 2026-10-11 baseline: 3 SHRINK
-   lounges, about 323k women in shared cells; 34 GROW areas, about 796k women).
-2. **Tick "All catchments (overlap)"** above the map: the Abu Dhabi city cluster, where siblings
+1. **[Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the
+   COO's question answered in one line (at the 2026-10-11 baseline: *review 3 weak lounge sites,
+   defend 6 strong ones and test 34 areas for new lounges, most of them in Abu Dhabi and Sharjah*),
+   then three cards in % of our served market, the ~164k women our lounges serve today (model
+   estimate): **Review** 3 lounges, 7%; **Grow** 34 areas, the best (Al Dhaid) +35%; **Protect** 6
+   lounges, 37%. Each card's evidence follows below as a map and a table whose names link to the
+   lounge or area page, then *How sure we are*.
+2. **[What-if explorer](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/explore):
+   pick "Abu Dhabi" and tick "All catchments (overlap)"**: the city cluster, where siblings
    and premium salons split the same women. Overlap alone doesn't make a SHRINK: judged against Abu
    Dhabi's salon sites, only westyas there is SHRINK; delma, noya-plaza and the rest are HOLD.
 3. **[city-walk](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk)
    (SHRINK):** a typical lounge at its site would serve about 1.9k women in the Huff split: bottom
    30% of Dubai salon sites on demand (26th percentile UAE-wide), at a rent ratio of 0.47 (its DLD area's
    DLD rent, dearer than the median Dubai salon site; 98th percentile UAE-wide). The AI pyramid with
-   *so what / now what*, the factor table's contributions, which siblings share its women and *What
-   would change the call*. High confidence: it holds at all 3 worker-housing share levels.
+   *so what / now what*, *What would change the call* and the factor tree (each scored row shaded
+   red to green by how it pushes the call), a tab per assumption, its premium competitors and which
+   siblings share its women. High confidence: the call holds in all 27 drive-time x coverage x
+   worker-share combinations.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah)
    (GROW):** a typical new lounge there would add about 12.5k net new women against a 6,000 line,
    top 10% of Sharjah salon sites on demand (98th percentile UAE-wide); low confidence. Kalba has
    no shop rent of its own (its cells take Sharjah's emirate median), so the rent test is neutral
    rather than passed, and the call says so (limitations 3).
-5. **The fallback:** change anything in the Overview's **🧪 What if…?** panel (say worker housing
-   high, or close a lounge): where the numbers change, the text switches to the labelled template.
+5. **The fallback:** on the What-if explorer, open **🧪 Change the assumptions, or test a SHRINK**
+   (say drive time 20 min, or close a lounge) and click a lounge on the map: where the numbers
+   change, the text switches to the labelled template. Only that page reads the what-if; the other
+   pages always show the baseline.
 6. **[How it works & limitations](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how)**,
    then the limitations below.
 
@@ -52,8 +61,9 @@ decisions**, and the limitations matter more than the calls. The biggest ones:
   the emirate-median fallback has no rent of its own, so where it sets the rent the rent test is
   neutral and the call low confidence: 17 of the 34 GROW areas (9 in Sharjah) and two PROTECT
   lounges (al-ain, al-falah).
-- **The calls move with the assumptions.** 11 of the 23 scored lounges are low confidence: 10
-  within 0.05 of a line, plus al-ain on a fallback rent. Affluence weighting is off at baseline: every woman counts the same.
+- **The calls move with the assumptions.** 12 of the 23 scored lounges are low confidence: 10
+  within 0.05 of a line, plus al-ain (fallback rent) and jumeirah-park, whose calls change in 9 of
+  the 27 drive-time x coverage x worker-share combinations. Affluence weighting is off at baseline: every woman counts the same.
 - **Drive times are midday**, and the competitor search misses smaller salons where Google's
   20-result cap bites.
 - **The yardstick and thresholds are judgement.** Both signals rank a site within its emirate
@@ -91,11 +101,11 @@ utilisation), so the model can't tell a full lounge from an empty one, and a SHR
 modelled demand and shop rent, not by services that would be lost. Read the calls with that in mind.
 
 **One flow, question to action.** *"Which lounges should we review before their leases?"* →
-Overview: the summary and map show 3 SHRINKs, one per emirate (city-walk, westyas, al-jada) → click
-**city-walk** → its page: a typical lounge at its site would serve about 1.9k women, bottom 30% of
+Executive Summary: the Review card and its evidence map and table show 3 SHRINKs, one per emirate
+(city-walk, westyas, al-jada) → click **city-walk** in the table → its page: a typical lounge at its site would serve about 1.9k women, bottom 30% of
 Dubai salon sites on demand (26th percentile UAE-wide), at a rent ratio of 0.47 (98th percentile of
 rent UAE-wide); 72% of its catchment women are also reached by a sibling (the shared-women table
-names which), and the call is high confidence: it holds at all 3 worker-housing share levels → action:
+names which), and the call is high confidence: it holds in all 27 assumption combinations → action:
 put city-walk on the lease-review list with the sibling named, and ask finance for its P&L before
 anyone says "close" (a prime rent may be buying footfall the model can't see).
 
@@ -162,26 +172,37 @@ with `scorecard.ipynb`).
 
 ## Using the app
 
-Four pages; the loop is **Overview → click a lounge or area → its page → back**.
+Five pages; the loop is **Executive Summary → click a lounge or area → its page → back**.
 
-1. **Overview** (`/?lounge=delma` or `/?area=kalba-sharjah` preselects): the COO's question, the
-   executive summary (answer, ranked arguments, *so what*, *now what*), the at-stake figures, the
-   limitations box and the **🧪 What if…?** panel (worker-housing share, search recall, close lounges;
-   every call recomputes; drive time and competitor coverage stay at baseline because they don't reach
-   the scoring yet). Then the map,
-   with toggles for growth areas (and SKIPs), Dubai rents, **all catchments (overlap)** and premium
-   substitutes (selected lounge or every lounge); click a lounge or area for its short pyramid and
-   caveats. **Compare** has a sortable **Lounges** table and a **Growth areas, ranked** table.
-2. **Lounges** (`/lounge?lounge=delma`): a picker filtered by emirate checkboxes (Abu Dhabi and
-   Dubai ticked, plus any emirate with a PROTECT lounge; a link ticks its own emirate), then address and rating, the call with its pyramid
-   and caveats, raw vs addressable women, the two signals on their scales, premium substitutes,
-   which siblings share its women, *What would change the call*, and the factor table (value,
-   threshold, meaning, contribution to the composite) with its sources.
-3. **Areas** (`/area?area=kalba-sharjah`): a picker of the areas with 5,000+ women, with the
-   same emirate checkboxes (plus any emirate with a GROW area ticked), then the call against its tests, the margins that would move it, a map
-   of its cells, the nearest lounge and the factor table.
-4. **How it works & limitations:** the ranked limitations, the market model, every assumption with
-   its source, and every constant with why it was chosen.
+1. **Executive Summary** (`/overview`): the COO's question, one governing thought, a *How we measure*
+   note (the two proxies and why each threshold sits where it does) and the AI-written summary, then
+   three cards (**Review**, **Grow**, **Protect**), each a claim with its share of our served market
+   (model estimate). Below them, each card's evidence: a map and a table (composite, share of
+   market, out-serves, rent ratio, performance vs its site, confidence; est. growth for areas) whose
+   names link to the lounge or area page. Last, **How sure we are**: the HOLDs, the low-confidence
+   calls by name, a branch-health KPI box (what each KPI rests on today and the data that would make
+   us surer) and the limitations box.
+2. **What-if explorer** (`/explore?lounge=delma` or `?area=kalba-sharjah` preselects): the only page
+   that reads the what-if. **🧪 Change the assumptions, or test a SHRINK** (collapsed at baseline):
+   drive time, competitor coverage, worker housing and search recall; *Test a SHRINK* closes lounges
+   and lists every call that moved. Then the map: every area coloured by its call (GROW blue,
+   already captured green, WATCH purple, SKIP grey), lounge pins in their call's colour (hollow =
+   low confidence), **Jump to** city pills, toggles for premium substitutes (selected lounge or
+   every lounge) and **all catchments (overlap)**, and a collapsible legend. Click a lounge or area
+   for its short pyramid, tests and caveats, and a link to its page.
+3. **Lounges** (`/lounge?lounge=delma`): the table of all 24 lounges, filterable by call and
+   emirate and sortable, is the picker: select a row and its detail opens below: address and rating,
+   the call with its pyramid and caveats, its catchment map, the two signals on their scales,
+   *What would change the call* and the factor tree (call, signals, their inputs; scored rows shaded
+   red to green), a tab per assumption showing how its estimates and call move, its premium
+   competitors table and its shared catchment (which siblings reach its women, and what share they'd
+   absorb if it closed).
+4. **Areas** (`/area?area=kalba-sharjah`): the GROW and WATCH areas ranked by net new women, the
+   same table-as-picker; below, the call with its pyramid and caveats, *How this call was made*
+   (the three tests), the factor tree, the per-assumption tabs, a map of its cells and the nearest
+   lounge.
+5. **How it works & limitations:** this README, then live values read from the code each load: every
+   assumption with its source and every constant with why it was chosen.
 
 Links carry the selection, so any page can be shared directly. Guided tour: [`docs/walkthrough.md`](docs/walkthrough.md).
 
@@ -399,8 +420,8 @@ Demoted rather than dropped, so still shown as context: the lounge's own served 
 7. **Lounge call** (`src/model/scorecard.py`). A composite of the demand percentile and the rent
    ratio scored on a frozen P10-P90 scale (`RENT_RATIO_P10`/`P90`), equal weights, both judging the
    site: PROTECT at `PROTECT_AT` or above, SHRINK at `SHRINK_AT` or below, HOLD between. Confidence
-   is low within 0.05 of a line, on a fallback rent, or when a ±25% weight or a third of the 3
-   worker-housing share levels change the call (the only assumption that reaches the scoring). Dropped on the way: a UAE-wide cost anchor
+   is low within 0.05 of a line, on a fallback rent, or when a ±25% weight or a third of the 27
+   drive-time x coverage x worker-share combinations change the call. Dropped on the way: a UAE-wide cost anchor
    (`COST_ANCHOR`: it marked down every dear Dubai site and counted served women twice) and an
    emirate-median-of-our-lounges baseline (it moved when a sibling opened or closed).
    **Cannibalisation** is a display-only what-if: close the lounge, what share of its women do
@@ -611,14 +632,15 @@ reviews, uncalibrated Huff parameters, an estimated recall correction), Google p
 coverage), the women split outside Dubai, shop rents that are asking rents or emirate medians. And we didn't trust the AI to make the calls.
 
 **What we automated.** The what-if: every call recomputes in memory, and each lounge's call is
-re-run at each worker-housing share level to grade confidence (drive time and coverage don't
-reach the scoring yet, affluence is off). The grounding check on every
+re-run at each of the 27 drive-time x coverage x worker-share combinations to grade confidence
+(affluence is off). The grounding check on every
 explanation, with a template fallback. Fetch caching: every Places and Mapbox response is cached
 in `data/raw/`, so the derived files rebuild offline without paying twice. `just labels` exports
 the calls.
 
 **What we explain.** Every call: a pyramid (answer, ranked arguments, data points), the factor
-table with unit, threshold and meaning, caveats, and at how many worker-housing share levels it flips.
+factor tree (each scored row shaded by how it pushes the call), caveats, and in how many of the
+27 assumption combinations it flips.
 Every assumption with its source (table below), every constant with its reason (How page), and
 the limitations, ranked, first.
 
