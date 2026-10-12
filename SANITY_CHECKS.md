@@ -430,6 +430,32 @@ Scope: three owner-approved fixes. (1) **Fallback rents are neutral** (`growth.R
 - **SC5.** 23 explanations regenerated offline (prompt v7), all pass `check` and `ingest`.
 - **SC8.** run() unchanged (~4.4 s); speed guard green without raising limits.
 
+## Run 11 results (2026-10-11, fallback rents neutral, typical lounge frozen)
+
+Scripts: `src.baseline.run()` against a snapshot taken before the change, plus `lounges.build` + `scorecard.decide` with each of the 23 closures, a +50% women multiplier on each catchment and a 2,000-review 4.9★ rival 200 m north of each lounge (in-memory copies; no repo code edited for the checks).
+
+**Call diff vs run 10:**
+
+| Subject | Before | After | Why |
+|---|---|---|---|
+| manama-ajman | WATCH (high) | **GROW (low)** | 100% fallback rent; 0.997 ratio was the Ajman fallback, now neutral |
+| mudayrah-ajman | WATCH (high) | **GROW (low)** | same |
+| al-ain | PROTECT 0.829 (high) | PROTECT 0.724 (low) | site cell on the Abu Dhabi fallback: rent 0.71 → 0.5 |
+| al-falah | PROTECT 0.769 (high) | PROTECT 0.665 (low) | same; now 0.015 above the PROTECT line |
+| al-dhaid, kalba, khor-fakkan, al-hamriya, milehah, al-ramlah, dibba-al-hisn (Sharjah), al-fahlain (RAK) | GROW (high) | GROW (low) | mostly fallback rent |
+| al-awir, digdaga, al-sad | GROW (medium) | GROW (low) | mostly fallback rent |
+
+al-madam, al-batayih, ghalilah, khatt were already low (coverage or the size line). sharjah-sharjah (15% fallback) keeps its observed GROW at ratio 1.000: its weighted median lands on the fallback value, its listings cells alone give 0.997 (an explained knife edge, `RENT_FALLBACK_WHY`).
+
+- **SC2: as expected.** Lounges **6 / 14 / 3 / 1** (no call change); areas **34 GROW / 63 WATCH / 464 SKIP**. 17 of 34 GROW are on a fallback rent, all low confidence. GROW by emirate: Abu Dhabi 13, Sharjah 10, Ajman 6, Ras Al Khaimah 4, Dubai 1. 11 of 23 lounges low confidence (9 + al-ain, al-falah).
+- **SC4: PASS, 0 violations.** *Close a sibling (23 closures):* **0 moves toward SHRINK and 0 composite dips** in any other lounge; F5 is gone (khaleej-al-arabi stays HOLD 0.3504 under every closure). Four moves *up*, by design (a closed sibling raises a neighbour's site demand): westyas SHRINK → HOLD when al-falah, khalifa-city-a or shahama closes (0.348 → 0.351–0.358), al-jada SHRINK → HOLD when zawaya-walk closes (0.338 → 0.363). My expectation said "0 label moves"; it should have said "0 moves toward SHRINK", which run 10 meant too. Unit test: every closure's site_served opens the same frozen 757-review 4.6★ lounge. *+50% women in one catchment (23 cases):* 0 label drops. *Rival next door (23 cases):* 0 composite rises; 27 label falls (F3, unchanged in kind; run 10 counted 23, not re-diagnosed).
+- **Level flips:** khaleej-al-arabi 27/81 only; al-ain and al-falah 0.
+- **BT2/BT3:** unchanged in kind (F6; nad-al-sheba SKIP as a new opening). F6 is now stated as a limitation (How page box 6, README, limitations 8, lounge glossary).
+- **SC5: PASS.** 23 explanations regenerated offline (prompt v7): 20 fallback areas, al-ain, al-falah, the UAE summary; `check` and `ingest` 23 / 0 failed. Read-through: manama-ajman, kalba-sharjah, al-ain, uae: rent named as the emirate median, not observed, and neutral; no in-branch advice; performance quoted as context.
+- **SC8:** run() 4.4 s (fresh processes); suite 57 s (186 passed); speed guard green, limits unchanged.
+
+**Model issues after run 11:** F5 fixed. F6 stated, owner's call unchanged. F7 unchanged. New, explained: sharjah-sharjah's median lands on the fallback value at 15% fallback share.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
@@ -454,5 +480,7 @@ Scope: three owner-approved fixes. (1) **Fallback rents are neutral** (`growth.R
 | 9 | 2026-10-11 | F1 (frozen UAE-wide cost anchor, 14.34) and F2 (site_served demand; performance_vs_site as context) | unchanged (3/10) | BT2/BT3 **pass**: PROTECT → GROW 10/10, SHRINK → SKIP 8 + WATCH 1, HOLD → WATCH 4; BT4 partial (DIP); BT1, BT5, BT6 unchanged | SC2 10/4/9/1, 49/48/464 (14 lounge calls and 15 WATCH → GROW, attributed); SC4 **F1 passes** (no relative baseline; +50% demand never lowers another lounge), one knife-edge closure move via the typical-lounge median (F5); SC5 pass (121 regenerated); SC8 4.4 s cold / 4.1 s warm, suite 58 s | **none unexplained.** F5 (typical lounge drifts with closures; al-maqta 0.0003 from the line) and F3 fragility explained |
 
 | 10 | 2026-10-11 | Labels judged within each emirate against a frozen reference of 1,123 competitor salon sites: demand percentile + rent ratio; GROW also needs rent ratio ≥ 1 and demand ≥ 50th percentile | unchanged (3/10) | BT2/BT3 partial, explained (F6: PROTECT → GROW 4/6; nad-al-sheba SKIP on the absolute 6,000 line); BT4 partial (DIP); BT1, BT5, BT6 unchanged | SC2 6/14/3/1, 32/65/464 (15 lounge calls and 17 GROW → WATCH, attributed; F7 bunching); SC4 **pass** on the frozen reference (rent ratio and reference never move; one F5 knife-edge move, 0 with the typical lounge pinned; no competitor raises a composite); SC5 pass (121 regenerated); SC8 4.1 s cold / 3.8 s warm | **none unexplained.** F5, F6, F7 explained |
+
+| 11 | 2026-10-11 | Fallback rents neutral (area half+ fallback, lounge site cell); typical lounge frozen (757, 4.6★); F6 limitation stated | unchanged (3/10) | BT2/BT3 unchanged (F6, now a stated limitation); others unchanged | SC2 6/14/3/1, 34/63/464 (manama-ajman, mudayrah-ajman WATCH → GROW; al-ain, al-falah PROTECT at low confidence); SC4 **pass** (0 moves toward SHRINK, 0 dips; F5 gone); SC5 pass (23 regenerated); SC8 4.4 s, suite 57 s | **none unexplained.** sharjah-sharjah fallback-median edge explained |
 
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.
