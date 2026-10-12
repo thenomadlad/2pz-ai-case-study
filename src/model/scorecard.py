@@ -45,7 +45,7 @@ SIGNALS: tuple[Signal, ...] = (
            "there and all our lounges open; UAE-wide where an emirate has under 50: SITE_REFERENCE_WHY "
            "in src/features/lounges.py). The 0..1 percentile is the score. The lounge's own served "
            "women are shown as performance_vs_site (context, not scored): served by its own reviews, "
-           "they partly restate review volume (SANITY_CHECKS F2)."),
+           "they partly restate review volume (docs/sanity-checks.md F2)."),
     Signal("cost", "rent_ratio", "Site rent: emirate median shop rent at salon sites ÷ this site's",
            RENT_RATIO_P10, RENT_RATIO_P90,
            "Above 1 = cheaper than a typical salon site in its emirate. Scale frozen (RENT_RATIO_WHY). "
@@ -76,7 +76,7 @@ NEUTRAL = 0.5  # a missing rating gap never scores as the worst; thin-market cap
 THIN_MARKET = 10
 THIN_MARKET_WHY = ("Under 10 premium salons, capture is a share of a tiny pool, so it is noisy: its score keeps "
                    "only premium_pool / 10 of its distance from neutral (0 salons: neutral). A blend replaces "
-                   "the old cliff, where three 5-review salons swung al-dhafra by 0.14 (SANITY_CHECKS SC4). "
+                   "the old cliff, where three 5-review salons swung al-dhafra by 0.14 (docs/sanity-checks.md SC4). "
                    "A thin market stays a low-confidence reason.")
 WEIGHT_STEPS = (0.75, 1.25)
 WEIGHT_WHY = ("The weights are a design choice, not data. Each signal's weight is moved ×0.75 and ×1.25, "

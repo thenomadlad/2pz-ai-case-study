@@ -11,7 +11,7 @@
 
 **Tech Stack:** Python 3.11+, pandas, the existing `src/features/lounges.py` feature build, pydantic models, Streamlit pages, pytest. No new dependencies. No paid APIs.
 
-**Spec:** This plan carries its own design: the user's request on 2026-10-10 ("obtain commercial real estate prices for each lounge and ideally each catchment; calculate something like number of women / average dollar of rent"). Read alongside `RUBRIC.md` (OB5, DA1, S6, US7) and `SANITY_CHECKS.md` (the rules: expected outcomes before running; no tuning to pass).
+**Spec:** This plan carries its own design: the user's request on 2026-10-10 ("obtain commercial real estate prices for each lounge and ideally each catchment; calculate something like number of women / average dollar of rent"). Read alongside `docs/rubric.md` (OB5, DA1, S6, US7) and `docs/sanity-checks.md` (the rules: expected outcomes before running; no tuning to pass).
 
 ## Design decisions (read before Task 1)
 
@@ -39,7 +39,7 @@
 - Every new constant lives next to the logic that uses it, with a `*_WHY` string (rubric MO9).
 - Every published-rent row cites a public URL and a publication date. A row without a source is not allowed.
 - Labels must not change: this plan adds display fields only. If a label changes, that's a bug.
-- Before running, write the run-5 expected outcomes into `SANITY_CHECKS.md` (Task 0), as for runs 2 and 3.
+- Before running, write the run-5 expected outcomes into `docs/sanity-checks.md` (Task 0), as for runs 2 and 3.
 
 ## Review Focus
 
@@ -54,7 +54,7 @@
 ### Task 0: Write the expected outcomes (no code)
 
 **Files:**
-- Modify: `SANITY_CHECKS.md` (new section "Expected outcomes for run 5", before `## Run log`)
+- Modify: `docs/sanity-checks.md` (new section "Expected outcomes for run 5", before `## Run log`)
 
 - [ ] **Step 1: Add the expectations, before any code exists**
 
@@ -74,8 +74,8 @@
 - [ ] **Step 2: Commit**
 
 ```bash
-git add SANITY_CHECKS.md
-git commit -m "SANITY_CHECKS: expected outcomes for run 5 (commercial rent), written before the work"
+git add docs/sanity-checks.md
+git commit -m "docs/sanity-checks.md: expected outcomes for run 5 (commercial rent), written before the work"
 git push origin main
 ```
 
@@ -569,8 +569,8 @@ git push origin main
   - The reference unit is assumed.
   - Display only, and why (rent tracks revenue too).
 - Modify: `docs/data-inventory.md` (rows for both new files, with licences: DLD open data; each report's terms)
-- Modify: `SANITY_CHECKS.md` (run 5 results for SC7 and BT6 against Task 0; run log row)
-- Modify: `RUBRIC.md`:
+- Modify: `docs/sanity-checks.md` (run 5 results for SC7 and BT6 against Task 0; run log row)
+- Modify: `docs/rubric.md`:
   - OB5: "fixed site cost" has a source.
   - DA1 and S6 notes.
   - An audit-log row.
@@ -599,7 +599,7 @@ Run: `uv run --extra dev --extra notebook pytest -q` (green). Then grep the docs
 - [ ] **Step 3: Commit**
 
 ```bash
-git add CONTEXT.md README.md docs/limitations.md docs/data-inventory.md SANITY_CHECKS.md RUBRIC.md
+git add CONTEXT.md README.md docs/limitations.md docs/data-inventory.md docs/sanity-checks.md docs/rubric.md
 git commit -m "Commercial rent: docs, sanity run 5 (SC7, BT6), rubric OB5 site-cost source"
 git push origin main
 ```

@@ -189,7 +189,7 @@ def test_affluence_off_reproduces_the_unweighted_model_exactly(real_v3):
     assert all(x.est_customers == (0.0 if x.not_scored else x.capture * x.catchment_women) for x in f)
     assert all(a.addressable_women == a.women for a in areas)
     # the calls are the baseline run's (affluence is off at baseline); no frozen composites since the
-    # site-scored model (2026-10-11): calls are checked by behaviour, the call diff lives in SANITY_CHECKS
+    # site-scored model (2026-10-11): calls are checked by behaviour, the call diff lives in docs/sanity-checks.md
     from src.baseline import run
     r = run()
     assert [(d.branch_id, d.composite) for d in scorecard.decide(f)] == [(d.branch_id, d.composite) for d in r.decisions]

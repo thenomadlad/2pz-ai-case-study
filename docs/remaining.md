@@ -1,4 +1,4 @@
-> **Historical:** a build log and decision register from the v1/v2 models through the v3 integration. Several sections describe models that no longer exist; the current model, scope and limitations are in the [README](../README.md) and [`limitations.md`](limitations.md). Open work is tracked in [`RUBRIC.md`](../RUBRIC.md).
+> **Historical:** a build log and decision register from the v1/v2 models through the v3 integration. Several sections describe models that no longer exist; the current model, scope and limitations are in the [README](../README.md) and [`limitations.md`](limitations.md). Open work is tracked in [`docs/rubric.md`](rubric.md).
 
 # Case study gap analysis: what's done, what's missing
 

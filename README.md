@@ -588,7 +588,7 @@ Built with **Claude Code** throughout: 119 of the first 149 commits carry a Clau
 Sonnet and Haiku). Claude wrote the code and tests, the fetch scripts and notebooks, ran
 the review passes (the "Fix N" and "review fixes" commits), and wrote the committed explanations
 offline in a session from the app's own prompts. The specs and plans it executed are in
-`docs/superpowers/`; the audits are `RUBRIC.md` and `SANITY_CHECKS.md`. The human set the
+`docs/superpowers/`; the audits are `docs/rubric.md` and `docs/sanity-checks.md`. The human set the
 direction and signed off the judgement calls: the scorecard scales and the salon-site reference, every paid API run (e.g.
 282 Places calls, ~$7) and the ones declined (a ~$54-210 full sweep).
 
@@ -689,7 +689,7 @@ rush-hour catchments, a full competitor sweep, Bedashing's real price level.
 
 ## Potential improvements
 
-Ideas raised while building this that we haven't acted on, roughly in order of value. The open items in [RUBRIC.md](RUBRIC.md) (*To improve*) and the limitations above are the detailed record; this is the short list.
+Ideas raised while building this that we haven't acted on, roughly in order of value. The open items in [docs/rubric.md](docs/rubric.md) (*To improve*) and the limitations above are the detailed record; this is the short list.
 
 **Features**
 

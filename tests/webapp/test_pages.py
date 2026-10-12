@@ -198,7 +198,7 @@ def test_how_page_is_the_readme_then_live_values():
     parts = readme_parts(README.read_text())
     assert sum(k == "mermaid" for k, _ in parts) == 2                     # both diagrams drawn, not shown as code
     md = " ".join(p for k, p in parts if k == "md")
-    assert "](https://github.com/thenomadlad/2pz-ai-case-study/blob/main/RUBRIC.md)" in md   # repo links work
+    assert "](https://github.com/thenomadlad/2pz-ai-case-study/blob/main/docs/rubric.md)" in md   # repo links work
     assumptions = at.table[0].value                                       # live values from the code
     assert {"travel_time_minutes", "search_recall", "worker_housing_female_share"} <= set(assumptions.index)
     assert "low: 10 · medium: 15 · high: 20" in assumptions.loc["travel_time_minutes"].iloc[0]

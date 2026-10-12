@@ -9,7 +9,7 @@ Our **go/no-go criteria**: the checklist that grades our solution against the br
 **Go / no-go.** The solution is **GO** (ready to submit) only when all three hold:
 1. Every `[brief]` item is ticked.
 2. Every `[ours]` item is either ticked or parked, with a `parked:` reason in its To-improve list.
-3. The latest run of [`SANITY_CHECKS.md`](SANITY_CHECKS.md) has no unexplained failure. That file holds the user stories, back-tests and sanity checks, which are about whether the answers are *believable* rather than whether a box exists.
+3. The latest run of [`docs/sanity-checks.md`](sanity-checks.md) has no unexplained failure. That file holds the user stories, back-tests and sanity checks, which are about whether the answers are *believable* rather than whether a box exists.
 
 Anything else is **NO-GO**, and the audit log records which condition failed.
 
@@ -403,7 +403,7 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
   - [x] **Multi-criteria suitability / weighted overlay (MCDA, AHP):** likely what our whitespace model really is. Weights are justified the way MCDA requires (stated, sensitivity-tested), not just picked.
   - [x] **Location-allocation / maximal coverage (MCLP):** picks the *set* of new sites that maximises coverage. We score cells one by one, so two adjacent GROW cells could cannibalise each other. Stated, or handled.
   - [x] **Analog / sales-regression models:** these need revenue we don't have. Stated as the main reason our health score is a proxy.
-- [x] **MO5. Validated against reality.** The latest run of [`SANITY_CHECKS.md`](SANITY_CHECKS.md) (back-tests BT1–BT5, sanity checks SC1–SC6) has no unexplained failure, and each expected outcome was written down before the check ran.
+- [x] **MO5. Validated against reality.** The latest run of [`docs/sanity-checks.md`](sanity-checks.md) (back-tests BT1–BT5, sanity checks SC1–SC6) has no unexplained failure, and each expected outcome was written down before the check ran.
 - [ ] **MO6. Sensitivity is known** (see 1.7). We report which labels flip under reasonable changes to weights and thresholds. Labels that sit near a boundary are presented as borderline, not as confident calls.
 - [x] **MO7. Not tuned to taste.** Weights and thresholds weren't adjusted until the label mix "looked right". Where we did tune them, we say so and give the target.
 - [x] **MO8. Branch and whitespace models are consistent** (see B1). They use the same catchment, competitor definition and demand measure, so a branch's cell scored by the whitespace model gives an answer that fits with its branch label.
@@ -466,4 +466,4 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 | "What we care about" | Framing, research, structure, stack, trade-offs, AI use, delivery | J1–J7 |
 | Final note | First / simplify / abstract / trust / automate / explain / ship | H1–H7 |
 | *(ours)* | Business focus, ROIC gate, clustering | A7, E6, OB5, MO11 |
-| *(ours)* | User stories, back-tests, sanity checks | [`SANITY_CHECKS.md`](SANITY_CHECKS.md) via MO5 |
+| *(ours)* | User stories, back-tests, sanity checks | [`docs/sanity-checks.md`](sanity-checks.md) via MO5 |

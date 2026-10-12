@@ -15,7 +15,7 @@
 
 **Tech Stack:** Python 3.11+, pandas, numpy, shapely (already used by the scripts), Jupyter via `uv run --extra notebook`, pytest. No new dependencies. No paid APIs.
 
-**Spec:** `RUBRIC.md` Part 7 (OB1–OB5, MO4-Huff, MO6, MO8, MO11) and the user's request on 2026-10-11 ("create notebooks for each of our models, with our assumptions and decision thresholds analyzed… dig into and refine the model with notebooks before updating the site"). Also `SANITY_CHECKS.md` (its rules and BT1–BT6, SC1–SC7) and the conversation decisions recorded in RUBRIC OB1–OB4:
+**Spec:** `docs/rubric.md` Part 7 (OB1–OB5, MO4-Huff, MO6, MO8, MO11) and the user's request on 2026-10-11 ("create notebooks for each of our models, with our assumptions and decision thresholds analyzed… dig into and refine the model with notebooks before updating the site"). Also `docs/sanity-checks.md` (its rules and BT1–BT6, SC1–SC7) and the conversation decisions recorded in RUBRIC OB1–OB4:
 - the objective is services delivered;
 - a lounge is a capacity bundle;
 - cannibalisation means shared-zone demand below combined capacity;
@@ -47,7 +47,7 @@
 
 **Files:**
 - Create: `data/scenarios/baseline_v3_labels.csv` (the output of `just labels` on today's model)
-- Modify: `SANITY_CHECKS.md` (new section "Expected outcomes for the v4 served-demand model", before `## Run log`)
+- Modify: `docs/sanity-checks.md` (new section "Expected outcomes for the v4 served-demand model", before `## Run log`)
 - Test: `tests/test_baseline_v3.py`
 
 **Interfaces:**
@@ -92,7 +92,7 @@ Run: `uv run --extra dev --extra notebook pytest tests/test_baseline_v3.py -k fr
 - [ ] **Step 4: Commit**
 
 ```bash
-git add data/scenarios/baseline_v3_labels.csv tests/test_baseline_v3.py SANITY_CHECKS.md
+git add data/scenarios/baseline_v3_labels.csv tests/test_baseline_v3.py docs/sanity-checks.md
 git commit -m "Frozen v3 labels and v4 expected outcomes (before the served-demand work)"
 git push
 ```
@@ -469,10 +469,10 @@ What the notebook covers:
 - Create: `src/sanity.py` (BT1–BT6 and SC2–SC4 as functions, each returning a small DataFrame plus a pass/explain verdict)
 - Create: `notebooks/sanity.ipynb` (runs them for v3 and v4 side by side)
 - Modify: `justfile` (`sanity: uv run python -m src.sanity`)
-- Modify: `SANITY_CHECKS.md` (v4 run results against the Task 0 expectations; run-log row)
+- Modify: `docs/sanity-checks.md` (v4 run results against the Task 0 expectations; run-log row)
 - Test: `tests/test_sanity.py` (each check runs, and returns a verdict on both models)
 
-- [ ] **Steps:** port the audit scripts' logic (they live in the session scratch dir and are not in the repo; re-derive from the SANITY_CHECKS definitions) into `src/sanity.py` behind tests; the notebook; `just sanity`; record the results; commit and push.
+- [ ] **Steps:** port the audit scripts' logic (they live in the session scratch dir and are not in the repo; re-derive from the docs/sanity-checks.md definitions) into `src/sanity.py` behind tests; the notebook; `just sanity`; record the results; commit and push.
 
 ---
 

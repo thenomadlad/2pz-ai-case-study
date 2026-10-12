@@ -1,6 +1,6 @@
 # Sanity Checks
 
-[`RUBRIC.md`](RUBRIC.md) asks whether the solution has what it needs. This file asks whether the answers are **believable**: whether a COO can actually use them, whether the model rediscovers what we already know, and whether it fails in the places it should. The rubric is the go/no-go gate, and a clean run of this file is one of its conditions (MO5).
+[`docs/rubric.md`](rubric.md) asks whether the solution has what it needs. This file asks whether the answers are **believable**: whether a COO can actually use them, whether the model rediscovers what we already know, and whether it fails in the places it should. The rubric is the go/no-go gate, and a clean run of this file is one of its conditions (MO5).
 
 ## When to run
 
