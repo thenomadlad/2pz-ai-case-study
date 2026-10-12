@@ -127,6 +127,15 @@ def _area_legend(r) -> None:
                 "🟪 **WATCH**: big but dearer or weaker demand, or mostly worker housing  \n"
                 f"⬜ **SKIP or no data**: under {growth.SKIP_UNDER_WOMEN:,} women, a non-residential name, or too small a gain")
 
+def _rules_note() -> None:
+    """The explanation text quotes the baseline decision rules; say so when the user has changed them."""
+    from src.models import Rules
+    if data.what_if()["rules"] != Rules():
+        st.caption("⚠️ The text above was written for the baseline decision rules (PROTECT at "
+                   f"{scorecard.PROTECT_AT}, SHRINK at {scorecard.SHRINK_AT}, GROW from {growth.NEW_SITE_MIN:,} "
+                   "net new women). The call and tests shown here use your rules.")
+
+
 def _lounge_panel(r, b: str) -> None:
     f = next((f for f in r.features if f.branch_id == b), None)
     if f is None:
@@ -143,6 +152,7 @@ def _lounge_panel(r, b: str) -> None:
     left, right = st.columns([3, 2])
     with left:
         render_pyramid(exp)
+        _rules_note()
         if d.key_drivers:
             weights = scorecard.weights(r.rules)
             st.markdown("**Top drivers:** " + " · ".join(
@@ -172,6 +182,7 @@ def _area_panel(r, area_id: str) -> None:
     left, right = st.columns([3, 2])
     with left:
         render_pyramid(exp)
+        _rules_note()
         st.markdown(f"**The tests:** {_check(d.big_enough)} big enough ({a.new_site_net or 0:,.0f} net new "
                     f"women, line {r.rules.grow_min:,}) · "
                     f"{_check(a.demand_pct is None or a.demand_pct >= r.rules.demand_pct_min)} "
