@@ -1,6 +1,6 @@
 # Walkthrough
 
-About ten minutes. It follows one question from the overview to two decisions, shows how the AI
+About ten minutes. It follows one question from the Executive Summary to two decisions, shows how the AI
 text is made and checked, and ends with where not to trust it. Every number below is what the app
 shows at the baseline on 2026-10-11 (15-min drive, 60% competitor coverage, 5.5% women in worker
 housing, affluence weighting off). The AI text is paraphrased, not quoted: it is regenerated when the
@@ -21,52 +21,42 @@ The app answers the two decisions the COO already makes:
 The rules make every call. Claude only explains them, and every number it writes is checked
 against the data.
 
-## 2. The overview: the question and what's at stake
+## 2. The Executive Summary: the answer, then the evidence
 
-Open the [Overview](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/). It opens on the
-COO's question, **"Where is my network under pressure, and where should we grow?"**, and answers it
-in the **Executive summary**: of 23 scored lounges, 6 are PROTECT, 14 HOLD and 3 SHRINK; 32 of 561
-growth areas are GROW and 65 WATCH. Every label is judged within the site's emirate against a frozen
-market of 1,123 competitor salon sites, never against our own lounges. Numbered arguments follow (where to investigate, where to grow,
-what to protect, how sure we are, what this can't see), each with its data underneath, then **So
-what** and **Now what**.
+Open the [Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/). It opens on
+the COO's question, **"Where is my network under pressure, and where should we grow?"**, and answers it in
+one sentence: review 3 weak lounge sites, defend 6 strong ones and test 34 areas for new lounges. Of 23
+scored lounges, 6 are PROTECT, 14 HOLD and 3 SHRINK; 34 of 561 growth areas are GROW and 63 WATCH. Every
+label is judged within the site's emirate against a frozen market of 1,123 competitor salon sites, never
+against our own lounges. A warning line says 12 of 23 calls are low confidence and links to *How sure we
+are*.
 
-Below it, three at-stake figures, counted in women because the model has a rent-based site cost but
-no revenue:
+Two collapsed boxes sit under it: **How we measure** (serviceable market per AED of commercial rent,
+within each emirate; why rent is the cost signal; why each threshold) and the **AI-written summary**.
 
-| Metric | Value | Counts |
-|---|---|---|
-| Under pressure: 3 SHRINK lounges | about 323k women | women in their catchment cells that a sibling also reaches |
-| To defend: 6 PROTECT lounges | about 595k women | women within a 15-min drive of them |
-| To grow: 32 GROW areas | about 784k women | addressable women beyond a 15-min drive of every lounge; 65 more areas on WATCH |
+Then three cards, each a claim with one number, counted as a share of the ~164k women our lounges serve
+today (model estimate): **Review** (3 SHRINK lounges, 7% of our served market), **Grow** (34 areas;
+the best, Al Dhaid, would grow it by about 35%) and **Protect** (6 PROTECT lounges, 37%). Each card's
+*Evidence ↓* jumps to its section: a map of just those lounges or areas and a table whose names link to
+their pages. Growth percentages can't be added up: neighbouring areas reach the same women.
 
-Then the **⚠️ Before you trust these calls** box (no revenue or lease data, lifetime reviews behind
-served demand, shop rent from a different source per emirate, 9 of 23 calls low confidence, growth
-areas a first cut) and the **🧪 What if…?** panel (used in section 5).
+**How sure we are** closes the page: the HOLD band, the low-confidence list, a box of the branch-health
+KPIs with what each rests on today and the data that would make us surer, and the **⚠️ Before you trust
+these calls** limitations.
 
-**The map.** Under *The map — click a lounge or an area*, tick **All catchments (overlap)**. Every
-lounge's 15-min catchment is drawn at once, with cells shared by 2+ lounges in red. Abu Dhabi
-island and its mainland suburbs are almost solid red; al-ain, al-dhafra, al-taif-mall and
-ras-al-khaimah sit alone. Overlap is shown, not scored: the Huff split already divides a shared
-cell's women between the lounges and salons that reach it. Untick it; the other toggles are
-**Growth areas** (on), **…including SKIP areas**, **Affluence (Dubai rents)**, **Premium
-substitutes** (on) and **…of every lounge**. Hollow circles are low-confidence calls.
-
-**Compare.** At the bottom, the **Lounges** tab ranks every lounge by composite with its two
-signal scores (demand, rent), and as context its shared catchment, capture share, premium reviews per
-1k women, shop rent, rating, reviews and confidence (filter by Call or Emirate; click a header to
-sort). The **Growth areas, ranked** tab lists GROW then WATCH with a one-line *Why* and a confidence.
+**The What-if explorer** is a separate page and the only one that reads a what-if: the assumptions panel
+(collapsed), **Test a SHRINK** (close lounges), and the full map. Every area is coloured: GROW blue,
+already captured green (our lounges serve 2%+ of its women), WATCH purple, SKIP or no data grey; lounges
+are pins in their call's colour, hollow when low confidence. *Jump to* pills re-centre on a city, and the
+legend is a collapsed section under the map.
 
 ## 3. One lounge decision: city-walk (SHRINK)
 
-Click the **city-walk** flag in Dubai, or open
-[`?lounge=city-walk`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/?lounge=city-walk).
-The map draws its drive polygon, catchment cells and premium substitutes, and a panel opens under
-the legend with the short pyramid, its top drivers and the caveats. Click **Open the lounge page →**
-([`/lounge?lounge=city-walk`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk)).
+Click **City Walk** in the Review evidence table, select its row on the **Lounges** page, or open
+[`/lounge?lounge=city-walk`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk).
 
-**What.** City Walk, Al Wasl, Dubai. *Composite 0.15 · confidence high · the call changes at 0 of 3
-worker-housing share levels.* A typical lounge at its site would serve about **1,900 women** in the Huff
+**What.** City Walk, Al Wasl, Dubai. *Composite 0.15 · confidence high · the call changes in 0 of 27
+assumption combinations.* A typical lounge at its site would serve about **1,900 women** in the Huff
 split: **bottom 30% of Dubai salon sites on demand** (the demand score is that percentile, 0.30),
 26th percentile UAE-wide. Its shop rent, AED 4,561/m² (its DLD area's median), gives a **rent ratio
 of 0.47**: Dubai's median salon site pays under half that. That is below the rent scale's P10 (0.62),
@@ -75,9 +65,11 @@ estimates this lounge is performing 1.1x compared to its site*: context, not sco
 
 **The two signals.** *The two signals, on fixed scales* shows each value, its scale, the UAE-wide
 percentile beside it and why the scale is set there: both rank the site within its emirate against a
-frozen reference of competitor salon sites (582 in Dubai), never against our own lounges. The factor
-table at the bottom gives each signal's contribution to the composite. Capture, rating and shared
-catchment are shown below them, not scored.
+frozen reference of competitor salon sites (582 in Dubai), never against our own lounges. Right under
+it, **What would change the call** is a tree: the call, then each signal, then what drives it, shaded
+red (pulls the call down) to green (up). For city-walk the rent rows are deep red. Below the tree:
+how the estimates move with each assumption (drive time, competitor coverage, worker housing), the
+competitors table and the shared catchment.
 
 **Who it shares with.** The **Shared catchment** table names the siblings that reach its cells
 (72% of its catchment women are also reached by another lounge). If city-walk closed, siblings would
@@ -97,18 +89,17 @@ finance's P&L for it before anyone says "close".
 
 ## 4. One growth opportunity: Kalba (GROW)
 
-Back on the Overview, open the **Growth areas, ranked** tab. Click Kalba's blue cells on the east
-coast, or open
+Select Kalba on the **Areas** page (or click its blue cells on the What-if explorer's map), or open
 [`/area?area=kalba-sharjah`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah).
 
 **How this call was made.** Every area is a what-if: open a typical lounge (the median lounge's
 reviews and rating) at its centre. In Kalba it would add about **12,500 net new women** (6,000
 needed), worker housing is 1% (under 50%), it is in the **top 10% of Sharjah salon sites on demand**
-(0.5 needed; 98th percentile UAE-wide), and its **rent ratio is 1.00** (1 needed). All checks ✅,
-high confidence. Premium reviews per 1k women is shown as context.
+(0.5 needed; 98th percentile UAE-wide), and its rent test is **neutral**: it passes, but the call is
+**low confidence**. Premium reviews per 1k women is shown as context.
 The caveats: Kalba has no shop rent of its own, so it carries Sharjah's emirate median, which equals
-the median at Sharjah's reference salon sites: the rent test passes by construction, as it does for
-all 10 Sharjah GROW areas. A site far from any salon also tops the demand percentile easily (the
+the median at Sharjah's reference salon sites. Where an area's rent is mostly that fallback, the rent
+test is scored neutral and the call marked low confidence, as for most of Sharjah's 10 GROW areas. A site far from any salon also tops the demand percentile easily (the
 reference sites all have a competitor next door). Distance is a straight line, and Bedashing's only
 Sharjah lounges (al-jada, zawaya-walk) are on the Dubai side, which is a business question the model
 can't answer.
@@ -116,7 +107,7 @@ can't answer.
 For a WATCH, compare
 [`/area?area=bani-yas-abu-dhabi`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=bani-yas-abu-dhabi):
 about 8,300 net new women and the top 2% of Abu Dhabi salon sites on demand, but a rent ratio of
-0.70, dearer than the median Abu Dhabi salon site (62nd percentile of rent UAE-wide). All 17 WATCH
+0.70, dearer than the median Abu Dhabi salon site (62nd percentile of rent UAE-wide). All 15 WATCH
 areas with 6,000+ net new women fail this way, on rent; none fails on demand.
 
 ## 5. The AI layer
@@ -137,17 +128,18 @@ data points each, so what, now what. It doesn't make or change calls.
 **Offline, no API spend.** The committed explanations in `data/explanations/cache.json` were
 written in a Claude Code session from the same prompts the API would get:
 `python -m src.explain prompts DIR` → write answers → `check DIR` → `ingest DIR`, which runs
-`verify` again and caches only grounded answers. `just explain` is the API route (needs a key).
+`verify` again and caches only grounded answers. `just explain` (`python -m src.explain api`) is the
+only API route (needs a key); any other argument just prints the usage.
 Every AI text in the app is captioned *"AI-written (cached): every number in it was checked against
 the data."*
 
 **Fallback.** The cache is keyed by a hash of the exact numbers. Change them and the cached text no
-longer applies, so a deterministic template takes over. Try it: in **🧪 What if…?** set **Travel
-time to a lounge** to **20 min (high)**, or close a lounge from its map panel, then open a lounge
-page from inside the app (reloading the URL starts a fresh session at the baseline). A *What-if
-view* banner appears, and where the numbers changed the text is captioned *"Template — numbers
-changed by the what-if, so the cached AI text no longer applies."* **Reset to baseline** brings the
-AI text back. SKIP areas and the NOT SCORED airport lounge always use the template.
+longer applies, so a deterministic template takes over. Try it on the **What-if explorer**: set **Drive
+time** to **20 min (high)**, or close a lounge under **Test a SHRINK**, then click a lounge on the map.
+A *What-if view* banner appears, and where the numbers changed the panel's text is captioned
+*"Template — numbers changed by the what-if, so the cached AI text no longer applies."* **Reset to
+baseline** brings the AI text back. The other pages always show the baseline, so they keep the AI text.
+SKIP areas and the NOT SCORED airport lounge always use the template.
 
 ## 6. Where not to trust it
 
