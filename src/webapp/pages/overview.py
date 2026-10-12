@@ -125,11 +125,11 @@ def _lounge_evidence(r, fs: list, claim: str, anchor: str) -> None:
     left, right = st.columns([5, 8])
     left.pydeck_chart(build_deck([lounge_layer(r.features, r.decisions, only=ids)],
                                  _fit([(f.lat, f.lng) for f in fs])), height=340)
-    df = pd.DataFrame([{"Lounge": short(f.name, f.branch_id), "Composite": calls[f.branch_id].composite,
+    df = pd.DataFrame([{"Lounge": f"/lounge?lounge={f.branch_id}&name={short(f.name, f.branch_id)}", "Composite": calls[f.branch_id].composite,
                         "Share of market": _pct((f.served_women or 0) / served_market(r)),
                         "Out-serves": _pct(f.demand_pct), "Rent ratio": _ratio(f.rent_ratio),
                         "Vs its site": f.performance_vs_site, "Confidence": calls[f.branch_id].confidence,
-                        "Page": f"/lounge?lounge={f.branch_id}"}
+}
                        for f in sorted(fs, key=lambda f: calls[f.branch_id].composite)])
     right.dataframe(df, hide_index=True, column_config=_EVIDENCE_COLUMNS)
 
@@ -157,7 +157,9 @@ _EVIDENCE_COLUMNS = {
     "Est. growth": st.column_config.NumberColumn(format="+%d%%", help="Net new women a typical lounge here "
                                                  "would add ÷ the women our lounges serve today (both model "
                                                  "estimates). Not additive: neighbouring areas reach the same women"),
-    "Page": st.column_config.LinkColumn(display_text="Open →")}
+    # the name is the link (opens its page in a new tab); display_text shows the name carried in the URL
+    "Lounge": st.column_config.LinkColumn(display_text=r"name=(.*)$"),
+    "Area": st.column_config.LinkColumn(display_text=r"name=(.*)$")}
 
 
 def _grow_evidence(r, p: dict) -> None:
@@ -168,10 +170,10 @@ def _grow_evidence(r, p: dict) -> None:
     left, right = st.columns([5, 8])
     left.pydeck_chart(build_deck([area_cells_layer(cells, p["grow"], r.area_decisions),
                                   lounge_layer(r.features, r.decisions)], _fit(pts, 9)), height=340)
-    df = pd.DataFrame([{"Area": f"{a.name}, {a.emirate}", "Est. growth": _pct((a.new_site_net or 0) / p["base"]),
+    df = pd.DataFrame([{"Area": f"/area?area={a.area_id}&name={a.name}, {a.emirate}", "Est. growth": _pct((a.new_site_net or 0) / p["base"]),
                         "Out-serves": _pct(a.demand_pct),
                         "Rent ratio": _ratio(None if growth.rent_fallback(a) else a.rent_ratio),
-                        "Confidence": act[a.area_id].confidence, "Page": f"/area?area={a.area_id}"}
+                        "Confidence": act[a.area_id].confidence}
                        for a in p["grow"]])
     right.dataframe(df, hide_index=True, column_config=_EVIDENCE_COLUMNS, height=340)
     st.caption(f"Blue cells: GROW areas; pins: our lounges. Est. growth = net new women a typical lounge would "
@@ -192,7 +194,23 @@ def _how_sure(r) -> None:
                 f"{scorecard.LOW_MARGIN} of a line.\n"
                 f"- **{len(low)} of {len(calls)} calls are low confidence:** "
                 f"{', '.join(names[d.branch_id] for d in low)}.")
+    with st.container(border=True):
+        st.markdown("#### Branch health KPIs, and what would make us surer of them")
+        act = {d.area_id: d.action for d in r.area_decisions}
+        st.markdown(KPI_TABLE.format(
+            lounges=_n(sum(f.site_rent_source == "emirate_median" for f in r.features), "lounge"),
+            areas=_n(sum(act[a.area_id] == "GROW" and growth.rent_fallback(a) for a in r.areas), "GROW area")))
     limitations_box(r)
+
+
+KPI_TABLE = """| Branch health KPI | What it tells us | Today it rests on | To be more confident we need |
+|---|---|---|---|
+| **Site demand** (share of its emirate's salon sites it out-serves) | Is the location strong for its emirate? | A Huff split of women 15+ across premium salons, weighted by lifetime Google reviews; distance decay and the outside option are uncalibrated | Bookings or visits per lounge (even a ranking) to calibrate the split; customers' home areas to check the catchments |
+| **Site rent** (rent ratio vs the emirate's salon sites) | Is the site dear for its emirate? | Area shop rents (DLD contracts, ADREC district rates, asking rents); the emirate median where none is observed | Each lounge's actual lease; observed rents where we use the median ({lounges}, {areas}) |
+| **Share of our served market** | How much of our business sits at this lounge? | The same Huff estimate, counted in women, not customers | Customers or revenue per lounge |
+| **Performance vs its site** | Is the lounge beating or trailing its location? | Its lifetime Google reviews as a stand-in for popularity | Bookings, revenue and chair utilisation per lounge |
+| **The call** (PROTECT / HOLD / SHRINK) | Keep, watch or review? | Demand and rent only: no revenue, margin, capex or capacity | Revenue, margin, capex and capacity per lounge, for a return-on-capital test |
+"""
 
 
 def render() -> None:
