@@ -43,37 +43,39 @@ def _rows(tree: list[tuple]) -> pd.DataFrame:
         last_at[depth] = i
         bars = "".join("│  " if more_siblings(last_at[k]) else "   " for k in range(1, depth))
         prefix = "" if depth == 0 else bars + ("├─ " if more_siblings(i) else "└─ ")
-        out.append({"Factor": prefix + label, "Value": value,
-                    "Effect": None if effect is None else round(effect, 2), "Why it matters": note})
+        out.append({"Factor": prefix + label, "Value": value, "_pull": effect, "Why it matters": note})
     return pd.DataFrame(out)
 
 
+CALL_SHADE = {"PROTECT": 1.0, "SHRINK": -1.0, "GROW": 1.0, "SKIP": -1.0}   # HOLD / WATCH: unshaded
+
+
 def lounge_tree(f: dict) -> list[tuple]:
+    """Shaded rows are what pulls the call; each pull is on one scale: a signal score s pulls 2s - 1
+    (0.5 = neutral). The site's own rent row carries the cost pull: it is the cause, the median the yardstick."""
     c, sd, sc = f.get("composite"), f.get("score_demand"), f.get("score_cost")
     ref = f.get("demand_ref") or "its emirate's"
     site_rent, ratio = f.get("site_rent_m2"), f.get("rent_ratio")
     median = ratio * site_rent if ratio and site_rent else None
-    mid = (scorecard.PROTECT_AT + scorecard.SHRINK_AT) / 2
-    half = (scorecard.PROTECT_AT - scorecard.SHRINK_AT) / 2
+    pull_d = None if sd is None else 2 * sd - 1
+    pull_c = None if sc is None else 2 * sc - 1
+    action = f.get("action", "")
     return [
-        (0, "Composite", _num(c, "{:.2f}"), None if c is None else _clip((c - mid) / half),
-         f"Average of the two scores. SHRINK at {scorecard.SHRINK_AT} or less, PROTECT at {scorecard.PROTECT_AT}+"),
-        (1, "Site demand score (weight 1)", _num(sd, "{:.2f}"), None if sd is None else 2 * sd - 1,
-         "Half the composite"),
-        (2, f"Out-serves {ref} salon sites", _pct(f.get("demand_pct")),
-         None if sd is None else 2 * sd - 1, "The score is this percentile"),
-        (3, "Women a typical lounge would serve here", _num(f.get("site_served")), None,
-         "What is ranked: the Huff split, this lounge closed"),
-        (4, "Women 15+ in the catchment", _num(f.get("catchment_women")), None, "The market within reach"),
-        (4, "Premium salons competing for them", _num(f.get("premium_pool")), None, "Rivals that take a share"),
-        (2, "UAE-wide percentile", _pct(f.get("demand_pct_uae")), None, "Context: the same site against all UAE salon sites"),
-        (1, "Site cost score (weight 1)", _num(sc, "{:.2f}"), None if sc is None else 2 * sc - 1,
-         "Half the composite"),
-        (2, "Rent ratio (emirate median ÷ this site)", _num(ratio, "{:.2f}x"),
-         None if sc is None else 2 * sc - 1, "Above 1x = cheaper than a typical salon site in its emirate"),
-        (3, "Shop rent at the site (AED/m²/yr)", _num(site_rent), None,
+        (0, f"{action} · composite {_num(c, '{:.2f}')}", "", CALL_SHADE.get(action),
+         (f"The average of the two signals below. SHRINK at {scorecard.SHRINK_AT} or less, PROTECT at "
+          f"{scorecard.PROTECT_AT}+")),
+        (1, f"Site demand: out-serves {_pct(f.get('demand_pct'))} of {ref} salon sites", f"score {_num(sd, '{:.2f}')}",
+         pull_d, "Half the composite"),
+        (2, "Women a typical lounge would serve here", _num(f.get("site_served")), pull_d,
+         "The number that is ranked (Huff split, this lounge closed)"),
+        (3, "Women 15+ within reach", _num(f.get("catchment_women")), None, "The market"),
+        (3, "Premium salons competing for them", _num(f.get("premium_pool")), None, "Rivals that take a share"),
+        (2, "UAE-wide percentile", _pct(f.get("demand_pct_uae")), None, "Context: against all UAE salon sites"),
+        (1, f"Site rent: {_num(ratio, '{:.2f}x')} the median {ref} salon site", f"score {_num(sc, '{:.2f}')}",
+         pull_c, "Half the composite. Above 1x = cheaper than typical"),
+        (2, "Shop rent at this site (AED/m²/yr)", _num(site_rent), pull_c,
          "Our cost: an area rate that mixes mall and street shops, not this lounge's lease"),
-        (3, "Median rent at its emirate's salon sites", _num(median), None, "The yardstick"),
+        (2, "Median at its emirate's salon sites (AED/m²/yr)", _num(median), None, "The yardstick"),
         (0, "Context, not scored", "", None, ""),
         (1, "Women this lounge serves", _num(f.get("served_women")), None, "Its own customers (model estimate)"),
         (1, "Performance vs its site", _num(f.get("performance_vs_site"), "{:.1f}x"), None,
@@ -86,7 +88,7 @@ def area_tree(f: dict) -> list[tuple]:
     net, pct, ratio = f.get("new_site_net"), f.get("demand_pct"), f.get("rent_ratio")
     fallback = bool(f.get("rent_fallback"))
     return [
-        (0, f"The call: {f.get('action', '')}", f.get("action", ""), None, "GROW needs every test below to pass"),
+        (0, f"{f.get('action', '')}", "", CALL_SHADE.get(f.get("action", "")), "GROW needs every test below to pass"),
         (1, f"Net new women (line {growth.NEW_SITE_MIN:,})", _num(net),
          None if net is None else _clip((net - growth.NEW_SITE_MIN) / growth.NEW_SITE_MIN), "Size test"),
         (2, "Women a typical new lounge would serve", _num(f.get("new_site_served")), None, "Huff split with our lounges and rivals"),
@@ -110,11 +112,11 @@ def area_tree(f: dict) -> list[tuple]:
 
 def render(kind: str, facts: dict) -> None:
     df = _rows(lounge_tree(facts) if kind == "lounge" else area_tree(facts))
-    styled = df.style.format({"Effect": "{:+.2f}"}, na_rep="").apply(
-        lambda row: [_colour(row["Effect"]) if c in ("Factor", "Effect") else "" for c in row.index], axis=1)
+    pulls = df.pop("_pull")
+    styled = df.style.apply(lambda row: [_colour(pulls[row.name]) if c in ("Factor", "Value") else ""
+                                         for c in row.index], axis=1)
     st.dataframe(styled, hide_index=True, column_config={
         "Factor": st.column_config.TextColumn(width="large"),
-        "Effect": st.column_config.NumberColumn(format="%+.2f", help="-1 pushes toward SHRINK or fails the test, "
-                                                "+1 toward PROTECT or passes; blank = context, not scored"),
         "Why it matters": st.column_config.TextColumn(width="large")})
-    st.caption("Shading: red pushes the call down, green up, deeper = stronger; unshaded rows are context.")
+    st.caption("Green pulls the call up (toward PROTECT, or passes a test), red pulls it down; deeper = "
+               "stronger. Unshaded rows are context or yardsticks.")

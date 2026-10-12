@@ -128,10 +128,10 @@ def test_level_selectors_show_actual_values():
 
 
 def _tree(at):
-    """The factor tree under the signals: the dataframe with Factor and Effect columns (shown via a Styler)."""
+    """The factor tree under the signals (a Styler-shaded dataframe with Factor and Why it matters)."""
     for d in at.dataframe:
         v = getattr(d.value, "data", d.value)
-        if {"Factor", "Effect"} <= set(v.columns):
+        if {"Factor", "Why it matters"} <= set(v.columns):
             return v
     raise AssertionError("no factor tree on the page")
 
@@ -145,8 +145,8 @@ def test_lounge_page_shows_caveats_beside_the_call():
     assert "within 0.05 of the SHRINK line" in caveats
     assert "No revenue, lease or footfall data" in caveats
     tree = _tree(at)                                      # 'What would change the call' as a tree
-    assert list(tree.Factor[:2]) == ["Composite", "├─ Site demand score (weight 1)"]
-    assert tree.Effect[0] < 0                             # near SHRINK: the composite row is shaded red
+    assert tree.Factor[0].startswith(("HOLD", "SHRINK", "PROTECT")) and "composite" in tree.Factor[0]
+    assert tree.Factor[1].startswith("├─ Site demand: out-serves")
 
 
 def test_lounge_page_says_performance_vs_site_is_context():
