@@ -81,6 +81,37 @@ network and capital owner on it, to answer five questions. Each answer below is 
 The full ten-minute version, with the AI layer and where not to trust it:
 [`docs/walkthrough.md`](docs/walkthrough.md).
 
+## Limitations
+
+The calls are **a shortlist to test with the business, not decisions**, and the limitations matter
+more than the calls. The biggest ones:
+
+- **No revenue or lease data in the model.** The cost signal is a shop rent (an area median, a
+  district rate or an asking rent, not the lease) against its emirate's median salon site. No revenue, lease terms, actual capex or footfall. **SHRINK means "investigate", not
+  "close".**
+- **Served demand rests on lifetime Google review counts.** Each salon's pull in the Huff split is
+  its reviews, so older salons look bigger and new lounges look weak; the Huff parameters are an
+  uncalibrated first cut.
+- **Shop rent comes from different sources per emirate.** DLD contracts (Dubai), ADREC district
+  rates read by hand off its public map (Abu Dhabi), Property Finder / Bayut asking rents scraped
+  via third-party Apify actors, a grey area under those portals' terms (northern emirates), else the
+  emirate median. The rent ratio compares a site only with its own emirate's salon sites. A cell on
+  the emirate-median fallback has no rent of its own, so where it sets the rent the rent test is
+  neutral and the call low confidence: 17 of the 34 GROW areas (9 in Sharjah) and two PROTECT
+  lounges (al-ain, al-falah).
+- **The calls move with the assumptions.** 12 of the 23 scored lounges are low confidence: 10
+  within 0.05 of a line, plus al-ain (fallback rent) and jumeirah-park, whose calls change in 9 of
+  the 27 drive-time x coverage x worker-share combinations. Affluence weighting is off at baseline: every woman counts the same.
+- **Drive times are midday**, and the competitor search misses smaller salons where Google's
+  20-result cap bites.
+- **The yardstick and thresholds are judgement.** Both signals rank a site within its emirate
+  against a frozen set of 1,123 competitor salon sites, valued by the same uncalibrated served model;
+  emirates with under 50 such sites are ranked UAE-wide on demand. Every score is shown with its
+  UAE-wide percentile as context.
+
+The full ranked list, with which calls each limitation touches and what would fix it:
+[`docs/limitations.md`](docs/limitations.md), also the app's **How it works & limitations** page.
+
 ## Who it's for, and what it decides
 
 | Role | Who | Uses it to |
