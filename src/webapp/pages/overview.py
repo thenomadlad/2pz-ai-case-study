@@ -89,7 +89,7 @@ def _legend(r, lounge: str | None, show_affluence: bool, show_overlap: bool = Fa
                     "Hover a cell for which lounges.")
     if show_all_subs:
         st.markdown("**Every lounge's premium substitutes** (grey, sized by reviews): the premium salons each "
-                    "lounge's capture is measured against.")
+                    "lounge's review share is measured against.")
     if show_affluence:
         rent = data.rents()
         st.markdown(f"**Affluence**: 🟧 observed median household rent per cell, pale = cheap "
@@ -112,7 +112,7 @@ def _lounge_legend() -> None:
                 "◯ **Hollow** = low confidence")
     st.caption("Composite: site demand (share of its emirate's competitor salon sites a typical lounge there would out-serve) "
                "and site rent (its emirate's median salon-site rent ÷ its own), weight 1 each, each "
-               f"0-1 on a fixed scale against a frozen reference; capture, rating and shared catchment are shown, not scored. Low confidence: within {scorecard.LOW_MARGIN} of a line, the call changes in "
+               f"0-1 on a fixed scale against a frozen reference; review share, rating and shared catchment are shown, not scored. Low confidence: within {scorecard.LOW_MARGIN} of a line, the call changes in "
                f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations, or it changes when a "
                "signal weight moves ±25%.")
 
@@ -199,10 +199,12 @@ def pyramid(r) -> dict:
     shrink, protect = lounges["SHRINK"], lounges["PROTECT"]
     thought = (f"Review {_n(len(shrink), 'weak lounge site')}, defend {_n(len(protect), 'strong one')} and test "
                f"{_n(len(grow), 'area')} for new lounges" + (f", most of them in {' and '.join(lead)}." if lead else "."))
-    return {"thought": thought, "shrink": shrink, "protect": protect, "grow": grow,
+    base = served_market(r)
+    return {"thought": thought, "shrink": shrink, "protect": protect, "grow": grow, "base": base,
             "claims": {"review": f"{_n(len(shrink), 'lounge site is', 'lounge sites are')} weak for "
                                  "their emirate on demand or rent: review them",
-                       "grow": f"{_n(len(grow), 'area')} would each add {growth.NEW_SITE_MIN:,}+ net new women",
+                       "grow": f"{_n(len(grow), 'area')} would each grow our served market by "
+                               f"{growth.NEW_SITE_MIN / base:.0%} or more",
                        "protect": f"{_n(len(protect), 'lounge site is', 'lounge sites are')} strong for "
                                   "their emirate: defend them"}}
 
@@ -214,21 +216,47 @@ def _governing(r, p: dict) -> None:
         st.markdown(f"### {p['thought']}")
         st.markdown(f"⚠️ {low} of {len(scored)} lounge calls are low confidence, and the model has no revenue or "
                     "lease data. [How sure we are ↓](#how-sure-we-are)")
+    with st.expander("How we measure: serviceable market per AED of commercial rent, within each emirate"):
+        st.markdown(measures_text(r))
     with st.expander("Read the AI-written summary"):
         render_pyramid(explanation_for(r, "uae", "uae")[0])
 
 
+def served_market(r) -> float:
+    """Women our open lounges serve today: the model's estimate (Huff split), the base for every % below."""
+    return sum(f.served_women or 0 for f in r.features)
+
+
+def measures_text(r) -> str:
+    base = served_market(r)
+    return (
+        "Every call asks one question: **how much serviceable market does a site give us for its commercial "
+        "rent, compared with other salon sites in the same emirate?** We have no bookings, revenue or lease "
+        "data, so two proxies stand in:\n\n"
+        "- **Demand → serviceable market.** The model estimates how many women 15+ a typical lounge at the "
+        "site would serve once competing premium salons and our other lounges take their share (a Huff split "
+        "over 10-20 min drives), and ranks it against its emirate's premium salon sites.\n"
+        "- **Cost to run → commercial rent.** The site's shop rent against the median at its emirate's salon "
+        "sites (Dubai: DLD contracts; Abu Dhabi: ADREC rates; north: listings).\n\n"
+        f"Each is scored 0-1 and the two are averaged: PROTECT at {scorecard.PROTECT_AT}+, SHRINK at "
+        f"{scorecard.SHRINK_AT} or less. Emirates are compared with themselves because rents, prices and "
+        "competition differ between them.\n\n"
+        f"**Growth is shown as % growth in our served market**: what a new lounge would add, net of what it "
+        f"takes from our lounges, ÷ the ~{base / 1000:,.0f}k women our lounges serve today. Every count of "
+        "women is the model's estimate, not a customer count.")
+
+
 def _cards(p: dict) -> None:
-    served = lambda fs: sum(f.served_women or 0 for f in fs)
+    share = lambda fs: f"{sum(f.served_women or 0 for f in fs) / p['base']:.0%}"
     top = p["grow"][0] if p["grow"] else None
-    cards = [("1 · Review", p["claims"]["review"], f"{served(p['shrink']):,.0f} women",
-              "served by them today", ", ".join(short(f.name) for f in p["shrink"]), "review"),
+    cards = [("1 · Review", p["claims"]["review"], share(p["shrink"]),
+              "of our served market (model estimate)", ", ".join(short(f.name) for f in p["shrink"]), "review"),
              ("2 · Grow", p["claims"]["grow"],
-              f"{top.new_site_net:,.0f} women" if top else "none",
-              f"net new at the best ({top.name})" if top else "net new at the best",
+              f"+{top.new_site_net / p['base']:.0%}" if top else "none",
+              f"best: {top.name} (model est.)" if top else "",
               ", ".join(a.name for a in p["grow"][:3]) + (" …" if len(p["grow"]) > 3 else ""), "grow"),
-             ("3 · Protect", p["claims"]["protect"], f"{served(p['protect']):,.0f} women",
-              "served by them today", ", ".join(short(f.name) for f in p["protect"]), "protect")]
+             ("3 · Protect", p["claims"]["protect"], share(p["protect"]),
+              "of our served market (model estimate)", ", ".join(short(f.name) for f in p["protect"]), "protect")]
     for col, (label, claim, kpi, kpi_note, names, anchor) in zip(st.columns(3), cards):
         with col.container(border=True, height="stretch"):
             st.caption(label)
@@ -258,6 +286,7 @@ def _lounge_evidence(r, fs: list, claim: str, anchor: str) -> None:
     left.pydeck_chart(build_deck([lounge_layer(r.features, r.decisions, only=ids)],
                                  _fit([(f.lat, f.lng) for f in fs])), height=340)
     df = pd.DataFrame([{"Lounge": short(f.name), "Composite": calls[f.branch_id].composite,
+                        "Share of market": _pct((f.served_women or 0) / served_market(r)),
                         "Out-serves": _pct(f.demand_pct), "Rent ratio": _ratio(f.rent_ratio),
                         "Vs its site": f.performance_vs_site, "Confidence": calls[f.branch_id].confidence,
                         "Page": f"/lounge?lounge={f.branch_id}"}
@@ -283,7 +312,11 @@ _EVIDENCE_COLUMNS = {
                                               "known, so rent is scored neutral"),
     "Vs its site": st.column_config.NumberColumn(format="%.1fx", help="Women the lounge serves ÷ women a typical "
                                                  "lounge would serve at its site: context, not scored"),
-    "Net new women": st.column_config.NumberColumn(format="%d"),
+    "Share of market": st.column_config.NumberColumn(format="%d%%", help="Share of the women our lounges serve "
+                                                     "today that this lounge serves (model estimate)"),
+    "Est. growth": st.column_config.NumberColumn(format="+%d%%", help="Net new women a typical lounge here "
+                                                 "would add ÷ the women our lounges serve today (both model "
+                                                 "estimates). Not additive: neighbouring areas reach the same women"),
     "Page": st.column_config.LinkColumn(display_text="Open →")}
 
 
@@ -295,14 +328,15 @@ def _grow_evidence(r, p: dict) -> None:
     left, right = st.columns([5, 8])
     left.pydeck_chart(build_deck([area_cells_layer(cells, p["grow"], r.area_decisions),
                                   lounge_layer(r.features, r.decisions)], _fit(pts, 9)), height=340)
-    df = pd.DataFrame([{"Area": f"{a.name}, {a.emirate}", "Net new women": round(a.new_site_net or 0),
+    df = pd.DataFrame([{"Area": f"{a.name}, {a.emirate}", "Est. growth": _pct((a.new_site_net or 0) / p["base"]),
                         "Out-serves": _pct(a.demand_pct),
                         "Rent ratio": _ratio(None if growth.rent_fallback(a) else a.rent_ratio),
                         "Confidence": act[a.area_id].confidence, "Page": f"/area?area={a.area_id}"}
                        for a in p["grow"]])
     right.dataframe(df, hide_index=True, column_config=_EVIDENCE_COLUMNS, height=340)
-    st.caption("Blue cells: GROW areas; pins: our lounges. Net new women can't be added up across areas: "
-               "neighbouring areas reach the same women.")
+    st.caption(f"Blue cells: GROW areas; pins: our lounges. Est. growth = net new women a typical lounge would "
+               f"add ÷ the ~{p['base'] / 1000:,.0f}k our lounges serve today, both model estimates. The growths "
+               "can't be added up: neighbouring areas reach the same women.")
 
 
 def _how_sure(r) -> None:
@@ -330,7 +364,7 @@ def _lounge_table(r) -> None:
                         "Rent ratio": None if f.not_scored else f.rent_ratio,
                         "Rent pct (UAE)": None if f.not_scored else f.rent_pct_uae,
                         "Performance vs site": None if f.not_scored else f.performance_vs_site,
-                        "Shared catchment": f.shared_share, "Capture share": f.capture,
+                        "Shared catchment": f.shared_share, "Review share": f.capture,
                         "Premium reviews per 1k women": f.premium_reviews_per_1k,
                         "Shop rent (AED/m²/yr)": f.site_rent_m2, "Women per AED 1k rent": f.women_per_rent_k,
                         "Google rating": f.rating,
@@ -347,7 +381,7 @@ def _lounge_table(r) -> None:
         "Demand pct (emirate)": pct, "Demand pct (UAE)": pct, "Rent pct (UAE)": pct,
         "Rent ratio": st.column_config.NumberColumn(format="%.2f"),
         "Performance vs site": st.column_config.NumberColumn(format="%.1fx"),
-        "Capture share": pct, "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
+        "Review share": pct, "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
         "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
         "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f")})
     st.caption("Click a column header to sort. Signal scores are 0-1 on fixed scales (1 = good for the "
@@ -356,7 +390,7 @@ def _lounge_table(r) -> None:
                "median shop rent ÷ the site's, above 1 = cheaper); the UAE columns rank the same site against all "
                "UAE salon sites (rent pct: higher = dearer). Performance vs site = women the lounge serves ÷ women a typical "
                "lounge would serve there (2.7x reads 'The model estimates this lounge is performing 2.7x compared "
-               "to its site'): context, not scored; shared catchment = share of its women another open lounge also reaches; capture "
+               "to its site'): context, not scored; shared catchment = share of its women another open lounge also reaches; review "
                "share = its share of its premium substitutes' Google reviews; premium reviews per 1k women = "
                "catchment saturation, the growth areas' measure (shown, not scored). "
                "Shop rent is our cost; women per AED 1k assumes a 150 m² unit. Rent sources: DLD shop "

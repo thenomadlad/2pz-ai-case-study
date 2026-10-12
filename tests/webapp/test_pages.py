@@ -257,6 +257,9 @@ def test_overview_opens_on_the_question_and_its_pyramid():
     evidence = [d.value for d in at.dataframe[:3]]               # review, grow, protect tables
     assert len(evidence[0]) == len(p["shrink"]) and len(evidence[1]) == len(p["grow"])
     assert len(evidence[2]) == len(p["protect"])
+    assert p["base"] == sum(f.served_women or 0 for f in r.features) > 0     # % are of our served market
+    assert "grow our served market by" in p["claims"]["grow"]
+    assert evidence[1]["Est. growth"].iloc[0] == round(100 * p["grow"][0].new_site_net / p["base"])
 
 
 def test_overview_compares_lounges_and_ranks_growth_areas_with_filters():
