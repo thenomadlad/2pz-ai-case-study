@@ -1,13 +1,13 @@
-# Case Study Rubric
+# Product rubric
 
-Our **go/no-go criteria**: the checklist that grades our solution against the brief in `ai-associate-case-study.docx`. Every requirement in the brief maps to at least one item here. The traceability table at the bottom shows where.
+Our **go/no-go criteria**: the checklist that grades the product against what it must do. The coverage table at the bottom shows which items cover each area.
 
 **How to use it:** this is our own working checklist, and we make repeated passes over it. Tick an item only when the solution clearly meets it. "It kind of does this" doesn't count. Leave the box open and add the gap under that section's *To improve* list, with the item ID (e.g. `- E3: no per-cell driver breakdown`). Strike or delete an entry once it's fixed.
 
-**Tags:** `[brief]` means the item is stated in the brief or directly implied by it. Failing one is a real gap against the assignment. `[ours]` means it's our own quality bar. Failing one is a judgement call: fix it if it's cheap or if it makes a `[brief]` item stronger, and otherwise park it. Part 7 is all `[ours]`.
+**Tags:** `[core]` means the item is required of the product. Failing one is a real gap. `[ours]` means it's our own quality bar. Failing one is a judgement call: fix it if it's cheap or if it makes a `[core]` item stronger, and otherwise park it. Part 7 is all `[ours]`.
 
-**Go / no-go.** The solution is **GO** (ready to submit) only when all three hold:
-1. Every `[brief]` item is ticked.
+**Go / no-go.** The solution is **GO** (ready to ship) only when all three hold:
+1. Every `[core]` item is ticked.
 2. Every `[ours]` item is either ticked or parked, with a `parked:` reason in its To-improve list.
 3. The latest run of [`docs/sanity-checks.md`](sanity-checks.md) has no unexplained failure. That file holds the user stories, back-tests and sanity checks, which are about whether the answers are *believable* rather than whether a box exists.
 
@@ -15,17 +15,17 @@ Anything else is **NO-GO**, and the audit log records which condition failed.
 
 ## Audit log
 
-| Pass | Date | `[brief]` | `[ours]` (Parts 1–6) | Part 7 | Verdict | Headline |
+| Pass | Date | `[core]` | `[ours]` (Parts 1–6) | Part 7 | Verdict | Headline |
 |---|---|---|---|---|---|---|
-| 1 | 2026-10-10 | 37/80 | 17/40 | 5/26 | **NO-GO**: 43 `[brief]` items open, nothing parked, sanity checks not yet run as a set | Brief coverage is solid on data, explainability and the AI layer. The model has no capacity, served-demand or ROIC concept (OB1–OB5), so 1.4, 2.5, 3.6, E6, US4/US5/US7 fail together, and the back-test shows the growth rule calls our own lounges saturated (MO5). There's no demo or walkthrough, and the docs are stale. |
-| 2 | 2026-10-10 | 69/80 | 30/40 | 5/26 | **NO-GO**: 11 `[brief]` open (2.5, 4.4, L3, A3, B1, B3, C3, C6, E4, P1, J7); sanity run 1 has unexplained fails | Every non-model gap is closed: docs, UI, explanations (what / so what / now what, enforced) and the walkthrough. What's left is the model: capacity, served demand and ROIC (OB1–OB5), the growth rule (WORKER_CAP bug, a saturation penalty against BT5's clustering evidence) and the airport-in-comparison bug. |
-| 3 | 2026-10-10 | 74/80 | 33/40 | 9/26 | **NO-GO**: 6 `[brief]` open (2.5, A3, B1, C3, P1, J7), all structural model items except P1/J7 (pending a live click-through); sanity run 2 has one unexplained fail (SC4 al-maqta) | The non-structural model fixes landed: the airport is out of comparisons (shahama SHRINK → HOLD), name and worker-cap SKIP rules, the thin-market blend, lounge saturation, a 150 line by a pre-fixed rule (+al-jerf GROW), area confidence and weight sensitivity. What's left is the structural model work: capacity, served demand and ROIC (OB1–OB5), plus the coverage-k median bug. |
-| 3b | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO** on the `[brief]` model items only (2.5, A3, B1, C3) and P1/J7 (the live app hasn't redeployed; reboot it on Streamlit Cloud); sanity checks now GO (no unexplained failure) | Fixed the SC4 bug: rating gap over the whole premium pool with 20+ reviews (al-maqta SHRINK → HOLD by 0.003, low confidence). Lounges 3 PROTECT / 15 HOLD / 5 SHRINK. UI: the area picker drops sub-5k areas (580 → 68), and emirate checkboxes on both pickers (Abu Dhabi and Dubai by default). |
+| 1 | 2026-10-10 | 37/80 | 17/40 | 5/26 | **NO-GO**: 43 `[core]` items open, nothing parked, sanity checks not yet run as a set | Core coverage is solid on data, explainability and the AI layer. The model has no capacity, served-demand or ROIC concept (OB1–OB5), so 1.4, 2.5, 3.6, E6, US4/US5/US7 fail together, and the back-test shows the growth rule calls our own lounges saturated (MO5). There's no demo or walkthrough, and the docs are stale. |
+| 2 | 2026-10-10 | 69/80 | 30/40 | 5/26 | **NO-GO**: 11 `[core]` open (2.5, 4.4, L3, A3, B1, B3, C3, C6, E4, P1, J7); sanity run 1 has unexplained fails | Every non-model gap is closed: docs, UI, explanations (what / so what / now what, enforced) and the walkthrough. What's left is the model: capacity, served demand and ROIC (OB1–OB5), the growth rule (WORKER_CAP bug, a saturation penalty against BT5's clustering evidence) and the airport-in-comparison bug. |
+| 3 | 2026-10-10 | 74/80 | 33/40 | 9/26 | **NO-GO**: 6 `[core]` open (2.5, A3, B1, C3, P1, J7), all structural model items except P1/J7 (pending a live click-through); sanity run 2 has one unexplained fail (SC4 al-maqta) | The non-structural model fixes landed: the airport is out of comparisons (shahama SHRINK → HOLD), name and worker-cap SKIP rules, the thin-market blend, lounge saturation, a 150 line by a pre-fixed rule (+al-jerf GROW), area confidence and weight sensitivity. What's left is the structural model work: capacity, served demand and ROIC (OB1–OB5), plus the coverage-k median bug. |
+| 3b | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO** on the `[core]` model items only (2.5, A3, B1, C3) and P1/J7 (the live app hasn't redeployed; reboot it on Streamlit Cloud); sanity checks now GO (no unexplained failure) | Fixed the SC4 bug: rating gap over the whole premium pool with 20+ reviews (al-maqta SHRINK → HOLD by 0.003, low confidence). Lounges 3 PROTECT / 15 HOLD / 5 SHRINK. UI: the area picker drops sub-5k areas (580 → 68), and emirate checkboxes on both pickers (Abu Dhabi and Dubai by default). |
 | 3c | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO**, same open items (2.5, A3, B1, C3 structural; P1/J7 live app) | A growth area is now one named OSM place (580 → 413 areas, same 5 GROW). Unnamed emirate-fallback cells (67, ~33.8k women) make no area but stay in catchments and totals. Sanity run 4: no unexplained failure. |
 | 3d | 2026-10-10 | 74/80 | 34/40 | 10/26 | **NO-GO**, same open items | Shop rent and women per AED 1k of rent shown for 9 of 23 scored lounges (DLD for Dubai, JLL bands for Abu Dhabi malls), display only. OB5 has a partial site-cost source. Sanity run 5: no unexplained failure. |
-| 4 | 2026-10-11 | 74/80 | 34/40 | 10/26 | **NO-GO**: 6 `[brief]` open (2.5, A3, B1, C3 structural (OB3); P1, J7 need the live app rebooted and clicked through); sanity run 6 has no unexplained failure | Full re-audit after the median fix, named-place areas and shop rent, by fresh agents. No score regressions. New, all small: stale "no rent data" text in about 10 places, knife-edge rounding (al-maqta), emirate defaults hiding every GROW area, area confidence blind to level flips (kalba), a possible name-rule overreach near al-falah. |
-| 5 | 2026-10-11 | 77/80 | 34/40 | 11/26 | **NO-GO** on B1 *(model)*: F1, a sibling opening, closing or growing flips calls through the emirate-median cost baseline; sanity run 7 has 2 unexplained failures (F1, F4), so MO5 fails | Delta audit after the served-demand (Huff) model: 2 scored signals (served women, rent-based cost index), growth = what-if new lounge (≥ 6,000 net new women, cost ≥ 1x), absorbed share, three-source shop rent, affluence off. Newly passing: 2.5, A3, C3 (`[brief]`), OB3, OB4, MO4's Huff and MCDA rows. Newly failing: MO5. New: the AI quotes two "women at stake" figures per lounge (served vs the old capture-based `est_customers`), dead retired-rule code in growth.py, stale capture/thin-market text (the text fixed after the pass; the dead code and `est_customers` remain). P1/J7: merged to `main` (d9d7d6a) and the live click-through passed at b53e319. |
-| 6 | 2026-10-11 | 78/80 | 34/40 | 13/26 | **NO-GO** only on P1/J7: their boxes stay open until this build is merged to `main` and clicked through live (AppTest renders overview, a lounge, an area and How with no exception). The model conditions are met: B1 passes, sanity run 9 has no unexplained failure (MO5) | Owner decisions on F1 and F2 implemented: one frozen UAE-wide cost anchor (14.34 women per AED 1k) and site_served (a typical lounge at the site, this lounge closed) as demand; served women are context as performance vs site ("performing 2.7x compared to its site"). Calls: lounges 10/4/9/1 (14 changed), areas 49/48/464 (15 WATCH → GROW). Newly passing: B1 (`[brief]`), MO5, MO8. New finding F5 (typical lounge drifts with closures; al-maqta knife edge). run() 4.1–4.4 s. |
+| 4 | 2026-10-11 | 74/80 | 34/40 | 10/26 | **NO-GO**: 6 `[core]` open (2.5, A3, B1, C3 structural (OB3); P1, J7 need the live app rebooted and clicked through); sanity run 6 has no unexplained failure | Full re-audit after the median fix, named-place areas and shop rent, by fresh agents. No score regressions. New, all small: stale "no rent data" text in about 10 places, knife-edge rounding (al-maqta), emirate defaults hiding every GROW area, area confidence blind to level flips (kalba), a possible name-rule overreach near al-falah. |
+| 5 | 2026-10-11 | 77/80 | 34/40 | 11/26 | **NO-GO** on B1 *(model)*: F1, a sibling opening, closing or growing flips calls through the emirate-median cost baseline; sanity run 7 has 2 unexplained failures (F1, F4), so MO5 fails | Delta audit after the served-demand (Huff) model: 2 scored signals (served women, rent-based cost index), growth = what-if new lounge (≥ 6,000 net new women, cost ≥ 1x), absorbed share, three-source shop rent, affluence off. Newly passing: 2.5, A3, C3 (`[core]`), OB3, OB4, MO4's Huff and MCDA rows. Newly failing: MO5. New: the AI quotes two "women at stake" figures per lounge (served vs the old capture-based `est_customers`), dead retired-rule code in growth.py, stale capture/thin-market text (the text fixed after the pass; the dead code and `est_customers` remain). P1/J7: merged to `main` (d9d7d6a) and the live click-through passed at b53e319. |
+| 6 | 2026-10-11 | 78/80 | 34/40 | 13/26 | **NO-GO** only on P1/J7: their boxes stay open until this build is merged to `main` and clicked through live (AppTest renders overview, a lounge, an area and How with no exception). The model conditions are met: B1 passes, sanity run 9 has no unexplained failure (MO5) | Owner decisions on F1 and F2 implemented: one frozen UAE-wide cost anchor (14.34 women per AED 1k) and site_served (a typical lounge at the site, this lounge closed) as demand; served women are context as performance vs site ("performing 2.7x compared to its site"). Calls: lounges 10/4/9/1 (14 changed), areas 49/48/464 (15 WATCH → GROW). Newly passing: B1 (`[core]`), MO5, MO8. New finding F5 (typical lounge drifts with closures; al-maqta knife edge). run() 4.1–4.4 s. |
 | 7 | 2026-10-11 | 78/80 | 34/40 | 13/26 | **NO-GO** only on P1/J7, as pass 6 (live app not yet merged to `main` and clicked through; AppTest renders overview, a lounge, an area and How with no exception). Model conditions still met: B1 passes, sanity run 10 has no unexplained failure (MO5) | Owner decision: labels judged within each emirate against a frozen reference of 1,123 competitor salon sites (demand percentile, UAE-wide under 50 sites; rent ratio vs the emirate's median salon-site rent on a frozen P10–P90 scale), never against our own lounges. `COST_ANCHOR` / cost index gone; served women leave the cost signal. Calls: lounges 6/14/3/1 (15 changed: Dubai up, dear Abu Dhabi/Sharjah/RAK sites down), areas 32/65/464 (17 GROW → WATCH on rent). UAE-wide percentiles shown wherever a score is. New explained findings: F6 (an emirate-relative PROTECT can fail the absolute 6,000 growth line: nad-al-sheba), F7 (composites bunch in the middle: 14 HOLD, 9 within 0.05 of a line). |
 | 8 | 2026-10-11 | 78/80 | 34/40 | 13/26 | **NO-GO** only on P1/J7, as pass 7 (live app not yet merged to `main` and clicked through; AppTest renders overview, a lounge, an area and How with no exception). Model conditions still met: B1 passes (F5 gone: the typical lounge is frozen, so no closure moves another lounge through it), sanity run 11 has no unexplained failure (MO5) | Three owner fixes. Fallback rents are neutral: an area with half or more of its rented women on the emirate median passes the rent test at low confidence; a lounge on a fallback site cell scores rent 0.5 at low confidence (manama-ajman, mudayrah-ajman WATCH → GROW: 34/63/464; al-ain, al-falah stay PROTECT, low). Typical lounge frozen at 757 reviews, 4.6★ (site_reference.csv unchanged). F6 stated plainly (keep within emirate vs the absolute 6,000 growth floor; nad-al-sheba). 23 explanations regenerated offline. Residual: sharjah-sharjah (15% fallback) keeps ratio 1.000 because its median lands on the fallback value. |
 | 9 | 2026-10-12 | 80/80 | 34/40 | 13/26 | **GO**: P1/J7 pass. `main` is at bef0960 and the live link (after a reboot) renders overview (6/14/3, 34 GROW, judged against each emirate's salon sites), lounge (mirdif-35 PROTECT 0.79 with 'performing 1.0x compared to its site'), area (sharjah-sharjah GROW, out-serves 90% of Sharjah salon sites) and How, with no tracebacks (Playwright). Model conditions as pass 8 | Live click-through only; no model or data change. |
@@ -38,29 +38,29 @@ Anything else is **NO-GO**, and the audit log records which condition failed.
 
 These are the product's reason to exist. Part 2 (layers), Part 3 (functional requirements) and Part 4 (data sourcing) all serve these.
 
-### Q1. Which existing branches should we protect, hold, or shrink?
+### Q1. Which lounges do we keep, watch or review?
 
-- [x] `[brief]` **1.1 Every branch gets a label.** No branch in the network is missing one. The label set (PROTECT / HOLD / SHRINK, or our own) is defined in one place.
+- [x] `[core]` **1.1 Every branch gets a label.** No branch in the network is missing one. The label set (PROTECT / HOLD / SHRINK, or our own) is defined in one place.
 - [x] `[ours]` **1.2 Labels mean an action.** Each label is defined as what leadership should *do*, e.g. "SHRINK = reduce footprint/staff or consolidate into X". A score band alone isn't a definition.
 - [x] `[ours]` **1.3 The inputs combine all four lenses:** branch health (Q4), local competition (Q4), self-overlap (Q3) and catchment demand (Layer 2).
 - [ ] `[ours]` **1.4 Overlap affects labels only through cannibalization (3.6).** Overlap on its own is never a penalty. A branch moves toward SHRINK only when its capacity exceeds the demand it can reach once shared with our other branches. Overlap that's drawn on the map but has no defined effect on labels fails this item.
 - [x] `[ours]` **1.5 Thresholds are justified.** Every cut-off and weight has a written reason: data-driven, a business rule, or an explicitly stated judgement call.
 - [x] `[ours]` **1.6 The distribution makes sense.** The label counts are reported. If one label dominates, there's an explanation, and the model isn't simply defaulting to HOLD.
 - [x] `[ours]` **1.7 Stability is checked.** We know which branches flip labels under reasonable changes to weights or thresholds, and borderline cases are flagged as such.
-- [x] `[brief]` **1.8 Branch-level drill-down.** From any branch you can see its label, the drivers behind it, its raw inputs and its caveats (see E1–E4).
+- [x] `[core]` **1.8 Branch-level drill-down.** From any branch you can see its label, the drivers behind it, its raw inputs and its caveats (see E1–E4).
 
 *To improve:*
 
 - 1.4 *(model)*: pass 5: raw `shared_share` is no longer scored; overlap now reaches labels only through the Huff split (siblings share a cell's women), and `absorbed_share` is shown, not scored. Still no capacity, so "capacity exceeds the demand it can reach" can't be tested (OB2).
 - Fixed (sanity run 3): the rating gap now uses the whole premium pool's median (20+ reviews), not a top-k that grew with the pool. al-maqta moved SHRINK → HOLD by 0.003: a knife-edge call, flagged low confidence and disclosed in README, walkthrough and limitations. A regression test pins it.
 
-### Q2. Where should we consider opening new branches?
+### Q2. Where is there room for a new lounge?
 
-- [x] `[brief]` **2.1 The candidate universe is defined.** Areas, grid cells, hexes or districts, with a stated reason for the unit and its resolution.
-- [x] `[brief]` **2.2 Every candidate gets a label** (GROW / WATCH / SKIP or our own), and each label means an action.
+- [x] `[core]` **2.1 The candidate universe is defined.** Areas, grid cells, hexes or districts, with a stated reason for the unit and its resolution.
+- [x] `[core]` **2.2 Every candidate gets a label** (GROW / WATCH / SKIP or our own), and each label means an action.
 - [ ] `[ours]` **2.3 Demand side:** a population or affluence proxy, plus a target-customer fit signal.
-- [x] `[brief]` **2.4 Supply side:** competitor density or saturation within the candidate's catchment.
-- [x] `[brief]` **2.5 Our own coverage:** distance or travel time to our nearest branch. Whitespace means *unserved demand* (OB3), not "outside our catchments". An under-served area inside our footprint can still be GROW, and an area outside it can be SKIP if competitors already serve it.
+- [x] `[core]` **2.4 Supply side:** competitor density or saturation within the candidate's catchment.
+- [x] `[core]` **2.5 Our own coverage:** distance or travel time to our nearest branch. Whitespace means *unserved demand* (OB3), not "outside our catchments". An under-served area inside our footprint can still be GROW, and an area outside it can be SKIP if competitors already serve it.
 - [x] `[ours]` **2.6 SKIP actually happens.** The model rules areas out with a stated reason. A model that only says GROW or WATCH is hedging.
 - [x] `[ours]` **2.7 WATCH has a meaning.** It says what would move an area to GROW or SKIP, e.g. "rent data missing" or "demand is OK but saturation is borderline".
 - [x] `[ours]` **2.8 Ranking.** Within GROW, candidates are ordered so leadership has a top N, not just a set.
@@ -71,12 +71,12 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 - 2.3 *(model/data)*: affluence is Dubai-only and now off at baseline (what-if only); there's no target-customer signal beyond women 15+ and the worker-housing cap.
 - ~~2.5 *(model)*: areas are still only cells no lounge reaches.~~ Passes since pass 5: every named place is an area, and GROW is the net new women a typical lounge would add after the Huff split with our lounges and competitors, plus the nearest-lounge distance in the why. Caveat F4, explained in sanity run 8: in 4 areas net new women exceed 2x the area's own women (manama-ajman 35.1k from 5.1k). The straight-line band isn't the cause (it under-reaches the isochrones: 86k vs 98k pairs at 20 min). An area is one place, but its what-if reaches a 20-min catchment that covers a neighbouring town (Al Dhaid for manama-ajman). Neighbouring areas claim the same women, so net new must not be summed across GROW areas.
 
-### Q3. Where are we overlapping with ourselves?
+### Q3. Where do our own lounges compete for the same women?
 
-- [x] `[brief]` **3.1 Overlap is measured,** as catchment intersection area, shared population, or travel-time overlap. "Two pins are close" isn't a measurement.
+- [x] `[core]` **3.1 Overlap is measured,** as catchment intersection area, shared population, or travel-time overlap. "Two pins are close" isn't a measurement.
 - [x] `[ours]` **3.2 Pairwise view.** You can see which branch pairs overlap and by how much.
-- [x] `[brief]` **3.3 Same competitive set.** Overlap is only counted between branches that compete for the same customer (same format, tier or service mix), as the brief asks. Any simplification is stated.
-- [x] `[brief]` **3.4 It's visible on the map** as overlapping catchments or highlighted pairs.
+- [x] `[core]` **3.3 Same competitive set.** Overlap is only counted between branches that compete for the same customer (same format, tier or service mix), as the decision needs. Any simplification is stated.
+- [x] `[core]` **3.4 It's visible on the map** as overlapping catchments or highlighted pairs.
 - [ ] `[ours]` **3.5 It feeds decisions** into Q1 (SHRINK or consolidate when capacity in the shared zone is excess) and Q2 (a new site's demand is counted net of the capacity already reaching it).
 - [ ] `[ours]` **3.6 Cannibalization is defined, not assumed.** Overlap counts as cannibalization only when demand in the shared zone is less than the combined capacity reaching it (OB3). Overlap where demand is high is legitimate density, and it also keeps competitors out. The definition lives in one place in the code and docs, and it's the only route by which overlap changes a label.
 
@@ -84,24 +84,24 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 
 - 3.5, 3.6 *(model)*: pass 5: half of 3.5 now holds (a new site's demand is net of what our lounges already serve: `new_site_taken`). Still open: no capacity (OB2), so no "excess capacity in the shared zone" test for Q1, and cannibalisation (`absorbed_share`, ≤ 0.30 for every lounge in run 7) is shown, not a defined route to a label.
 
-### Q4. How strong or weak is each branch relative to local competition?
+### Q4. How does each lounge stand against the salons around it?
 
-- [x] `[brief]` **4.1 Branch health signals:** ratings, review volume, review recency or trend, or other performance proxies. Each one names its source and date.
-- [x] `[brief]` **4.2 Relative, not absolute.** Each branch is compared with the competitors in *its* catchment (e.g. rating percentile among local salons), not only with a network-wide average.
-- [x] `[brief]` **4.3 Competitive density indicators:** a count and/or per-capita measure of competitors in each catchment.
-- [x] `[brief]` **4.4 Saturation indicator:** a supply-vs-demand measure such as salons per 10k population or per unit of spend.
+- [x] `[core]` **4.1 Branch health signals:** ratings, review volume, review recency or trend, or other performance proxies. Each one names its source and date.
+- [x] `[core]` **4.2 Relative, not absolute.** Each branch is compared with the competitors in *its* catchment (e.g. rating percentile among local salons), not only with a network-wide average.
+- [x] `[core]` **4.3 Competitive density indicators:** a count and/or per-capita measure of competitors in each catchment.
+- [x] `[core]` **4.4 Saturation indicator:** a supply-vs-demand measure such as salons per 10k population or per unit of spend.
 - [x] `[ours]` **4.5 Competitor definition.** What counts as a competitor (category, tier, minimum review count) is written down, and noise like barbers or nail-only shops is handled deliberately.
 - [x] `[ours]` **4.6 Small-sample handling.** A 5.0 rating from 3 reviews is not treated as equal to 4.6 from 900. We use shrinkage, a minimum-n rule or a flag.
-- [x] `[brief]` **4.7 A comparison method.** There's a side-by-side view, a ranking or a scorecard across branches on common axes.
+- [x] `[core]` **4.7 A comparison method.** There's a side-by-side view, a ranking or a scorecard across branches on common axes.
 
 *To improve:*
 
 - (none open; 4.6 passes since run 3: a 20-review minimum for the rating median, `MIN_RATING_REVIEWS`)
 
-### Q5. How can decision-makers explore these answers visually and interactively?
+### Q5. Can the team see and test these answers for themselves?
 
-- [x] `[brief]` **5.1 Map-first overview:** branches, competitors, catchments and opportunity areas on one map, with toggleable layers.
-- [x] `[brief]` **5.2 A drill-down page** for each branch and each opportunity area.
+- [x] `[core]` **5.1 Map-first overview:** branches, competitors, catchments and opportunity areas on one map, with toggleable layers.
+- [x] `[core]` **5.2 A drill-down page** for each branch and each opportunity area.
 - [x] `[ours]` **5.3 Filters and sorting** by label, score, area or emirate.
 - [x] `[ours]` **5.4 Legends and labels** let a non-technical exec read the map without being told what the colors mean.
 - [ ] `[ours]` **5.5 What-if or scenario control** (e.g. adjust weights or thresholds and see labels change). Nice to have, but it directly supports "defensible".
@@ -115,15 +115,15 @@ These are the product's reason to exist. Part 2 (layers), Part 3 (functional req
 
 ---
 
-## Part 2: Required layers (minimum explorable content)
+## Part 2: Required layers
 
-The brief lists these as the minimum content of the product. Most of the substance is covered in Part 1, so this part checks that each layer is present and explorable.
+These are the layers the product must show. Most of the substance is covered in Part 1, so this part checks that each layer is present and explorable.
 
-- [x] `[brief]` **L1. Current branch network:** branch locations ✔ branch-level detail (address, rating, reviews, services or tier, label) ✔ → see Q1.8, Q5.2
-- [x] `[brief]` **L2. Catchment / coverage:** catchment areas or service radii ✔ overlap between branches in the same competitive set ✔ → see Q3
-- [x] `[brief]` **L3. Competition:** nearby competitors ✔ density or saturation indicators ✔ → see Q4.3–4.5
-- [x] `[brief]` **L4. Performance / health:** quality or performance indicators ✔ a method for comparing branches ✔ → see Q4.1, 4.2, 4.6, 4.7
-- [x] `[brief]` **L5. Decision layer:** model for existing branches ✔ model for whitespace ✔ → see Q1, Q2
+- [x] `[core]` **L1. Current branch network:** branch locations ✔ branch-level detail (address, rating, reviews, services or tier, label) ✔ → see Q1.8, Q5.2
+- [x] `[core]` **L2. Catchment / coverage:** catchment areas or service radii ✔ overlap between branches in the same competitive set ✔ → see Q3
+- [x] `[core]` **L3. Competition:** nearby competitors ✔ density or saturation indicators ✔ → see Q4.3–4.5
+- [x] `[core]` **L4. Performance / health:** quality or performance indicators ✔ a method for comparing branches ✔ → see Q4.1, 4.2, 4.6, 4.7
+- [x] `[core]` **L5. Decision layer:** model for existing branches ✔ model for whitespace ✔ → see Q1, Q2
 
 *To improve:*
 
@@ -131,14 +131,14 @@ The brief lists these as the minimum content of the product. Most of the substan
 
 ---
 
-## Part 3: Minimum functional requirements (A–E)
+## Part 3: Core requirements (A–E)
 
 ### A. Business framing
 
-- [x] `[brief]` **A1. Decision-maker named:** who they are (e.g. Head of Network / portfolio team / CEO) and what they care about.
-- [x] `[brief]` **A2. Decisions enumerated:** the specific decisions, each tied to a label set, e.g. "approve lease renewal → PROTECT/HOLD/SHRINK".
-- [x] `[brief]` **A3. Metrics that matter:** the north-star metric (services delivered, OB1) and the proxies standing in for it are named. Each signal is listed with *why* it matters for the decision, not just *that* we computed it.
-- [x] `[brief]` **A4. How the system supports the decision:** the flow from question to screen to evidence to action is stated.
+- [x] `[core]` **A1. Decision-maker named:** who they are (e.g. COO, portfolio team, board) and what they care about.
+- [x] `[core]` **A2. Decisions enumerated:** the specific decisions, each tied to a label set, e.g. "approve lease renewal → PROTECT/HOLD/SHRINK".
+- [x] `[core]` **A3. Metrics that matter:** the north-star metric (services delivered, OB1) and the proxies standing in for it are named. Each signal is listed with *why* it matters for the decision, not just *that* we computed it.
+- [x] `[core]` **A4. How the system supports the decision:** the flow from question to screen to evidence to action is stated.
 - [x] `[ours]` **A5. Out of scope** is stated: actual P&L (we only model contribution from assumptions, see OB5), in-branch staffing, quality management and operations, and anything else we deliberately don't model, with the reason. Our job ends once capacity is allocated to sites (OB4).
 - [x] `[ours]` **A6. Framing shows up up front:** in the README and the demo opening, not only in a design doc.
 - [x] `[ours]` **A7. The first page leads with the business.** The overview opens on the COO's question and the headline answer (e.g. "N lounges to protect, M under pressure, top 3 openings, and what's at stake") before any map layer or score. Someone who reads only the first screen should know what to do next.
@@ -151,12 +151,12 @@ The brief lists these as the minimum content of the product. Most of the substan
 
 ### B. Recommendation logic
 
-The brief says it must be **coherent, explainable, defensible**. It does not have to be mathematically perfect.
+The logic has to be **coherent, explainable and defensible**. It does not have to be mathematically perfect.
 
-- [x] `[brief]` **B1. Coherent:** the same inputs give the same outputs, labels are mutually exclusive, there are no contradictions (e.g. the best-rated, least-overlapped branch marked SHRINK without a stated reason), and the branch and whitespace models share their definitions (same catchment, same competitor set).
-- [x] `[brief]` **B2. Explainable:** the logic fits on one page (rules, score formula, decision tree) and a non-technical reader could follow it.
-- [x] `[brief]` **B3. Defensible:** every weight and threshold has a rationale (see 1.5), the method choice is justified against at least one alternative we considered, and we've sanity-checked the output against local knowledge or spot checks.
-- [x] `[brief]` **B4. Covers both populations:** existing branches *and* opportunity areas.
+- [x] `[core]` **B1. Coherent:** the same inputs give the same outputs, labels are mutually exclusive, there are no contradictions (e.g. the best-rated, least-overlapped branch marked SHRINK without a stated reason), and the branch and whitespace models share their definitions (same catchment, same competitor set).
+- [x] `[core]` **B2. Explainable:** the logic fits on one page (rules, score formula, decision tree) and a non-technical reader could follow it.
+- [x] `[core]` **B3. Defensible:** every weight and threshold has a rationale (see 1.5), the method choice is justified against at least one alternative we considered, and we've sanity-checked the output against local knowledge or spot checks.
+- [x] `[core]` **B4. Covers both populations:** existing branches *and* opportunity areas.
 - [x] `[ours]` **B5. Tested:** unit tests pin the classification rules, and a regression check catches unintended label changes.
 - [x] `[ours]` **B6. Reproducible:** one command rebuilds the scores and labels from the sourced data.
 
@@ -169,17 +169,17 @@ The brief says it must be **coherent, explainable, defensible**. It does not hav
 
 ### C. Geographic reasoning
 
-The brief asks us to use geography *meaningfully*. Each item below should both exist and affect a recommendation.
+Geography has to matter. Each item below should both exist and affect a recommendation.
 
-- [x] `[brief]` **C1. Catchments,** preferably travel-time based (isochrones). Radii are acceptable with a stated reason.
-- [x] `[brief]` **C2. Proximity:** distance or time to competitors and to our own branches.
-- [x] `[brief]` **C3. Overlap:** see Q3.
-- [x] `[brief]` **C4. Coverage gaps:** populated areas outside our catchments are identified, and that feeds Q2.
-- [x] `[brief]` **C5. Competitor density:** see Q4.3.
-- [x] `[brief]` **C6. Market saturation:** see Q4.4.
-- [x] `[brief]` **C7. Travel-time logic,** with the drive-time mode and minute threshold stated and justified for UAE car-centric travel.
+- [x] `[core]` **C1. Catchments,** preferably travel-time based (isochrones). Radii are acceptable with a stated reason.
+- [x] `[core]` **C2. Proximity:** distance or time to competitors and to our own branches.
+- [x] `[core]` **C3. Overlap:** see Q3.
+- [x] `[core]` **C4. Coverage gaps:** populated areas outside our catchments are identified, and that feeds Q2.
+- [x] `[core]` **C5. Competitor density:** see Q4.3.
+- [x] `[core]` **C6. Market saturation:** see Q4.4.
+- [x] `[core]` **C7. Travel-time logic,** with the drive-time mode and minute threshold stated and justified for UAE car-centric travel.
 - [x] `[ours]` **C8. Spatial unit and CRS are sound:** areas are computed in a metric projection, not raw degrees, and the cell size is justified.
-- [x] `[brief]` **C9. Geography changes outcomes.** At least one example shows a label that is *because of* a spatial factor (overlap, gap, saturation).
+- [x] `[core]` **C9. Geography changes outcomes.** At least one example shows a label that is *because of* a spatial factor (overlap, gap, saturation).
 
 *To improve:*
 
@@ -187,16 +187,16 @@ The brief asks us to use geography *meaningfully*. Each item below should both e
 
 ### D. AI-relevant design
 
-The brief says the AI layer must be practical, not gimmicky.
+The AI layer has to be practical, not a gimmick.
 
-- [x] `[brief]` **D1. At least one meaningful AI layer.** Possible kinds: NL interaction, AI-assisted explanation, grounded summaries, a tool-using analyst, prompt/tool/retrieval design, or an agentic flow. Name the one we chose.
-- [x] `[brief]` **D2. Grounded:** AI output is generated from our computed data, so every number it states can be traced to a field. No invented facts.
+- [x] `[core]` **D1. At least one meaningful AI layer.** For example generated explanations, grounded summaries, a question box or a tool-using agent. Name the one we chose.
+- [x] `[core]` **D2. Grounded:** AI output is generated from our computed data, so every number it states can be traced to a field. No invented facts.
 - [x] `[ours]` **D3. Groundedness is verified:** there's an automated check or a documented review showing outputs match the data.
-- [x] `[brief]` **D4. Practical value:** the layer saves the decision-maker time or adds insight the raw table doesn't. We can say what a user would do without it.
+- [x] `[core]` **D4. Practical value:** the layer saves the decision-maker time or adds insight the raw table doesn't. We can say what a user would do without it.
 - [x] `[ours]` **D5. The AI explains the model, it doesn't make the decisions.** If labels come from deterministic logic and the AI only narrates them, we say so as a trust choice.
 - [x] `[ours]` **D6. Prompt and design are visible:** the prompt or tool schema is in the repo, along with why we designed it that way.
-- [x] `[brief]` **D7. Failure modes are handled:** no API key, rate limits, stale cache. An offline or cached mode keeps the product working (see Part 5).
-- [x] `[brief]` **D8. Responsible use:** limitations of the AI layer are stated (hallucination risk, what it can't see), and so is how AI tools were used to *build* the solution.
+- [x] `[core]` **D7. Failure modes are handled:** no API key, rate limits, stale cache. An offline or cached mode keeps the product working (see Part 5).
+- [x] `[core]` **D8. Responsible use:** limitations of the AI layer are stated (hallucination risk, what it can't see), and so is how AI tools were used to *build* the solution.
 
 *To improve:*
 
@@ -206,10 +206,10 @@ The brief says the AI layer must be practical, not gimmicky.
 
 From the reviewer's seat, each question below should be answerable **for any single branch or area, in the product, in under a minute**.
 
-- [x] `[brief]` **E1. "Why did this branch get this recommendation?"** Per-branch rationale: which rule or threshold fired, and the input values that triggered it.
-- [x] `[brief]` **E2. "Why is this area attractive or unattractive?"** Per-area rationale, both its demand and its supply side, including why it's *not* GROW when it's WATCH or SKIP.
-- [x] `[brief]` **E3. "Which inputs most influenced the outcome?"** Per-entity input attribution: contribution breakdown, rank of drivers, or a counterfactual ("would be GROW if saturation < X"). Saying which rule fired doesn't answer this. We need magnitudes or ordering.
-- [x] `[brief]` **E4. "Where should we trust the model, and where should we be careful?"**
+- [x] `[core]` **E1. "Why this call for this lounge?"** Per-branch rationale: which rule or threshold fired, and the input values that triggered it.
+- [x] `[core]` **E2. "What makes this area worth a lounge, or not?"** Per-area rationale, both its demand and its supply side, including why it's *not* GROW when it's WATCH or SKIP.
+- [x] `[core]` **E3. "Which inputs moved the call most?"** Per-entity input attribution: contribution breakdown, rank of drivers, or a counterfactual ("would be GROW if saturation < X"). Saying which rule fired doesn't answer this. We need magnitudes or ordering.
+- [x] `[core]` **E4. "Where can we rely on the model, and where not?"**
   - [x] Global: a limitations doc covering data gaps, proxies, biases and staleness.
   - [x] Per entity: confidence or caveat flags on the specific recommendation (missing data, low review count, imputed values, borderline score).
   - [x] Known failure cases are named, with examples.
@@ -229,12 +229,12 @@ From the reviewer's seat, each question below should be answerable **for any sin
 
 ## Part 4: Data sourcing
 
-The brief says to source inputs from public sources and lists some combination of these.
+Inputs come from public sources.
 
-- [x] `[brief]` **S1. Branch location data,** with its source.
-- [x] `[brief]` **S2. Ratings / review signals,** with source and pull date.
-- [x] `[brief]` **S3. Competitor data,** with source, query definition and coverage.
-- [x] `[brief]` **S4. Precomputed travel-time / catchment data,** with the provider and parameters.
+- [x] `[core]` **S1. Branch location data,** with its source.
+- [x] `[core]` **S2. Ratings / review signals,** with source and pull date.
+- [x] `[core]` **S3. Competitor data,** with source, query definition and coverage.
+- [x] `[core]` **S4. Drive-time catchment data,** with the provider and parameters.
 - [x] `[ours]` **S5. Further context data** (population, affluence, rent, etc.), each with a stated reason for inclusion.
 - [x] `[ours]` **S6. Data inventory:** source, date, licence or ToS, row counts and known gaps for every dataset.
 - [x] `[ours]` **S7. Provenance in the product:** a reviewer can tell where a number came from.
@@ -247,38 +247,38 @@ The brief says to source inputs from public sources and lists some combination o
 
 ---
 
-## Part 5: Deliverables and submission
+## Part 5: Deliverables
 
 ### Working product
 
-- [x] `[brief]` **P1. Usable end to end:** a reviewer can go from overview to a recommendation to its explanation without help.
-- [x] `[brief]` **P2. The format is justified:** why a web app, notebook, agent or whatever we picked suits this decision-maker.
-- [x] `[brief]` **P3. Easy to run:** one or two commands, or a hosted link.
+- [x] `[core]` **P1. Usable end to end:** a reviewer can go from overview to a recommendation to its explanation without help.
+- [x] `[core]` **P2. The format is justified:** why a web app, notebook, agent or whatever we picked suits this decision-maker.
+- [x] `[core]` **P3. Easy to run:** one or two commands, or a hosted link.
 
 ### Technical README
 
-- [x] `[brief]` **R1. Setup and run instructions** that work on a clean machine, verified.
-- [x] `[brief]` **R2. Written for time-constrained reviewers:** a TL;DR at the top, the live link first, and a "what to look at in 5 minutes" path.
-- [x] `[brief]` **R3. Architecture and tech-stack rationale:** why these tools.
+- [x] `[core]` **R1. Setup and run instructions** that work on a clean machine, verified.
+- [x] `[core]` **R2. Readable in a few minutes:** a TL;DR at the top, the live link first, and a "what to look at in 5 minutes" path.
+- [x] `[core]` **R3. Architecture and tech-stack rationale:** why these tools.
 - [x] `[ours]` **R4. Pointers** to the framing (A), logic (B), limitations (E4) and data inventory (S6).
 
 ### Demo
 
-- [x] `[brief]` **M1. One of:** a 5–10 minute recorded walkthrough, **or** a live hosted version plus a short written walkthrough.
+- [x] `[core]` **M1. A walkthrough:** a short recording, or the hosted app with a written tour.
 - [x] `[ours]` **M2. It covers** framing → the map → a branch decision with its explanation → an opportunity with its explanation → the AI layer → limitations.
-- [x] `[brief]` **M3. If recorded, it fits in 5–10 minutes.**
+- [x] `[core]` **M3. A recording, if any, stays short (about ten minutes).**
 
 ### Secrets and paid APIs
 
-- [x] `[brief]` **K1. A fallback mode** exists for anything needing secrets or paid APIs, and the product works without keys.
-- [x] `[brief]` **K2. Otherwise, screenshots or a recording** show the paid path working.
+- [x] `[core]` **K1. A fallback mode** exists for anything needing secrets or paid APIs, and the product works without keys.
+- [x] `[core]` **K2. The paid path is shown working** (screenshots or a recording) where the product can't run it live.
 - [x] `[ours]` **K3. No secrets** are committed to the repo.
 
-### Submission bundle
+### Delivery bundle
 
-- [x] `[brief]` **U1.** Link to the source repository
-- [x] `[brief]` **U2.** README with run instructions
-- [x] `[brief]` **U3.** Demo video or live link
+- [x] `[core]` **U1.** The source repository
+- [x] `[core]` **U2.** A README that says how to run it
+- [x] `[core]` **U3.** A live link or a recording
 
 *To improve:*
 
@@ -288,48 +288,48 @@ The brief says to source inputs from public sources and lists some combination o
 
 ---
 
-## Part 6: Constraints and how we're judged
+## Part 6: Constraints and quality lenses
 
 ### Constraints we're allowed to lean on, as long as we use them deliberately
 
-- [x] `[brief]` **X1. Simplifications are explained.** Every simplification ("you may simplify parts of the problem if you explain why") is listed with its reason and its cost.
-- [x] `[brief]` **X2. Static files instead of a backend** is a stated choice, if we made it.
-- [x] `[brief]` **X3. No time spent on irrelevant production polish.** Anything production-grade we built has to materially improve the case.
+- [x] `[core]` **X1. Simplifications are explained.** Every simplification is listed with its reason and its cost.
+- [x] `[core]` **X2. No backend** (committed data files) is a stated choice, if we made it.
+- [x] `[core]` **X3. No polish for its own sake.** Anything production-grade we built has to make the answers better.
 
 ### Evaluation lenses
 
-The brief says *"this is not a coding test"*. Each lens needs a visible artifact.
+The product is judged on its thinking, not only its code. Each lens needs a visible artifact.
 
-- [x] `[brief]` **J1. Problem framing:** see A.
-- [x] `[brief]` **J2. Research:** how we found and vetted the data and the domain assumptions (see S6, design docs).
-- [x] `[brief]` **J3. Solution structure:** pipeline stages are clear (sourcing → features → model → explain → UI).
-- [x] `[brief]` **J4. Tech-stack decision:** see R3.
-- [x] `[brief]` **J5. Trade-offs:** a written list of what we chose, what we gave up and why.
-- [x] `[brief]` **J6. Responsible and effective AI use:** see D8, covering both AI in the product and AI in the build.
-- [x] `[brief]` **J7. Usable delivery:** see P1–P3.
+- [x] `[core]` **J1. Problem framing:** see A.
+- [x] `[core]` **J2. Research:** how we found and vetted the data and the domain assumptions (see S6, design docs).
+- [x] `[core]` **J3. Solution structure:** pipeline stages are clear (sourcing → features → model → explain → UI).
+- [x] `[core]` **J4. Tech-stack decision:** see R3.
+- [x] `[core]` **J5. Trade-offs:** a written list of what we chose, what we gave up and why.
+- [x] `[core]` **J6. Responsible and effective AI use:** see D8, covering both AI in the product and AI in the build.
+- [x] `[core]` **J7. Usable delivery:** see P1–P3.
 
-### The closing "hardest part" questions
+### Questions about how we worked
 
-Each should have a one-paragraph answer somewhere a reviewer will find it, such as the README or a decisions doc.
+Each should have a one-paragraph answer somewhere a reader will find it, such as the README or the docs.
 
-- [x] `[brief]` **H1.** What problem did we solve first, and why?
-- [x] `[brief]` **H2.** What did we simplify?
-- [x] `[brief]` **H3.** How did we abstract (the spatial unit, scores, labels)?
-- [x] `[brief]` **H4.** What did we trust, and what didn't we?
-- [x] `[brief]` **H5.** What did we automate?
-- [x] `[brief]` **H6.** What did we explain?
-- [x] `[brief]` **H7.** What did we ship, and what didn't we?
+- [x] `[core]` **H1.** Where did we start, and why?
+- [x] `[core]` **H2.** What did we leave simple?
+- [x] `[core]` **H3.** How is the problem modelled (the spatial unit, scores, labels)?
+- [x] `[core]` **H4.** Which inputs do we rely on, and which not?
+- [x] `[core]` **H5.** What runs without a person?
+- [x] `[core]` **H6.** What does the product explain?
+- [x] `[core]` **H7.** What is in the product, and what isn't?
 
 *To improve:*
 
 - J7: follows P1.
-- Hygiene: untracked root files (`ai-associate-case-study.docx`, `transactions-2026-10-10.csv`, `.ropeproject/`, `.superpowers/`). Keep them out of commits.
+- Hygiene: untracked local files in the repo root (`transactions-2026-10-10.csv`, a local document, `.ropeproject/`, `.superpowers/`). Keep them out of commits.
 
 ---
 
 ## Part 7: Our standards for data and modeling
 
-Parts 1–6 ask whether we did what the brief asked. This part asks whether the thing underneath is any good. All items here are `[ours]`.
+Parts 1–6 ask whether the product does what it must. This part asks whether the thing underneath is any good. All items here are `[ours]`.
 
 ### Objective: services delivered, not branches
 
@@ -438,32 +438,32 @@ Parts 1–6 ask whether we did what the brief asked. This part asks whether the 
 
 ---
 
-## Traceability: brief → rubric
+## Coverage: area → rubric
 
-| Brief section | Requirement | Rubric items |
+| Area | Requirement | Rubric items |
 |---|---|---|
-| Context | Protect / hold / shrink | Q1 |
-| Context | Where to open | Q2 |
-| Context | Self-overlap | Q3 |
-| Context | Strength vs. local competition | Q4 |
-| Context | Visual, interactive exploration | Q5 |
-| Assignment §1 | Branch locations, detail | L1, Q1.8, Q5.2 |
-| Assignment §2 | Catchments, same-set overlap | L2, Q3, C1, C7 |
-| Assignment §3 | Competitors, density/saturation | L3, Q4.3–4.5, C5, C6 |
-| Assignment §4 | Health indicators, comparison method | L4, Q4.1–4.2, 4.6–4.7 |
-| Assignment §5 | Branch model, whitespace model | L5, Q1, Q2, B4 |
-| Inputs | Branches, ratings, competitors, travel time | S1–S4 (+S5–S9) |
-| Expected outcome §1 | Working product | P1–P3 |
-| Expected outcome §2 | Technical README | R1–R4 |
-| Expected outcome §3 | Short demo | M1–M3 |
-| Min. req. A | Business framing | A1–A6 |
-| Min. req. B | Recommendation logic | B1–B6 |
-| Min. req. C | Geographic reasoning | C1–C9 |
-| Min. req. D | AI-relevant design | D1–D8 |
-| Min. req. E | Explainability | E1–E5 |
+| Business questions | Keep / watch / review | Q1 |
+| Business questions | Where to open | Q2 |
+| Business questions | Self-overlap | Q3 |
+| Business questions | Strength vs. local competition | Q4 |
+| Business questions | Visual, interactive exploration | Q5 |
+| Layers | Branch locations, detail | L1, Q1.8, Q5.2 |
+| Layers | Catchments, same-set overlap | L2, Q3, C1, C7 |
+| Layers | Competitors, density/saturation | L3, Q4.3–4.5, C5, C6 |
+| Layers | Health indicators, comparison method | L4, Q4.1–4.2, 4.6–4.7 |
+| Layers | Branch model, whitespace model | L5, Q1, Q2, B4 |
+| Data | Branches, ratings, competitors, travel time | S1–S4 (+S5–S9) |
+| Deliverables | Working product | P1–P3 |
+| Deliverables | Technical README | R1–R4 |
+| Deliverables | Short demo | M1–M3 |
+| Core A | Business framing | A1–A6 |
+| Core B | Recommendation logic | B1–B6 |
+| Core C | Geographic reasoning | C1–C9 |
+| Core D | AI-relevant design | D1–D8 |
+| Core E | Explainability | E1–E5 |
 | Constraints | Simplify with reasons, static OK, no polish | X1–X3 |
-| Submission format | Repo, README, demo; fallback for secrets | U1–U3, K1–K3 |
-| "What we care about" | Framing, research, structure, stack, trade-offs, AI use, delivery | J1–J7 |
-| Final note | First / simplify / abstract / trust / automate / explain / ship | H1–H7 |
+| Delivery | Repo, README, demo; fallback for secrets | U1–U3, K1–K3 |
+| Quality lenses | Framing, research, structure, stack, trade-offs, AI use, delivery | J1–J7 |
+| How we worked | Start / simplify / model / rely on / automate / explain / ship | H1–H7 |
 | *(ours)* | Business focus, ROIC gate, clustering | A7, E6, OB5, MO11 |
 | *(ours)* | User stories, back-tests, sanity checks | [`docs/sanity-checks.md`](sanity-checks.md) via MO5 |

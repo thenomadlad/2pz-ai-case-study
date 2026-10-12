@@ -6,7 +6,7 @@
 
 - **On every rubric pass.**
 - **After any change** to `src/model/`, `src/features/`, `src/market.py`, `data/seed/` or `data/scenarios/baseline.yaml`, run at least the back-tests and SC2–SC4.
-- **Before a demo or submission,** run everything.
+- **Before a demo or release,** run everything.
 
 Record each run in the log at the bottom.
 
