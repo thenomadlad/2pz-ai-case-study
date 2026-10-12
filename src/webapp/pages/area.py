@@ -115,6 +115,7 @@ def render() -> None:
         render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
                        d.action != "SKIP")
     _rule(a, d)
+    render_factor_table(exp, explain.AREA_TABLE, facts)
     render_assumptions("area", area_id)
 
     layers = [area_cells_layer(data.v3().cells, r.areas, r.area_decisions, only=area_id),
@@ -124,4 +125,3 @@ def render() -> None:
                f"{a.nearest_lounge_id}, {a.nearest_lounge_km:.1f} km away in a straight line.")
     st.page_link(nav.LOUNGE, label=f"Nearest lounge: {a.nearest_lounge_id} →", icon="💇",
                  query_params={"lounge": a.nearest_lounge_id})
-    render_factor_table(exp, explain.AREA_TABLE, facts)

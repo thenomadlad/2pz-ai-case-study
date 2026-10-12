@@ -127,6 +127,15 @@ def test_level_selectors_show_actual_values():
     assert at.number_input(key="wi-recall").value == 0.66
 
 
+def _tree(at):
+    """The factor tree under the signals: the dataframe with Factor and Effect columns (shown via a Styler)."""
+    for d in at.dataframe:
+        v = getattr(d.value, "data", d.value)
+        if {"Factor", "Effect"} <= set(v.columns):
+            return v
+    raise AssertionError("no factor tree on the page")
+
+
 def test_lounge_page_shows_caveats_beside_the_call():
     # salon-site reference 2026-10-11: al-barsha is a HOLD within 0.05 of the SHRINK line
     at = _page("lounge", lounge="al-barsha")
@@ -135,8 +144,9 @@ def test_lounge_page_shows_caveats_beside_the_call():
     assert "Confidence: low" in caveats
     assert "within 0.05 of the SHRINK line" in caveats
     assert "No revenue, lease or footfall data" in caveats
-    assert "Threshold" in at.table[-1].value.columns
-    assert "PROTECT ≥ 0.65" in " ".join(at.table[-1].value["Threshold"])
+    tree = _tree(at)                                      # 'What would change the call' as a tree
+    assert list(tree.Factor[:2]) == ["Composite", "├─ Site demand score (weight 1)"]
+    assert tree.Effect[0] < 0                             # near SHRINK: the composite row is shaded red
 
 
 def test_lounge_page_says_performance_vs_site_is_context():
@@ -277,7 +287,7 @@ def test_overview_overlap_toggle_adds_its_legend():
 
 
 def test_shop_rent_shows_as_cost_with_the_unit_assumption():
-    lounge = " ".join(t.value.to_string() for t in _page("lounge", lounge="al-barsha").table)   # factor table
+    lounge = _tree(_page("lounge", lounge="al-barsha")).to_string()                          # factor tree
     assert "Shop rent at the site" in lounge and "AED/m²/yr" in lounge
     lounges, areas = _page("lounge"), _page("area")
     assert "Shop rent (AED/m²/yr)" in lounges.dataframe[0].value.columns

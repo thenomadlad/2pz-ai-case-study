@@ -134,7 +134,8 @@ def render_factor_table(exp: Explanation, fields: tuple[str, ...], facts: dict) 
     changes = explain.what_would_change(exp.kind, facts)
     if changes:
         st.markdown("**What would change the call.** " + " ".join(changes))
-    wrapped_table(explain.table_rows(fields, facts))
+    from src.webapp import factor_tree
+    factor_tree.render(exp.kind, {**facts, "action": exp.action})
     st.caption(provenance(exp.kind))
 
 

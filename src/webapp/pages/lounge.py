@@ -185,7 +185,7 @@ def render() -> None:
 
     if d.action != "NOT SCORED":
         _signals(f, d)
+    render_factor_table(exp, explain.LOUNGE_TABLE, facts)
     render_assumptions("lounge", b)
     _substitutes(subs, f, data.assumptions().competitor_coverage[r.levels.coverage])
     _shared(r, b)
-    render_factor_table(exp, explain.LOUNGE_TABLE, facts)
