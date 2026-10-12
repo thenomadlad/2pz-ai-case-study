@@ -38,8 +38,9 @@ def _rule(a, d) -> None:
     cols[1].caption(f"{_check(a.demand_pct is None or a.demand_pct >= growth.DEMAND_PCT_MIN)} At least "
                     f"{growth.DEMAND_PCT_MIN:.0%}: " + growth.demand_text(a.demand_ref, a.demand_pct, a.demand_pct_uae, a.emirate))
     cols[2].metric("Rent ratio", "no data" if a.rent_ratio is None else f"{a.rent_ratio:.2f}")
-    cols[2].caption(f"{_check(a.rent_ratio is None or a.rent_ratio >= growth.RENT_RATIO_MIN)} Not dearer: "
-                    + growth.rent_text(a.rent_ratio, a.rent_pct_uae, a.emirate) + "; unknown passes")
+    cols[2].caption(f"{_check(growth.rent_ok(a))} Not dearer: "
+                    + growth.rent_text(a.rent_ratio, a.rent_pct_uae, a.emirate, growth.rent_fallback(a))
+                    + "; unknown or emirate-median fallback passes")
     per_1k = "no data" if a.premium_reviews_per_1k is None else f"{a.premium_reviews_per_1k:,.0f}"
     cols[3].metric("Premium reviews per 1k women", per_1k)
     cols[3].caption(f"Saturation, context only (our lightest-quarter line is {growth.UNSATURATED_PER_1K:g}); "

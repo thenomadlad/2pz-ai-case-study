@@ -188,6 +188,7 @@ class Area(BaseModel):
     rent_pct_uae: float | None = None            # share of UAE reference salon sites with a lower shop rent (context)
     shop_rent_m2: float | None = None            # women-weighted median shop rent over the area's cells
     shop_rent_coverage: float = 0.0
+    shop_rent_fallback_share: float = 0.0        # share of the women with a shop rent whose cell rent is the emirate-median fallback
     women_per_rent_k: float | None = None        # addressable women per AED 1,000 of annual rent there
     data_coverage: float                    # share of the area's women in cells with competitor data
     cell_ids: list[str]

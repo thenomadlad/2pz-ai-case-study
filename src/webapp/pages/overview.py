@@ -164,8 +164,8 @@ def _area_panel(r, area_id: str) -> None:
                     f"women, line {growth.NEW_SITE_MIN:,}) · "
                     f"{_check(a.demand_pct is None or a.demand_pct >= growth.DEMAND_PCT_MIN)} "
                     f"{growth.demand_text(a.demand_ref, a.demand_pct, a.demand_pct_uae, a.emirate)} · "
-                    f"{_check(a.rent_ratio is None or a.rent_ratio >= growth.RENT_RATIO_MIN)} "
-                    f"{growth.rent_text(a.rent_ratio, a.rent_pct_uae, a.emirate)} · {_check(a.data_coverage >= growth.MIN_COVERAGE)} searched ({a.data_coverage:.0%} of women)")
+                    f"{_check(growth.rent_ok(a))} "
+                    f"{growth.rent_text(a.rent_ratio, a.rent_pct_uae, a.emirate, growth.rent_fallback(a))} · {_check(a.data_coverage >= growth.MIN_COVERAGE)} searched ({a.data_coverage:.0%} of women)")
     with right:
         render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
                        d.action != "SKIP")

@@ -85,13 +85,17 @@ put four of the five Dubai lounges on SHRINK; now only city-walk is, at its DLD 
 rent ratio 0.47). The UAE-wide rent percentile is shown beside it as context, not scored. What is
 still wrong:
 
-- **An emirate-median rent passes the GROW rent test by construction.** A cell with no rent of its
-  own gets the emirate median of the cells that have one; in Sharjah that equals the reference
-  median (AED 1,121/m²), so the rent ratio is exactly 1.00. **All 10 Sharjah GROW areas** (Kalba,
-  Khor Fakkan, Al Dhaid, ...) pass the rent test this way, on no rent of their own. In Ajman the two
-  medians differ by AED 2/m², so manama-ajman (about 35,000 net new women) and mudayrah-ajman are
-  WATCH at a rent ratio of 0.997 while hamidiya-ajman is GROW at 1.001. Treat a ratio within a
-  percent of 1 as "unknown", not as a pass or a fail.
+- **An emirate-median rent is no observation, so it no longer decides a call (2026-10-11).** A cell
+  with no rent of its own gets the emirate median of the cells that have one; in Sharjah that equals
+  the reference median (AED 1,121/m²), so the ratio came out exactly 1.00, and in Ajman 0.997. Where
+  half or more of an area's women sit in such cells, its women-weighted median *is* that one number,
+  so the GROW rent test is **neutral** (passes) and the call **low confidence**, with a caveat
+  (`growth.RENT_FALLBACK_WHY`). A lounge whose site cell is on the fallback (al-ain, al-falah) scores
+  rent neutral (0.5), low confidence. Effect: manama-ajman (about 35,000 net new women) and
+  mudayrah-ajman move WATCH → GROW; nine Sharjah GROW areas, al-awir, al-sad and four Ras Al
+  Khaimah areas stay GROW at low confidence; al-ain and al-falah stay PROTECT at low confidence.
+  **Known edge:** sharjah-sharjah is 15% fallback, so it keeps its observed-rent call (GROW, ratio
+  1.000), but its median lands on the fallback value; its listings cells alone give 0.997.
 - **The reference medians mix sources too**: Dubai's is contract rents, Abu Dhabi's district rates,
   the north's asking rents or emirate medians, so "cheaper than the median salon site" means
   different things per emirate.
@@ -196,14 +200,21 @@ or a non-residential name. Saturation (premium reviews per 1k women) is shown as
   zones, military bases, airports and ports; areas with such names are SKIP before any test. Camps
   without such a name get through on their worker share alone (Dubai Investments Park is mixed-use
   and stays in; WATCH there means "revisit", not "open").
-- **The rent check uses northern-emirates asking rents and many emirate medians** (see 3: every
-  Sharjah GROW passes it on the emirate median), and the 6,000 line is a first cut (about what our
+- **The rent check uses northern-emirates asking rents and many emirate medians** (see 3: where the
+  emirate median sets an area's rent the test is neutral, so 17 of the 34 GROW areas carry no rent
+  test at all), and the 6,000 line is a first cut (about what our
   median lounge serves today).
 - **The demand test is easy to pass far from salons.** The reference sites are where competitors
   already trade, each ranked with that competitor still open beside the what-if lounge; an area with
   no salons nearby out-serves most of them by construction (Al Dhaid: top 1% of Sharjah's). Net new
   women stay the real size test; the demand percentile mostly screens out crowded spots.
-- **10 of the 32 GROW areas are in Sharjah emirate**, beyond a 15-minute drive of Bedashing's two Sharjah
+- **Keep and grow use different bars.** Keep or shrink is judged within the emirate (demand
+  percentile among its salon sites); growth needs an absolute 6,000 net new women. So a PROTECT site
+  can fail the growth test as a new opening: nad-al-sheba is PROTECT (it out-serves 68% of Dubai
+  salon sites), yet a typical lounge there would serve about 2,700 women, under half the floor. Not
+  a contradiction (an open lounge's site is already paid for; a new one must earn its fit-out), but
+  the two lists are not on one scale.
+- **10 of the 34 GROW areas are in Sharjah emirate**, beyond a 15-minute drive of Bedashing's two Sharjah
   lounges (al-jada, zawaya-walk), both on the Dubai side. The business question is why the Sharjah
   footprint is only two lounges. The model can't see licensing, brand fit, landlord terms or
   customer mix.
@@ -224,7 +235,9 @@ Since 2026-10-11 both signals rank a site within its emirate against a **frozen 
 real premium competitor salon sites** (no imputed competitors, no Bedashing; built once by
 `scripts/build_site_reference.py`): Dubai 582, Abu Dhabi 304, Sharjah 143, Ajman 38, Ras Al Khaimah
 33, Fujairah 18, Umm Al Quwain 5. Per site: its cell's shop rent and the women a typical lounge (757
-reviews, 4.6★) would serve there with all our lounges open. Our own lounges are never in it, and
+reviews, 4.6★) would serve there with all our lounges open. That typical lounge is **frozen** at those
+baseline medians (`lounges.TYPICAL_WHY`) for every what-if too: a live median drifted when a lounge
+closed (khaleej-al-arabi 0.3504 → 0.3488 with nothing of its own changed). Our own lounges are never in it, and
 nothing we open or close moves it. This replaced scales calibrated on our 23 lounges (0 → 20k
 site-served women, and a cost index against one UAE-wide anchor), which judged the network against
 itself.

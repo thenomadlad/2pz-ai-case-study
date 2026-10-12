@@ -199,7 +199,8 @@ def limitations_box(r: Run) -> None:
             "Abu Dhabi: ADREC 2025 district street-retail rates, read by hand off its public map; northern "
             "emirates: Property Finder / Bayut asking rents scraped via third-party Apify actors (a grey area "
             "under those portals' terms; asking rents run above achieved ones); gaps take the "
-            "emirate median. Both signals rank a site within its emirate's frozen market of competitor salon "
+            "emirate median, which is no observation: where it sets the rent, the rent test is neutral and "
+            "the call low confidence. Both signals rank a site within its emirate's frozen market of competitor salon "
             "sites (demand: share of them it out-serves; rent: their median ÷ its own), so a dear Dubai site is "
             "judged against Dubai salon sites, not Fujairah ones. Emirates with under 50 reference sites (Ajman, "
             "Ras Al Khaimah, Fujairah, Umm Al Quwain) rank demand UAE-wide. "
@@ -212,7 +213,8 @@ def limitations_box(r: Run) -> None:
             f"women); the Huff parameters are uncalibrated starting points and competitor data is partial. {sharjah} of {len(grow)} GROW areas are in Sharjah "
             "emirate but beyond a 15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), "
             "both on the Dubai side. Why the footprint there is only two lounges is a business question: "
-            "the model can't see licensing, brand fit, landlord terms or customer mix.")
+            "the model can't see licensing, brand fit, landlord terms or customer mix.\n"
+            f"6. **Keep and grow use different bars.** {explain.LIMIT_WITHIN_EMIRATE}")
         st.page_link(nav.HOW, label="All the limitations, every assumption and threshold →", icon="⚠️")
 
 

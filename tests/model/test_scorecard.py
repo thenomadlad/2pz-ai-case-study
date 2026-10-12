@@ -68,6 +68,13 @@ def test_missing_rent_scores_neutral():
     assert decide([_f(cost=None)])[0].scores["cost"] == 0.5
 
 
+def test_fallback_site_rent_scores_neutral_with_low_confidence():
+    # growth.RENT_FALLBACK_WHY: the emirate median is no observation of the site
+    d = decide([_f(served=1, cost=1).model_copy(update={"site_rent_source": "emirate_median"})])[0]
+    assert d.scores["cost"] == 0.5 and d.confidence == "low"
+    assert any("median, not observed" in c for c in d.caveats)
+
+
 def test_confidence_margin_rule():
     far = decide([_f(served=1, cost=1)])[0]
     near = decide([_f(served=0.8, cost=0.5)])[0]       # (0.8 + 0.5) / 2 = 0.65: on the PROTECT line

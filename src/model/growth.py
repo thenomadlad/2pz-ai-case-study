@@ -3,7 +3,7 @@
 from our own lounges.
 
   GROW   net new women >= NEW_SITE_MIN, worker housing under WORKER_CAP of adults, rent_ratio >= 1
-         (no dearer than the median salon site in its emirate; unknown passes) and demand_pct >=
+         (no dearer than the median salon site in its emirate; unknown or emirate-median fallback passes: RENT_FALLBACK_WHY) and demand_pct >=
          DEMAND_PCT_MIN (a new lounge here would out-serve at least half its emirate's salon sites;
          src/features/lounges.SITE_REFERENCE_WHY).
   WATCH  big enough but dearer or weaker demand; or big enough but mostly worker housing; or
@@ -56,12 +56,21 @@ DEMAND_PCT_MIN_WHY = ("GROW needs the site to out-serve at least half of its emi
                       "one would at the median competitor salon site. Net new women stay the absolute size test.")
 RENT_RATIO_MIN = 1.0
 RENT_RATIO_MIN_WHY = ("GROW needs a shop rent no dearer than the median at its emirate's reference salon sites "
-                      "(rent_ratio 1 or more; unknown passes). Rent only: served women are the demand tests.")
+                      "(rent_ratio 1 or more; unknown or the emirate-median fallback passes). Rent only: served women are the demand tests.")
+RENT_FALLBACK_MIN = 0.5
+RENT_FALLBACK_WHY = ("A cell with no DLD, ADREC or listings rent takes its emirate's median (SHOP_RENT_WHY). When "
+                     "half or more of an area's women with a rent live in such cells, the area's women-weighted "
+                     "median IS that one emirate-wide number, not an observation of the place: the rent test is "
+                     "neutral (passes) and the call low confidence. Lounges: a site cell on the fallback scores "
+                     "rent neutral (0.5), low confidence. Nine of the ten Sharjah GROW areas sat at ratio exactly 1.000, "
+                     "and manama-ajman / mudayrah-ajman missed at 0.997, on this number alone (2026-10-11). "
+                     "Known edge: sharjah-sharjah (15% fallback) keeps its observed-rent call, though its median "
+                     "lands on the fallback value (1.000; its listings cells alone give 0.997).")
 NEW_SITE_MIN = 6_000
 NEW_SITE_MIN_WHY = ("Quick first cut (2026-10-11): a new lounge here should add at least about what our median "
                     "lounge serves today (~6k women, Huff), net of what it takes from our own lounges.")
 WHY = {"NEW_SITE_MIN": NEW_SITE_MIN_WHY, "DEMAND_PCT_MIN": DEMAND_PCT_MIN_WHY,
-       "RENT_RATIO_MIN": RENT_RATIO_MIN_WHY, **WHY}  # shown first on the How page
+       "RENT_RATIO_MIN": RENT_RATIO_MIN_WHY, "RENT_FALLBACK_MIN": RENT_FALLBACK_WHY, **WHY}  # shown first on the How page
 
 
 def _ord(p: float) -> str:
@@ -78,10 +87,25 @@ def demand_text(where: str, pct: float | None, pct_uae: float | None, emirate: s
     return f"{rank} of {group} on demand · {_ord(pct_uae)} percentile UAE-wide"
 
 
-def rent_text(ratio: float | None, pct_uae: float | None, emirate: str) -> str:
+def rent_fallback(x) -> bool:
+    """The rent is the emirate-median fallback (RENT_FALLBACK_WHY): an area's mostly, a lounge's
+    (LoungeFeatures) site cell's."""
+    if not isinstance(x, Area):
+        return x.site_rent_source == "emirate_median"
+    return x.rent_ratio is not None and x.shop_rent_fallback_share >= RENT_FALLBACK_MIN
+
+
+def rent_ok(a: Area) -> bool:
+    """The GROW rent test: no dearer than its emirate's median salon site; unknown or fallback passes."""
+    return a.rent_ratio is None or rent_fallback(a) or a.rent_ratio >= RENT_RATIO_MIN
+
+
+def rent_text(ratio: float | None, pct_uae: float | None, emirate: str, fallback: bool = False) -> str:
     """'rent ratio 1.25 (cheaper than the median Dubai salon site) · 45th percentile of rent UAE-wide'."""
     if ratio is None:
         return "rent unknown"
+    if fallback:
+        return f"rent unknown: the {emirate} median shop rent stands in (fallback, not observed), so the rent test is neutral"
     r = f"{ratio:.2f}" if round(ratio, 2) != 1 or ratio == 1 else f"{ratio:.3f}"   # 0.998 is not "1.00"
     side = "cheaper than" if ratio > 1 else "as dear as" if ratio == 1 else "dearer than"
     return f"rent ratio {r} ({side} the median {emirate} salon site) · {_ord(pct_uae)} percentile of rent UAE-wide"
@@ -90,14 +114,15 @@ def rent_text(ratio: float | None, pct_uae: float | None, emirate: str) -> str:
 def site_text(x) -> str:
     """Both signals in words with their UAE-wide context, for a lounge (LoungeFeatures) or an area."""
     return (f"{demand_text(x.demand_ref, x.demand_pct, x.demand_pct_uae, x.emirate)}; "
-            f"{rent_text(x.rent_ratio, x.rent_pct_uae, x.emirate)}")
+            f"{rent_text(x.rent_ratio, x.rent_pct_uae, x.emirate, rent_fallback(x))}")
 
 
 def classify(a: Area) -> AreaDecision:
     """What-if: open a typical lounge here (src/model/served.what_if_open). GROW / WATCH / SKIP on the
     women it would add to the network, its demand percentile and its rent ratio (salon-site reference)."""
     net = a.new_site_net or 0.0
-    cheap = a.rent_ratio is None or a.rent_ratio >= RENT_RATIO_MIN
+    cheap = rent_ok(a)
+    fallback = rent_fallback(a)
     strong = a.demand_pct is None or a.demand_pct >= DEMAND_PCT_MIN
     big = net >= NEW_SITE_MIN and a.worker_share < WORKER_CAP
     unsat = None if a.premium_reviews_per_1k is None else a.premium_reviews_per_1k < UNSATURATED_PER_1K
@@ -107,10 +132,13 @@ def classify(a: Area) -> AreaDecision:
                        "imputed from comparable places in the emirate.")
     if a.rent_ratio is None and a.new_site_net is not None:
         caveats.append("No shop rent here: rent unknown.")
+    if fallback and a.new_site_net is not None:
+        caveats.append(f"Shop rent is the {a.emirate} median, not observed ({a.shop_rent_fallback_share:.0%} of its "
+                       "women are in cells without a rent of their own): the rent test is neutral.")
     if a.demand_ref == "UAE" and a.new_site_net is not None:
         caveats.append(f"{a.emirate} has under 50 reference salon sites: demand is ranked UAE-wide.")
     gap = (net - NEW_SITE_MIN) / NEW_SITE_MIN
-    confidence = "low" if abs(gap) < NEAR_LINE or a.data_coverage < MIN_COVERAGE else "high" if abs(gap) >= FAR_LINE else "medium"
+    confidence = "low" if abs(gap) < NEAR_LINE or a.data_coverage < MIN_COVERAGE or (fallback and big) else "high" if abs(gap) >= FAR_LINE else "medium"
     if NON_RESIDENTIAL.search(a.name):
         action, why, confidence = "SKIP", f"Non-residential by name ({a.name}): not where customers live.", "high"
     elif a.women < SKIP_UNDER_WOMEN:

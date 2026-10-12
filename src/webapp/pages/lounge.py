@@ -38,7 +38,7 @@ def _signals(f, d) -> None:
     st.caption("Each signal scores 0 (worst) to 1 (best for the lounge); the composite is their "
                "weighted average. Capture, rating and shared catchment are shown below, not scored.")
     words = {"demand": growth.demand_text(f.demand_ref, f.demand_pct, f.demand_pct_uae, f.emirate).capitalize(),
-             "cost": growth.rent_text(f.rent_ratio, f.rent_pct_uae, f.emirate).capitalize()}
+             "cost": growth.rent_text(f.rent_ratio, f.rent_pct_uae, f.emirate, growth.rent_fallback(f)).capitalize()}
     for s in scorecard.SIGNALS:
         score = d.scores[s.name]
         st.progress(score, text=f"**{s.label}:** {val(s.field, getattr(f, s.field))} → score "

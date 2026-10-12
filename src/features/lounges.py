@@ -371,6 +371,9 @@ def _area(area_id, name, emirate, piece, w, aw, rents, shop, p, a, lounges, lats
     lng = sum(w[c] * cell[c]["lng"] for c in piece) / women
     sat = _saturation(piece, w, p, a)
     a_rent, a_cov = _shop_rent(piece, w, shop)
+    src = p["shop_source"]
+    rented = sum(w[c] for c in piece if src.get(c, "none") != "none")
+    fallback = sum(w[c] for c in piece if src.get(c) == "emirate_median") / rented if rented else 0.0
     d = haversine_km(lat, lng, lats, lngs)
     j = int(d.argmin()) if len(d) else None
     return Area(area_id=area_id, name=name, emirate=emirate, lat=lat, lng=lng, women=women,
@@ -378,7 +381,7 @@ def _area(area_id, name, emirate, piece, w, aw, rents, shop, p, a, lounges, lats
                 worker_share=sum(cell[c]["adults_worker"] for c in piece) / sum(cell[c]["adults"] for c in piece),
                 premium_salons=sat["n"], premium_reviews_per_1k=sat["per_1k"], full_circle_share=sat["fcs"],
                 unserved_women=float(sum(unserved.get(c, 0.0) for c in piece)) if unserved is not None else 0.0,
-                shop_rent_m2=a_rent, shop_rent_coverage=a_cov,
+                shop_rent_m2=a_rent, shop_rent_coverage=a_cov, shop_rent_fallback_share=fallback,
                 women_per_rent_k=women_per_rent_k(sum(aw[c] for c in piece), a_rent),
                 data_coverage=sat["cw"] / women, cell_ids=piece,
                 nearest_lounge_id=lounges[j].branch_id if j is not None else "",

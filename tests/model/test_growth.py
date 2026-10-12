@@ -5,6 +5,7 @@ from src.model.growth import (
     DEMAND_PCT_MIN,
     MIN_COVERAGE,
     NEW_SITE_MIN,
+    RENT_FALLBACK_MIN,
     RENT_RATIO_MIN,
     SKIP_UNDER_WOMEN,
     UNSATURATED_PER_1K,
@@ -54,6 +55,16 @@ def test_worker_housing_caps_at_watch():
 def test_unknown_rent_is_a_caveat_not_a_block():
     d = classify(_a(rent=None, demand=0.8))
     assert d.action == "GROW" and any("rent unknown" in c for c in d.caveats)
+
+
+def test_fallback_rent_is_neutral_and_low_confidence():
+    # growth.RENT_FALLBACK_WHY: half or more of the rented women on the emirate median -> the test passes
+    fb = _a(net=20_000, rent=0.9, demand=0.9, per_1k=0.0).model_copy(update={"shop_rent_fallback_share": RENT_FALLBACK_MIN})
+    d = classify(fb)
+    assert d.action == "GROW" and d.confidence == "low" and any("median, not observed" in c for c in d.caveats)
+    assert "neutral" in d.rationale
+    observed = fb.model_copy(update={"shop_rent_fallback_share": RENT_FALLBACK_MIN - 0.01})
+    assert classify(observed).action == "WATCH"
 
 
 def test_small_emirates_rank_demand_uae_wide_and_say_so():

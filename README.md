@@ -121,21 +121,24 @@ At the baseline (2026-10-11: 15-min drive, 60% competitor coverage, 5.5% women i
 affluence off):
 
 - **Lounges:** 6 PROTECT (al-taif-mall, al-ain, mirdif-35, al-falah, al-dhafra, nad-al-sheba),
-  14 HOLD, 3 SHRINK, 1 NOT SCORED (the airport lounge serves travellers). **9 of 23** calls are low
-  confidence, all within 0.05 of a line; 5 of them are Abu Dhabi HOLDs just above the SHRINK line.
+  14 HOLD, 3 SHRINK, 1 NOT SCORED (the airport lounge serves travellers). **11 of 23** calls are low
+  confidence: 9 within 0.05 of a line (5 of them Abu Dhabi HOLDs just above the SHRINK line), and
+  al-ain and al-falah, whose site rent is the Abu Dhabi median (fallback), so rent scores neutral.
   khalifa-city-a is HOLD on its site (top 27% of Abu Dhabi salon sites on demand, but rent ratio
   0.62), though the model estimates it is performing 2.7x compared to its site (context, not scored).
 - **The 3 SHRINKs:** city-walk (bottom 30% of Dubai salon sites on demand, rent ratio 0.47), westyas
   (bottom 45% of Abu Dhabi's, 0.82) and al-jada (top 34% of Sharjah's on demand, but rent ratio 0.63:
   it sits on the dear Dubai edge of Sharjah). Each site is weak for its own emirate's salon market.
   Investigate, don't cut.
-- **Growth areas:** 32 GROW and 65 WATCH out of 561. GROW is in Abu Dhabi (13), Sharjah (10), Ajman
-  (4), Ras Al Khaimah (4) and Dubai (1, Al Awir). Most big WATCHes (al-dhahir, bani-yas, manama-ajman)
+- **Growth areas:** 34 GROW and 63 WATCH out of 561. GROW is in Abu Dhabi (13), Sharjah (10), Ajman
+  (6), Ras Al Khaimah (4) and Dubai (1, Al Awir). Most big WATCHes (al-dhahir, bani-yas, al-helio)
   have the women but a shop rent dearer than their emirate's median salon site. Most of the Sharjah ones are beyond a 15-minute drive
   of Bedashing's two Sharjah lounges (al-jada, zawaya-walk, both on the Dubai side); why the footprint
   there is only two is a business question the model can't answer (licensing, brand fit, landlords).
-  Every Sharjah GROW passes the rent test on the emirate-median rent, and the northern-emirates
-  rent checks use scraped asking rents (see limitations).
+  17 of the 34 GROW areas (nine in Sharjah, plus manama-ajman and mudayrah-ajman, which this
+  moved up from WATCH) have a rent that is mostly the emirate-median fallback: their rent test is
+  neutral and the call low confidence. The northern-emirates rent checks use scraped asking rents
+  (see limitations).
 
 Treat these as the places to look first, not as answers.
 
@@ -370,11 +373,16 @@ no longer scored.*
 - **The outside option is a convention, not a measurement.** Pegging it to the median premium
   supplier sets how much demand is "unserved"; a different peg moves every served count.
 - **The what-if lounge is a median lounge.** A new site gets the median lounge's reviews and rating
-  on day one, which flatters it (a new lounge has few reviews) and ignores size or format.
+  on day one, which flatters it (a new lounge has few reviews) and ignores size or format. It is
+  frozen at the 2026-10-11 baseline (757 reviews, 4.6★), so closing a lounge never moves another's
+  call through it.
 - **Rents mix sources.** Dubai is contract rent, Abu Dhabi published rates, the north asking rents
   (which run above signed rents). The rent ratio keeps each site inside its emirate, but a site on
-  the emirate-median fallback lands at a ratio of about 1 and passes or fails the GROW rent test on
-  noise.
+  the emirate-median fallback has no rent of its own: where it sets the rent (half or more of an
+  area's women; a lounge's site cell), the rent test is neutral and the call low confidence.
+- **Keep and grow use different bars.** Keep or shrink is judged within the emirate; growth needs
+  an absolute 6,000 net new women. So a PROTECT site can fail the growth test as a new opening:
+  nad-al-sheba is PROTECT, yet a typical lounge there would serve about 2,700 women.
 - **Imputed competitors** stand in for unsearched cells: remote areas' competition is assumed, not seen.
 - **No capacity cap.** A lounge can "serve" any number of women; chairs and staff never bind.
 

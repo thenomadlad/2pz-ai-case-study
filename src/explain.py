@@ -50,6 +50,11 @@ class Field:
     pct: bool = False  # stored as 0-1, shown as %
 
 
+LIMIT_WITHIN_EMIRATE = (
+    "Keep or shrink is judged within the site's emirate, but a growth area needs an absolute "
+    f"{growth.NEW_SITE_MIN:,} net new women, so a PROTECT site can fail the growth test as a new opening: nad-al-sheba is PROTECT (it "
+    "out-serves 68% of Dubai salon sites), yet a typical lounge there would serve about 2,700 women "
+    "(baseline 2026-10-11).")
 GLOSSARY: dict[str, Field] = {
     # --- lounge ---
     "catchment_women": Field(
@@ -105,7 +110,8 @@ GLOSSARY: dict[str, Field] = {
     "composite": Field(
         "Composite score", "0-1",
         "Weighted average of the signal scores below (weights in the Threshold column). "
-        f"PROTECT ≥ {scorecard.PROTECT_AT}, SHRINK ≤ {scorecard.SHRINK_AT}."),
+        f"PROTECT ≥ {scorecard.PROTECT_AT}, SHRINK ≤ {scorecard.SHRINK_AT}. "
+        + LIMIT_WITHIN_EMIRATE),
     **{f"score_{s.name}": Field(
         f"{s.name.capitalize()} score", "0-1",
         f"{s.label}, converted to a fixed 0-1 score where 1 is best for the lounge "
@@ -129,7 +135,7 @@ GLOSSARY: dict[str, Field] = {
                         "changes, all else equal."),
     # --- growth area ---
     "area_name": Field("Area", "", "OpenStreetMap place name nearest the area's cells."),
-    "emirate": Field("Emirate", "", "Emirate the area lies in."),
+    "emirate": Field("Emirate", "", "Emirate the area or lounge lies in."),
     "women": Field("Women 15+", "women", "Women aged 15+ living in the area's cells (raw)."),
     "cells": Field("Cells", "count", "Populated ~2 km cells in the area (every unreached cell with this OSM place name)."),
     "worker_share": Field("Worker housing", "% of adults",
@@ -160,6 +166,10 @@ GLOSSARY: dict[str, Field] = {
     "rent_ratio": Field("Rent ratio", "",
                         "Median shop rent at the reference salon sites in its emirate ÷ this site's shop rent: above 1 "
                         "is cheaper than a typical salon site there. Rent only, no served women."),
+    "rent_fallback": Field("Rent is the emirate median", "yes/no",
+                           "Yes: the shop rent here is its emirate's median standing in for cells with no DLD, ADREC "
+                           "or listings rent (an area: half or more of its women), not an observation of the place. "
+                           "The rent test is neutral (passes; a lounge's rent scores 0.5) and the call is low confidence."),
     "rent_pct_uae": Field("Rent percentile UAE-wide", "% of UAE salon sites",
                           "Share of the UAE reference salon sites with a lower shop rent (higher = dearer). Context, not scored.",
                           pct=True),
@@ -275,7 +285,7 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
         "demand": ("demand_pct", "demand_pct_uae", "demand_ref", "site_served", "served_women", "performance_vs_site", "score_demand", "addressable_women",
                    "catchment_women", "affluence_coverage", "affluence_rent", "catchment_cells", "contrib_demand"),
         "cannibalisation": ("absorbed_share", "shared_share"),
-        "cost": ("rent_ratio", "rent_pct_uae", "site_rent_m2", "site_cost_k", "score_cost", "contrib_cost"),
+        "cost": ("rent_ratio", "rent_fallback", "rent_pct_uae", "site_rent_m2", "site_cost_k", "score_cost", "contrib_cost"),
         "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market"),
         "rating": ("rating_gap", "lounge_rating", "substitutes_median_rating", "lounge_reviews"),
     },
@@ -283,7 +293,7 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
         "size": ("new_site_net", "new_site_served", "new_site_taken", "new_site_min", "size_gap",
                  "big_enough", "women", "skip_under_women", "unserved_women"),
         "demand": ("demand_pct", "demand_gap", "demand_pct_uae", "demand_ref", "new_site_served"),
-        "cost": ("rent_ratio", "rent_gap", "rent_pct_uae", "shop_rent_m2", "site_cost_k"),
+        "cost": ("rent_ratio", "rent_fallback", "rent_gap", "rent_pct_uae", "shop_rent_m2", "site_cost_k"),
         "saturation": ("premium_reviews_per_1k", "premium_salons", "unsaturated",
                        "unsaturated_per_1k", "saturation_gap"),
         "reach": ("nearest_lounge_km", "nearest_lounge_id"),
@@ -369,7 +379,8 @@ THRESHOLDS: dict[str, str] = {
        for s in scorecard.SIGNALS},
     "size_gap": f"GROW needs 0 or more (line {growth.NEW_SITE_MIN:,})",
     "saturation_gap": f"Context, not a test (line {growth.UNSATURATED_PER_1K:g})",
-    "rent_gap": "GROW needs 0 or more (or no rent known)",
+    "rent_gap": "GROW needs 0 or more (or no rent known, or the emirate-median fallback)",
+    "rent_fallback": "Yes: rent test neutral, low confidence",
     "demand_gap": "GROW needs 0 or more",
     "worker_gap": f"GROW needs above 0 (cap {growth.WORKER_CAP:.0%})",
     "coverage_gap": f"Under 0: low confidence (needs {growth.MIN_COVERAGE:.0%})",
@@ -417,7 +428,9 @@ def what_would_change(kind: str, facts: dict) -> list[str]:
         out.append(f"Demand: {fmt('demand_pct', facts['demand_pct'])} of {facts['demand_ref']} salon sites out-served, "
                    f"{fmt('demand_gap', abs(dem))} " + ("above the line." if dem >= 0 else "short of the line."))
     rent = facts.get("rent_gap")
-    if rent is not None:
+    if facts.get("rent_fallback"):
+        out.append(f"Rent: the {facts['emirate']} median stands in (not observed), so the rent test is neutral.")
+    elif rent is not None:
         out.append(f"Rent: ratio {fmt('rent_ratio', facts['rent_ratio'])} against its emirate's median salon site, "
                    f"{fmt('rent_gap', abs(rent))} " + ("above the 1 line." if rent >= 0 else "short of the 1 line."))
     if facts["worker_gap"] <= 0:
@@ -462,6 +475,8 @@ def lounge_facts(f: LoungeFeatures, d: Decision, flips: int | None = None) -> di
     facts = {k: getattr(f, k) for k in LOUNGE_TABLE if hasattr(f, k)}
     facts.update(lounge_rating=f.rating, lounge_reviews=f.review_count, level_flips=flips,
                  composite=d.composite, **{f"score_{k}": v for k, v in d.scores.items()})
+    if growth.rent_fallback(f):   # only when true: unaffected fact sheets keep their cache keys
+        facts.update(rent_fallback=True, emirate=f.emirate)
     if d.action != NOT_SCORED_ACTION:
         facts.update(_counterfactual(facts, d.action))
     return _rounded(facts)
@@ -479,7 +494,8 @@ def _counterfactual(facts: dict, action: str) -> dict:
     out.update(next_call=nxt, line_gap=gap, flip_driver=None, flip_value=None)
     for topic in prioritize("lounge", facts, action) + [s.name for s in scorecard.SIGNALS]:
         s = next(s for s in scorecard.SIGNALS if s.name == topic)
-        if topic == "rating" or (topic == "capture" and facts.get("thin_premium_market")):
+        if topic == "rating" or (topic == "capture" and facts.get("thin_premium_market")) \
+                or (topic == "cost" and facts.get("rent_fallback")):   # fallback rent scores neutral whatever its ratio
             continue  # rating is not a portfolio lever (OB4); thin-market capture is damped toward neutral, off its scale
         needed = facts[f"score_{topic}"] + sign * gap * _TOTAL_WEIGHT / s.weight
         if 0 <= needed <= 1:
@@ -498,11 +514,13 @@ def area_facts(a: Area, d: AreaDecision) -> dict:
                  # Gap to each test's line (E3): positive passes, negative is the shortfall.
                  size_gap=round((a.new_site_net or 0.0) - growth.NEW_SITE_MIN),
                  demand_gap=None if a.demand_pct is None else a.demand_pct - growth.DEMAND_PCT_MIN,
-                 rent_gap=None if a.rent_ratio is None else a.rent_ratio - growth.RENT_RATIO_MIN,
+                 rent_gap=None if a.rent_ratio is None or growth.rent_fallback(a) else a.rent_ratio - growth.RENT_RATIO_MIN,
                  saturation_gap=None if a.premium_reviews_per_1k is None
                  else growth.UNSATURATED_PER_1K - a.premium_reviews_per_1k,
                  worker_gap=growth.WORKER_CAP - a.worker_share,
                  coverage_gap=a.data_coverage - growth.MIN_COVERAGE)
+    if growth.rent_fallback(a):   # only when true: unaffected fact sheets keep their cache keys
+        facts["rent_fallback"] = True
     return _rounded(facts)
 
 
@@ -575,7 +593,8 @@ GROWTH_WHY = (
     "Each area is a what-if: open a typical lounge there and count the women it would add to the "
     f"network, net of those it takes from our own lounges (Huff). GROW needs at least {growth.NEW_SITE_MIN:,} "
     f"net new women, worker housing under {growth.WORKER_CAP:.0%} of adults, a shop rent no dearer than the median "
-    "salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least "
+    "salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: "
+    "neutral, low confidence) and a site that would out-serve at least "
     f"{growth.DEMAND_PCT_MIN:.0%} of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big "
     "enough but dearer or weaker demand, mostly "
     f"worker housing, or {growth.NEW_SITE_MIN // 2:,}+ net new women. SKIP: fewer, under "
@@ -601,6 +620,8 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
     if kind == "lounge" and f.get(f"score_{topic}") is None:  # NOT SCORED: no scores
         main = TOPICS["lounge"][topic][0]
         return f"{GLOSSARY[main].label}: {fmt_unit(main, f[main])}, shown but not scored."
+    if kind == "lounge" and topic == "cost" and f.get("rent_fallback"):
+        return f"Rent scores neutral: the site's shop rent is the {f['emirate']} median, not observed."
     if kind == "lounge":
         score = f[f"score_{topic}"]
         strength = "a strength" if score >= 0.6 else "a weakness" if score <= 0.4 else "middling"
@@ -614,7 +635,9 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
             "demand": (f"A new lounge here would out-serve {fmt('demand_pct', f['demand_pct'])} of "
                        f"{f['demand_ref']} salon sites ({fmt('demand_pct_uae', f['demand_pct_uae'])} UAE-wide; "
                        f"GROW needs {growth.DEMAND_PCT_MIN:.0%})."),
-            "cost": (f"Rent ratio {fmt('rent_ratio', f['rent_ratio'])} against the median {f['emirate']} salon "
+            "cost": (f"Rent is the {f['emirate']} median standing in, not observed: the rent test is neutral."
+                     if f.get("rent_fallback") else
+                     f"Rent ratio {fmt('rent_ratio', f['rent_ratio'])} against the median {f['emirate']} salon "
                      f"site (GROW needs 1 or more)."),
             "saturation": (f"{fmt('premium_reviews_per_1k', sat)} premium reviews per 1k women, "
                            f"{'under' if f['unsaturated'] else 'over'} the "
@@ -1015,8 +1038,8 @@ def explain(kind: str, subject_id: str, action: str, facts: dict,
     call when a client is given, else the template. Never writes the cache file."""
     cache = load_cache() if cache is None else cache
     key = cache_key(kind, subject_id, action, facts)
-    if key in cache:
-        return Explanation(**cache[key])
+    if key in cache:   # the thresholds note is derived, not written: always today's
+        return Explanation(**{**cache[key], "thresholds_note": _thresholds_note(kind)})
     if client is not None and action != NOT_SCORED_ACTION:
         exp = llm_explanation(client, kind, subject_id, action, facts)
         if exp is not None:

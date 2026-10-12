@@ -13,6 +13,7 @@ from collections import Counter
 from dataclasses import dataclass, fields
 from itertools import product
 
+from src.model.growth import rent_fallback
 from src.models import Decision, Levels, LoungeFeatures
 
 
@@ -49,7 +50,8 @@ SIGNALS: tuple[Signal, ...] = (
            RENT_RATIO_P10, RENT_RATIO_P90,
            "Above 1 = cheaper than a typical salon site in its emirate. Scale frozen (RENT_RATIO_WHY). "
            "Rent only: served women are already the demand signal, so they are not counted twice. Site "
-           "shop rent from DLD, ADREC, listings or the emirate median; a missing rent scores neutral. "
+           "shop rent from DLD, ADREC or listings; a missing rent scores neutral. "
+           "A site cell on the emirate-median fallback scores neutral too (growth.RENT_FALLBACK_WHY). "
            "Cannibalisation is not scored: it is a what-if shown on the lounge page."),
 )
 
@@ -124,10 +126,14 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
         return Decision(branch_id=f.branch_id, action="NOT SCORED", confidence="low",
                         rationale="Not scored: this lounge serves travellers, not the women in its catchment.",
                         key_drivers=[], caveats=[])
-    scores = {s.name: score(s, getattr(f, s.field)) for s in SIGNALS}
+    fallback = rent_fallback(f)    # growth.RENT_FALLBACK_WHY: the emirate median is no observation of the site
+    scores = {s.name: score(s, None if fallback and s.name == "cost" else getattr(f, s.field)) for s in SIGNALS}
     composite = _composite(scores, {s.name: s.weight for s in SIGNALS})
     action = _action(composite)
     caveats = [NO_FINANCIALS]
+    if fallback:
+        caveats.append(f"Site shop rent is the {f.emirate} median, not observed (no DLD, ADREC or listings rent in "
+                       "its cell): rent scores neutral.")
     flippy = flips is not None and flips >= FLIP_LOW
     if flippy:
         caveats.append(f"The call changes in {flips} of {COMBOS} assumption combinations.")
@@ -136,7 +142,7 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
         caveats.append("The call depends on the signal weights: it changes with " + "; ".join(wflips) + ".")
     return Decision(
         branch_id=f.branch_id, action=action, weight_flips=wflips,
-        confidence=_confidence(composite, flippy or bool(wflips)),
+        confidence=_confidence(composite, flippy or bool(wflips) or fallback),
         rationale=(f"Composite {composite:.2f} across site demand and site rent "
                    f"(PROTECT ≥ {PROTECT_AT}, SHRINK ≤ {SHRINK_AT})."),
         key_drivers=sorted(scores, key=lambda n: abs(scores[n] - NEUTRAL), reverse=True)[:2],
