@@ -216,7 +216,7 @@ Bedashing's network, real estate and expansion team and its analysts. The primar
 _Avoid_: user, analyst (unqualified)
 
 **Decision-maker**:
-The network and capital owner, on the portfolio team. Decides where Bedashing is present and how much capital each site ties up: open, renew, resize, relocate or exit. Doesn't run the branches: service quality, staffing and day-to-day performance belong to operations, so every call answers "is this a good place to have our capital?", never "is this branch well run?".
+The network and capital owner, on the portfolio team. Decides where Bedashing is present and how much capital each site ties up: open, renew, resize, relocate or exit. Also decides how much capacity each catchment needs (service providers and hours). Doesn't run the branches: service quality, rosters, hiring and day-to-day performance belong to operations, so every call answers "is this a good place to have our capital?", never "is this branch well run?".
 _Avoid_: leadership, user, a job title
 
 **Board**:

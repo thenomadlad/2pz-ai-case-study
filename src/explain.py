@@ -714,7 +714,8 @@ ACTIONS = {
     "SKIP": ("no action", "No action: a new lounge here would add too few women."),
 }
 LABELS = {"lounge": ("PROTECT", "HOLD", "SHRINK"), "area": ("GROW", "WATCH", "SKIP")}
-# In-branch advice (ratings, staffing, service quality) is out of scope (rubric OB4).
+# Advice on running a branch (ratings, rosters and hiring, service quality) is out of scope (rubric OB4); capacity
+# per catchment is in scope but unmeasured today (no bookings or headcount), so explanations never prescribe staff.
 IN_BRANCH = re.compile(
     r"\b(improv|rais|boost|lift|fix|lever)\w*\b[^.;]{0,40}\b(rating|service|staff|quality)"
     r"|\b(rating|service)\b[^.;]{0,40}\blever|\bstaff(ing)?\b|\btraining\b|service quality",
@@ -872,7 +873,7 @@ SYSTEM_PROMPT = (
     "key phrase) and what would change the call, citing the distance-to-line facts "
     "(line_gap, next_call, flip_driver, flip_value; for areas size_gap, demand_gap, rent_gap, saturation_gap, "
     "worker_gap, coverage_gap). Our scope ends at the site: never advise on anything inside a "
-    "branch (ratings, reviews to chase, staffing, service quality, operations); rating is "
+    "branch (ratings, reviews to chase, rosters or hiring, service quality, operations); rating is "
     "context, not a lever. Use only the fact sheet. Every number you write must appear in the "
     "fact sheet or the thresholds; round sensibly. Write like a board memo: short, concrete "
     "claims. Never mention revenue or profit (none exist). Quote shop rent only when the fact "

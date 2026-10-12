@@ -18,8 +18,8 @@ market of competitor salon sites (`data/seed/v3/site_reference.csv`, see 10): **
 **rent ratio** (`rent_ratio`: the emirate's median shop rent at those sites ÷ this site's). Each is
 shown with its UAE-wide percentile as context. The only money is a shop rent; site cost (rent x an
 **assumed** 150 m² unit plus an **assumed** fit-out of AED 3,000/m² over 5 years) is display only.
-There is no revenue, no actual lease (rent, floor area, terms), no actual capex, no staffing and no
-footfall. SHRINK means "a weak site for its emirate, on demand and rent, investigate", not "loses
+There is no revenue, no actual lease (rent, floor area, terms), no actual capex, no capacity data (service
+providers, hours, bookings) and no footfall. SHRINK means "a weak site for its emirate, on demand and rent, investigate", not "loses
 money". A lounge can be SHRINK and
 profitable (a cheap lease, loyal clients), and PROTECT and unprofitable.
 

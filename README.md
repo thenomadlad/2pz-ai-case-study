@@ -22,19 +22,21 @@ A guided path through the live app: the answer, one lounge decision, one growth 
 
 1. **[Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the answer in one line, then the Review, Grow and Protect cards and their evidence maps.
 2. **[What-if explorer](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/explore):** pick Abu Dhabi, tick "All catchments (overlap)": heavy overlap, yet only West Yas is SHRINK.
-3. **[City Walk](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk) (SHRINK):** the AI pyramid, *What would change the call*, the factor tree and which siblings share its women.
+3. **[City Walk](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk) (SHRINK):** the AI pyramid, *What would change the call*, the factor tree and which siblings share its women. *Action:* lease review, with finance's P&L before anyone says "close"; a prime rent may be buying footfall the model can't see.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah) (GROW, low confidence):** about 12.5k net new women, but no shop rent of its own, and the call says so.
 5. **Back on the What-if explorer:** open the 🧪 panel, quote City Walk a rent of 2,200 and watch its call move.
 6. **[README](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how):** this README in the app, with the detailed docs linked.
 
-## The questions it answers
+## The questions it helps answer
 
-The app is for Bedashing's **retail portfolio team** (network, real estate, expansion) and the
-**network and capital owner** on it. The answers below are the baseline (15-min drive, 60%
-competitor coverage, 5.5% women in worker housing, affluence off); every count of women is a model
-estimate.
+A decision-support system for Bedashing's **retail portfolio team** (network, real estate,
+expansion) and the **network and capital owner** on it. It doesn't hand down answers: for each
+question the team keeps coming back to, it gives a recommendation, the evidence behind it, how sure
+to be, and a way to test it. Below, what it suggests at the baseline (15-min drive, 60% competitor
+coverage, 5.5% women in worker housing, affluence off); every count of women is a model estimate.
 
 1. **Which lounges should we keep, watch or review?**
+   It scores every lounge's site on demand and rent within its emirate. At the baseline:
    **6 PROTECT, 14 HOLD, 3 SHRINK** of 23 scored lounges (the airport lounge serves travellers and isn't scored).
    - PROTECT: Al Ain, Al Dhafra, Al Falah, Al Taif Mall, Mirdif 35, Nad Al Sheba.
    - SHRINK (investigate, don't close: we can't see profit): City Walk (bottom 30% of Dubai's salon
@@ -42,8 +44,9 @@ estimate.
      34% of Sharjah's on demand, but rent ratio 0.63: it sits on the dear Dubai edge of Sharjah).
    - 12 of the 23 calls are low confidence: close to a line, on a fallback rent, or moved by the
      assumptions (see Limitations).
-   - **Where:** the Executive Summary's Review and Protect sections; the Lounges page for every lounge and its "What would change the call" tree.
+   - **Where to look:** the Executive Summary's Review and Protect sections; the Lounges page for every lounge and its "What would change the call" tree.
 2. **Where is there room for a new lounge?**
+   It opens a typical lounge at every named place and counts the women it would add. At the baseline,
    **34 GROW areas** (and 63 WATCH, of 561 named places) pass all three tests: 6,000+ net new women, site demand in the emirate's top half, and a rent ratio of 1 or more.
    - By emirate: Abu Dhabi 13, Sharjah 10, Ajman 6, Ras Al Khaimah 4, Dubai 1 (Al Awir).
    - The biggest are Al Dhaid (+35% on the women our lounges serve today), Manama (+21%) and Khor Fakkan (+14%).
@@ -51,27 +54,28 @@ estimate.
    - 17 of the 34 have no shop rent of their own (they take the emirate median), so their rent test is neutral and the call low confidence.
    - Most Sharjah GROWs are beyond a 15-minute drive of our two Sharjah lounges (Al Jada, Zawaya Walk, both on the Dubai side); why the footprint there is two is a business question the model can't answer.
    - Most big WATCHes (Al Dhahir, Bani Yas, Al Helio) have the women but a rent dearer than their emirate's median salon site.
-   - **Where:** the Executive Summary's Grow section; the Areas page; the What-if explorer's map (GROW areas in blue).
+   - **Where to look:** the Executive Summary's Grow section; the Areas page; the What-if explorer's map (GROW areas in blue).
 3. **Where do our own lounges compete for the same women?**
-   Almost everywhere on the map, yet barely in effect.
+   It shares each area's women among every salon that reaches them, our lounges included, and shows
+   what a closure would hand to the siblings. At the baseline: almost everywhere on the map, yet barely
+   in effect.
    - 19 of 24 lounges share more than half their catchment with a sibling.
    - If one closes, its siblings pick up a median **8%** of its customers (30% at most). The rest go to competitors or nowhere.
    - **Lounges sharing a catchment both keep their call while women there go unserved.** A sibling only counts against a site for the women it actually wins; women still unserved, or with competitors, still count toward the site's demand. Of the 18 lounges sharing more than half their catchment, 15 are HOLD or PROTECT, and the 3 SHRINKs are there for rent or weak demand, not overlap. Khalifa City A, Shakhbout City and Mohammed Bin Zayed City share 97-100% of their catchments and are all HOLD.
    - **A new lounge can still be GROW inside our footprint**, judged on net new women only: 15 GROW areas are places our lounges already reach, such as Sharjah city (we serve 3% of its women; a new lounge would add about 12.8k net new).
    - So overlap isn't a reason to shrink, and expanding both lounges in a shared catchment can be right if it raises our coverage.
-   - **Where:** each lounge page's shared-catchment table and cannibalisation what-if; the What-if explorer's "All catchments (overlap)" layer and **Test a SHRINK**.
+   - **Where to look:** each lounge page's shared-catchment table and cannibalisation what-if; the What-if explorer's "All catchments (overlap)" layer and **Test a SHRINK**.
 4. **How does each lounge stand against the salons around it?**
-   Site demand shares every area's women among our lounges and the 1,100+ premium competitor salons around them, in proportion to how much each sells (measured by its Google reviews, our proxy for services sold; a service sold = one completed appointment), then ranks the site against its emirate's competitor salon sites.
+   It ranks each site against its emirate's competitor salon sites. Site demand shares every area's women among our lounges and the 1,100+ premium competitor salons around them, in proportion to how much each sells (measured by its Google reviews, our proxy for services sold; a service sold = one completed appointment), then ranks the site against its emirate's competitor salon sites.
    - Example: City Walk out-serves only 30% of Dubai's salon sites; Al Dhafra out-serves all of Abu Dhabi's.
    - How much a lounge sells against its site is shown beside the call, not scored: "The model estimates this lounge is performing 2.7x compared to its site" (Khalifa City A, a HOLD): it sells 2.7x what a typical lounge would at its site, which separates a strong lounge from a strong location.
-   - **Where:** each lounge page's signals, factor tree and competitors table; premium competitors on the What-if explorer's map.
-5. **What would change the answers, and can the team test that themselves?**
-   Yes, on the **What-if explorer**, the only page a what-if touches:
-   - **Your decision rules** (how much risk to take): the weight of demand against rent, the PROTECT and SHRINK lines, the GROW minimum and demand line. A GROW minimum of 10,000 net new women cuts GROW from 34 to 16 areas.
-   - **A rent quote** for a lounge or an area: a landlord quote of AED 2,200/m² for City Walk (today 4,561) turns it SHRINK → HOLD (low confidence).
-   - **Test a SHRINK:** close one or more lounges and see who picks up their women and which calls move.
-   - **The model's assumptions:** drive time, competitor coverage, women in worker housing, search recall.
-   - The scenario summary shows baseline against scenario and what changed, with the signal that moved; the map colours every area by its call.
+   - **Where to look:** each lounge page's signals, factor tree and competitors table; premium competitors on the What-if explorer's map.
+Every answer can be tested. On the **[What-if explorer](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/explore)**
+the team sets its own decision rules (the weight of demand against rent, the PROTECT and SHRINK
+lines, the GROW bar), plugs in a landlord's rent quote, closes lounges, or changes the model's
+assumptions (drive time, competitor coverage, worker housing), and sees the baseline against the
+scenario with every call that moved. For example, a rent quote of AED 2,200/m² turns City Walk from
+SHRINK to HOLD, and a GROW bar of 10,000 net new women cuts GROW from 34 areas to 16.
 
 ## How I approached it
 
@@ -201,14 +205,14 @@ Full version: [docs/model.md](docs/model.md) ("The ideal model").
 
 **Who decides:** the network and capital owner, on the retail portfolio team. They decide where
 Bedashing is present and how much capital each site ties up: open, renew, resize, relocate or exit.
-They don't run the branches: service quality, staffing and day-to-day performance belong to
-operations.
+How much capacity each catchment needs (service providers and hours) is their call too. They don't
+run the branches: service quality, rosters, hiring and day-to-day performance belong to operations.
 
 | Role | Who | Uses it to |
 |---|---|---|
 | **Primary user** | Bedashing's retail portfolio team (network, real estate, expansion) | form recommendations, stress-test them with what-ifs, lift the explanations into memos |
 | **Decision-maker** | The network and capital owner, on the portfolio team | open, renew, resize, relocate or exit, from the headline and the reasons |
-| **Operations** (out of scope) | Whoever runs the branches: service quality, staffing, day-to-day performance | nothing here: the tool never judges how a branch is run |
+| **Operations** (out of scope) | Whoever runs the branches: service quality, rosters and hiring, day-to-day performance | nothing here: the tool never judges how a branch is run |
 | **Board / investors** | Bedashing's board and investors | judge whether the call is defensible: evidence, thresholds, caveats |
 
 Each label maps to a decision the network and capital owner already makes (definitions: [`docs/glossary.md`](docs/glossary.md), "Decisions"):
@@ -217,7 +221,7 @@ Each label maps to a decision the network and capital owner already makes (defin
 |---|---|---|
 | **Lease renewal, resize or exit** (each lounge, at its lease event) | **PROTECT** | Keep and defend: renew, don't relocate, respond to a competitor opening nearby |
 | | **HOLD** | No portfolio action this cycle; revisit at the next lease event, or sooner if a signal crosses a line |
-| | **SHRINK** | Investigate, don't close: before the lease event, review downsizing or consolidating into the sibling that shares most of its catchment |
+| | **SHRINK** | Investigate, don't close: before the lease event, review downsizing; consolidate only where a sibling would take most of its customers (City Walk's siblings would take about 1%) |
 | **Open** (site search, expansion plan) | **GROW** | Start a site search: a shortlist for site visits, verified on the ground before committing |
 | **Revisit later** | **WATCH** | Don't act now; revisit when the named failing test changes |
 | **No action** | **SKIP** | Too small or already crowded. (The airport lounge is NOT SCORED: it serves travellers.) |
@@ -228,13 +232,6 @@ estimate of the customers behind the services a lounge sells), shown as context,
 **capacity is not modelled at all** (no chairs, hours or utilisation), so a SHRINK is driven by
 modelled demand and shop rent, not by services that would be lost.
 
-**One flow, question to action.** *"Which lounges should we review before their leases?"* →
-Executive Summary, Review card: 3 SHRINKs, one per emirate → City Walk's page: a typical lounge
-there would serve about 1.9k women, bottom 30% of Dubai's salon sites, rent ratio 0.47; 72% of its
-catchment's women are also reached by a sibling; high confidence (holds in all 27 assumption
-combinations) → action: put City Walk on the lease-review list with the sibling named, and ask
-finance for its P&L before anyone says "close" (a prime rent may be buying footfall the model can't see).
-
 ## Out of scope, and why
 
 Our job ends at **allocating lounges to neighbourhoods**: where the network should be denser,
@@ -242,8 +239,10 @@ thinner or new. Out of scope:
 
 - **The P&L: revenue, actual rent paid, capex, lease terms.** We have none of it, and it is Bedashing's own
   data. It decides whether a SHRINK is closed; the model only says which lounges to look at.
-- **In-branch staffing and capacity.** How many chairs and stylists a lounge needs is an
-  operations question, answered from bookings, not from maps.
+- **Running a branch day to day: rosters, shifts, hiring and managing individual staff.** How much
+  capacity each catchment needs (service providers × hours) is in scope, since it decides where
+  branches and providers go, but today's model can't measure it: that needs bookings and headcount
+  data (see "The model we'd build with Bedashing's data").
 - **Service quality and operations.** Ratings enter only as a factor on each salon's services sold
   in the Huff split; fixing a weak lounge's service is a management job, not a location one.
 
