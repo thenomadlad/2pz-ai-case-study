@@ -264,7 +264,7 @@ Inputs come from public sources.
 
 ### Demo
 
-- [x] `[core]` **M1. A walkthrough:** a short recording, or the hosted app with a written tour.
+- [x] `[core]` **M1. A walkthrough:** a short recording, or the hosted app with a written tour. (2026-10-12: the README's "Walkthrough (5 minutes)", with the live app; docs/walkthrough.md was removed as a duplicate.)
 - [x] `[ours]` **M2. It covers** framing → the map → a branch decision with its explanation → an opportunity with its explanation → the AI layer → limitations.
 - [x] `[core]` **M3. A recording, if any, stays short (about ten minutes).**
 

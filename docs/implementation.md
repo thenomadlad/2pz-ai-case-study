@@ -80,7 +80,7 @@ Five pages; the loop is **Executive Summary → click a lounge or area → its p
    notes), then live values read from the code each load: every
    assumption with its source and every constant with why it was chosen.
 
-Links carry the selection, so any page can be shared directly. Guided tour: [`docs/walkthrough.md`](walkthrough.md).
+Links carry the selection, so any page can be shared directly. Guided tour: the Walkthrough at the top of the [README](../README.md).
 
 ## Data
 

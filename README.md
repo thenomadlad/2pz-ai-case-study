@@ -15,7 +15,10 @@ spot, after sharing them with every competing salon and sibling lounge they can 
 against the competitor salon sites in the same emirate. **Rent ratio**: the emirate's median salon-site
 shop rent divided by this site's (above 1 = cheaper than a typical salon site there).
 
-## Look at this in 5 minutes
+## Walkthrough (5 minutes)
+
+A guided path through the live app: the answer, one lounge decision, one growth call and a scenario.
+
 
 1. **[Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the answer in one line, then the Review, Grow and Protect cards and their evidence maps.
 2. **[What-if explorer](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/explore):** pick Abu Dhabi, tick "All catchments (overlap)": heavy overlap, yet only West Yas is SHRINK.
@@ -23,9 +26,6 @@ shop rent divided by this site's (above 1 = cheaper than a typical salon site th
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah) (GROW, low confidence):** about 12.5k net new women, but no shop rent of its own, and the call says so.
 5. **Back on the What-if explorer:** open the 🧪 panel, quote City Walk a rent of 2,200 and watch its call move.
 6. **[README](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how):** this README in the app, with the detailed docs linked.
-
-The full ten-minute version, with the AI layer and where not to trust it:
-[`docs/walkthrough.md`](docs/walkthrough.md).
 
 ## The questions it answers
 
@@ -467,7 +467,7 @@ Five pages; the loop is **Executive Summary → click a lounge or area → its p
 5. **README** (`/how`): this README, then every assumption and constant read live from the code; the detailed docs are linked.
 
 Links carry the selection, so any page can be shared directly. Page by page in detail:
-[docs/implementation.md](docs/implementation.md); guided tour: [`docs/walkthrough.md`](docs/walkthrough.md).
+[docs/implementation.md](docs/implementation.md); guided tour: the Walkthrough at the top of this README.
 
 ## Repo map
 
