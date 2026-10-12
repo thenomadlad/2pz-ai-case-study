@@ -189,25 +189,21 @@ def test_pages_default_to_the_top_row_and_ignore_unknown_links():
 
 
 def test_how_page_is_the_readme_then_live_values():
-    import posixpath
     import re
 
     from src.config import REPO_ROOT
-    from src.webapp.pages.how import DOCS, readme_parts
+    from src.webapp.pages.how import readme_parts
     at = _page("how")
     assert not at.exception
     text = _text(at)
     assert text.lstrip().startswith("# Bedashing network right-sizing")   # the README, from its own title
-    assert text.index("# The model in detail") < text.index("# Implementation notes")   # then the two docs, in order
-    assert "Every factor we ignore, and why" in text and "Why commercial rent stands in for cost" in text
-    assert "The AI layer" in text and "Potential improvements" in text
-    parts = [p for doc in DOCS for p in readme_parts((REPO_ROOT / doc).read_text(), posixpath.dirname(doc))]
-    assert sum(k == "mermaid" for k, _ in parts) == 3                     # every diagram drawn, not shown as code
-    assert sum(k == "mermaid" for k, _ in readme_parts((REPO_ROOT / "README.md").read_text())) == 1   # README: the short chain
+    assert "The model in detail" not in text and "Implementation notes" not in text   # README only on this page
+    assert "At a glance" in text and "Implementation at a glance" in text
+    parts = readme_parts((REPO_ROOT / "README.md").read_text())
+    assert sum(k == "mermaid" for k, _ in parts) == 3                     # chain + data-to-calls + signals, drawn
     md = " ".join(p for k, p in parts if k == "md")
-    assert "](https://github.com/thenomadlad/2pz-ai-case-study/blob/main/docs/limitations.md)" in md   # repo links work
-    assert "](/how#the-model-in-detail)" in md and "](/how#implementation-notes)" in md   # the three docs link in-page
-    assert not re.search(r"\]\((?:\.\./)?(?:docs/)?(?:model|implementation)\.md\)|README\.md\)", md)
+    gh = "](https://github.com/thenomadlad/2pz-ai-case-study/blob/main/docs/"
+    assert gh + "model.md)" in md and gh + "implementation.md)" in md     # the detailed docs open on GitHub
     assert not re.search(r"\bbrief\b|case study|interview|take-home|assignment", text, re.IGNORECASE)   # internal wording only
     assert not re.search(r"\bCOO\b", text)                                   # the audience is the network and capital owner
     assumptions = at.table[0].value                                       # live values from the code

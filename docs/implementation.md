@@ -76,8 +76,8 @@ Five pages; the loop is **Executive Summary → click a lounge or area → its p
    same table-as-picker; below, the call with its pyramid and caveats, *How this call was made*
    (the three tests), the factor tree, the per-assumption tabs, a map of its cells and the nearest
    lounge.
-5. **README:** the [README](../README.md), [docs/model.md](model.md) and
-   these notes, then live values read from the code each load: every
+5. **README:** the [README](../README.md) (which links to [docs/model.md](model.md) and these
+   notes), then live values read from the code each load: every
    assumption with its source and every constant with why it was chosen.
 
 Links carry the selection, so any page can be shared directly. Guided tour: [`docs/walkthrough.md`](walkthrough.md).

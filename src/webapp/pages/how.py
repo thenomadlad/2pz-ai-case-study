@@ -57,11 +57,8 @@ def _const(v) -> str:
 
 
 README = REPO_ROOT / "README.md"
-# The page, in order: each file's in-app anchor is its title's heading slug, so links between them stay in the page
-# Full page URLs, not bare "#..." anchors: Streamlit doesn't scroll on an in-page anchor click, but it does
-# land on the heading when a page loads with one
-DOCS = {"README.md": "/how#bedashing-network-right-sizing", "docs/model.md": "/how#the-model-in-detail",
-        "docs/implementation.md": "/how#implementation-notes"}
+DOCS = {"README.md": "/how#bedashing-network-right-sizing"}   # the page shows the README only; the
+# detailed docs (docs/model.md, docs/implementation.md) are linked on GitHub
 REPO_URL = "https://github.com/thenomadlad/2pz-ai-case-study/blob/main/"
 _MERMAID = """<div class="mermaid">{code}</div>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
@@ -83,7 +80,7 @@ def readme_parts(text: str, base: str = "") -> list[tuple[str, str]]:
 
 
 def render() -> None:
-    # The README and the two docs are this page: one source of truth for the model, its limitations and trade-offs
+    # The README is this page (one source of truth); the detailed docs it links to open on GitHub
     for doc in DOCS:
         for kind, part in readme_parts((REPO_ROOT / doc).read_text(), posixpath.dirname(doc)):
             if kind == "md":

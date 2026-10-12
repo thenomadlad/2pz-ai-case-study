@@ -22,7 +22,7 @@ shop rent divided by this site's (above 1 = cheaper than a typical salon site th
 3. **[City Walk](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk) (SHRINK):** the AI pyramid, *What would change the call*, the factor tree and which siblings share its women.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah) (GROW, low confidence):** about 12.5k net new women, but no shop rent of its own, and the call says so.
 5. **Back on the What-if explorer:** open the 🧪 panel, quote City Walk a rent of 2,200 and watch its call move.
-6. **[README](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how):** this page, the model and the implementation notes.
+6. **[README](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how):** this README in the app, with the detailed docs linked.
 
 The full ten-minute version, with the AI layer and where not to trust it:
 [`docs/walkthrough.md`](docs/walkthrough.md).
@@ -249,6 +249,9 @@ thinner or new. Out of scope:
 
 ## How the model works
 
+One chain: **where the women are → who can reach them → who they go to → what a site costs → the
+call.** The rules make every call; the AI only explains it.
+
 ```mermaid
 flowchart LR
   A["Women 15+<br/>where they live"] --> B["Who can reach them<br/>(drive time)"]
@@ -257,12 +260,186 @@ flowchart LR
   D --> E(["The call"])
 ```
 
-The rules make every call; the AI only narrates it. Constants are named in
-[docs/model.md](docs/model.md), not quoted, because they are still being tuned: each lives in code
-with a `*_WHY` string saying why. The full write-up, step by step, with the two detailed diagrams
-(data to calls, and every signal including the dropped ones), every proxy, threshold, ignored
-factor and assumption: [docs/model.md](docs/model.md). The AI layer, data pipeline, tools,
-trade-offs and improvements: [docs/implementation.md](docs/implementation.md).
+In detail, from data to calls:
+
+```mermaid
+flowchart LR
+  subgraph SRC["Data"]
+    WP["Population + worker housing"]
+    MB["Drive times"]
+    GP["Salons + our lounges"]
+    RENT["Shop rents"]
+    OSM["OSM place names"]
+  end
+  subgraph DER["Derived per ~2 km cell"]
+    DEM["Demand: women 15+"]
+    REACH["Reach: suppliers within 20 min"]
+    SUP["Suppliers"]
+    IMP["Imputed competitors<br/>for unsearched cells"]:::assume
+    COST["Site cost"]
+    UNIT["Unit size, fit-out"]:::assume
+  end
+  HUFF{{"Huff split by attractiveness x distance decay"}}
+  OUT["Outside option"]:::assume
+  SERVED["Served women per lounge"]
+  UNSERVED["Unserved women per cell"]
+  SITE["Site served: a typical lounge<br/>at each lounge's site"]
+  TYP["Typical lounge, frozen:<br/>757 reviews, 4.6★"]:::assume
+  FB["Fallback rent (emirate median)<br/>→ rent neutral, low confidence"]:::assume
+  UAE["UAE-wide percentiles<br/>of demand and rent"]
+  REF["Frozen salon-site reference:<br/>1,123 competitor sites, per emirate"]
+  DPCT["Demand percentile<br/>in its emirate's salon sites"]
+  RR["Rent ratio vs its emirate's<br/>median salon site"]
+  CANN["What-if: close a lounge"]:::whatif
+  OPEN["What-if: open a typical lounge<br/>at each named place"]:::whatif
+  LRULE["Lounge rule"]
+  GRULE["Growth rule"]
+  LCALL(["PROTECT / HOLD / SHRINK"])
+  GCALL(["GROW / WATCH / SKIP"])
+  AI["AI explanation"]
+
+  WP --> DEM
+  MB --> REACH
+  GP --> SUP
+  IMP -.-> SUP
+  RENT --> COST
+  UNIT -.-> COST
+  RENT --> RR
+  FB -.-> RR
+  GP --> REF
+  RENT --> REF
+  DEM --> HUFF
+  REACH --> HUFF
+  SUP --> HUFF
+  OUT -.-> HUFF
+  HUFF --> SERVED
+  HUFF --> UNSERVED
+  HUFF --> SITE
+  HUFF --> REF
+  TYP -.-> SITE
+  TYP -.-> OPEN
+  TYP -.-> REF
+  SITE --> DPCT
+  REF --> DPCT
+  REF --> RR
+  DPCT --> LRULE
+  RR --> LRULE
+  SERVED -.->|context: performance vs site| LCALL
+  REF --> UAE
+  UAE -.->|context only| LCALL
+  UAE -.->|context only| GCALL
+  COST -.->|display only| LCALL
+  HUFF --> CANN
+  CANN -.->|display only| LCALL
+  UNSERVED --> OPEN
+  OSM --> OPEN
+  OPEN --> GRULE
+  OPEN --> DPCT
+  DPCT --> GRULE
+  RR --> GRULE
+  LRULE --> LCALL
+  GRULE --> GCALL
+  LCALL --> AI
+  GCALL --> AI
+
+  classDef assume stroke-dasharray: 5 5,fill:#fff4e0,stroke:#c77700,color:#000
+  classDef whatif stroke-dasharray: 2 2,fill:#e8f0ff,stroke:#3b6fd6,color:#000
+```
+
+*Dashed orange = an assumption, not data. Dashed blue = a what-if the model simulates.*
+
+**At a glance**
+- **Demand:** women 15+ per ~2 km cell (WorldPop 2025, corrected for worker housing), reaching sites
+  within a 10-20 minute drive (Mapbox).
+- **Competition:** each area's women are split among our lounges and ~1,100 premium salons by how much
+  each sells (Google reviews as the proxy for services sold) and how far away it is (a Huff model).
+- **Scored signals (two):** *site demand*, the share of its emirate's competitor salon sites a typical
+  lounge here would out-serve; and *rent ratio*, the emirate's median salon-site rent ÷ this site's.
+  Each is scored 0-1 and averaged; PROTECT at 0.65+, SHRINK at 0.35 or less.
+- **Growth:** open a typical lounge at each named place and count the women it would add net of our
+  own lounges; GROW needs 6,000+, demand in the emirate's top half and rent no dearer than its median.
+- **Shown as context, not scored:** how much the lounge itself sells against its site, the share its
+  siblings would absorb if it closed, and UAE-wide percentiles.
+- **Key assumptions:** a typical lounge frozen at 757 reviews and 4.6★; a 150 m² unit with assumed
+  fit-out; rent from DLD, ADREC or listings, else the emirate median (scored neutral, low confidence);
+  confidence from 27 drive-time × coverage × worker-share combinations and ±25% weights.
+
+```mermaid
+flowchart LR
+  subgraph G["Growth universe"]
+    G1["Named OSM places, any reach"]
+    G2["Non-residential name rule"]
+    G3["Worker-housing cap"]
+    G4["New-lounge what-if: net new women<br/>(not additive across areas)"]
+    G5["DROPPED Premium saturation gate (reviews per 1k):<br/>competitors now take their Huff share"]:::dropped
+    G6["DROPPED Unreached cells only / contiguous pieces:<br/>now one area per named place"]:::dropped
+    G7["DROPPED Emirate-fallback-named cells as areas:<br/>no actionable place"]:::dropped
+  end
+  subgraph S["Decision rules / scores"]
+    S1["Site served, as a percentile of its<br/>emirate's salon sites (scored)"]
+    S9["Served women, performance vs site:<br/>context, not scored"]:::demoted
+    S2["Rent ratio vs its emirate's<br/>median salon site (scored)"]
+    S3["Cannibalisation what-if:<br/>display only, no longer scored"]:::demoted
+    S4["DROPPED Capture share:<br/>double-counted competition with Huff"]:::dropped
+    S5["DROPPED Rating gap:<br/>moved into attractiveness"]:::dropped
+    S6["DROPPED Raw catchment overlap (shared_share):<br/>capacity-blind, penalised both lounges"]:::dropped
+    S7["DROPPED 200k anchor on catchment women:<br/>demand is now site served"]:::dropped
+    S8["DROPPED Estimated customers:<br/>computed, never scored; superseded by served women"]:::dropped
+    S10["DROPPED Emirate-median-of-lounges baseline:<br/>moved when siblings opened or closed"]:::dropped
+    S11["DROPPED UAE-wide COST_ANCHOR (cost index):<br/>marked down dear Dubai sites, counted served women twice;<br/>now rent ratio within the emirate"]:::dropped
+    S12["DROPPED 0 → 20k site-served scale:<br/>calibrated on our own lounges; now a percentile of salon sites"]:::dropped
+    S13["UAE-wide demand and rent percentiles:<br/>context, not scored"]:::demoted
+    S14["DROPPED Live-median typical lounge:<br/>drifted when a lounge closed; now frozen at 757 reviews, 4.6★"]:::dropped
+  end
+  subgraph K["Cost"]
+    K1["Shop rent: DLD (Dubai), ADREC (Abu Dhabi),<br/>listings (north), emirate-median fallback"]
+    K2["Site cost (150 m² unit, fit-out):<br/>display only"]:::demoted
+    K4["Frozen salon-site reference:<br/>emirate median shop rent"]
+    K5["Fallback (emirate-median) rent:<br/>scores neutral, low confidence"]
+    K3["DROPPED JLL mall-class rent bands:<br/>4 lounges, read off a chart, superseded by ADREC"]:::dropped
+  end
+  subgraph C["Competition / attractiveness"]
+    C1["Premium competitor salons (Google Places)"]
+    C2["Reviews x (rating/4.6)^k = Huff attractiveness"]
+    C3["Imputed competitors for unsearched cells"]
+    C4["Outside option"]
+  end
+  subgraph R["Reach"]
+    R1["Drive-time bands 10/15/20 min:<br/>Mapbox cell isochrones, straight-line fallback"]
+  end
+  subgraph D["Demand"]
+    D1["Women 15+ per cell (WorldPop 2025)"]
+    D2["Worker-housing correction (OSM industrial)"]
+    D3["DROPPED Affluence weighting from DLD home rents:<br/>Dubai-only; changes no lounge call"]:::dropped
+    D4["DROPPED GHSL built-form rent proxy:<br/>CV R² −0.10"]:::dropped
+  end
+
+  classDef dropped stroke:#d32f2f,stroke-width:3px,color:#d32f2f
+  classDef demoted stroke-dasharray: 5 5,stroke:#757575,stroke-width:2px,color:#757575
+```
+
+*Plain = in use. Red = dropped, with the reason. Grey dashed = demoted: still computed and shown,
+no longer scored.*
+
+Every step, threshold, proxy, ignored factor and assumption, with its evidence:
+[docs/model.md](docs/model.md).
+
+## Implementation at a glance
+
+- **Stack:** Python 3.11+, Streamlit (hosted on Streamlit Community Cloud), pydeck maps, pandas,
+  numpy and shapely; managed with uv. The whole model runs in memory in about 2 s, so every what-if
+  is a full re-run.
+- **Data:** committed snapshots in `data/seed/v3/`, built by scripts in `scripts/`: WorldPop and
+  OpenStreetMap (population, worker housing, place names), Mapbox isochrones (drive times), Google
+  Places (our lounges and ~5,900 salons), DLD, ADREC and listings (shop rents). No key is needed to
+  run the app.
+- **AI:** grounded explanations written offline and cached (see the AI layer above); Claude Code was
+  used to build it, gated by tests, review passes and sanity checks.
+- **Quality:** 196 tests (about 40 s), speed guards, sanity checks and back-tests after every model
+  change.
+
+Data sources and licences, tool choices, trade-offs and potential improvements:
+[docs/implementation.md](docs/implementation.md).
 
 ## Run it
 
@@ -287,7 +464,7 @@ Five pages; the loop is **Executive Summary → click a lounge or area → its p
 2. **What-if explorer** (`/explore`): your decision rules, rent quotes, closures and the model's assumptions; the scenario summary and the map. The only page that reads a what-if.
 3. **Lounges** (`/lounge?lounge=delma`): a sortable table of all 24; select one for its call, explanation, factor tree, competitors and shared catchment.
 4. **Areas** (`/area?area=kalba-sharjah`): GROW and WATCH areas ranked by net new women, with the same detail.
-5. **README** (`/how`): this README, the model and the implementation notes, then every assumption and constant read live from the code.
+5. **README** (`/how`): this README, then every assumption and constant read live from the code; the detailed docs are linked.
 
 Links carry the selection, so any page can be shared directly. Page by page in detail:
 [docs/implementation.md](docs/implementation.md); guided tour: [`docs/walkthrough.md`](docs/walkthrough.md).
