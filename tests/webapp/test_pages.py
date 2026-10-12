@@ -153,41 +153,29 @@ def test_area_page_caveats():
     assert "Only 3% of its women were searched for competitors" in _text(_page("area", area="madinat-hind-4-dubai"))
 
 
-def test_area_picker_leaves_out_areas_under_the_skip_floor():
+def test_area_link_opens_an_area_the_table_leaves_out():
+    # the table is the picker (SKIP left out); a ?area= link (the map's) still opens any area
     from src.baseline import run
     from src.model import growth
     r = run()
-    thin = next(a.area_id for a in r.areas if a.women < growth.SKIP_UNDER_WOMEN)
-    at = _page("area", area=thin)
-    opts = at.selectbox(key="area-pick").options
-    act = {d.area_id: d.action for d in r.area_decisions}
-    shown = {"Abu Dhabi", "Dubai"} | {a.emirate for a in r.areas if act[a.area_id] == "GROW"}   # default emirates
-    assert len(opts) == sum(a.women >= growth.SKIP_UNDER_WOMEN and a.emirate in shown for a in r.areas)
-    assert "isn't listed in this view" in _text(at)
+    thin = next(a for a in r.areas if a.women < growth.SKIP_UNDER_WOMEN)
+    at = _page("area", area=thin.area_id)
+    assert not at.exception and thin.area_id not in at.dataframe[0].value.index.tolist()
+    assert at.header[0].value == f"Area: {thin.name}, {thin.emirate}"
 
 
-def test_pickers_default_to_abu_dhabi_dubai_and_where_the_strong_calls_are():
+def test_pages_default_to_the_top_row_and_ignore_unknown_links():
     from src.baseline import run
     r = run()
-    emirate = {f"{f.name} · {d.action}": f.emirate for f, d in zip(r.features, r.decisions)}   # option labels
-    protect = {f.emirate for f, d in zip(r.features, r.decisions) if d.action == "PROTECT"}
-    at = _page("lounge")
-    ticked = {e for e in ("Abu Dhabi", "Dubai", "Sharjah", "Ras Al Khaimah", "Fujairah")
-              if at.checkbox(key=f"lounge-em-{e}").value}
-    assert ticked == {"Abu Dhabi", "Dubai"} | protect                     # every PROTECT lounge is listed
-    assert {emirate[b] for b in at.selectbox(key="lounge-pick").options} == {"Abu Dhabi", "Dubai"} | protect
-    grow = {a.emirate for a in r.areas for d in r.area_decisions if d.area_id == a.area_id and d.action == "GROW"}
-    at = _page("area")
-    assert all(at.checkbox(key=f"area-em-{e}").value for e in grow)       # every GROW area is listed
-    assert any("GROW" in o for o in at.selectbox(key="area-pick").options)
-    # a deep link outside the defaults ticks its emirate and shows it, never something else
+    top = max((d for d in r.decisions if d.composite is not None), key=lambda d: d.composite).branch_id
+    for q in ({}, {"lounge": "no-such-lounge"}):
+        at = _page("lounge", **q)
+        assert not at.exception and at.query_params["lounge"] == top
     at = _page("lounge", lounge="al-jada")
-    assert at.checkbox(key="lounge-em-Sharjah").value
-    assert at.selectbox(key="lounge-pick").value == "al-jada"
-    # unticking narrows the list
-    at = _page("lounge")
-    at.checkbox(key="lounge-em-Dubai").uncheck().run()
-    assert "Dubai" not in {emirate[b] for b in at.selectbox(key="lounge-pick").options}
+    assert at.header[0].value == "Lounge: Al Jada"
+    at = _page("area")
+    first = at.dataframe[0].value
+    assert first.Call.iloc[0] == "GROW" and at.query_params["area"] == first.index[0]
 
 
 def test_how_page_renders_limitations_market_model_and_every_assumption():

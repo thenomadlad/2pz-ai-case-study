@@ -104,9 +104,10 @@ GLOSSARY: dict[str, Field] = {
     "rating_gap": Field("Rating gap", "stars",
                         "Lounge rating minus the median rating of the premium salons in its catchment (20+ reviews)."),
     "level_flips": Field(
-        "Assumption sensitivity", f"of {scorecard.COMBOS} combinations",
-        f"How many of the {scorecard.COMBOS} combinations of travel time, competitor coverage, "
-        "worker-housing share and affluence weighting change this lounge's call."),
+        "Assumption sensitivity", f"of {scorecard.COMBOS} worker-housing share levels",
+        f"At how many of the {scorecard.COMBOS} worker-housing share levels (low, medium, high) this "
+        "lounge's call changes. Only worker share is varied: drive time and competitor coverage don't "
+        "reach the served-demand scoring yet, and affluence weighting is off."),
     "composite": Field(
         "Composite score", "0-1",
         "Weighted average of the signal scores below (weights in the Threshold column). "
@@ -365,7 +366,7 @@ THRESHOLDS: dict[str, str] = {
     "composite": (f"PROTECT ≥ {scorecard.PROTECT_AT} · HOLD between · "
                   f"SHRINK ≤ {scorecard.SHRINK_AT}"),
     "thin_premium_market": "Context: capture is shown, not scored",
-    "level_flips": f"Low confidence at {scorecard.FLIP_LOW} or more",
+    "level_flips": f"Low confidence at {scorecard.FLIP_LOW} or more of {scorecard.COMBOS}",
     "new_site_net": f"GROW needs {growth.NEW_SITE_MIN:,}; WATCH from {growth.NEW_SITE_MIN // 2:,}",
     "women": f"SKIP under {growth.SKIP_UNDER_WOMEN:,}",
     "affluence_coverage": "Under 50%: affluence mostly unknown, weighted neutral",
