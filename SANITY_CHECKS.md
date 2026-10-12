@@ -419,6 +419,17 @@ Areas: **17 GROW → WATCH, nothing else moves** (49 → 32 GROW, 48 → 65 WATC
 - **F6 (new, explained):** emirate-relative lounge calls vs an absolute growth size line: nad-al-sheba PROTECT but its site would be SKIP as a new opening.
 - **F7 (new, explained):** composites bunch around the middle on the percentile / ratio scales: 14 HOLD, 9 within 0.05 of a line.
 
+## Expected outcomes for run 11 (written 2026-10-11, before running SC4)
+
+Scope: three owner-approved fixes. (1) **Fallback rents are neutral** (`growth.RENT_FALLBACK_WHY`): an area with half or more of its rented women in emirate-median cells passes the GROW rent test, low confidence, caveat; a lounge whose site cell is on the fallback scores rent 0.5, low confidence. (2) **The typical lounge is frozen** at 757 reviews, 4.6★ (`lounges.TYPICAL_WHY`; site_reference.csv unchanged, built with the same values). (3) The keep-within-emirate vs absolute-growth-floor limitation is stated (F6), no call change.
+
+- **SC2.** Already seen while building: lounges **6 / 14 / 3 / 1** (no call change; al-ain 0.83 → 0.72 and al-falah 0.77 → 0.66 stay PROTECT, now low confidence: 11 low-confidence lounges). Areas **34 GROW / 63 WATCH / 464 SKIP**: manama-ajman and mudayrah-ajman WATCH → GROW (the 0.997 fallback knife edge, F-run 10), nothing else moves. 17 of the 34 GROW are on a fallback rent, all low confidence. sharjah-sharjah (15% fallback) keeps its observed-rent GROW at ratio 1.000.
+- **SC4 (must pass, 0 moves).** *Close a sibling (23 closures):* with the typical lounge frozen, F5 is gone: expect **0 label moves and 0 composite dips** in any other lounge (khaleej-al-arabi stays HOLD at 0.3504). *+50% women in one catchment:* no label drop. *A 2,000-review 4.9★ rival next to each lounge:* no composite rise.
+- **Level flips:** khaleej-al-arabi still flips (on the line); al-ain and al-falah flip 0 (composite 0.72 / 0.66, but al-falah sits 0.015 above PROTECT, so a few flips there are possible).
+- **BT2/BT3:** unchanged in kind (F6): nad-al-sheba still SKIP as a new opening.
+- **SC5.** 23 explanations regenerated offline (prompt v7), all pass `check` and `ingest`.
+- **SC8.** run() unchanged (~4.4 s); speed guard green without raising limits.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
