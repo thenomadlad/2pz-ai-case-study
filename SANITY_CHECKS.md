@@ -370,6 +370,55 @@ Scope: the owner's decision to judge labels **within each emirate, against its m
 - **SC5.** 121 explanations regenerated offline (prompt v7); all must pass `check`; read-through of six.
 - **SC8.** run() unchanged (~4.2 s warm): one cached CSV read and a sorted search per site.
 
+## Run 10 results (2026-10-11, salon-site reference)
+
+Scripts: `src.baseline.run()` against a snapshot of run 9 (`b3f89a4`), plus `lounges.build` + `scorecard.decide` with closures, a +50% demand multiplier and an added salon on in-memory copies (no repo code edited for the checks). Reference: 1,123 sites, built in 8.6 s; rent-ratio scale P10 0.6176 / P90 1.4290.
+
+**Call diff vs run 9** (bold = call changed; 15 of 23 scored lounges change call; sorted by new composite):
+
+| Lounge | Emirate | Old call (composite) | New call (composite) | Demand pct (ref) · UAE | Rent ratio · rent pct UAE | Old cost index |
+|---|---|---|---|---|---|---|
+| al-taif-mall | Fujairah | PROTECT (0.72) | PROTECT (0.95) | 90% (UAE) · 90% | 1.55 · 0% | 3.86 |
+| al-ain | Abu Dhabi | PROTECT (0.75) | PROTECT (0.83) | 95% (Abu Dhabi) · 93% | 1.19 · 22% | 2.68 |
+| **mirdif-35** | Dubai | HOLD (0.37) | **PROTECT** (0.79) | 98% (Dubai) · 75% | 1.10 · 58% | 0.98 |
+| al-falah | Abu Dhabi | PROTECT (0.70) | PROTECT (0.77) | 83% (Abu Dhabi) · 85% | 1.19 · 22% | 2.07 |
+| al-dhafra | Abu Dhabi | PROTECT (1.00) | PROTECT (0.76) | 100% (Abu Dhabi) · 100% | 1.04 · 32% | 5.48 |
+| **nad-al-sheba** | Dubai | SHRINK (0.08) | **PROTECT** (0.71) | 68% (Dubai) · 48% | 1.21 · 55% | 0.52 |
+| mohammed-bin-zayed-city | Abu Dhabi | HOLD (0.44) | HOLD (0.61) | 59% (Abu Dhabi) · 70% | 1.13 · 26% | 1.16 |
+| **shahama** | Abu Dhabi | PROTECT (0.75) | **HOLD** (0.57) | 93% (Abu Dhabi) · 92% | 0.80 · 54% | 1.95 |
+| **baniyas** | Abu Dhabi | PROTECT (0.83) | **HOLD** (0.54) | 99% (Abu Dhabi) · 98% | 0.70 · 62% | 2.33 |
+| **shakhbout-city** | Abu Dhabi | PROTECT (0.72) | **HOLD** (0.53) | 87% (Abu Dhabi) · 89% | 0.77 · 56% | 1.67 |
+| al-maqta | Abu Dhabi | HOLD (0.35) | HOLD (0.52) | 52% (Abu Dhabi) · 67% | 1.03 · 33% | 0.99 |
+| **ras-al-khaimah** | Ras Al Khaimah | PROTECT (0.70) | **HOLD** (0.50) | 86% (UAE) · 86% | 0.73 · 23% | 2.08 |
+| **jumeirah-park** | Dubai | SHRINK (0.06) | **HOLD** (0.47) | 45% (Dubai) · 34% | 1.02 · 66% | 0.38 |
+| **zawaya-walk** | Sharjah | PROTECT (0.69) | **HOLD** (0.41) | 58% (Sharjah) · 83% | 0.81 · 36% | 1.77 |
+| **al-barsha** | Dubai | SHRINK (0.05) | **HOLD** (0.39) | 42% (Dubai) · 33% | 0.90 · 83% | 0.34 |
+| **noya-plaza** | Abu Dhabi | SHRINK (0.28) | **HOLD** (0.38) | 52% (Abu Dhabi) · 67% | 0.82 · 52% | 0.85 |
+| **delma** | Abu Dhabi | SHRINK (0.05) | **HOLD** (0.38) | 38% (Abu Dhabi) · 25% | 0.93 · 40% | 0.42 |
+| khalifa-city-a | Abu Dhabi | HOLD (0.40) | HOLD (0.36) | 73% (Abu Dhabi) · 78% | 0.62 · 76% | 1.00 |
+| **ministries-complex** | Abu Dhabi | SHRINK (0.23) | **HOLD** (0.36) | 50% (Abu Dhabi) · 65% | 0.79 · 54% | 0.77 |
+| **khaleej-al-arabi** | Abu Dhabi | SHRINK (0.03) | **HOLD** (0.35) | 22% (Abu Dhabi) · 11% | 1.01 · 34% | 0.32 |
+| westyas | Abu Dhabi | SHRINK (0.16) | SHRINK (0.35) | 45% (Abu Dhabi) · 57% | 0.82 · 52% | 0.66 |
+| **al-jada** | Sharjah | PROTECT (0.70) | **SHRINK** (0.34) | 66% (Sharjah) · 85% | 0.63 · 54% | 1.55 |
+| city-walk | Dubai | SHRINK (0.05) | SHRINK (0.15) | 30% (Dubai) · 26% | 0.47 · 98% | 0.17 |
+
+Areas: **17 GROW → WATCH, nothing else moves** (49 → 32 GROW, 48 → 65 WATCH, 464 SKIP). All 17 are big enough and clear the demand test (75%–100% of their emirate's salon sites); all 17 fail on rent, being dearer than their emirate's median salon site (rent ratio 0.50–0.95: al-dhahir, al-samhah, bani-yas, mbazzarah-al-khadra, al-wathbah, al-muwaij-i, shiab-al-ashkhar, al-aamerah, al-nahdah, al-sader in Abu Dhabi; al-helio, al-muwaihat, al-rashidiya in Ajman; wasit in Sharjah; al-dhait-south in Ras Al Khaimah), and two Ajman areas (manama 35,094 net new, mudayrah 18,651) at 0.997: their cells take Ajman's emirate-median shop rent (AED 755/m²), a touch above the median at Ajman's salon sites (753). A knife edge made by a fallback value, not by data. GROW by emirate: Abu Dhabi 13, Sharjah 10, Ajman 4, Ras Al Khaimah 4, Dubai 1.
+
+- **SC2: reported, swings attributed (as expected).** Lounges **6 PROTECT / 14 HOLD / 3 SHRINK / 1 not scored**. (1) Dubai rises: judged against Dubai salon sites, mirdif-35 (98th percentile of Dubai sites, rent ratio 1.10) and nad-al-sheba (68th, 1.21) go to PROTECT; jumeirah-park and al-barsha SHRINK → HOLD; city-walk stays SHRINK (rent ratio 0.47, dearer than 98% of UAE salon sites). (2) Dear sites in their own emirate fall: baniyas, shahama, shakhbout-city (Abu Dhabi, rent ratio 0.70–0.80), ras-al-khaimah (0.73), zawaya-walk (0.81) PROTECT → HOLD, and al-jada PROTECT → SHRINK (0.63): run 9's cost index rewarded their many women per dirham, which the demand signal now carries alone. (3) **New, explained finding (F7): the composites bunch in the middle.** A percentile puts the median salon site at 0.5 and a ratio of 1 scores 0.47, so 14 of 23 lounges are HOLD and 9 sit within 0.05 of a line; run 9 had 4 HOLDs. The lines (0.65 / 0.35) were set for the old scales; moving them would be tuning to taste, so they stay and the bunching is reported.
+- **SC4: PASS on the frozen reference; one knife-edge move through F5, as predicted.** *Close a sibling (23 closures):* `rent_ratio` and `demand_ref` never move and `demand_pct` always equals the frozen percentile of the lounge's own site-served women (script check and unit test). khaleej-al-arabi (0.3504) goes HOLD → SHRINK (0.3488) when al-ain, al-falah, city-walk, mirdif-35 or ras-al-khaimah closes: the typical lounge drifts from 757 to 755 reviews, its site-served women dip 1,359 → 1,355 and its percentile 21.7% → 21.4%. With the typical lounge pinned, **0 label moves and 0 composite dips** (verified). *+50% women in one catchment (23 cases):* no label drops, no own composite falls. *A 2,000-review 4.9★ rival 200 m north of each lounge (23 cases):* **no composite rises** (run 9 had 12 rises of 0.0001; the frozen reference removed them); labels fall in 23 cases (F3, unchanged in kind).
+- **Level flips:** only khaleej-al-arabi flips (27 of 81, on the line); the other 22 flip 0 times. Fewer than expected: the frozen reference didn't add flips.
+- **BT2/BT3: PARTIAL, explained (F6, new).** Same unit; GROW rule with rent ratio and demand percentile. PROTECT → GROW 4 of 6 (al-ain, al-dhafra, al-falah, al-taif-mall); **nad-al-sheba → SKIP (2,637 net new) and mirdif-35 → WATCH (5,343)**. HOLD → WATCH 9, SKIP 5; SHRINK → SKIP 2, WATCH 1 (al-jada, big but dear). Cause: the lounge call is now relative to the emirate, but the growth size line stays an absolute 6,000 net new women (owner's spec), and Dubai sites serve fewer women in absolute terms (the median Dubai salon site serves ~2.3k against ~5.9k in Sharjah). A strong Dubai site can be PROTECT and still too small to open. Owner's call whether NEW_SITE_MIN should also be emirate-relative.
+- **BT1:** served model unchanged; absorbed share ≤ 0.30, as run 7.
+- **BT4 / SC3 / SC1 / SC7 / BT5 / BT6:** unchanged. GROW is a subset of run 9's, so no new non-residential GROW; 5 of 6 controls SKIP by name, Dubai Investments Park WATCH.
+- **SC5: PASS.** 121 explanations regenerated offline (prompt v7), all pass `check` and `ingest`. Read-through: al-jada, al-taif-mall, khalifa-city-a, al-dhahir-abu-dhabi, sharjah-sharjah, uae: what / so what / now what present, each cites the emirate and UAE-wide percentiles, no in-branch advice, performance quoted as context.
+- **SC8:** run() 4.1 s cold, 3.8 s warm (fresh processes); speed guard green.
+- **User stories:** unchanged count (3/10). US1 reads better: "out-serves 98% of Dubai salon sites · 75th percentile UAE-wide" says what a strong Dubai site is without comparing it with Fujairah.
+
+**Model issues after run 10:**
+- **F5 (explained, minor):** now the only channel by which a closure moves another lounge (khaleej-al-arabi). Freezing the typical lounge (757 reviews, 4.6★, already written into the reference file's header) would remove it.
+- **F6 (new, explained):** emirate-relative lounge calls vs an absolute growth size line: nad-al-sheba PROTECT but its site would be SKIP as a new opening.
+- **F7 (new, explained):** composites bunch around the middle on the percentile / ratio scales: 14 HOLD, 9 within 0.05 of a line.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
@@ -392,5 +441,7 @@ Scope: the owner's decision to judge labels **within each emirate, against its m
 | 8 | 2026-10-11 | F4 diagnosis; `est_customers` out of the lounge fact sheet; retired growth rule deleted | unchanged (3/10) | unchanged from run 7 | Calls unchanged (5/9/9/1, 34/63/464); SC5 pass (121 regenerated, 23 lounges); suite green | **F1 still open.** F4 explained: the straight-line band under-reaches the isochrones (86k vs 98k pairs at 20 min), and the 4 areas are small places whose 20-min reach covers a neighbouring town (Sharjah city, Al Dhaid, Dubai) |
 
 | 9 | 2026-10-11 | F1 (frozen UAE-wide cost anchor, 14.34) and F2 (site_served demand; performance_vs_site as context) | unchanged (3/10) | BT2/BT3 **pass**: PROTECT → GROW 10/10, SHRINK → SKIP 8 + WATCH 1, HOLD → WATCH 4; BT4 partial (DIP); BT1, BT5, BT6 unchanged | SC2 10/4/9/1, 49/48/464 (14 lounge calls and 15 WATCH → GROW, attributed); SC4 **F1 passes** (no relative baseline; +50% demand never lowers another lounge), one knife-edge closure move via the typical-lounge median (F5); SC5 pass (121 regenerated); SC8 4.4 s cold / 4.1 s warm, suite 58 s | **none unexplained.** F5 (typical lounge drifts with closures; al-maqta 0.0003 from the line) and F3 fragility explained |
+
+| 10 | 2026-10-11 | Labels judged within each emirate against a frozen reference of 1,123 competitor salon sites: demand percentile + rent ratio; GROW also needs rent ratio ≥ 1 and demand ≥ 50th percentile | unchanged (3/10) | BT2/BT3 partial, explained (F6: PROTECT → GROW 4/6; nad-al-sheba SKIP on the absolute 6,000 line); BT4 partial (DIP); BT1, BT5, BT6 unchanged | SC2 6/14/3/1, 32/65/464 (15 lounge calls and 17 GROW → WATCH, attributed; F7 bunching); SC4 **pass** on the frozen reference (rent ratio and reference never move; one F5 knife-edge move, 0 with the typical lounge pinned; no competitor raises a composite); SC5 pass (121 regenerated); SC8 4.1 s cold / 3.8 s warm | **none unexplained.** F5, F6, F7 explained |
 
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.
