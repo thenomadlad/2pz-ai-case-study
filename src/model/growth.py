@@ -14,7 +14,7 @@ from our own lounges.
 """
 import re
 
-from src.models import Area, AreaDecision
+from src.models import Area, AreaDecision, Rules
 
 SKIP_UNDER_WOMEN = 5_000
 WORKER_CAP = 0.5
@@ -50,7 +50,7 @@ WHY = {
 }
 
 
-DEMAND_PCT_MIN = 0.5
+DEMAND_PCT_MIN = Rules().demand_pct_min
 DEMAND_PCT_MIN_WHY = ("GROW needs the site to out-serve at least half of its emirate's reference salon sites "
                       "(UAE-wide where an emirate has under 50): a typical lounge here would serve at least what "
                       "one would at the median competitor salon site. Net new women stay the absolute size test.")
@@ -66,7 +66,7 @@ RENT_FALLBACK_WHY = ("A cell with no DLD, ADREC or listings rent takes its emira
                      "and manama-ajman / mudayrah-ajman missed at 0.997, on this number alone (2026-10-11). "
                      "Known edge: sharjah-sharjah (15% fallback) keeps its observed-rent call, though its median "
                      "lands on the fallback value (1.000; its listings cells alone give 0.997).")
-NEW_SITE_MIN = 6_000
+NEW_SITE_MIN = Rules().grow_min
 NEW_SITE_MIN_WHY = ("Quick first cut (2026-10-11): a new lounge here should add at least about what our median "
                     "lounge serves today (~6k women, Huff), net of what it takes from our own lounges.")
 WHY = {"NEW_SITE_MIN": NEW_SITE_MIN_WHY, "DEMAND_PCT_MIN": DEMAND_PCT_MIN_WHY,
@@ -117,14 +117,15 @@ def site_text(x) -> str:
             f"{rent_text(x.rent_ratio, x.rent_pct_uae, x.emirate, rent_fallback(x))}")
 
 
-def classify(a: Area) -> AreaDecision:
+def classify(a: Area, rules: Rules = Rules()) -> AreaDecision:  # noqa: B008 (frozen)
     """What-if: open a typical lounge here (src/model/served.what_if_open). GROW / WATCH / SKIP on the
     women it would add to the network, its demand percentile and its rent ratio (salon-site reference)."""
     net = a.new_site_net or 0.0
     cheap = rent_ok(a)
     fallback = rent_fallback(a)
-    strong = a.demand_pct is None or a.demand_pct >= DEMAND_PCT_MIN
-    big = net >= NEW_SITE_MIN and a.worker_share < WORKER_CAP
+    line = rules.grow_min
+    strong = a.demand_pct is None or a.demand_pct >= rules.demand_pct_min
+    big = net >= line and a.worker_share < WORKER_CAP
     unsat = None if a.premium_reviews_per_1k is None else a.premium_reviews_per_1k < UNSATURATED_PER_1K
     caveats = []
     if a.data_coverage < MIN_COVERAGE:
@@ -137,7 +138,7 @@ def classify(a: Area) -> AreaDecision:
                        "women are in cells without a rent of their own): the rent test is neutral.")
     if a.demand_ref == "UAE" and a.new_site_net is not None:
         caveats.append(f"{a.emirate} has under 50 reference salon sites: demand is ranked UAE-wide.")
-    gap = (net - NEW_SITE_MIN) / NEW_SITE_MIN
+    gap = (net - line) / line
     confidence = "low" if abs(gap) < NEAR_LINE or a.data_coverage < MIN_COVERAGE or (fallback and big) else "high" if abs(gap) >= FAR_LINE else "medium"
     if NON_RESIDENTIAL.search(a.name):
         action, why, confidence = "SKIP", f"Non-residential by name ({a.name}): not where customers live.", "high"
@@ -150,10 +151,10 @@ def classify(a: Area) -> AreaDecision:
                                 + " and ".join(w for w, bad in (("dearer than its emirate's median salon site", not cheap),
                                                                ("weaker demand than its emirate's median salon site", not strong)) if bad)
                                 + f": {site_text(a)}.")
-    elif net >= NEW_SITE_MIN:
+    elif net >= line:
         action, why = "WATCH", f"Enough new women ({net:,.0f}), but mostly worker housing ({a.worker_share:.0%} of adults)."
-    elif net >= NEW_SITE_MIN / 2:
-        action, why = "WATCH", f"A new lounge would add about {net:,.0f} women: half a typical lounge (GROW needs {NEW_SITE_MIN:,})."
+    elif net >= line / 2:
+        action, why = "WATCH", f"A new lounge would add about {net:,.0f} women: half a typical lounge (GROW needs {line:,})."
     else:
         action, why = "SKIP", f"A new lounge would add only about {net:,.0f} women."
     why += f" Nearest lounge: {a.nearest_lounge_id}, {a.nearest_lounge_km:.1f} km in a straight line."
@@ -161,5 +162,5 @@ def classify(a: Area) -> AreaDecision:
                         rationale=why, caveats=caveats, confidence=confidence)
 
 
-def classify_all(areas: list[Area]) -> list[AreaDecision]:
-    return [classify(a) for a in areas]
+def classify_all(areas: list[Area], rules: Rules = Rules()) -> list[AreaDecision]:  # noqa: B008 (frozen)
+    return [classify(a, rules) for a in areas]

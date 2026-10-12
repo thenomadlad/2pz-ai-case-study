@@ -14,7 +14,7 @@ from dataclasses import dataclass, replace
 from itertools import product
 
 from src.model.growth import rent_fallback
-from src.models import Decision, LoungeFeatures
+from src.models import Decision, LoungeFeatures, Rules
 
 
 @dataclass(frozen=True)
@@ -55,8 +55,9 @@ SIGNALS: tuple[Signal, ...] = (
            "Cannibalisation is not scored: it is a what-if shown on the lounge page."),
 )
 
-PROTECT_AT = 0.65
-SHRINK_AT = 0.35
+RULES = Rules()          # the baseline's decision rules; a what-if passes its own
+PROTECT_AT = RULES.protect_at
+SHRINK_AT = RULES.shrink_at
 THRESHOLDS_WHY = (
     f"PROTECT at a composite of {PROTECT_AT} or more means the lounge clears the bar on most "
     f"signals, not just one. SHRINK at {SHRINK_AT} or less means it is weak on most signals. "
@@ -96,43 +97,51 @@ LOW_MARGIN = 0.05   # composite this close to a line: low confidence
 HIGH_MARGIN = 0.10  # this far from both lines: high confidence
 
 
-def _confidence(composite: float, low: bool) -> str:
-    margin = min(abs(composite - PROTECT_AT), abs(composite - SHRINK_AT))
+def _confidence(composite: float, low: bool, rules: Rules = RULES) -> str:
+    margin = min(abs(composite - rules.protect_at), abs(composite - rules.shrink_at))
     if low or margin < LOW_MARGIN:
         return "low"
     return "high" if margin >= HIGH_MARGIN else "medium"
 
 
-def _action(composite: float) -> str:
-    return "PROTECT" if composite >= PROTECT_AT else "SHRINK" if composite <= SHRINK_AT else "HOLD"
+def _action(composite: float, rules: Rules = RULES) -> str:
+    return "PROTECT" if composite >= rules.protect_at else "SHRINK" if composite <= rules.shrink_at else "HOLD"
+
+
+def weights(rules: Rules = RULES) -> dict[str, float]:
+    """Signal weights under these rules: demand_weight 0.5 gives each signal its own weight (1, 1)."""
+    share = {"demand": rules.demand_weight, "cost": 1 - rules.demand_weight}
+    return {s.name: s.weight * 2 * share[s.name] for s in SIGNALS}
 
 
 def _composite(scores: dict[str, float], weights: dict[str, float]) -> float:
     return sum(weights[n] * scores[n] for n in weights) / sum(weights.values())
 
 
-def weight_flips(scores: dict[str, float]) -> list[str]:
+def weight_flips(scores: dict[str, float], rules: Rules = RULES) -> list[str]:
     """The weight variants (each signal ×0.75 or ×1.25, one at a time) that change the call."""
-    base = {s.name: s.weight for s in SIGNALS}
-    action = _action(_composite(scores, base))
+    base = weights(rules)
+    action = _action(_composite(scores, base), rules)
     out = []
     for s in SIGNALS:
+        if not base[s.name]:
+            continue
         for step in WEIGHT_STEPS:
-            new = _action(_composite(scores, {**base, s.name: s.weight * step}))
+            new = _action(_composite(scores, {**base, s.name: base[s.name] * step}), rules)
             if new != action:
                 out.append(f"{s.name} weight ×{step:g} → {new}")
     return out
 
 
-def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
+def _decide(f: LoungeFeatures, flips: int | None, rules: Rules = RULES) -> Decision:
     if f.not_scored:
         return Decision(branch_id=f.branch_id, action="NOT SCORED", confidence="low",
                         rationale="Not scored: this lounge serves travellers, not the women in its catchment.",
                         key_drivers=[], caveats=[])
     fallback = rent_fallback(f)    # growth.RENT_FALLBACK_WHY: the emirate median is no observation of the site
     scores = {s.name: score(s, None if fallback and s.name == "cost" else getattr(f, s.field)) for s in SIGNALS}
-    composite = _composite(scores, {s.name: s.weight for s in SIGNALS})
-    action = _action(composite)
+    composite = _composite(scores, weights(rules))
+    action = _action(composite, rules)
     caveats = [NO_FINANCIALS]
     if fallback:
         caveats.append(f"Site shop rent is the {f.emirate} median, not observed (no DLD, ADREC or listings rent in "
@@ -140,30 +149,36 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
     flippy = flips is not None and flips >= FLIP_LOW
     if flippy:
         caveats.append(f"The call changes in {flips} of {COMBOS} assumption combinations.")
-    wflips = weight_flips(scores)
+    wflips = weight_flips(scores, rules)
     if wflips:
         caveats.append("The call depends on the signal weights: it changes with " + "; ".join(wflips) + ".")
     return Decision(
         branch_id=f.branch_id, action=action, weight_flips=wflips,
-        confidence=_confidence(composite, flippy or bool(wflips) or fallback),
+        confidence=_confidence(composite, flippy or bool(wflips) or fallback, rules),
         rationale=(f"Composite {composite:.2f} across site demand and site rent "
-                   f"(PROTECT ≥ {PROTECT_AT}, SHRINK ≤ {SHRINK_AT})."),
+                   f"(PROTECT ≥ {rules.protect_at:g}, SHRINK ≤ {rules.shrink_at:g})."),
         key_drivers=sorted(scores, key=lambda n: abs(scores[n] - NEUTRAL), reverse=True)[:2],
         caveats=caveats, composite=round(composite, 4), scores={k: round(v, 4) for k, v in scores.items()})
 
 
-def decide(features: list[LoungeFeatures], flips: dict[str, int] | None = None) -> list[Decision]:
+def decide(features: list[LoungeFeatures], flips: dict[str, int] | None = None,
+           rules: Rules = RULES) -> list[Decision]:
     """`flips`: per lounge, how many of the COMBOS live-axis level combinations change its action (level_flips)."""
-    return [_decide(f, (flips or {}).get(f.branch_id)) for f in features]
+    return [_decide(f, (flips or {}).get(f.branch_id), rules) for f in features]
 
 
-def level_flips(v3, assumptions, levels, closed=frozenset()) -> dict[str, int]:
+def level_flips(v3, assumptions, levels, closed=frozenset(), rules: Rules = RULES,
+                quotes: dict[str, float] | None = None) -> dict[str, int]:
     """How many of the COMBOS combinations of LIVE_AXES levels (other axes as in `levels`) give each
-    lounge a different action than `levels`."""
-    from src.features.lounges import build  # here, not at the top: build doesn't need the scorecard
+    lounge a different action than `levels`, under these rules and rent quotes."""
+    from src.features.lounges import (  # here, not at the top: build doesn't need the scorecard
+        build,
+        with_quotes,
+    )
 
     def actions(lv):
-        return {d.branch_id: d.action for d in decide(build(v3, assumptions, lv, closed, areas=False)[0])}
+        feats = with_quotes(build(v3, assumptions, lv, closed, areas=False)[0], quotes)
+        return {d.branch_id: d.action for d in decide(feats, rules=rules)}
 
     base = actions(levels)
     out = Counter()

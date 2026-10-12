@@ -283,6 +283,29 @@ def _lounge_costs(feats):
                                  **site_signals(f.emirate, f.site_served, f.site_rent_m2)}) for f in feats]
 
 
+def with_quotes(sites: list, quotes: dict[str, float] | None) -> list:
+    """Lounges (LoungeFeatures) or growth areas with a quoted shop rent (AED/m²/yr) in place of the
+    data's: rent ratio against the same frozen emirate median, site cost, women per rent. A quote is an
+    observation of the site, so it clears the emirate-median fallback. Rent doesn't feed the Huff split,
+    so nothing else moves."""
+    if not quotes:
+        return sites
+    out = []
+    for x in sites:
+        sid = getattr(x, "branch_id", None) or x.area_id
+        q = quotes.get(sid)
+        if q is None:
+            out.append(x)
+            continue
+        sig = site_signals(x.emirate, None, q)
+        upd = {"site_cost_k": site_cost_k(q), "women_per_rent_k": women_per_rent_k(x.addressable_women, q),
+               "rent_ratio": sig["rent_ratio"], "rent_pct_uae": sig["rent_pct_uae"]}
+        upd.update({"site_rent_m2": q, "site_rent_source": "quote"} if isinstance(x, LoungeFeatures)
+                   else {"shop_rent_m2": q, "shop_rent_fallback_share": 0.0})
+        out.append(x.model_copy(update=upd))
+    return out
+
+
 TYPICAL_REVIEWS = 757
 TYPICAL_RATING = 4.6
 TYPICAL_WHY = ("The typical lounge every what-if opens (area what-ifs, site_served, the salon-site reference) is "

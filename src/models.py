@@ -118,6 +118,18 @@ class Levels:
     affluence: str = "low"          # affluence_elasticity; "low" = 0 = off (notebooks/features/affluence.ipynb)
 
 
+@dataclass(frozen=True)
+class Rules:
+    """The decision rules the portfolio team owns (its risk appetite), as opposed to model assumptions
+    (Levels). The defaults are the baseline's: scorecard.THRESHOLDS_WHY, growth.NEW_SITE_MIN_WHY and
+    growth.DEMAND_PCT_MIN_WHY say why."""
+    demand_weight: float = 0.5      # composite weight on site demand; site rent gets the rest
+    protect_at: float = 0.65        # composite at or above: PROTECT
+    shrink_at: float = 0.35         # composite at or below: SHRINK (kept below protect_at)
+    grow_min: int = 6_000           # GROW: net new women a new lounge must add
+    demand_pct_min: float = 0.5     # GROW: share of its emirate's salon sites it must out-serve
+
+
 class LoungeFeatures(BaseModel):
     branch_id: str
     name: str

@@ -5,14 +5,16 @@ from pydantic import BaseModel
 
 from src.config import REPO_ROOT, load_baseline_assumptions
 from src.data_v3 import load_v3
-from src.features.lounges import NOT_SCORED, build
+from src.features.lounges import NOT_SCORED, build, with_quotes
 from src.model import growth, scorecard
-from src.models import Area, AreaDecision, Decision, Levels, LoungeFeatures
+from src.models import Area, AreaDecision, Decision, Levels, LoungeFeatures, Rules
 
 
 class Run(BaseModel):
     levels: Levels
     closed: list[str]
+    rules: Rules = Rules()
+    quotes: dict[str, float] = {}   # site (lounge or area id) -> quoted shop rent, AED/m²/yr
     features: list[LoungeFeatures]
     decisions: list[Decision]
     areas: list[Area]
@@ -21,7 +23,8 @@ class Run(BaseModel):
 
 
 @lru_cache(maxsize=64)
-def _run(levels: Levels, closed: frozenset[str], search_recall: float | None) -> Run:
+def _run(levels: Levels, closed: frozenset[str], search_recall: float | None,
+         rules: Rules = Rules(), quotes: tuple[tuple[str, float], ...] = ()) -> Run:  # noqa: B008 (frozen)
     """Features, decisions (with level-sensitivity confidence) and growth areas for one scenario."""
     v3 = load_v3()
     ids = {lo.branch_id for lo in v3.lounges}
@@ -29,19 +32,29 @@ def _run(levels: Levels, closed: frozenset[str], search_recall: float | None) ->
         raise ValueError(f"unknown lounge id(s) in closed: {sorted(closed - ids)}; valid: {sorted(ids)}")
     if not ids - closed - set(NOT_SCORED):
         raise ValueError("closing every scored lounge leaves nothing to compare")
+    if not rules.shrink_at < rules.protect_at:
+        raise ValueError(f"the SHRINK line ({rules.shrink_at}) must sit below the PROTECT line ({rules.protect_at})")
+    q = dict(quotes)
+    if bad := [k for k, v in q.items() if not v > 0]:
+        raise ValueError(f"a rent quote must be above 0: {bad}")
     a = load_baseline_assumptions(REPO_ROOT / "data" / "scenarios" / "baseline.yaml")
     if search_recall is not None:
         a = a.model_copy(update={"search_recall": search_recall})
     features, areas = build(v3, a, levels, closed)
-    flips = scorecard.level_flips(v3, a, levels, closed)
-    return Run(levels=levels, closed=sorted(closed), features=features,
-               decisions=scorecard.decide(features, flips), flips=flips, areas=areas, area_decisions=growth.classify_all(areas))
+    features, areas = with_quotes(features, q), with_quotes(areas, q)
+    flips = scorecard.level_flips(v3, a, levels, closed, rules, q)
+    return Run(levels=levels, closed=sorted(closed), rules=rules, quotes=q, features=features,
+               decisions=scorecard.decide(features, flips, rules), flips=flips, areas=areas,
+               area_decisions=growth.classify_all(areas, rules))
 
 
 def run(levels: Levels = Levels(), closed: frozenset[str] = frozenset(),  # noqa: B008 (frozen)
-        search_recall: float | None = None) -> Run:
-    """A deep copy of the cached run, so callers can mutate it freely."""
-    return _run(levels, frozenset(closed), search_recall).model_copy(deep=True)
+        search_recall: float | None = None, rules: Rules = Rules(),  # noqa: B008 (frozen)
+        quotes: dict[str, float] | None = None) -> Run:
+    """A deep copy of the cached run, so callers can mutate it freely. `quotes`: site (lounge or
+    growth-area id) -> a quoted shop rent, AED/m²/yr (features.lounges.with_quotes)."""
+    return _run(levels, frozenset(closed), search_recall, rules,
+                tuple(sorted((quotes or {}).items()))).model_copy(deep=True)
 
 
 class LoungeChange(BaseModel):
@@ -52,6 +65,13 @@ class LoungeChange(BaseModel):
     new_composite: float | None
     old_scores: dict[str, float]
     new_scores: dict[str, float]
+
+    @property
+    def main_signal(self) -> str | None:
+        """The signal whose score moved most, or None when neither moved (the rules moved the call)."""
+        moved = {k: abs(self.new_scores[k] - self.old_scores[k]) for k in self.old_scores.keys() & self.new_scores.keys()}
+        top = max(moved, key=moved.get, default=None)
+        return top if top and moved[top] >= 0.005 else None
 
 
 class AreaChange(BaseModel):
