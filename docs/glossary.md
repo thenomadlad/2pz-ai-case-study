@@ -211,5 +211,5 @@ The network and capital owner, on the portfolio team. Decides where Bedashing is
 _Avoid_: leadership, user, a job title
 
 **Board**:
-The PE owner's board and operating partner, who must be persuaded that a decision is defensible.
-_Avoid_: investor, PE firm (as the user)
+Bedashing's board and investors, who must be persuaded that a decision is defensible.
+_Avoid_: naming an owner or fund (unsourced); the board as the user
