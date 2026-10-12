@@ -229,10 +229,10 @@ def _how_sure(r) -> None:
 
 KPI_TABLE = """| Branch health KPI | What it tells us | Today it rests on | To be more confident we need |
 |---|---|---|---|
-| **Site demand** (share of its emirate's salon sites it out-serves) | Is the location strong for its emirate? | A Huff split of women 15+ across premium salons, weighted by lifetime Google reviews; distance decay and the outside option are uncalibrated | Bookings or visits per lounge (even a ranking) to calibrate the split; customers' home areas to check the catchments |
+| **Site demand** (share of its emirate's salon sites it out-serves) | Is the location strong for its emirate? | A Huff split of women 15+ across premium salons, weighted by services sold (lifetime Google reviews, our proxy); distance decay and the outside option are uncalibrated | Bookings or visits per lounge (even a ranking) to calibrate the split; customers' home areas to check the catchments |
 | **Site rent** (rent ratio vs the emirate's salon sites) | Is the site dear for its emirate? | Area shop rents (DLD contracts, ADREC district rates, asking rents); the emirate median where none is observed | Each lounge's actual lease; observed rents where we use the median ({lounges}, {areas}) |
 | **Share of our served market** | How much of our business sits at this lounge? | The same Huff estimate, counted in women, not customers | Customers or revenue per lounge |
-| **Performance vs its site** | Is the lounge beating or trailing its location? | Its lifetime Google reviews as a stand-in for popularity | Bookings, revenue and chair utilisation per lounge |
+| **Performance vs its site** | Is the lounge beating or trailing its location? | Whether it sells more or less than a typical lounge would at its site, measured by lifetime Google reviews (our proxy for services sold) | Bookings, revenue and chair utilisation per lounge |
 | **The call** (PROTECT / HOLD / SHRINK) | Keep, watch or review? | Demand and rent only: no revenue, margin, capex or capacity | Revenue, margin, capex and capacity per lounge, for a return-on-capital test |
 """
 

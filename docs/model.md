@@ -15,8 +15,11 @@ The full write-up behind the README's short overview ([README](../README.md)): h
    emirate and density tier.
 4. **Huff split.** Each cell's women are shared among the suppliers it reaches, by weight
    `reviews^ALPHA x (rating/4.6)^RATING_ELASTICITY x DECAY[band]`, plus an **outside option** (the
-   median premium supplier's weight) standing for women who go elsewhere or don't buy premium. Out
-   come **served women per lounge** and **unserved women per cell**. **Site served** re-runs the
+   median premium supplier's weight) standing for women who go elsewhere or don't buy premium.
+   Google reviews are our proxy for **services sold**: each review is a trace of past appointments,
+   so a salon's lifetime reviews stand in for how much it has sold, and its share of the market
+   follows how much it sells. Out come **served women per lounge** (a model estimate of the
+   customers behind the services a lounge renders) and **unserved women per cell**. **Site served** re-runs the
    split with the lounge closed and a typical lounge at its site, frozen at 757 reviews and 4.6★
    (the 2026-10-11 medians of our scored lounges, `TYPICAL_WHY`)
    ([`notebooks/served_demand.ipynb`](../notebooks/served_demand.ipynb)).
@@ -48,7 +51,8 @@ The full write-up behind the README's short overview ([README](../README.md)): h
    **Cannibalisation** is a display-only what-if: close the lounge, what share of its women do
    siblings absorb ([`notebooks/scorecard.ipynb`](../notebooks/scorecard.ipynb)). **Performance vs
    site** (served women / site served) is context, not scored: "The model estimates this lounge is
-   performing 2.7x compared to its site" (khalifa-city-a).
+   performing 2.7x compared to its site" (khalifa-city-a): it sells 2.7x what a typical lounge would
+   at its site.
 8. **Growth call** (`src/model/growth.py`). Areas are named OSM places (cells with only an emirate
    fallback name make no area). The what-if opens the same frozen typical lounge at each one: women it would serve, how many it takes from our lounges, **net new**. GROW
    if net new ≥ `NEW_SITE_MIN`, mostly not worker housing, rent ratio ≥ 1 (or unknown, or mostly
@@ -248,7 +252,7 @@ no longer scored.*
 | Factor | What it was | Why it isn't used | What took its place |
 |---|---|---|---|
 | **Affluence weighting** | Women counted more where household rents are higher (DLD home rents as an income proxy) | Observed home rents exist for only **241 of 2,373 cells, all in Dubai**, so everywhere else would count as "average": it would tilt the model toward Dubai because of where the data happens to be, not where the money is. Switched on, it changes **no lounge call** and 1-3 of 561 area calls (notebooks/features/affluence.ipynb). It also barely relates to what we can observe (ρ ≈ 0.05-0.15 against reviews and ratings). We keep it only to correlate with other metrics | Every woman 15+ counts the same; a UAE-wide income proxy would let it back in (Potential improvements) |
-| **Capture share** | The lounge's Google reviews as a share of its own plus its premium competitors' | The served-demand split already uses reviews to divide the market among competitors, so scoring capture as well counted competition twice. It also measures the lounge's popularity, not its site | Site demand (the site, scored); performance vs its site (the lounge, shown as context) |
+| **Capture share** | The lounge's Google reviews as a share of its own plus its premium competitors' | The served-demand split already uses reviews to divide the market among competitors, so scoring capture as well counted competition twice. It also measures how much the lounge itself sells, not its site | Site demand (the site, scored); performance vs its site (the lounge, shown as context) |
 | **Rating gap** | Its Google rating minus its competitors' median | Ratings sit in a narrow band (-0.2 to +0.3 stars), and in-branch quality is out of scope: we decide where capacity sits, not how a branch is run | Rating enters only as attractiveness in the demand split: (rating / 4.6)^5 |
 | **Raw catchment overlap** (shared catchment) | The share of a lounge's catchment that another of our lounges also reaches, scored as cannibalisation | It penalised both lounges for any overlap, but overlap isn't cannibalisation: 19 of 24 lounges share 50%+ of their catchment, yet if one closes its siblings absorb a median 8% of its customers (30% at most). It also ignores capacity | The demand split shares women between lounges directly; the cannibalisation what-if is shown on each lounge page |
 | **Catchment size on a 0-200k scale** | Women 15+ within the 15-min drive, scored by absolute size | Bigger catchments in crowded markets serve *fewer* women (ρ = -0.33 between catchment size and served women): size without competition misleads | Site demand, which accounts for competitors |
@@ -274,8 +278,8 @@ We have no bookings, revenue, lease or capacity data, so every signal is a **pro
 
 | What we want to know | Proxy we use today (source) | Better signal once we have the data | Data needed |
 |---|---|---|---|
-| **Demand**: how many customers would book at this site | **Site demand**: women 15+ within a 10-20 min drive, split across premium salons by the Huff model (each salon's pull = its lifetime Google reviews × rating), ranked against the emirate's salon sites (WorldPop, Google Places, Mapbox) | Appointments per lounge per week; how many of the catchment's women book (penetration); new vs repeat customers | Booking-system export per lounge; customers' home area (postcode or loyalty data) |
-| **Capture**: our share of the market we can reach | **Share of our served market** and **performance vs its site**, both from the same Huff split, which counts women, not customers, and uses reviews as popularity | Our appointments ÷ all premium salon appointments in the catchment (women × visit frequency × premium share) | Bookings; visit frequency and premium share from a survey or industry benchmark |
+| **Demand**: how many customers would book at this site | **Site demand**: women 15+ within a 10-20 min drive, split across premium salons by the Huff model (each salon's weight = its services sold, measured by lifetime Google reviews, × a rating factor), ranked against the emirate's salon sites (WorldPop, Google Places, Mapbox) | Appointments per lounge per week; how many of the catchment's women book (penetration); new vs repeat customers | Booking-system export per lounge; customers' home area (postcode or loyalty data) |
+| **Capture**: our share of the market we can reach | **Share of our served market** and **performance vs its site**, both from the same Huff split, which counts women, not customers, and uses reviews as services sold | Our appointments ÷ all premium salon appointments in the catchment (women × visit frequency × premium share) | Bookings; visit frequency and premium share from a survey or industry benchmark |
 | **Cost to run** | **Site rent**: the area's shop rent × an assumed 150 m² unit + assumed fit-out of AED 3,000/m² over 5 years (DLD contracts, ADREC district rates, listings) | Each lounge's actual lease, service charge, staff, products and utilities, and fit-out depreciation | Per-lounge P&L and lease terms from finance |
 | **Capacity**: how much we can serve | None | Chairs × opening hours; utilisation (booked ÷ available chair-hours) | Scheduling system |
 | **Return**: whether a site pays | None (a return-on-capital gate can't be built from rent alone) | Profit per appointment, profit per m² per year, payback on fit-out, ROIC | P&L + capex per lounge |
@@ -291,7 +295,7 @@ We have no bookings, revenue, lease or capacity data, so every signal is a **pro
 | **Healthy (PROTECT)** | The site out-serves most of its emirate's salon sites and its rent is at or below their median: composite 0.65+ | Profit per m² above the network median, chairs well used, appointments flat or growing, fit-out paid back |
 | **Watch (HOLD)** | Mixed: strong on one signal, weak on the other, composite 0.35-0.65 | Profitable but below the network median, or utilisation slipping |
 | **Unhealthy (SHRINK)** | Weak demand for its emirate or rent well above the median: composite 0.35 or less. **Investigate, don't close**: we can't see profit | Loses money after its own rent and costs, low utilisation, appointments falling; and few of its customers would move to a sibling if it closed |
-| **Lounge vs location** | Performance vs its site: above 1x, the lounge beats what a typical lounge would do there (popularity, from reviews); below 1x, it trails its site | The same comparison on appointments and profit, which separates a good site badly run from a bad site well run |
+| **Lounge vs location** | Performance vs its site: above 1x, the lounge sells more than a typical lounge would there (services sold, from reviews); below 1x, it trails its site | The same comparison on appointments and profit, which separates a good site badly run from a bad site well run |
 | **Grow** | A typical new lounge would add 6,000+ net new women, out-serve half the emirate's salon sites, at rent no dearer than their median | Predicted appointments × contribution per appointment covers rent and fit-out within an agreed payback period |
 
 ### Shared catchments aren't a reason to shrink
@@ -319,7 +323,9 @@ what it would add after our own lounges keep theirs.
 
 Today's model is a proxy for one we'd build with Bedashing's own data. The structure stays the same,
 **demand → what we can serve → what it costs → what it returns → the call**, but every step is
-measured instead of estimated. The two biggest upgrades are the cost side and **capacity**, which
+measured instead of estimated: bookings measure services sold and rendered directly, so reviews
+are no longer needed as a proxy. The objective is services rendered per catchment, against the
+total capacity and total rent of its branches. The two biggest upgrades are the cost side and **capacity**, which
 today isn't modelled at all.
 
 | Step | Today (proxy) | Ideal (Bedashing's data) |
@@ -392,7 +398,7 @@ directly, and the decision rules become hurdle rates (minimum profit per m², pa
 ## Decisions about the model
 
 **What we left simple.** Midday drive times with a stepped, uncalibrated decay; lifetime reviews as
-each salon's draw; the premium end only; Bedashing's price level assumed; affluence off; one lounge
+each salon's services sold; the premium end only; Bedashing's price level assumed; affluence off; one lounge
 format; no revenue and no capacity; cost as a shop rent (Dubai contract medians, Abu Dhabi
 hand-read district rates, northern asking rents) against the emirate's median salon site;
 growth areas merged by OSM place name, with cells that have no place within 3 km left out of them.
@@ -421,9 +427,9 @@ be replaced with better data.
 | 2 | **Where each lounge is** | Google Maps pin, not the store locator's | The locator's pins are off by up to 16 km (Shahama 15.9, Al Ain 8.4, Nad Al Sheba 4.8 km); its street addresses agree with Google | in data |
 | 3 | **Catchment = drive time** a customer will travel | 10 / **15** / 20 min (low / medium / high), Mapbox typical traffic at a weekday 12:00 departure. Competitors are searched within **2x** (30 min at medium): any salon a catchment resident can reach in 15 min is at most 30 min from the lounge | BrightLocal 2014 (US, 800+ consumers): ~14 min to a hair/beauty salon, women ~5 min more than men. Retail trade-area practice: the primary trade area (50-80% of customers) is a 5-15 min drive. No UAE-specific survey found. TomTom 2025: a Dubai trip takes ~40% longer at evening rush (27 vs 19 min per 10 km), so real catchments are smaller after work | in data |
 | 4 | **Market size** of each ~2 km grid cell | Women aged 15+ | Only relative size matters. WorldPop 2025 gives adults per 100 m but a flat 33.6% female share everywhere, so the split is redone (row 13). Grid cells, not official neighbourhoods: OSM neighbourhoods cover only 66% of Dubai's women and none of Fujairah | in data |
-| 5 | **How Bedashing's share is estimated** | **Capture** = the lounge's Google reviews ÷ (its reviews + its premium substitutes' reviews x a recall correction), inside its 15-min catchment. Estimated customers = capture x catchment women. Shown, not scored: served demand (Huff) replaced it | Reviews stand in for each salon's draw (revealed preference). Other Bedashing lounges count as substitutes, so overlapping lounges split shared demand. It measures share among premium substitutes, not market penetration. Rejected: splitting every cell among every salon that reaches it (~2,100 Google calls vs 72-144) | in data |
-| 6 | **Review counts are lifetime totals** | Google `userRatingCount`, not adjusted for age | Older salons have had longer to collect reviews: a stated limitation. Partly a fair signal too: years of trading build a customer base. Per-year rates were considered and dropped: Google can't sort reviews oldest-first, so the first review needs a full scrape (unaffordable for competitors, and against Google's terms) | in data |
-| 7 | **Ratings don't separate lounges** | Not a scored signal; part of each supplier's Huff pull, (rating / 4.6)^5 | Google ratings for the 24 lounges span 4.4-4.9 (median 4.6, std 0.12); 17 of 24 sit at 4.5 or 4.6. No link to review count (Spearman ρ = −0.22, p = 0.30) | in data |
+| 5 | **How Bedashing's share is estimated** | **Capture** = the lounge's Google reviews ÷ (its reviews + its premium substitutes' reviews x a recall correction), inside its 15-min catchment. Estimated customers = capture x catchment women. Shown, not scored: served demand (Huff) replaced it | Reviews stand in for each salon's services sold (revealed preference). Other Bedashing lounges count as substitutes, so overlapping lounges split shared demand. It measures share among premium substitutes, not market penetration. Rejected: splitting every cell among every salon that reaches it (~2,100 Google calls vs 72-144) | in data |
+| 6 | **Review counts are lifetime totals** | Google `userRatingCount`, not adjusted for age | Reviews are our proxy for services sold. Older salons have had longer to collect reviews: a stated limitation, and review rates differ between salons and services. Partly a fair signal too: years of trading build a customer base. Per-year rates were considered and dropped: Google can't sort reviews oldest-first, so the first review needs a full scrape (unaffordable for competitors, and against Google's terms) | in data |
+| 7 | **Ratings don't separate lounges** | Not a scored signal; a factor on each supplier's Huff weight, (rating / 4.6)^5 | Google ratings for the 24 lounges span 4.4-4.9 (median 4.6, std 0.12); 17 of 24 sit at 4.5 or 4.6. No link to review count (Spearman ρ = −0.22, p = 0.30) | in data |
 | 8 | **Bedashing's price segment** | `expensive` (assumed) | Google has no price level for Bedashing's lounges; to be revisited from its own menu | set |
 | 9 | **Premium substitutes** | Women's beauty, hair and nail salons in the catchment that Google prices expensive or very expensive; where Google has no price, those with reviews ≥ the catchment median and rating ≥ 4.3 | A shopper choosing Bedashing compares it with similar places, not budget salons. Google's price level is crowd-sourced spend per person and only 36% of the 2,824 candidates have it, so popularity and rating stand in. Salons priced expensive or above had twice the median reviews (165 vs 77) | in data |
 | 10 | **How many substitutes** | The most-reviewed premium salons that together hold **60%** of the catchment's premium reviews (50% / 70% as sensitivity): 63 around Al Barsha, 2-3 in Al Dhafra | Reviews are concentrated in thin markets and spread out in dense ones: a fixed top 20 held 22% of reviews around Al Barsha but 66% around Al Taif Mall, so capture against a fixed k meant different things in each catchment. A coverage share makes lounges comparable. (Fixed k = 20 with 10/30 was the earlier design.) | in data |

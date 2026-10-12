@@ -147,14 +147,16 @@ GLOSSARY: dict[str, Field] = {
     "site_served": Field("Women a typical lounge would serve here", "women",
                          "What-if: the women a typical lounge (median reviews and rating) would serve at this site, "
                          "with this lounge closed and its siblings and rivals open (Huff). The demand signal: it "
-                         "scores the site, not the lounge's own popularity."),
+                         "scores the site, not how much the lounge itself sells."),
     "served_women": Field("Women served (Huff)", "women",
-                          "Addressable women this lounge serves: its Huff share of every cell it reaches within 20 min. "
-                          "It rests on the lounge's own reviews and rating, so it is context, not scored."),
+                          "Model estimate of the customers behind the services this lounge renders: its Huff share of "
+                          "every cell it reaches within 20 min. It rests on the lounge's own reviews (our proxy for "
+                          "services sold) and rating, so it is context, not scored."),
     "performance_vs_site": Field("Performance vs site", "x its site",
                                  "Women this lounge serves ÷ women a typical lounge would serve at its site. Read as "
                                  "'The model estimates this lounge is performing 2.7x compared to its site'. Context, "
-                                 "not scored: it reflects the lounge's own reviews and rating, not the site."),
+                                 "not scored: above 1x the lounge sells more than a typical lounge would at its site (from its "
+                                 "reviews and rating), not the site."),
     "absorbed_share": Field("Absorbed by siblings", "% of served", "Share of its served women other lounges take over if it closes.", pct=True),
     "site_cost_k": Field("Site cost", "AED 1k/yr", "Shop rent x 150 m² (assumed unit) + fit-out of AED 3,000/m² over 5 years (assumed)."),
     "demand_ref": Field("Demand ranked among", "", "Whose salon sites the demand percentile ranks against: the site's emirate, or UAE when the emirate has under 50 reference salon sites."),
@@ -877,7 +879,7 @@ SYSTEM_PROMPT = (
     "sheet has it, as our cost (never customer affluence, never a lever to renegotiate), and say "
     "the 150 m² unit is assumed when quoting women per rent. For a lounge, the call scores its SITE "
     "(its demand percentile and rent ratio among its emirate's competitor salon sites), not the lounge's "
-    "own popularity; quote the UAE-wide percentiles as context where you cite either signal: so_what "
+    "own sales; quote the UAE-wide percentiles as context where you cite either signal: so_what "
     "must quote performance_vs_site word for word as 'The model estimates this lounge is performing "
     "N.Nx compared to its site' (1 decimal) and say it is context, not scored. Always answer by "
     "calling the submit_explanation tool."

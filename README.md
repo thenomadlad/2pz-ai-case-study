@@ -49,9 +49,9 @@ estimate.
    - So overlap isn't a reason to shrink, and expanding both lounges in a shared catchment can be right if it raises our coverage.
    - **Where:** each lounge page's shared-catchment table and cannibalisation what-if; the What-if explorer's "All catchments (overlap)" layer and **Test a SHRINK**.
 4. **How does each lounge stand against the salons around it?**
-   Site demand shares every area's women among our lounges and the 1,100+ premium competitor salons around them, then ranks the site against its emirate's competitor salon sites.
+   Site demand shares every area's women among our lounges and the 1,100+ premium competitor salons around them, in proportion to how much each sells (measured by its Google reviews, our proxy for services sold), then ranks the site against its emirate's competitor salon sites.
    - Example: City Walk out-serves only 30% of Dubai's salon sites; Al Dhafra out-serves all of Abu Dhabi's.
-   - A lounge's own pull is shown beside its site, not scored: "The model estimates this lounge is performing 2.7x compared to its site" (Khalifa City A, a HOLD) separates a strong lounge from a strong location.
+   - How much a lounge sells against its site is shown beside the call, not scored: "The model estimates this lounge is performing 2.7x compared to its site" (Khalifa City A, a HOLD): it sells 2.7x what a typical lounge would at its site, which separates a strong lounge from a strong location.
    - **Where:** each lounge page's signals, factor tree and competitors table; premium competitors on the What-if explorer's map.
 5. **What would change the answers, and can the team test that themselves?**
    Yes, on the **What-if explorer**, the only page a what-if touches:
@@ -74,7 +74,7 @@ HOLD or SHRINK at a lounge's lease event, GROW as the start of a site search.
   and Abu Dhabi markets (and rent sources) aren't comparable, and a UAE-wide yardstick sank every dear
   Dubai site. Cost: a site is only as good as its emirate's yardstick; emirates with under 50 salon
   sites are ranked UAE-wide on demand.
-- **Score the site, not the lounge's popularity.** Site demand puts a typical lounge (757 reviews,
+- **Score the site, not how much the lounge itself sells.** Site demand puts a typical lounge (757 reviews,
   4.6★) at each spot, so a strong lounge can't hide a weak site. Cost: a well-run lounge on a weak
   site still reads SHRINK; its own performance is shown as context.
 - **Rent as the cost signal.** It is the cost that differs most between sites (9.5x across our
@@ -86,7 +86,7 @@ HOLD or SHRINK at a lounge's lease event, GROW as the start of a site search.
   URL, so a recommendation can be sent as a link to its evidence. Cost: the data is a committed
   snapshot, refreshed by re-running scripts.
 
-**What I simplified, and why.** Midday drive times; lifetime Google reviews as each salon's pull;
+**What I simplified, and why.** Midday drive times; lifetime Google reviews as each salon's services sold;
 one lounge format; no capacity; affluence off (household rents exist only for Dubai, and weighting
 by them changes no lounge call). Each is there because the better data is Bedashing's own or not
 public; [docs/model.md](docs/model.md) lists every one with its evidence.
@@ -133,9 +133,11 @@ more than the calls. The biggest ones:
 - **No revenue or lease data in the model.** The cost signal is a shop rent (an area median, a
   district rate or an asking rent, not the lease) against its emirate's median salon site. No revenue, lease terms, actual capex or footfall. **SHRINK means "investigate", not
   "close".**
-- **Served demand rests on lifetime Google review counts.** Each salon's pull in the Huff split is
-  its reviews, so older salons look bigger and new lounges look weak; the Huff parameters are an
-  uncalibrated first cut.
+- **Services sold are measured by lifetime Google reviews.** Each review is a trace of past
+  appointments, so a salon's reviews stand in for how much it has sold, and its share of the Huff
+  split follows them. Lifetime counts favour older salons and new lounges look weak; review rates
+  differ between salons and services; it is a stand-in until bookings data. The Huff parameters are
+  an uncalibrated first cut.
 - **Shop rent comes from different sources per emirate.** DLD contracts (Dubai), ADREC district
   rates read by hand off its public map (Abu Dhabi), Property Finder / Bayut asking rents scraped
   via third-party Apify actors, a grey area under those portals' terms (northern emirates), else the
@@ -208,8 +210,9 @@ Each label maps to a decision the network and capital owner already makes (defin
 | **Revisit later** | **WATCH** | Don't act now; revisit when the named failing test changes |
 | **No action** | **SKIP** | Too small or already crowded. (The airport lounge is NOT SCORED: it serves travellers.) |
 
-**North star: services delivered**, the demand our lounges actually serve, bounded by their
-capacity. The model can't measure it yet: its nearest proxy is served women, shown as context, and
+**North star: services rendered** (appointments delivered to customers), judged per catchment and
+bounded by capacity. The model can't measure it yet: its nearest proxy is served women (a model
+estimate of the customers behind the services a lounge renders), shown as context, and
 **capacity is not modelled at all** (no chairs, hours or utilisation), so a SHRINK is driven by
 modelled demand and shop rent, not by services that would be lost.
 
@@ -229,8 +232,8 @@ thinner or new. Out of scope:
   data. It decides whether a SHRINK is closed; the model only says which lounges to look at.
 - **In-branch staffing and capacity.** How many chairs and stylists a lounge needs is an
   operations question, answered from bookings, not from maps.
-- **Service quality and operations.** Ratings enter only as part of each salon's pull in the
-  Huff split; fixing a weak lounge's service is a management job, not a location one.
+- **Service quality and operations.** Ratings enter only as a factor on each salon's services sold
+  in the Huff split; fixing a weak lounge's service is a management job, not a location one.
 
 ## How the model works
 

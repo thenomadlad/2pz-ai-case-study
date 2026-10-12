@@ -39,7 +39,7 @@ RENT_RATIO_WHY = (
 SIGNALS: tuple[Signal, ...] = (
     Signal("demand", "demand_pct", "Site demand: share of its emirate's salon sites it out-serves",
            0, 1,
-           "Scores the SITE, not the lounge's popularity: the women a typical lounge (median reviews and "
+           "Scores the SITE, not how much the lounge itself sells: the women a typical lounge (median reviews and "
            "rating) would serve there, this lounge closed and rivals and siblings open, ranked among the "
            "frozen reference of competitor salon sites in the same emirate (each with a typical lounge "
            "there and all our lounges open; UAE-wide where an emirate has under 50: SITE_REFERENCE_WHY "

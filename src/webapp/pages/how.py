@@ -131,8 +131,8 @@ def render() -> None:
          "Why": scorecard.RENT_RATIO_WHY},
         {"Constant": "performance_vs_site", "Value": "served women ÷ site served",
          "Why": "Context, not scored: 'The model estimates this lounge is performing 2.7x compared to its site' "
-                "(khalifa-city-a at baseline). The call scores the site; this says how the lounge does on it, "
-                "which rests on its own reviews and rating."},
+                "(khalifa-city-a at baseline). The call scores the site; this says whether the lounge sells more "
+                "or less than a typical lounge would there, measured by its own reviews and rating."},
         {"Constant": "NOT_SCORED", "Value": ", ".join(sorted(NOT_SCORED)), "Why": NOT_SCORED_WHY},
     ])
 

@@ -27,25 +27,28 @@ profitable (a cheap lease, loyal clients), and PROTECT and unprofitable.
 - **Fix:** per-lounge revenue and the actual leases, even banded. With those, the scorecard becomes a
   return-on-capital view, and the market signals explain *why* a lounge earns what it does.
 
-## 2. Served demand leans on lifetime Google reviews
+## 2. Services sold are measured by lifetime Google reviews
 
-Each premium supplier's pull in the Huff split (our lounges and premium salons alike) is its Google
-review count, times a rating factor ((rating / 4.6)^5) and a drive-time decay (10 / 15 / 20 min:
-1 / 0.5 / 0.25). Google review counts are **lifetime totals**, so:
+Google reviews are our proxy for **services sold**: each review is a trace of past appointments, so a
+salon's lifetime reviews stand in for how much it has sold. Each premium supplier's weight in the
+Huff split (our lounges and premium salons alike) is its reviews, times a rating factor
+((rating / 4.6)^5) and a drive-time decay (10 / 15 / 20 min: 1 / 0.5 / 0.25), so a salon's share of
+the market follows how much it sells. Google review counts are **lifetime totals**, so:
 
 - Older salons look bigger. New lounges (noya-plaza, 215 reviews) serve fewer women in the model
   partly because they are new.
 - Chains probably push for reviews more than independents, which may inflate Bedashing.
-- Reviews are a proxy for customers, not a count of them.
+- Review rates differ between salons and services, so reviews are a stand-in for services sold
+  until bookings data, not a count of them.
 - **Tourist and visitor skew.** Salons in malls and tourist areas collect reviews from visitors
-  who don't live nearby, so they pull harder in the split than their resident trade justifies, and a
+  who don't live nearby, so they look like they sell more to residents than they do, and a
   mall-heavy area's premium reviews per 1k women (saturation, see 8) reads high. Incentivised reviews
   push the same way, unevenly.
 - **The Huff parameters are a first cut** (2026-10-11): review exponent 1, the decay steps, the rating
-  elasticity and the outside option (the median supplier's pull) are starting points, not calibrated
+  elasticity and the outside option (the median supplier's weight) are starting points, not calibrated
   on where customers actually come from.
 
-The scored demand gives every lounge the median lounge's reviews and rating, so its own review count
+The scored demand gives every lounge the median lounge's reviews and rating, so how much it sells itself
 moves only its served women and performance vs site (context, not scored).
 
 Capture (the lounge's share of its premium substitutes' reviews) and the rating gap are still
@@ -112,7 +115,7 @@ worker-housing female share (1%/5.5%/15%) and affluence elasticity (0/0.5/1). **
 baseline** (elasticity 0: every woman counts the same; why in `notebooks/features/affluence.ipynb`); it
 is not offered in the app. The other three reach the served-demand (Huff) scoring: travel time sets
 the decay across the 10/15/20-min bands (10 min keeps only the nearest band; 20 min flattens it;
-reach itself can't go past 20 min), competitor coverage scales every competitor's pull by coverage /
+reach itself can't go past 20 min), competitor coverage scales every competitor's weight by coverage /
 60%, and worker-housing share sets the women. Medium reproduces the baseline; the salon-site reference
 stays frozen at baseline, so a level that moves every site's demand moves it against a fixed bar
 (`src/model/served.py`, LEVELS_WHY). The confidence check and the app's what-if vary those three.
@@ -226,7 +229,7 @@ or a non-residential name. Saturation (premium reviews per 1k women) is shown as
 - **Fix:** competitor searches for the remaining cells (~2,000 calls), candidate sites inside each
   area instead of its centre, and a business view on why Sharjah has only two lounges.
 
-## 9. The rating enters only through the Huff pull
+## 9. The rating enters only through the Huff weight
 
 Google ratings come in 0.1★ steps, and lounges span only 4.4-4.9★. The rating gap (lounge minus the
 median rating of the premium salons in its catchment with 20+ reviews) is shown, not scored. Rating
