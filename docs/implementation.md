@@ -83,7 +83,7 @@ Tunable values: [`data/scenarios/baseline.yaml`](../data/scenarios/baseline.yaml
 | Lifetime review counts | Reviews per year | Per-year needs a full review scrape, unaffordable and against Google's terms |
 | Fixed-scale signals, absolute thresholds | Ranking into thirds (the v1 model) | No forced SHRINKs; a lounge's score doesn't move when a sibling opens or closes |
 | A frozen market of competitor salon sites, per emirate | Scales calibrated on our own 23 lounges; one UAE-wide cost anchor | Our network isn't its own benchmark, and a Dubai contract rent isn't set against a northern asking rent; the reference carries the served model's and the rents' biases (limitations 3, 10) |
-| Affluence weighting off | DLD-rent weighting in Dubai; a UAE-wide built-form proxy | Dubai-only weighting changed no call; the proxy didn't predict rent (CV R² −0.10); every woman counting the same beats one emirate on different rules |
+| Affluence weighting off | DLD-rent weighting in Dubai; a UAE-wide built-form proxy | Dubai-only weighting changes no lounge call; the proxy didn't predict rent (CV R² −0.10); every woman counting the same beats one emirate on different rules |
 | Rules decide, Claude explains | An LLM classifier (deleted in v2) | Calls are deterministic and auditable; the AI can only phrase them |
 | Explanations written offline in Claude Code | Generating via the API | No API spend; same prompts, same grounding check |
 | Search recall 0.66, estimated on one tile | A full sweep of capped circles (~$54-210) | Declined on cost; stated as an estimate and an upper bound |

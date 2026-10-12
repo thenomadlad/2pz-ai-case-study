@@ -5,7 +5,7 @@ The full write-up behind the README's short overview ([README](../README.md)): h
 ## How a call is made, step by step
 
 1. **Demand.** Women 15+ per ~2 km cell: WorldPop 2025 adults, rebalanced so OSM worker housing
-   counts few women. Affluence weighting is **off**: it changed no call and was Dubai-only
+   counts few women. Affluence weighting is **off**: it changes no lounge call (1-3 of 561 areas) and the data is Dubai-only
    (evidence: [`notebooks/features/affluence.ipynb`](../notebooks/features/affluence.ipynb)).
 2. **Reach.** Which suppliers each cell reaches within 20 min, in 10/15/20-min bands: the cell's own
    Mapbox isochrones where fetched, elsewhere straight-line km bands fitted on those cells. Demand

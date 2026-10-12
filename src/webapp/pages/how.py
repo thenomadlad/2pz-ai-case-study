@@ -59,8 +59,10 @@ def _const(v) -> str:
 
 README = REPO_ROOT / "README.md"
 # The page, in order: each file's in-app anchor is its title's heading slug, so links between them stay in the page
-DOCS = {"README.md": "#bedashing-network-right-sizing", "docs/model.md": "#the-model-in-detail",
-        "docs/implementation.md": "#implementation-notes"}
+# Full page URLs, not bare "#..." anchors: Streamlit doesn't scroll on an in-page anchor click, but it does
+# land on the heading when a page loads with one
+DOCS = {"README.md": "/how#bedashing-network-right-sizing", "docs/model.md": "/how#the-model-in-detail",
+        "docs/implementation.md": "/how#implementation-notes"}
 REPO_URL = "https://github.com/thenomadlad/2pz-ai-case-study/blob/main/"
 _MERMAID = """<div class="mermaid">{code}</div>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
