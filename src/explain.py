@@ -157,7 +157,7 @@ GLOSSARY: dict[str, Field] = {
                         "against what it would serve at each competitor salon site, frozen 2026-10-11.", pct=True),
     "demand_pct_uae": Field("Demand percentile UAE-wide", "% of UAE salon sites",
                             "The same, against all 1,123 UAE reference salon sites. Context, not scored.", pct=True),
-    "rent_ratio": Field("Rent ratio", "ratio",
+    "rent_ratio": Field("Rent ratio", "",
                         "Median shop rent at the reference salon sites in its emirate ÷ this site's shop rent: above 1 "
                         "is cheaper than a typical salon site there. Rent only, no served women."),
     "rent_pct_uae": Field("Rent percentile UAE-wide", "% of UAE salon sites",
@@ -219,7 +219,7 @@ GLOSSARY: dict[str, Field] = {
     "saturation_gap": Field("Saturation gap", "reviews per 1k women",
                             "Saturation line minus premium saturation: positive is room under the "
                             "line, negative is how far over it. Context only. n/a when unsearched."),
-    "rent_gap": Field("Rent gap", "ratio",
+    "rent_gap": Field("Rent gap", "",
                       "Rent ratio minus 1 (the median salon site in its emirate): GROW needs 0 or more, "
                       "else a big-enough area is WATCH. n/a when no shop rent is known."),
     "demand_gap": Field("Demand gap", "% of salon sites",
@@ -379,7 +379,7 @@ THRESHOLDS: dict[str, str] = {
 def _in_unit(field: str, value, pct_digits: int = 0) -> str:
     """A signal input with its full unit ("38,123 women", "47% of catchment women")."""
     f, text = GLOSSARY[field], fmt(field, value, pct_digits)
-    return text + (f.unit[1:] if f.pct else f" {f.unit}")
+    return text + (f.unit[1:] if f.pct else f" {f.unit}" if f.unit else "")
 
 
 def _flip_text(facts: dict, pct_digits: int = 0) -> str:
