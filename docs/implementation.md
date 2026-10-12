@@ -38,6 +38,50 @@ offline in a session from the app's own prompts. The audits are `docs/rubric.md`
 direction and signed off the judgement calls: the scorecard scales and the salon-site reference, every paid API run (e.g.
 282 Places calls, ~$7) and the ones declined (a ~$54-210 full sweep).
 
+## The app, page by page
+
+Five pages; the loop is **Executive Summary → click a lounge or area → its page → back**.
+
+1. **Executive Summary** (`/overview`): the portfolio team's question, one governing thought, a *How we measure*
+   note (the two proxies and why each threshold sits where it does) and the AI-written summary, then
+   three cards (**Review**, **Grow**, **Protect**), each a claim with its share of our served market
+   (model estimate). Below them, each card's evidence: a map and a table (composite, share of
+   market, out-serves, rent ratio, performance vs its site, confidence; est. growth for areas) whose
+   names link to the lounge or area page. Last, **How sure we are**: the HOLDs, the low-confidence
+   calls by name, a branch-health KPI box (what each KPI rests on today and the data that would make
+   us surer) and the limitations box.
+2. **What-if explorer** (`/explore?lounge=delma` or `?area=kalba-sharjah` preselects): the only page
+   that reads the what-if. **🧪 Change your decision rules, a rent or the model's assumptions, or test a
+   SHRINK** (collapsed at baseline): *Your decision rules* first (demand vs rent weight, PROTECT and
+   SHRINK lines, GROW minimum and demand line); the model's assumptions (drive time, competitor
+   coverage, worker housing, search recall); *Plug in a quote* (a rent for a lounge or growth area);
+   *Test a SHRINK* closes lounges. Once anything differs from the baseline, the **scenario summary**
+   appears under the form (Baseline | This scenario | Change: lounge calls, low confidence,
+   GROW/WATCH/SKIP, women served, best growth) with **What changed** (~~HOLD~~ → **SHRINK**, with the
+   signal that moved). Example: a landlord quote of AED 2,200/m² for City Walk
+   (today 4,561) turns it ~~SHRINK~~ → **HOLD** (low confidence; the line is about 2,290); a GROW
+   minimum of 10,000 net new women cuts GROW from 34 to 16 areas. Then the map: every area coloured by its call (GROW blue,
+   already captured green, WATCH purple, SKIP grey), lounge pins in their call's colour (hollow =
+   low confidence), **Jump to** city pills, toggles for premium substitutes (selected lounge or
+   every lounge) and **all catchments (overlap)**, and a collapsible legend. Click a lounge or area
+   for its short pyramid, tests and caveats, and a link to its page.
+3. **Lounges** (`/lounge?lounge=delma`): the table of all 24 lounges, filterable by call and
+   emirate and sortable, is the picker: select a row and its detail opens below: address and rating,
+   the call with its pyramid and caveats, its catchment map, the two signals on their scales,
+   *What would change the call* and the factor tree (call, signals, their inputs; scored rows shaded
+   red to green), a tab per assumption showing how its estimates and call move, its premium
+   competitors table and its shared catchment (which siblings reach its women, and what share they'd
+   absorb if it closed).
+4. **Areas** (`/area?area=kalba-sharjah`): the GROW and WATCH areas ranked by net new women, the
+   same table-as-picker; below, the call with its pyramid and caveats, *How this call was made*
+   (the three tests), the factor tree, the per-assumption tabs, a map of its cells and the nearest
+   lounge.
+5. **How it works & limitations:** the [README](../README.md), [docs/model.md](model.md) and
+   these notes, then live values read from the code each load: every
+   assumption with its source and every constant with why it was chosen.
+
+Links carry the selection, so any page can be shared directly. Guided tour: [`docs/walkthrough.md`](walkthrough.md).
+
 ## Data
 
 All committed in `data/seed/v3/`, fetched 2026-10-08/10 by the scripts in `scripts/`. Sources, fetch

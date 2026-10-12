@@ -202,12 +202,14 @@ def test_how_page_is_the_readme_then_live_values():
     assert "Every factor we ignore, and why" in text and "Why commercial rent stands in for cost" in text
     assert "The AI layer" in text and "Potential improvements" in text
     parts = [p for doc in DOCS for p in readme_parts((REPO_ROOT / doc).read_text(), posixpath.dirname(doc))]
-    assert sum(k == "mermaid" for k, _ in parts) == 2                     # both diagrams drawn, not shown as code
+    assert sum(k == "mermaid" for k, _ in parts) == 3                     # every diagram drawn, not shown as code
+    assert sum(k == "mermaid" for k, _ in readme_parts((REPO_ROOT / "README.md").read_text())) == 1   # README: the short chain
     md = " ".join(p for k, p in parts if k == "md")
     assert "](https://github.com/thenomadlad/2pz-ai-case-study/blob/main/docs/limitations.md)" in md   # repo links work
     assert "](/how#the-model-in-detail)" in md and "](/how#implementation-notes)" in md   # the three docs link in-page
     assert not re.search(r"\]\((?:\.\./)?(?:docs/)?(?:model|implementation)\.md\)|README\.md\)", md)
-    assert not re.search(r"\bbrief\b|case study|interview|take-home", text, re.IGNORECASE)   # no trace of the original assignment
+    assert not re.search(r"\bbrief\b|case study|interview|take-home|assignment", text, re.IGNORECASE)   # internal wording only
+    assert not re.search(r"\bCOO\b", text)                                   # the audience is the network and capital owner
     assumptions = at.table[0].value                                       # live values from the code
     assert {"travel_time_minutes", "search_recall", "worker_housing_female_share"} <= set(assumptions.index)
     assert "low: 10 · medium: 15 · high: 20" in assumptions.loc["travel_time_minutes"].iloc[0]

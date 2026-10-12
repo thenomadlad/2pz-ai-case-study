@@ -92,6 +92,157 @@ Other modelling choices that still hold:
   26°N, where 97% of UAE adults live, and nothing computes an area in degrees: distances are
   haversine, sizes are people counts.
 
+## The model in two diagrams
+
+The first is the whole chain from data to calls; the second lists every signal behind it, including the ones we dropped, with the reason.
+
+**The model: from data to calls**
+
+```mermaid
+flowchart LR
+  subgraph SRC["Data"]
+    WP["Population + worker housing"]
+    MB["Drive times"]
+    GP["Salons + our lounges"]
+    RENT["Shop rents"]
+    OSM["OSM place names"]
+  end
+  subgraph DER["Derived per ~2 km cell"]
+    DEM["Demand: women 15+"]
+    REACH["Reach: suppliers within 20 min"]
+    SUP["Suppliers"]
+    IMP["Imputed competitors<br/>for unsearched cells"]:::assume
+    COST["Site cost"]
+    UNIT["Unit size, fit-out"]:::assume
+  end
+  HUFF{{"Huff split by attractiveness x distance decay"}}
+  OUT["Outside option"]:::assume
+  SERVED["Served women per lounge"]
+  UNSERVED["Unserved women per cell"]
+  SITE["Site served: a typical lounge<br/>at each lounge's site"]
+  TYP["Typical lounge, frozen:<br/>757 reviews, 4.6★"]:::assume
+  FB["Fallback rent (emirate median)<br/>→ rent neutral, low confidence"]:::assume
+  UAE["UAE-wide percentiles<br/>of demand and rent"]
+  REF["Frozen salon-site reference:<br/>1,123 competitor sites, per emirate"]
+  DPCT["Demand percentile<br/>in its emirate's salon sites"]
+  RR["Rent ratio vs its emirate's<br/>median salon site"]
+  CANN["What-if: close a lounge"]:::whatif
+  OPEN["What-if: open a typical lounge<br/>at each named place"]:::whatif
+  LRULE["Lounge rule"]
+  GRULE["Growth rule"]
+  LCALL(["PROTECT / HOLD / SHRINK"])
+  GCALL(["GROW / WATCH / SKIP"])
+  AI["AI explanation"]
+
+  WP --> DEM
+  MB --> REACH
+  GP --> SUP
+  IMP -.-> SUP
+  RENT --> COST
+  UNIT -.-> COST
+  RENT --> RR
+  FB -.-> RR
+  GP --> REF
+  RENT --> REF
+  DEM --> HUFF
+  REACH --> HUFF
+  SUP --> HUFF
+  OUT -.-> HUFF
+  HUFF --> SERVED
+  HUFF --> UNSERVED
+  HUFF --> SITE
+  HUFF --> REF
+  TYP -.-> SITE
+  TYP -.-> OPEN
+  TYP -.-> REF
+  SITE --> DPCT
+  REF --> DPCT
+  REF --> RR
+  DPCT --> LRULE
+  RR --> LRULE
+  SERVED -.->|context: performance vs site| LCALL
+  REF --> UAE
+  UAE -.->|context only| LCALL
+  UAE -.->|context only| GCALL
+  COST -.->|display only| LCALL
+  HUFF --> CANN
+  CANN -.->|display only| LCALL
+  UNSERVED --> OPEN
+  OSM --> OPEN
+  OPEN --> GRULE
+  OPEN --> DPCT
+  DPCT --> GRULE
+  RR --> GRULE
+  LRULE --> LCALL
+  GRULE --> GCALL
+  LCALL --> AI
+  GCALL --> AI
+
+  classDef assume stroke-dasharray: 5 5,fill:#fff4e0,stroke:#c77700,color:#000
+  classDef whatif stroke-dasharray: 2 2,fill:#e8f0ff,stroke:#3b6fd6,color:#000
+```
+
+*Dashed orange = an assumption, not data. Dashed blue = a what-if the model simulates.*
+
+**Signals and features**
+
+```mermaid
+flowchart LR
+  subgraph G["Growth universe"]
+    G1["Named OSM places, any reach"]
+    G2["Non-residential name rule"]
+    G3["Worker-housing cap"]
+    G4["New-lounge what-if: net new women<br/>(not additive across areas)"]
+    G5["DROPPED Premium saturation gate (reviews per 1k):<br/>competitors now take their Huff share"]:::dropped
+    G6["DROPPED Unreached cells only / contiguous pieces:<br/>now one area per named place"]:::dropped
+    G7["DROPPED Emirate-fallback-named cells as areas:<br/>no actionable place"]:::dropped
+  end
+  subgraph S["Decision rules / scores"]
+    S1["Site served, as a percentile of its<br/>emirate's salon sites (scored)"]
+    S9["Served women, performance vs site:<br/>context, not scored"]:::demoted
+    S2["Rent ratio vs its emirate's<br/>median salon site (scored)"]
+    S3["Cannibalisation what-if:<br/>display only, no longer scored"]:::demoted
+    S4["DROPPED Capture share:<br/>double-counted competition with Huff"]:::dropped
+    S5["DROPPED Rating gap:<br/>moved into attractiveness"]:::dropped
+    S6["DROPPED Raw catchment overlap (shared_share):<br/>capacity-blind, penalised both lounges"]:::dropped
+    S7["DROPPED 200k anchor on catchment women:<br/>demand is now site served"]:::dropped
+    S8["DROPPED Estimated customers:<br/>computed, never scored; superseded by served women"]:::dropped
+    S10["DROPPED Emirate-median-of-lounges baseline:<br/>moved when siblings opened or closed"]:::dropped
+    S11["DROPPED UAE-wide COST_ANCHOR (cost index):<br/>marked down dear Dubai sites, counted served women twice;<br/>now rent ratio within the emirate"]:::dropped
+    S12["DROPPED 0 → 20k site-served scale:<br/>calibrated on our own lounges; now a percentile of salon sites"]:::dropped
+    S13["UAE-wide demand and rent percentiles:<br/>context, not scored"]:::demoted
+    S14["DROPPED Live-median typical lounge:<br/>drifted when a lounge closed; now frozen at 757 reviews, 4.6★"]:::dropped
+  end
+  subgraph K["Cost"]
+    K1["Shop rent: DLD (Dubai), ADREC (Abu Dhabi),<br/>listings (north), emirate-median fallback"]
+    K2["Site cost (150 m² unit, fit-out):<br/>display only"]:::demoted
+    K4["Frozen salon-site reference:<br/>emirate median shop rent"]
+    K5["Fallback (emirate-median) rent:<br/>scores neutral, low confidence"]
+    K3["DROPPED JLL mall-class rent bands:<br/>4 lounges, read off a chart, superseded by ADREC"]:::dropped
+  end
+  subgraph C["Competition / attractiveness"]
+    C1["Premium competitor salons (Google Places)"]
+    C2["Reviews x (rating/4.6)^k = Huff attractiveness"]
+    C3["Imputed competitors for unsearched cells"]
+    C4["Outside option"]
+  end
+  subgraph R["Reach"]
+    R1["Drive-time bands 10/15/20 min:<br/>Mapbox cell isochrones, straight-line fallback"]
+  end
+  subgraph D["Demand"]
+    D1["Women 15+ per cell (WorldPop 2025)"]
+    D2["Worker-housing correction (OSM industrial)"]
+    D3["DROPPED Affluence weighting from DLD home rents:<br/>Dubai-only; changes no lounge call"]:::dropped
+    D4["DROPPED GHSL built-form rent proxy:<br/>CV R² −0.10"]:::dropped
+  end
+
+  classDef dropped stroke:#d32f2f,stroke-width:3px,color:#d32f2f
+  classDef demoted stroke-dasharray: 5 5,stroke:#757575,stroke-width:2px,color:#757575
+```
+
+*Plain = in use. Red = dropped, with the reason. Grey dashed = demoted: still computed and shown,
+no longer scored.*
+
 ## Every factor we ignore, and why
 
 | Factor | What it was | Why it isn't used | What took its place |
