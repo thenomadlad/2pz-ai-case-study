@@ -53,8 +53,8 @@ def what_if_summary() -> str:
 
 def banner() -> None:
     if data.active():
-        st.warning(f"**What-if view**, not the baseline: {what_if_summary()}. Reset it in the "
-                   "what-if panel on Model predictions.", icon="🧪")
+        st.warning(f"**What-if view**, not the baseline: {what_if_summary()}. Only this page "
+                   "changes: the Executive Summary, Lounges and Areas show the baseline.", icon="🧪")
 
 
 # --- explanations -------------------------------------------------------------------------

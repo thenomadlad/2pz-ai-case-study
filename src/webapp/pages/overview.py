@@ -14,7 +14,6 @@ from src.webapp.map import (
     lounge_layer,
 )
 from src.webapp.views import (
-    banner,
     explanation_for,
     limitations_box,
     render_pyramid,
@@ -198,8 +197,7 @@ def _how_sure(r) -> None:
 
 def render() -> None:
     st.title("Bedashing UAE network")
-    banner()
-    r = data.current()
+    r = data.baseline()
     st.markdown(f"#### {QUESTION}")
     p = pyramid(r)
     _governing(r, p)

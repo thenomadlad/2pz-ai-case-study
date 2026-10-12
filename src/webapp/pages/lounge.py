@@ -19,7 +19,6 @@ from src.webapp.map import (
 from src.webapp.views import (
     affluence_metrics,
     badge,
-    banner,
     emirate_filter,
     explanation_for,
     lounge_caveats,
@@ -136,9 +135,8 @@ def _lounge_table(r) -> None:
 
 
 def render() -> None:
-    r = data.current()
+    r = data.baseline()
     st.title("Lounges")
-    banner()
     st.subheader("All lounges")
     _lounge_table(r)
     st.divider()

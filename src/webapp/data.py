@@ -1,4 +1,5 @@
-"""What the app shows: the baseline run, or the what-if the user set on Model predictions.
+"""What the app shows: the baseline run everywhere, and the what-if the user set on the What-if explorer
+(only that page reads it).
 
 The what-if lives in st.session_state["what_if"] (not in widget keys, which Streamlit drops on
 pages that don't render the widget), so every page sees it."""
@@ -46,8 +47,13 @@ def _run(levels: Levels, closed: frozenset[str], recall: float | None) -> Run:
     return run(levels, closed, recall)     # run() deep-copies; keep one copy per what-if
 
 
+def baseline() -> Run:
+    """The baseline run: what every page except the What-if explorer shows. Treat it as read-only."""
+    return _run(Levels(), frozenset(), None)
+
+
 def current() -> Run:
-    """The run for the current what-if: the same object for the same what-if, so treat it as read-only."""
+    """The What-if explorer's run for the current what-if: the same object for the same what-if, so treat it as read-only."""
     w = what_if()
     return _run(w["levels"], w["closed"], w["recall"])
 

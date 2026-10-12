@@ -15,7 +15,7 @@ from src.features.lounges import (
 from src.market import AFFLUENCE_CLIP, AFFLUENCE_CLIP_WHY
 from src.model import growth, scorecard
 from src.webapp import data
-from src.webapp.views import banner, wrapped_table
+from src.webapp.views import wrapped_table
 
 LIMITATIONS = REPO_ROOT / "docs" / "limitations.md"
 SOURCES = REPO_ROOT / "data" / "seed" / "v3" / "SOURCES.md"
@@ -54,13 +54,10 @@ def _const(v) -> str:
 
 
 def render() -> None:
-    banner()
     st.title("How it works & limitations")
     st.markdown("We will iterate on this model: **the limitations matter more than the calls.** "
                 "Below: the limitations, how the model fits together, and every assumption and "
                 "threshold it uses.")
-    if data.active():
-        st.caption("The figures in the limitations below are at the baseline, not your what-if.")
     st.markdown(LIMITATIONS.read_text().split("\n", 1)[1])     # without its own title
 
     st.divider()
@@ -68,7 +65,7 @@ def render() -> None:
     st.markdown(section(SOURCES.read_text(), "Market model"))
 
     st.header("Every assumption (data/scenarios/baseline.yaml)")
-    st.caption("The what-if panel on Model predictions switches the four levelled assumptions and the "
+    st.caption("The What-if explorer switches the four levelled assumptions and the "
                "search recall.")
     notes = yaml_notes(data.BASELINE_YAML.read_text())
     wrapped_table([{"Assumption": k, "Value (levels)": _fmt(v),

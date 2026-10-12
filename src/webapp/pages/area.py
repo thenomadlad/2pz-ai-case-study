@@ -12,7 +12,6 @@ from src.webapp.views import (
     affluence_metrics,
     area_caveats,
     badge,
-    banner,
     emirate_filter,
     explanation_for,
     render_caveats,
@@ -87,9 +86,8 @@ def _area_table(r) -> None:
 
 
 def render() -> None:
-    r = data.current()
+    r = data.baseline()
     st.title("Areas")
-    banner()
     st.subheader("All growth areas, ranked")
     _area_table(r)
     st.divider()

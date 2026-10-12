@@ -15,7 +15,7 @@ def pages(default: str = "overview") -> list[st.Page]:
     global OVERVIEW, PREDICTIONS, LOUNGE, AREA, HOW
     OVERVIEW = st.Page(overview.render, title="Executive Summary", icon="📋", url_path="overview",
                        default=default == "overview")
-    PREDICTIONS = st.Page(predictions.render, title="Model predictions", icon="🗺️", url_path="predictions",
+    PREDICTIONS = st.Page(predictions.render, title="What-if explorer", icon="🧪", url_path="explore",
                           default=default == "predictions")
     LOUNGE = st.Page(lounge.render, title="Lounges", icon="💇", url_path="lounge",
                      default=default == "lounge")

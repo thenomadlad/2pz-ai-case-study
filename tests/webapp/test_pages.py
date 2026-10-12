@@ -37,7 +37,8 @@ def test_every_page_loads_at_baseline_and_with_two_lounges_closed():
         for what_if in (None, CLOSE_TWO):
             at = _page(page, what_if, **query)
             assert not at.exception, (page, query, what_if, at.exception)
-            assert any("What-if view" in w.value for w in at.warning) == bool(what_if), (page, query)
+            # only the What-if explorer reads the what-if; every other page shows the baseline
+            assert any("What-if view" in w.value for w in at.warning) == (bool(what_if) and page == "predictions"), (page, query)
 
 
 def test_overview_full_app_leads_with_summary_then_limitations():
@@ -89,6 +90,17 @@ def test_level_switch_is_fast_and_marks_explanations_as_template():
     assert any("What changed from the baseline" in m.value for m in at.markdown)
     at.button(key="wi-reset").click().run()
     assert not at.exception and not any("What-if view" in w.value for w in at.warning)
+
+
+def test_what_if_never_leaks_into_the_other_pages():
+    from src.baseline import run
+    closed = {"levels": Levels(travel="high"), "closed": frozenset({"al-barsha"}), "recall": None}
+    summary = _page("overview", what_if=closed)
+    assert not summary.exception and not any("What-if view" in w.value for w in summary.warning)
+    from src.webapp.pages.overview import pyramid
+    assert summary.markdown[1].value == f"### {pyramid(run())['thought']}"         # baseline, not the what-if
+    lounge = _page("lounge", what_if=closed, lounge="al-barsha")                     # closed in the what-if only
+    assert not lounge.exception and lounge.header[0].value == "Lounge: Al Barsha"
 
 
 def test_closing_lounges_from_the_panel_shows_what_changed():

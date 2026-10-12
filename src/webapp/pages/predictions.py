@@ -1,4 +1,4 @@
-"""Model predictions: the what-if panel and the full map (every lounge and growth area, optional layers)
+"""What-if explorer: the what-if panel and the full map (every lounge and growth area, optional layers)
 with a short pyramid for whatever you click. The Executive Summary argues; this page lets you explore."""
 import streamlit as st
 
@@ -144,7 +144,7 @@ def _lounge_panel(r, b: str) -> None:
         render_caveats("Caveats for this lounge" if d.action == "NOT SCORED"
                        else f"Confidence: {d.confidence}. Caveats for this lounge",
                        lounge_caveats(f, d, r.flips.get(b)), d.confidence == "low")
-    st.page_link(nav.LOUNGE, label="Open the lounge page →", icon="💇", query_params={"lounge": b})
+    st.page_link(nav.LOUNGE, label=f"Open the lounge page{" (baseline)" if data.active() else ""} →", icon="💇", query_params={"lounge": b})
 
 
 def _area_panel(r, area_id: str) -> None:
@@ -168,15 +168,16 @@ def _area_panel(r, area_id: str) -> None:
     with right:
         render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
                        d.action != "SKIP")
-    st.page_link(nav.AREA, label="Open the area page →", icon="📍", query_params={"area": area_id})
+    st.page_link(nav.AREA, label=f"Open the area page{" (baseline)" if data.active() else ""} →", icon="📍", query_params={"area": area_id})
 
 
 def render() -> None:
-    st.title("Model predictions")
+    st.title("What-if explorer")
     banner()
     r = data.current()
-    st.caption("Change the assumptions or close lounges, then click a lounge or an area on the map. Every number "
-               "is the model's estimate.")
+    st.caption("Change the model's assumptions or close lounges and watch the calls move, then click a lounge or "
+               "an area on the map. **Only this page changes:** the Executive Summary, Lounges and Areas pages "
+               "always show the baseline. Every number is the model's estimate.")
     render_panel()
     st.markdown("##### The map: click a lounge or an area")
     map_key = f"uae-map-{st.session_state.get('map_nonce', 0)}"

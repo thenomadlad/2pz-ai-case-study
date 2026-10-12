@@ -1,4 +1,4 @@
-"""The what-if panel (Model predictions): four assumption levels, search recall and closed lounges. Widgets
+"""The what-if panel (What-if explorer): four assumption levels, search recall and closed lounges. Widgets
 write into data.what_if() on change; everything recomputes through baseline.run()."""
 import streamlit as st
 
@@ -40,7 +40,7 @@ def render_panel() -> None:
     st.session_state["wi-recall"] = w["recall"] if w["recall"] is not None else data.assumptions().search_recall
     st.session_state["wi-closed"] = sorted(w["closed"])
 
-    with st.expander("🧪 What if…? Change the assumptions or close lounges", expanded=data.active()):
+    with st.expander("🧪 Change the assumptions or close lounges", expanded=True):
         if "wi-error" in st.session_state:
             st.error(f"Not applied: {st.session_state['wi-error']}")
         cols = st.columns(len(_AXES))
