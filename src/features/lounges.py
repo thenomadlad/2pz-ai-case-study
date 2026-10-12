@@ -147,8 +147,9 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
     shop = v3.cells.shop_rent_m2.to_dict() if "shop_rent_m2" in v3.cells else {}
     aw_s = women * affluence_weight(rent, women, a.affluence_elasticity[levels.affluence])
     aw = aw_s.to_dict()
-    sv = _served(v3, a, aw_s, levels, closed, leave_one_out=areas)
-    site = _site_served(v3, a, aw_s, closed)
+    hk = huff_levels(a, levels)
+    sv = _served(v3, a, aw_s, levels, closed, hk, leave_one_out=areas)
+    site = _site_served(v3, a, aw_s, closed, hk)
     lounges = [lo for lo in v3.lounges if lo.branch_id not in closed]
     catch = {lo.branch_id: p["catch"].get(levels.travel, {}).get(lo.branch_id, []) for lo in lounges}
     reach = Counter(c for b, cs in catch.items() if b not in NOT_SCORED for c in cs)   # scored lounges only
@@ -207,7 +208,7 @@ def build(v3: V3, assumptions: BaselineAssumptions, levels: Levels = Levels(),  
         out.append(_area(_slug(f"{name} {emirate}"), name, emirate, sorted(cs, key=p["rc"].get),
                          w, aw, rents, shop, p, a, lounges, lats, lngs, sv["cells"].unserved,
                          sv["cells"].served_lounges))
-    out = _area_what_ifs(v3, a, aw_s, out, feats, closed)
+    out = _area_what_ifs(v3, a, aw_s, out, feats, closed, hk)
     return feats, sorted(out, key=lambda x: -x.women)
 
 
@@ -291,16 +292,24 @@ TYPICAL_WHY = ("The typical lounge every what-if opens (area what-ifs, site_serv
                "could move another's call; frozen, it can't. Re-freeze only with a rebuilt reference.")
 
 
-def _site_served(v3, a, aw_s, closed) -> dict[str, float]:
-    """site_served per open scored lounge (src/model/served.site_served); cached on the demand and closures."""
+def huff_levels(a: BaselineAssumptions, levels: Levels) -> dict:
+    """The served model's drive time and competitor scale at these levels (served.LEVELS_WHY)."""
+    from src.model.served import competitor_scale
+    return {"minutes": a.travel_time_minutes[levels.travel],
+            "cscale": competitor_scale(a.competitor_coverage[levels.coverage])}
+
+
+def _site_served(v3, a, aw_s, closed, hk) -> dict[str, float]:
+    """site_served per open scored lounge (src/model/served.site_served); cached on the demand, closures and levels."""
     from src.model.served import site_served
-    key = ("site", id(v3), hash(aw_s.to_numpy().tobytes()), closed)
+    key = ("site", id(v3), hash(aw_s.to_numpy().tobytes()), closed, *hk.values())
     if key not in _SERVED:
-        _SERVED[key] = site_served(v3, a, aw_s, TYPICAL_REVIEWS, TYPICAL_RATING, closed=closed, not_scored=frozenset(NOT_SCORED))
+        _SERVED[key] = site_served(v3, a, aw_s, TYPICAL_REVIEWS, TYPICAL_RATING, closed=closed,
+                                   not_scored=frozenset(NOT_SCORED), **hk)
     return _SERVED[key]
 
 
-def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
+def _area_what_ifs(v3, a, aw_s, areas, feats, closed, hk):
     """Open a typical lounge at each area worth a look (5k+ women, a residential name): what it serves,
     what it takes from our lounges, and its demand and rent against the salon-site reference."""
     from src.model.growth import NON_RESIDENTIAL, SKIP_UNDER_WOMEN
@@ -311,10 +320,10 @@ def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
             out.append(ar)
             continue
         # keyed on the demand itself: affluence weighting keeps the total, so a sum would collide across levels
-        key = ("open", id(v3), ar.area_id, hash(aw_s.to_numpy().tobytes()), closed)
+        key = ("open", id(v3), ar.area_id, hash(aw_s.to_numpy().tobytes()), closed, *hk.values())
         if key not in _SERVED:
             _SERVED[key] = what_if_open(v3, a, aw_s, ar.lat, ar.lng, TYPICAL_REVIEWS, TYPICAL_RATING, closed=closed,
-                                        not_scored=frozenset(NOT_SCORED))
+                                        not_scored=frozenset(NOT_SCORED), **hk)
         w = _SERVED[key]
         cost = site_cost_k(ar.shop_rent_m2)
         out.append(ar.model_copy(update={
@@ -326,20 +335,20 @@ def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
 _SERVED: dict = {}
 
 
-def _served(v3, a, aw_s, levels, closed, leave_one_out: bool = True) -> dict:
-    """Huff served/unserved demand; depends only on demand levels and closures, so cached on those.
+def _served(v3, a, aw_s, levels, closed, hk, leave_one_out: bool = True) -> dict:
+    """Huff served/unserved demand; depends only on demand levels, closures and hk (huff_levels), so cached on those.
     Without leave_one_out (level_flips: absorbed_share isn't scored) the full result is reused if
     cached, else a lighter one is cached apart."""
     from src.model.served import served
-    key = (id(v3), levels.worker_share, levels.affluence, closed)
+    key = (id(v3), levels.worker_share, levels.affluence, closed, *hk.values())
     if key in _SERVED:
         return _SERVED[key]
     if leave_one_out:
-        _SERVED[key] = served(v3, a, aw_s, closed=closed, not_scored=frozenset(NOT_SCORED))
+        _SERVED[key] = served(v3, a, aw_s, closed=closed, not_scored=frozenset(NOT_SCORED), **hk)
         return _SERVED[key]
     light = (*key, "no-loo")
     if light not in _SERVED:
-        _SERVED[light] = served(v3, a, aw_s, closed=closed, not_scored=frozenset(NOT_SCORED), leave_one_out=False)
+        _SERVED[light] = served(v3, a, aw_s, closed=closed, not_scored=frozenset(NOT_SCORED), leave_one_out=False, **hk)
     return _SERVED[light]
 
 

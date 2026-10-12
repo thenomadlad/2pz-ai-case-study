@@ -4,7 +4,10 @@ plus an OUTSIDE option (women who go elsewhere / no premium salon): what it take
 
 Reach: the cell's own Mapbox isochrones (10/15/20 min) where fetched (810 cells inside some lounge's
 20-min reach); elsewhere straight-line km bands fitted on those cells (KM_PER_BAND, fitted at load).
-Quick first cut, 2026-10-11: parameters are starting points to examine, not calibrated."""
+Quick first cut, 2026-10-11: parameters are starting points to examine, not calibrated.
+
+Two assumption levels reach the split (LEVELS_WHY): drive time sets the decay across the bands
+(decay(minutes)) and competitor coverage scales the competitors' pull (competitor_scale)."""
 import hashlib
 import json
 
@@ -19,6 +22,28 @@ from src.market import _reviews, premium_substitutes
 ALPHA = 1.0
 DECAY = {10: 1.0, 15: 0.5, 20: 0.25}
 BANDS = (10, 15, 20)
+BASE_MINUTES = 15        # travel_time_minutes at medium: DECAY as written
+BASE_COVERAGE = 0.6      # competitor_coverage at medium: competitors at full pull
+LEVELS_WHY = (
+    "Drive time: DECAY halves a supplier's pull every 5 min past 10, which is the medium level (15 min: "
+    "the 15-min band at half the 10-min pull). At T minutes the exponent is stretched by 5 / (T - 10): "
+    "10 min (low) keeps only the 10-min band, 20 min (high) flattens it (15 min 0.71x, 20 min 0.5x). "
+    "Reach can't go past 20 min (no longer isochrones), so the levels move the decay, not the edge. "
+    "Competitor coverage: the old capture counted the most-reviewed premium salons holding this share of "
+    "the catchment's premium reviews, so competitor pull was proportional to it. Here every competitor's "
+    "(and stand-in's) pull is scaled by coverage / 0.6: 0.83x at low, 1x at medium, 1.17x at high. "
+    "Medium reproduces the baseline exactly; the frozen salon-site reference stays at baseline.")
+
+
+def decay(minutes: float = BASE_MINUTES) -> dict[int, float]:
+    """Band weights at this drive time (LEVELS_WHY); DECAY itself at BASE_MINUTES."""
+    if minutes <= BANDS[0]:
+        return {b: DECAY[b] if b == BANDS[0] else 0.0 for b in BANDS}
+    return {b: DECAY[b] ** ((BASE_MINUTES - BANDS[0]) / (minutes - BANDS[0])) for b in BANDS}
+
+
+def competitor_scale(coverage: float = BASE_COVERAGE) -> float:
+    return coverage / BASE_COVERAGE
 OUTSIDE_PCTL = 50
 RATING_ELASTICITY = 5.0   # attractiveness x (rating / 4.6) ** 5: 4.8 stars ~1.24x, 4.3 ~0.71x; missing rating = 1x   # outside option = the median premium supplier's attractiveness, at 10 min
 _ACCESS: dict[int, tuple] = {}
@@ -163,8 +188,9 @@ def _km(lat, lng, lats, lngs):
     return 2 * 6371.0 * np.arcsin(np.sqrt(h))
 
 
-def _arrays(acc: pd.DataFrame, sup: pd.DataFrame) -> dict:
-    """allocate's inputs as numpy: per access row its weight, cell code and supplier row (inner join on id)."""
+def _arrays(acc: pd.DataFrame, sup: pd.DataFrame, minutes: float = BASE_MINUTES, cscale: float = 1.0) -> dict:
+    """allocate's inputs as numpy: per access row its weight, cell code and supplier row (inner join on id).
+    `minutes` and `cscale` are the drive time and competitor scale (LEVELS_WHY)."""
     j = pd.Index(sup.id).get_indexer(acc.id)
     keep = j >= 0
     j = j[keep]
@@ -172,7 +198,8 @@ def _arrays(acc: pd.DataFrame, sup: pd.DataFrame) -> dict:
     ws = sup.reviews.clip(lower=1).to_numpy(float) ** ALPHA * (stars / 4.6) ** RATING_ELASTICITY
     codes, cell_ids = pd.factorize(acc.cell_id.to_numpy()[keep])
     lounge = sup.lounge.to_numpy(bool)[j]
-    return {"w": ws[j] * acc.minutes.map(DECAY).to_numpy(float)[keep], "code": codes, "cells": pd.Index(cell_ids),
+    w = ws[j] * acc.minutes.map(decay(minutes)).to_numpy(float)[keep] * np.where(lounge, 1.0, cscale)
+    return {"w": w, "code": codes, "cells": pd.Index(cell_ids), "minutes": minutes,
             "sup": j, "lounge": lounge, "ids": sup.id.to_numpy(), "reviews": sup.reviews.to_numpy(float)}
 
 
@@ -195,17 +222,17 @@ def _by_lounge(x: dict, women: np.ndarray) -> pd.Series:
     return pd.Series(np.bincount(inv, women[x["lounge"]], len(u)), index=pd.Index(x["ids"][u], name="id")).sort_index()
 
 
-def _base(v3, a, closed, not_scored) -> tuple[pd.DataFrame, dict]:
+def _base(v3, a, closed, not_scored, minutes=BASE_MINUTES, cscale=1.0) -> tuple[pd.DataFrame, dict]:
     """The suppliers open in this scenario and their access rows as allocate arrays. Cached; rebuilt
     whenever _access or _competitors hand back a new table (their caches cleared), or the weight
     parameters change (a notebook sweeps them)."""
     acc, comp = _access(v3, a, not_scored), _competitors(v3, a)
-    key = (id(v3), closed, not_scored, ALPHA, RATING_ELASTICITY, tuple(DECAY.items()))
+    key = (id(v3), closed, not_scored, ALPHA, RATING_ELASTICITY, tuple(DECAY.items()), minutes, cscale)
     hit = _BASE.get(key)
     if hit and hit[0] is acc and hit[1] is comp:
         return hit[2], hit[3]
     sup = _suppliers(v3, a, closed, not_scored)
-    x = _arrays(acc[acc.id.isin(sup.id)], sup)
+    x = _arrays(acc[acc.id.isin(sup.id)], sup, minutes, cscale)
     _BASE[key] = (acc, comp, sup, x)
     return sup, x
 
@@ -224,15 +251,17 @@ def _allocate(x: dict, demand: pd.Series) -> tuple[pd.DataFrame, pd.Series]:
     return cells, _by_lounge(x, women)
 
 
-def allocate(demand: pd.Series, acc: pd.DataFrame, sup: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
+def allocate(demand: pd.Series, acc: pd.DataFrame, sup: pd.DataFrame, minutes: float = BASE_MINUTES,
+             cscale: float = 1.0) -> tuple[pd.DataFrame, pd.Series]:
     """Per cell: demand, served_lounges, served_competitors, unserved; per lounge: women served."""
-    return _allocate(_arrays(acc, sup), demand)
+    return _allocate(_arrays(acc, sup, minutes, cscale), demand)
 
 
-def served(v3, a, demand: pd.Series, closed=frozenset(), not_scored=frozenset(), leave_one_out: bool = True) -> dict:
+def served(v3, a, demand: pd.Series, closed=frozenset(), not_scored=frozenset(), leave_one_out: bool = True,
+           minutes: float = BASE_MINUTES, cscale: float = 1.0) -> dict:
     """Served women per open lounge, unserved per cell, and per lounge the share of its served women
     its siblings absorb if it closes (leave-one-out; `leave_one_out=False` skips it: absorbed is {})."""
-    sup, x = _base(v3, a, frozenset(closed), frozenset(not_scored))
+    sup, x = _base(v3, a, frozenset(closed), frozenset(not_scored), minutes, cscale)
     cells, by_lounge = _allocate(x, demand)
     absorbed = {}
     if not leave_one_out:
@@ -274,21 +303,21 @@ def _with_site(x: dict, new: pd.DataFrame, lat: float, lng: float, reviews: floa
     """x with a typical lounge "NEW" at (lat, lng) appended (as allocate on the concatenated tables);
     `new` is its site_access."""
     y = _arrays(new.assign(id="NEW"), pd.DataFrame([{"id": "NEW", "lat": lat, "lng": lng, "reviews": reviews,
-                                                     "rating": rating, "lounge": True}]))
+                                                     "rating": rating, "lounge": True}]), x["minutes"])
     code = x["cells"].get_indexer(y["cells"])
     fresh = code < 0
     code[fresh] = len(x["cells"]) + np.arange(fresh.sum())
     return {"w": np.concatenate([x["w"], y["w"]]), "code": np.concatenate([x["code"], code[y["code"]]]),
-            "cells": x["cells"].append(y["cells"][fresh]), "sup": np.concatenate([x["sup"], y["sup"] + len(x["ids"])]),
+            "cells": x["cells"].append(y["cells"][fresh]), "minutes": x["minutes"], "sup": np.concatenate([x["sup"], y["sup"] + len(x["ids"])]),
             "lounge": np.concatenate([x["lounge"], y["lounge"]]), "ids": np.append(x["ids"], "NEW"),
             "reviews": np.append(x["reviews"], y["reviews"])}
 
 
 def what_if_open(v3, a, demand: pd.Series, lat: float, lng: float, reviews: float, rating: float | None,
-                 closed=frozenset(), not_scored=frozenset()) -> dict:
+                 closed=frozenset(), not_scored=frozenset(), minutes: float = BASE_MINUTES, cscale: float = 1.0) -> dict:
     """Open a typical lounge at (lat, lng): the women it would serve, and how many of them it takes
     from our existing lounges (the rest is new to the network)."""
-    _, x = _base(v3, a, frozenset(closed), frozenset(not_scored))
+    _, x = _base(v3, a, frozenset(closed), frozenset(not_scored), minutes, cscale)
     before = _by_lounge(x, _alloc(x, demand, x["w"], _outside(x["reviews"]))[0])
     x2 = _with_site(x, site_access(v3, a, lat, lng, not_scored), lat, lng, reviews, rating)
     after = _by_lounge(x2, _alloc(x2, demand, x2["w"], _outside(x2["reviews"]))[0])
@@ -301,11 +330,12 @@ _SITE_ACCESS: dict[tuple, tuple] = {}
 
 
 def site_served(v3, a, demand: pd.Series, reviews: float, rating: float | None,
-                closed=frozenset(), not_scored=frozenset()) -> dict[str, float]:
+                closed=frozenset(), not_scored=frozenset(), minutes: float = BASE_MINUTES,
+                cscale: float = 1.0) -> dict[str, float]:
     """Per open scored lounge: the women a typical lounge (these reviews and rating) would serve at its
     site with that lounge closed and the rest open. Same as what_if_open(closed=closed | {b}), but b's
     rows are zeroed (as the leave-one-out in `served`) instead of rebuilding the arrays: ~3 ms a lounge."""
-    sup, x = _base(v3, a, frozenset(closed), frozenset(not_scored))
+    sup, x = _base(v3, a, frozenset(closed), frozenset(not_scored), minutes, cscale)
     out = {}
     for b, lat, lng in sup.loc[sup.lounge, ["id", "lat", "lng"]].itertuples(index=False):
         k = int(np.flatnonzero(x["ids"] == b)[0])
