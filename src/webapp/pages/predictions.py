@@ -15,6 +15,7 @@ from src.webapp.map import (
     overlap_layer,
     polygon_layer,
     substitutes_layer,
+    view_at,
 )
 from src.webapp.pages.area import _check
 from src.webapp.scenario_editor import render_panel
@@ -70,13 +71,24 @@ def map_layers(r, lounge: str | None, show_subs: bool,
     return layers + [lounge_layer(r.features, r.decisions)]
 
 
+LEGEND_TITLE = ("Legend · lounges: :green[**PROTECT**] :orange[**HOLD**] :red[**SHRINK**] (hollow = low confidence) · "
+                "areas: :blue[**GROW**] :green[**captured**] :violet[WATCH] :gray[SKIP]")
+
+# name -> (lat, lng, zoom): the map jumps here; "UAE" is the whole-country view
+CITIES = {"UAE": (24.75, 54.95, 7.2), "Abu Dhabi": (24.42, 54.47, 9.2), "Dubai": (25.12, 55.25, 9.3),
+          "Sharjah": (25.33, 55.45, 9.8), "Ajman": (25.41, 55.50, 10.6), "Umm Al Quwain": (25.54, 55.62, 10.2),
+          "Ras Al Khaimah": (25.74, 55.95, 9.6), "Fujairah": (25.13, 56.33, 10.0), "Al Ain": (24.20, 55.72, 9.6),
+          "Al Dhafra": (23.66, 53.70, 8.6)}
+
+
 def _legend(r, lounge: str | None, show_overlap: bool = False,
             show_all_subs: bool = False) -> None:
-    lounges, areas = st.columns(2)
-    with lounges:
-        _lounge_legend()
-    with areas:
-        _area_legend(r)
+    with st.expander(LEGEND_TITLE):
+        lounges, areas = st.columns(2)
+        with lounges:
+            _lounge_legend()
+        with areas:
+            _area_legend(r)
     if show_overlap:
         st.markdown(f"**Overlap**: every lounge's {data.minutes(r.levels)}-min catchment at once; faint teal = "
                     "one lounge reaches the cell, 🟥 red = **shared** by 2+ lounges (deeper = more). "
@@ -112,7 +124,7 @@ def _area_legend(r) -> None:
                 "salon sites *and* rent no dearer than their median (or unknown)  \n"
                 f"🟩 **Already captured**: our lounges serve {CAPTURED_MIN:.0%}+ of its women (model estimate); "
                 f"deeper green = more, deepest at {CAPTURED_FULL:.0%}+  \n"
-                "🩵 **WATCH**: big but dearer or weaker demand, or mostly worker housing  \n"
+                "🟪 **WATCH**: big but dearer or weaker demand, or mostly worker housing  \n"
                 f"⬜ **SKIP or no data**: under {growth.SKIP_UNDER_WOMEN:,} women, a non-residential name, or too small a gain")
 
 def _lounge_panel(r, b: str) -> None:
@@ -173,7 +185,9 @@ def render() -> None:
                "always show the baseline. Every number is the model's estimate.")
     render_panel()
     st.markdown("##### The map: click a lounge or an area")
-    map_key = f"uae-map-{st.session_state.get('map_nonce', 0)}"
+    city = st.pills("Jump to", list(CITIES), default="UAE", key="map-city") or "UAE"
+    # the city is in the key: a new key is a new map, so deck.gl takes the new initial view
+    map_key = f"uae-map-{st.session_state.get('map_nonce', 0)}-{city}"
     lounge, area_id = _selection(st.session_state.get(map_key))
     # Controls above the map and the legend below it, so the map keeps its width on narrow screens.
     c1, c2, c4, c5 = st.columns(4)
@@ -189,7 +203,8 @@ def render() -> None:
     open_ = {f.branch_id for f in r.features}
     layers = map_layers(r, lounge if lounge in open_ else None, show_subs,
                         show_overlap, show_all_subs)
-    st.pydeck_chart(build_deck(layers), on_select="rerun", selection_mode="single-object", key=map_key)
+    lat, lng, zoom = CITIES[city]
+    st.pydeck_chart(build_deck(layers, view_at(lat, lng, zoom)), on_select="rerun", selection_mode="single-object", key=map_key)
     # Only known ids reach markdown: the URL value is untrusted.
     _legend(r, lounge if lounge in open_ else None, show_overlap, show_all_subs)
     if lounge:

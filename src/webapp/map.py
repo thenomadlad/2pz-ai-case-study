@@ -84,7 +84,7 @@ def catchment_cells_layer(cells: pd.DataFrame, cell_ids: list[str], women: pd.Se
 
 CAPTURED_MIN = 0.02    # our lounges serve 2%+ of an area's women: "captured", shaded green
 CAPTURED_FULL = 0.30   # ... at 30%+ the deepest green
-GROW_BLUE, WATCH_BLUE, GREY = [21, 101, 192], [144, 202, 249], [176, 176, 176]
+GROW_BLUE, WATCH_PURPLE, GREY = [21, 101, 192], [171, 71, 188], [176, 176, 176]
 CAPTURED_LOW, CAPTURED_HIGH = [178, 223, 219], [0, 105, 92]     # pale to deep teal-green (not PROTECT's green)
 
 
@@ -95,21 +95,20 @@ def our_share(a: Area) -> float:
 
 def area_colour(action: str, share: float) -> tuple[str, list[int]]:
     """(legend key, RGBA): GROW blue first (actionable); then captured, greener the more we serve;
-    then WATCH pale blue; everything else (SKIP, no data) grey."""
+    then WATCH purple; everything else (SKIP, no data) grey."""
     if action == "GROW":
         return "GROW", [*GROW_BLUE, 180]
     if share >= CAPTURED_MIN:
         t = min(1.0, (share - CAPTURED_MIN) / (CAPTURED_FULL - CAPTURED_MIN))
         return "CAPTURED", [round(lo + t * (hi - lo)) for lo, hi in zip(CAPTURED_LOW, CAPTURED_HIGH)] + [170]
     if action == "WATCH":
-        return "WATCH", [*WATCH_BLUE, 160]
+        return "WATCH", [*WATCH_PURPLE, 110]
     return "SKIP", [*GREY, 90]
 
 
 def area_cells_layer(cells: pd.DataFrame, areas: list[Area], decisions: list[AreaDecision],
                      only: str | None = None) -> pdk.Layer:
-    """Every area as its grid cells, always: GROW blue, captured green (shaded by our share), WATCH pale
-    blue, SKIP or no data grey (area_colour). `only`: one area."""
+    """Every area as its grid cells, always: GROW blue, captured green (shaded by our share), WATCH purple, SKIP or no data grey (area_colour). `only`: one area."""
     act = {d.area_id: d.action for d in decisions}
     rows = []
     for a in areas:
