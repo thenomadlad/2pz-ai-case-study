@@ -58,7 +58,7 @@ def _governing(r, p: dict) -> None:
                     "lease data. [How sure we are ↓](#how-sure-we-are)")
     with st.expander("How we measure: serviceable market per AED of commercial rent, within each emirate"):
         st.markdown(measures_text(r))
-    with st.expander("Read the AI-written summary"):
+    with st.expander("Read the AI-written summary", expanded=True):
         render_pyramid(explanation_for(r, "uae", "uae")[0])
 
 
