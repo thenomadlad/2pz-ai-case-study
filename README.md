@@ -96,21 +96,21 @@ HOLD or SHRINK at a lounge's lease event, GROW as the start of a site search.
    the cost, each site judged within its emirate, decision rules and rent quotes for scenarios, with
    notebooks, sanity checks and a go/no-go rubric guarding each change.
 
-**Key decisions, and what each costs.**
+**Key decisions, and their limitations.**
 - **Judge each site within its emirate**, against a frozen set of 1,123 competitor salon sites. Dubai
   and Abu Dhabi markets (and rent sources) aren't comparable, and a UAE-wide yardstick sank every dear
-  Dubai site. Cost: a site is only as good as its emirate's yardstick; emirates with under 50 salon
+  Dubai site. Limitation: a site is only as good as its emirate's yardstick; emirates with under 50 salon
   sites are ranked UAE-wide on demand.
 - **Score the site, not how much the lounge itself sells.** Site demand puts a typical lounge (757 reviews,
-  4.6★) at each spot, so a strong lounge can't hide a weak site. Cost: a well-run lounge on a weak
+  4.6★) at each spot, so a strong lounge can't hide a weak site. Limitation: a well-run lounge on a weak
   site still reads SHRINK; its own performance is shown as context.
 - **Rent as the cost signal.** It is the cost that differs most between sites (9.5x across our
-  lounges) and the one a negotiation can move. Cost: no revenue, lease or capex, so SHRINK means
+  lounges) and the one a negotiation can move. Limitation: no revenue, lease or capex, so SHRINK means
   "investigate".
 - **Rules decide, AI explains.** Calls must be reproducible and defensible to a board; the AI drafts
   the memo, it never makes the call.
 - **A hosted app with no keys.** The decision-maker opens a link; every lounge and area has its own
-  URL, so a recommendation can be sent as a link to its evidence. Cost: the data is a committed
+  URL, so a recommendation can be sent as a link to its evidence. Limitation: the data is a committed
   snapshot, refreshed by re-running scripts.
 
 **What I simplified, and why.** Midday drive times; lifetime Google reviews as each salon's services sold;
@@ -125,11 +125,18 @@ scenarios side by side ([docs/implementation.md](docs/implementation.md), Potent
 
 ## The AI layer, and why it's built this way
 
-Every call comes with a pyramid: a one-sentence answer, 2-5 arguments, each backed by data points.
+**The business case.** A footprint or capital call made on large amounts of data and a model built on
+stand-in signals (reviews for services sold, area rents for leases) and judgement thresholds is easy
+to misread: a 0.47 rent score, a low-confidence HOLD or a 4% growth figure each needs its context.
+So every call comes with its interpretation, not just its numbers: an LLM writes the executive
+summary and each lounge's and area's explanation, and code vets it before anyone sees it. The
+decision-maker gets the data *and* the correct reading of it.
+
+Every explanation is a pyramid: a one-sentence answer, 2-5 arguments, each backed by data points.
 - **The code picks the arguments** (`src/explain.py:prioritize`): which signals matter and in what order is computed, not left to the model.
 - **The model writes the prose; `verify()` checks it.** Every cited value must match the fact sheet and every number in the text must be a fact or a published threshold, correctly rounded. A failure falls back to a labelled template.
-- **No key needed.** Explanations are cached, keyed by a hash of the exact numbers; when a what-if changes the numbers, the app shows the template instead of a stale text.
-- **Why not a chatbot or an agent over the data?** A lease or capital call has to be defensible and reproducible: the same data must give the same call and the same reasons. So rules decide and the AI narrates under verification; an earlier LLM classifier was removed for that reason.
+- **Precomputed for this prototype.** The explanations for the baseline are generated ahead of time (offline, from the app's own prompts), verified and cached, keyed by a hash of the exact numbers, so the app needs no API key. In production, changing an assumption in the What-if explorer would have the LLM write new conclusions and summaries on the spot, through the same checks; here a changed what-if shows the labelled template instead of a stale text.
+- **Rules decide, the AI explains.** A lease or capital call has to be defensible and reproducible: the same data must give the same call and the same reasons, so an earlier LLM classifier was removed. That doesn't rule out a chatbot; it sets its guardrails. A chat could take "what if rent at City Walk were 3,000?" or "be stricter on GROW", set those assumptions in the same engine the What-if explorer uses, and have the LLM explain the new calls, with `verify()` checking every answer. The chat changes inputs; the rules still make the call.
 - **How AI built it:** agentic coding with Claude Code, with the human setting direction and signing off judgement calls, and every change gated by the tests, review passes and the sanity checks ([docs/implementation.md](docs/implementation.md)).
 
 ## How we checked it
@@ -145,9 +152,12 @@ Every call comes with a pyramid: a one-sentence answer, 2-5 arguments, each back
 The calls are **a shortlist to test with the business, not decisions**, and the limitations matter
 more than the calls. The biggest ones:
 
-- **No revenue or lease data in the model.** The cost signal is a shop rent (an area median, a
-  district rate or an asking rent, not the lease) against its emirate's median salon site. No revenue, lease terms, actual capex or footfall. **SHRINK means "investigate", not
-  "close".**
+- **No revenue or lease data in the model.** Site cost should be the real rent for the space a lounge
+  needs to serve its catchment; the model only has a shop rent per m² (an area median, a district
+  rate or an asking rent, not the lease), compared with its emirate's median salon site. The model
+  has none of the revenue, fixed cost base, profitability, capacity, capacity utilization and other
+  branch health KPIs which are key for this model to provide more definitive recommendations; [the next section](#the-model-wed-build-with-bedashings-data)
+  sets out the model we'd build with them. **SHRINK means "investigate", not "close".**
 - **Services sold are measured by lifetime Google reviews.** Each review is a trace of past
   appointments, so a salon's reviews stand in for how much it has sold, and its share of the Huff
   split follows them. Lifetime counts favour older salons and new lounges look weak; review rates
@@ -169,6 +179,14 @@ more than the calls. The biggest ones:
   against a frozen set of 1,123 competitor salon sites, valued by the same uncalibrated served model;
   emirates with under 50 such sites are ranked UAE-wide on demand. Every score is shown with its
   UAE-wide percentile as context.
+- **Keep and grow use different bars.** Keep or shrink is judged within the site's emirate, but a
+  growth area needs an absolute 6,000 net new women, so a PROTECT site can fail the growth test as a
+  new opening: Nad Al Sheba is PROTECT (it out-serves 68% of Dubai salon sites), yet a typical lounge
+  there would serve about 2,700 women.
+- **Sharjah's GROW areas are beyond our footprint.** 10 of the 34 GROW areas are in Sharjah emirate but
+  beyond a 15-minute drive of our two Sharjah lounges (Al Jada, Zawaya Walk), both on the Dubai side.
+  Why the footprint there is only two lounges is a business question: the model can't see licensing,
+  brand fit, landlord terms or customer mix.
 
 The full ranked list, with which calls each limitation touches and what would fix it:
 [`docs/limitations.md`](docs/limitations.md), also the app's **README** page.

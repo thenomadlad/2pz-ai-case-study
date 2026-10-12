@@ -32,9 +32,11 @@ RENT_RATIO_P10 = 0.6176   # RENT_RATIO_WHY
 RENT_RATIO_P90 = 1.4290
 RENT_RATIO_WHY = (
     "Frozen 2026-10-11 from the reference salon sites (scripts/build_site_reference.py): the 10th and "
-    "90th percentiles of rent_ratio over all 1,123, each against its own emirate's median. A site as "
-    "dear, relative to its emirate's salon sites, as the dearest tenth scores 0; as cheap as the "
-    "cheapest tenth scores 1; the emirate's median salon site (ratio 1) scores about 0.47.")
+    "90th percentiles of rent_ratio (its emirate's median salon-site rent ÷ its own) over all 1,123. "
+    f"A ratio of {RENT_RATIO_P10:.2f} or less (rent {1 / RENT_RATIO_P10:.1f}x the emirate median or more: the "
+    f"dearest 10% of salon sites) scores 0; {RENT_RATIO_P90:.2f} or more (rent {1 / RENT_RATIO_P90:.0%} of the "
+    "median or less: the cheapest 10%) scores 1; in between it scales evenly, so a site at its emirate's "
+    f"median rent scores {(1 - RENT_RATIO_P10) / (RENT_RATIO_P90 - RENT_RATIO_P10):.2f}.")
 
 SIGNALS: tuple[Signal, ...] = (
     Signal("demand", "demand_pct", "Site demand: share of its emirate's salon sites it out-serves",

@@ -62,8 +62,9 @@ Five pages; the loop is **Executive Summary → click a lounge or area → its p
    (today 4,561) turns it ~~SHRINK~~ → **HOLD** (low confidence; the line is about 2,290); a GROW
    minimum of 10,000 net new women cuts GROW from 34 to 16 areas. Then the map: every area coloured by its call (GROW blue,
    already captured green, WATCH purple, SKIP grey), lounge pins in their call's colour (hollow =
-   low confidence), **Jump to** city pills, toggles for premium substitutes (selected lounge or
-   every lounge) and **all catchments (overlap)**, and a collapsible legend. Click a lounge or area
+   low confidence), **Jump to** city pills, every lounge's catchment
+   always drawn underneath (shared cells red), toggles for premium substitutes (selected lounge or
+   every lounge), and a collapsible legend. Click a lounge or area
    for its short pyramid, tests and caveats, and a link to its page.
 3. **Lounges** (`/lounge?lounge=delma`): the table of all 24 lounges, filterable by call and
    emirate and sortable, is the picker: select a row and its detail opens below: address and rating,

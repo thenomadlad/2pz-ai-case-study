@@ -22,9 +22,9 @@ def test_lounge_layer_colours_by_action_and_hollows_low_confidence():
 def test_selected_lounge_adds_polygon_cells_and_substitutes():
     ids = lambda layers: [x.id for x in layers]
     none = ids(map_layers(run(), None, True))
-    assert none == ["areas", "lounges"]
+    assert none == ["overlap", "areas", "lounges"]
     picked = map_layers(run(), "al-barsha", True)
-    assert ids(picked) == ["areas", "catchment-cells", "catchment-polygon", "substitutes", "lounges"]
+    assert ids(picked) == ["overlap", "areas", "catchment-cells", "catchment-polygon", "substitutes", "lounges"]
     subs = next(x for x in picked if x.id == "substitutes").data
     assert len(subs) == next(f for f in run().features if f.branch_id == "al-barsha").substitutes_k
     assert "substitutes" not in ids(map_layers(run(), "al-barsha", False))
@@ -78,7 +78,7 @@ def test_pixel_units_serialise_as_literals_not_accessors():
 
 def test_overlap_layer_marks_shared_cells_and_all_substitutes_are_deduplicated():
     r = run()
-    layers = {x.id: x for x in map_layers(r, None, False, show_overlap=True, show_all_subs=True)}
+    layers = {x.id: x for x in map_layers(r, None, False, show_all_subs=True)}
     rows = layers["overlap"].data
     shared = [x for x in rows if "Reached by 1 " not in x["detail"]]
     assert shared and all(x["color"][0] == 211 for x in shared)

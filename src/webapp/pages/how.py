@@ -57,6 +57,7 @@ def _const(v) -> str:
 
 
 README = REPO_ROOT / "README.md"
+ANCHORS = {"the-model-wed-build-with-bedashings-data": "the-model-we-d-build-with-bedashings-data"}  # GitHub → Streamlit
 DOCS = {"README.md": "/how#bedashing-network-right-sizing"}   # the page shows the README only; the
 # detailed docs (docs/model.md, docs/implementation.md) are linked on GitHub
 REPO_URL = "https://github.com/thenomadlad/2pz-ai-case-study/blob/main/"
@@ -75,6 +76,8 @@ def readme_parts(text: str, base: str = "") -> list[tuple[str, str]]:
     """A doc as ("md", markdown) and ("mermaid", diagram) parts, its repo-relative links (relative to the
     directory `base`) rewritten by _link so they work inside the app."""
     text = re.sub(r"\]\((?!https?://|#|mailto:)([^)\s]+)\)", lambda m: f"]({_link(m.group(1), base)})", text)
+    # in-page anchors only scroll as page URLs in the app, and Streamlit slugs an apostrophe as "-"
+    text = re.sub(r"\]\(#([^)]+)\)", lambda m: f"](/how#{ANCHORS.get(m.group(1), m.group(1))})", text)
     parts = re.split(r"^```mermaid\n(.*?)^```\n?", text, flags=re.DOTALL | re.MULTILINE)
     return [("mermaid" if i % 2 else "md", p) for i, p in enumerate(parts) if p.strip()]
 

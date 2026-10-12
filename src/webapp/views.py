@@ -171,49 +171,16 @@ def render_factor_table(exp: Explanation, fields: tuple[str, ...], facts: dict) 
 
 
 def limitations_box(r: Run) -> None:
-    """The biggest limitations, right under the executive summary."""
-    from src.webapp import nav
-
+    """The three caveats that matter most, right under the executive summary; the README holds the full list."""
     scored = [d for d in r.decisions if d.action != "NOT SCORED"]
     low = sum(d.confidence == "low" for d in scored)
-    act = {d.area_id: d.action for d in r.area_decisions}
-    grow = [a for a in r.areas if act[a.area_id] == "GROW"]
-    sharjah = sum(a.emirate == "Sharjah" for a in grow)
     with st.container(border=True):
         st.markdown("#### ⚠️ Before you trust these calls")
         st.markdown(
-            "These calls are a shortlist to test with the business, not decisions.\n\n"
-            "1. **No revenue or lease data in the model.** Site cost is shop rent x an assumed 150 m² unit "
-            "plus an assumed fit-out (AED 3,000/m² over 5 years); the rent is an area median, a district "
-            "rate or an asking rent, not the lease. No revenue, lease terms, actual capex or footfall: it "
-            "scores site demand and site rent only. SHRINK means *investigate*, not *close*; a "
-            "SHRINK lounge can be profitable and a PROTECT one unprofitable.\n"
-            "2. **Services sold are measured by lifetime Google reviews.** Each review is a trace of past "
-            "appointments, so a salon's share of the Huff split follows how much it sells, as measured by "
-            "its reviews. Older salons look bigger, and review rates differ between salons and services. "
-            "The call therefore scores the *site* (what a typical lounge would serve there), not how much "
-            "the lounge itself sells; that is shown as performance vs its site, context only. Reviews are "
-            "a stand-in for services sold until bookings data.\n"
-            "3. **Shop rent comes from different sources per emirate.** Dubai: DLD Ejari shop contracts; "
-            "Abu Dhabi: ADREC 2025 district street-retail rates, read by hand off its public map; northern "
-            "emirates: Property Finder / Bayut asking rents scraped via third-party Apify actors (a grey area "
-            "under those portals' terms; asking rents run above achieved ones); gaps take the "
-            "emirate median, which is no observation: where it sets the rent, the rent test is neutral and "
-            "the call low confidence. Both signals rank a site within its emirate's frozen market of competitor salon "
-            "sites (demand: share of them it out-serves; rent: their median ÷ its own), so a dear Dubai site is "
-            "judged against Dubai salon sites, not Fujairah ones. Emirates with under 50 reference sites (Ajman, "
-            "Ras Al Khaimah, Fujairah, Umm Al Quwain) rank demand UAE-wide.\n"
-            f"4. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
-            "lounges are low confidence: near a threshold, a call "
-            f"that changes in {scorecard.FLIP_LOW}+ of the {scorecard.COMBOS} assumption combinations, or one that "
-            "changes when a signal weight moves ±25%. Try the what-if panel below.\n"
-            f"5. **Growth areas are a first cut.** Each is a what-if (open a typical lounge, count the net new "
-            f"women); the Huff parameters are uncalibrated starting points and competitor data is partial. {sharjah} of {len(grow)} GROW areas are in Sharjah "
-            "emirate but beyond a 15-minute drive of Bedashing's two Sharjah lounges (al-jada, zawaya-walk), "
-            "both on the Dubai side. Why the footprint there is only two lounges is a business question: "
-            "the model can't see licensing, brand fit, landlord terms or customer mix.\n"
-            f"6. **Keep and grow use different bars.** {explain.LIMIT_WITHIN_EMIRATE}")
-        st.page_link(nav.HOW, label="All the limitations, every assumption and threshold →", icon="⚠️")
+            "A shortlist to test with the business, not decisions: **No revenue or lease data in the model** "
+            "(SHRINK means *investigate*, not *close*), services sold are measured by lifetime Google reviews, "
+            f"and **{low} of {len(scored)}** lounge calls are low confidence.  \n"
+            "[All the limitations, and the model we'd build with Bedashing's data →](/how#limitations)")
 
 
 def performance_line(f) -> str:

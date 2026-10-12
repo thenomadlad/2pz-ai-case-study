@@ -1,4 +1,5 @@
 import time
+from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
 
@@ -54,10 +55,10 @@ def test_overview_full_app_leads_with_summary_then_limitations():
     assert "No revenue or lease data in the model" in body and "lifetime Google reviews" in body
     from src.baseline import run
     low = sum(d.confidence == "low" for d in run().decisions if d.action != "NOT SCORED")
-    assert f"**{low} of 23**" in body and "Sharjah" in body    # live low-confidence count (7, 2026-10-11)
-    assert "Shop rent comes from different sources per emirate" in body
-    from src.model import scorecard
-    assert f"{scorecard.FLIP_LOW}+ of the {scorecard.COMBOS}" in body
+    assert f"**{low} of 23**" in body                          # live low-confidence count
+    assert "](/how#limitations)" in body                         # the full list lives in the README
+    readme = (Path(__file__).parents[2] / "README.md").read_text()
+    assert "## Limitations" in readme and "Keep and grow use different bars" in readme
 
 
 def test_overview_shows_cached_ai_summary():
@@ -230,9 +231,10 @@ def test_untrusted_url_ids_never_reach_markdown():
 
 
 def test_overview_opens_on_the_question_and_its_pyramid():
-    """Governing thought, then review / grow / protect, each backed by exactly its lounges or areas."""
+    """Governing thought, then review / protect / grow, each backed by exactly its lounges or areas,
+    surest first; the thought counts high-confidence calls only."""
     from src.baseline import run
-    from src.webapp.pages.overview import QUESTION, pyramid
+    from src.webapp.pages.overview import QUESTION, SURE, pyramid
     at = _page("overview")
     assert at.markdown[0].value == f"#### {QUESTION}"
     r = run()
@@ -240,15 +242,19 @@ def test_overview_opens_on_the_question_and_its_pyramid():
     assert {f.branch_id for f in p["shrink"]} == {b for b, a in calls.items() if a == "SHRINK"}
     assert {f.branch_id for f in p["protect"]} == {b for b, a in calls.items() if a == "PROTECT"}
     assert len(p["grow"]) == sum(d.action == "GROW" for d in r.area_decisions) > 0
-    assert f"Review {len(p['shrink'])} weak" in p["thought"] and f"test {len(p['grow'])} areas" in p["thought"]
-    net = [a.new_site_net for a in p["grow"]]
-    assert net == sorted(net, reverse=True)                       # best area first
-    evidence = [d.value for d in at.dataframe[:3]]               # review, grow, protect tables
-    assert len(evidence[0]) == len(p["shrink"]) and len(evidence[1]) == len(p["grow"])
-    assert len(evidence[2]) == len(p["protect"])
+    sure = p["sure"]
+    assert all(x in p[k] for k in ("grow", "protect", "shrink") for x in sure[k])
+    assert f"Review {len(sure['shrink'])} weak" in p["thought"] and f"test {len(sure['grow'])} areas" in p["thought"]
+    conf = {d.area_id: d.confidence for d in r.area_decisions}
+    key = [(SURE[conf[a.area_id]], -a.new_site_net) for a in p["grow"]]
+    assert key == sorted(key)                                     # surest, then best area first
+    assert p["grow"][:len(sure["grow"])] == sure["grow"]
+    evidence = [d.value for d in at.dataframe[:3]]               # review, protect, grow tables
+    assert len(evidence[0]) == len(p["shrink"]) and len(evidence[1]) == len(p["protect"])
+    assert len(evidence[2]) == len(p["grow"])
     assert p["base"] == sum(f.served_women or 0 for f in r.features) > 0     # % are of our served market
     assert "grow our served market by" in p["claims"]["grow"]
-    assert evidence[1]["Est. growth"].iloc[0] == round(100 * p["grow"][0].new_site_net / p["base"])
+    assert evidence[2]["Est. growth"].iloc[0] == round(100 * p["grow"][0].new_site_net / p["base"])
 
 
 def test_lounge_and_area_pages_open_on_their_full_tables_with_filters():
@@ -284,9 +290,9 @@ def test_lounge_page_shows_address_and_says_services_are_missing():
     assert "Umm Suqeim St" in text and "Services offered and price tier" in text
 
 
-def test_overview_overlap_toggle_adds_its_legend():
+def test_explorer_always_shows_the_overlap_and_its_legend():
     at = _page("predictions")
-    next(c for c in at.checkbox if c.label == "All catchments (overlap)").check().run()
+    assert not any(c.label == "All catchments (overlap)" for c in at.checkbox)
     assert not at.exception and "shared** by 2+ lounges" in _text(at)
 
 
