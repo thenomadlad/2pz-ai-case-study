@@ -1180,6 +1180,12 @@ def main() -> None:
           f"{len(subjects) - ai} fall back to template. Wrote {CACHE_PATH}")
 
 
+USAGE = """usage: python -m src.explain COMMAND
+  prompts DIR   write the offline prompts (no API)
+  check DIR     check answers in DIR against their fact sheets (no API)
+  ingest DIR    check, then write the grounded answers to the cache (no API)
+  api           regenerate through the paid Anthropic API (needs ANTHROPIC_API_KEY)"""
+
 if __name__ == "__main__":
     import sys
     logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -1191,5 +1197,7 @@ if __name__ == "__main__":
             print(f"FAILED {name}: {errors}")
         print(f"{cached} grounded explanations{' cached' if sys.argv[1] == 'ingest' else ''}; "
               f"{len(failed)} failed the checks")
-    else:
+    elif sys.argv[1:] == ["api"]:   # the only paid path: it must be asked for by name
         main()
+    else:   # --help, a typo or no argument never reaches the API
+        raise SystemExit(USAGE)

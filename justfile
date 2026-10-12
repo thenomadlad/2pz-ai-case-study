@@ -7,7 +7,7 @@
 
 # Regenerate the committed AI explanation cache via the Anthropic API (needs ANTHROPIC_API_KEY)
 explain:
-    uv run python -m src.explain
+    uv run python -m src.explain api
 
 # Launch the Streamlit app on http://localhost:8501
 app:
