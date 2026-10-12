@@ -70,7 +70,7 @@ sites. The scorecard's cost signal on a frozen scale (P10 0.62 → 0, P90 1.43 �
 _Avoid_: ROI, return, profitability, cost efficiency
 
 **Women per rent**:
-Addressable women per AED 1,000 of a site's annual shop rent, on an assumed 150 m² unit (`women_per_rent_k`). Context only, in the lounge and area tables; no call uses it.
+Context only, in the lounge and area tables (no call uses it): addressable women per AED 1,000 of a site's annual shop rent, on an assumed 150 m² unit (`women_per_rent_k`).
 _Avoid_: income, wealth, spend, affluence score (unqualified)
 
 **Addressable women**:

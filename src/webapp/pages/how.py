@@ -120,8 +120,8 @@ def live_values() -> None:
     st.header("Live values from the code")
     st.caption("Read from the code and data/scenarios/baseline.yaml each time the page loads, so they can't go stale.")
     st.subheader("Every assumption (data/scenarios/baseline.yaml)")
-    st.caption("The What-if explorer switches the four levelled assumptions and the "
-               "search recall.")
+    st.caption("The What-if explorer switches three of the levelled assumptions (drive time, competitor "
+               "coverage, worker housing) and the search recall; affluence stays off.")
     notes = yaml_notes(data.BASELINE_YAML.read_text())
     wrapped_table([{"Assumption": k, "Value (levels)": _fmt(v),
                     "Why / source": notes.get(k) or "See the row above."}

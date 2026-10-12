@@ -68,7 +68,7 @@ NEW_SITE_MIN = Rules().grow_min
 NEW_SITE_MIN_WHY = ("Quick first cut (2026-10-11): a new lounge here should add at least about what our median "
                     "lounge serves today (~6k women, Huff), net of what it takes from our own lounges.")
 WHY = {"NEW_SITE_MIN": NEW_SITE_MIN_WHY, "DEMAND_PCT_MIN": DEMAND_PCT_MIN_WHY,
-       "RENT_RATIO_MIN": RENT_RATIO_MIN_WHY, "RENT_FALLBACK_MIN": RENT_FALLBACK_WHY, **WHY}  # shown first on the How page
+       "RENT_RATIO_MIN": RENT_RATIO_MIN_WHY, "RENT_FALLBACK_MIN": RENT_FALLBACK_WHY, **WHY}  # shown first on the Decision model page
 
 
 def _ord(p: float) -> str:

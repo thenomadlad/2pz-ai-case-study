@@ -145,7 +145,7 @@ GLOSSARY: dict[str, Field] = {
     "premium_salons": Field("Premium salons", "count",
                             "Premium salons found in the area's searched cells."),
     "site_served": Field("Women a typical lounge would serve here", "women",
-                         "What-if: the women a typical lounge (median reviews and rating) would serve at this site, "
+                         "What-if: the women a typical lounge (frozen at 757 reviews, 4.6★) would serve at this site, "
                          "with this lounge closed and its siblings and rivals open (Huff). The demand signal: it "
                          "scores the site, not how much the lounge itself sells."),
     "served_women": Field("Women served (Huff)", "women",
