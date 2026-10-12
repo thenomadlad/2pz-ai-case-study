@@ -226,9 +226,15 @@ Five pages; the loop is **Executive Summary → click a lounge or area → its p
    calls by name, a branch-health KPI box (what each KPI rests on today and the data that would make
    us surer) and the limitations box.
 2. **What-if explorer** (`/explore?lounge=delma` or `?area=kalba-sharjah` preselects): the only page
-   that reads the what-if. **🧪 Change the assumptions, or test a SHRINK** (collapsed at baseline):
-   drive time, competitor coverage, worker housing and search recall; *Test a SHRINK* closes lounges
-   and lists every call that moved. Then the map: every area coloured by its call (GROW blue,
+   that reads the what-if. On top, always, the **scenario summary** (Baseline | This scenario |
+   Change: lounge calls, low confidence, GROW/WATCH/SKIP, women served, best growth) and **What
+   changed** (~~HOLD~~ → **SHRINK**, with the signal that moved). **🧪 Change the assumptions, your
+   decision rules or a rent, or test a SHRINK** (collapsed at baseline): drive time, competitor
+   coverage, worker housing and search recall; *Your decision rules* (demand vs rent weight, PROTECT
+   and SHRINK lines, GROW minimum and demand line); *Plug in a quote* (a rent for a lounge or growth
+   area); *Test a SHRINK* closes lounges. Example: a landlord quote of AED 2,200/m² for City Walk
+   (today 4,561) turns it ~~SHRINK~~ → **HOLD** (low confidence; the line is about 2,290); a GROW
+   minimum of 10,000 net new women cuts GROW from 34 to 16 areas. Then the map: every area coloured by its call (GROW blue,
    already captured green, WATCH purple, SKIP grey), lounge pins in their call's colour (hollow =
    low confidence), **Jump to** city pills, toggles for premium substitutes (selected lounge or
    every lounge) and **all catchments (overlap)**, and a collapsible legend. Click a lounge or area

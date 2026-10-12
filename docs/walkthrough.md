@@ -45,11 +45,32 @@ their pages. Growth percentages can't be added up: neighbouring areas reach the 
 KPIs with what each rests on today and the data that would make us surer, and the **⚠️ Before you trust
 these calls** limitations.
 
-**The What-if explorer** is a separate page and the only one that reads a what-if: the assumptions panel
-(collapsed), **Test a SHRINK** (close lounges), and the full map. Every area is coloured: GROW blue,
-already captured green (our lounges serve 2%+ of its women), WATCH purple, SKIP or no data grey; lounges
-are pins in their call's colour, hollow when low confidence. *Jump to* pills re-centre on a city, and the
-legend is a collapsed section under the map.
+**The What-if explorer** is a separate page and the only one that reads a what-if. On top, always, a
+**scenario summary**: Baseline | This scenario | Change for the lounge calls, low-confidence calls,
+GROW/WATCH/SKIP counts, the women our lounges serve and their share in PROTECT and SHRINK lounges, and
+the best GROW area's growth; under it **What changed**, each moved call as ~~old~~ → **new** with the
+signal that moved it. Then the panel (collapsed at baseline): the model's assumptions, **Your decision
+rules** (weight on demand vs rent, the PROTECT and SHRINK lines, the GROW minimum and demand line),
+**Plug in a quote** (a rent for any lounge or GROW/WATCH area) and **Test a SHRINK** (close lounges);
+then the full map. Every area is coloured: GROW blue, already captured green (our lounges serve 2%+ of
+its women), WATCH purple, SKIP or no data grey; lounges are pins in their call's colour, hollow when low
+confidence. *Jump to* pills re-centre on a city, and the legend is a collapsed section under the map.
+
+A scenario in the portfolio team's own levers (numbers from the app):
+
+- **A landlord quote for City Walk.** City Walk is SHRINK at AED 4,561/m² (composite 0.15: demand
+  0.30, rent 0.00). Pick it under *Plug in a quote*, enter **2,200** and add it: the summary shows
+  SHRINK 3 → 2, HOLD 14 → 15, and *What changed* reads **City Walk at AED 2,200/m² (quote)**:
+  ~~SHRINK~~ → **HOLD** (site rent score 0.00 → 0.45). It is a weak HOLD (composite 0.37, low
+  confidence): the line sits at about AED 2,290 (2,300 is SHRINK again), barely above Dubai's median
+  salon-site rent of 2,154. A renegotiation has to land near the market median to keep the site.
+- **Tightening the GROW minimum to 10,000 net new women.** Add it under *Your decision rules*: GROW
+  34 → 16, WATCH 63 → 47, SKIP 464 → 498; 18 areas drop ~~GROW~~ → **WATCH**, each listed with the
+  women it would add. The best growth area (+35%) is unchanged: the bar only removes the marginal ones.
+- **Weighting demand at 70%** moves six calls (Baniyas, Shahama and Shakhbout City to PROTECT; Al Jada
+  and West Yas off SHRINK; Khaleej Al Arabi to SHRINK): how much those six hang on the equal weighting.
+
+**Reset to baseline** clears the assumptions, rules and quotes together.
 
 ## 3. One lounge decision: city-walk (SHRINK)
 

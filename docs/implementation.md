@@ -122,6 +122,8 @@ Ideas raised while building this that we haven't acted on, roughly in order of v
 **Features**
 
 - **Open lounges in the What-if explorer, several at once.** Today every growth area is evaluated as its own what-if (one typical lounge, net of our lounges and competitors), so the growth percentages can't be added up: neighbouring areas claim the same women (Al Dhaid and Manama). Opening several sites together in the full run would show their *combined* growth, which lounges they take customers from, and which calls move. The model already handles one new site (`what_if_open`); the work is wiring several into `run()`, the map and the tables. Measured cost: a re-run is ~2.7 s, the same as closing a lounge (confidence check ~65%, area what-ifs ~30%), or less if the explorer skips the confidence check. About half a day; add a speed test (two openings < 4 s).
+- **Relocation as one move.** Close a lounge and open at a named site in the same scenario (today: close in the explorer, read the area's own what-if separately), so the summary shows the net effect on served women and on the neighbours' calls.
+- **Named, saved scenarios side by side.** The explorer holds one scenario per session (assumptions, rules, quotes, closures). Saving them under a name ("City Walk renegotiated", "strict growth bar") and comparing two or three in the summary table would let the portfolio team argue between options rather than against the baseline only. Not built.
 - **Choose a portfolio of sites, not a ranked list.** With the above, pick the best *set* of openings greedily (each next site judged net of the ones already chosen), instead of reading down a list whose growths overlap.
 
 **Model and data**
@@ -132,7 +134,7 @@ Ideas raised while building this that we haven't acted on, roughly in order of v
 - **Revenue, lease and capex data for a return test.** A return-on-capital gate (rubric OB5) can't be built from shop rent alone; with lease terms and revenue per lounge, SHRINK could mean "losing money" instead of "weak site".
 - **Capacity.** Lounges have no capacity in the model (OB2), so "too much capacity in a shared catchment" can't be tested and cannibalisation is shown (siblings' absorbed share), not scored.
 - **Thin-market reach.** In small towns a new lounge's 20-min reach covers the next town (Al Dhaid's +35% is mostly Al Dhaid town, also claimed by Manama); treat single large growth figures as a ceiling until reach is checked against real drive times and demand.
-- **Score lines.** Percentile scoring bunches lounges in the middle (14 HOLD, 10 within 0.05 of a line). Where PROTECT and SHRINK lines belong is an owner decision, not a tuning job.
+- **Score lines.** Percentile scoring bunches lounges in the middle (14 HOLD, 10 within 0.05 of a line). Where PROTECT and SHRINK lines belong is an owner decision, not a tuning job: the What-if explorer's *Your decision rules* lets the owner move them and see the calls move, but the baseline keeps 0.65 / 0.35 until they choose.
 - **Better competitor and price data.** A full sweep of the capped search circles (free from 1 November, ~$54-210 before), Bedashing's real price level from its booking pages, and services and price tier per lounge, none of which are in the data today.
 - **Affluence beyond Dubai.** Observed household rents exist only for Dubai, so affluence weighting is off; a UAE-wide income or rent proxy would let it back in.
 
