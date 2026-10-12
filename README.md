@@ -28,7 +28,7 @@ A guided path through the live app: the answer, one lounge decision, one growth 
 1. **[Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the answer in one line, then the Review, Protect and Grow cards (high-confidence calls only) and their evidence maps and tables.
 2. **[What-if explorer](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/explore):** pick Abu Dhabi: every lounge's catchment is drawn, shared cells in red. Heavy overlap, yet only West Yas is SHRINK.
 3. **[City Walk](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk) (SHRINK):** the AI pyramid, *What would change the call*, the factor tree and which siblings share its women. *Action:* lease review, with finance's P&L before anyone says "close"; a prime rent may be buying footfall the model can't see.
-4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah) (GROW, low confidence):** about 12.5k net new women, but no shop rent of its own, and the call says so.
+4. **[Mazyad](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=mazyad-abu-dhabi) (GROW, high confidence):** a typical new lounge near Al Ain would add about 12.7k net new women (+8% of our served market), out-serving 99% of Abu Dhabi's salon sites at a shop rent about a quarter below the emirate median. *Action:* start a site search.
 5. **Back on the What-if explorer:** open the 🧪 panel, quote City Walk a rent of 2,200 and watch its call move.
 6. **Documentation** (sidebar): this [README](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how), then the Decision model, LLM explanations model, App and implementation, Limitations and Glossary pages.
 
