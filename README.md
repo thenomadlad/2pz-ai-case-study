@@ -20,14 +20,14 @@ is checked against the data.
    30% of Dubai salon sites on demand (26th percentile UAE-wide), at a rent ratio of 0.47 (its DLD area's
    DLD rent, dearer than the median Dubai salon site; 98th percentile UAE-wide). The AI pyramid with
    *so what / now what*, the factor table's contributions, which siblings share its women and *What
-   would change the call*. High confidence: it holds in all 81 assumption combinations.
+   would change the call*. High confidence: it holds at all 3 worker-housing share levels.
 4. **[Kalba](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/area?area=kalba-sharjah)
    (GROW):** a typical new lounge there would add about 12.5k net new women against a 6,000 line,
    top 10% of Sharjah salon sites on demand (98th percentile UAE-wide); low confidence. Kalba has
    no shop rent of its own (its cells take Sharjah's emirate median), so the rent test is neutral
    rather than passed, and the call says so (limitations 3).
-5. **The fallback:** change anything in the Overview's **🧪 What if…?** panel (say travel time 20
-   min, or close a lounge): where the numbers change, the text switches to the labelled template.
+5. **The fallback:** change anything in the Overview's **🧪 What if…?** panel (say worker housing
+   high, or close a lounge): where the numbers change, the text switches to the labelled template.
 6. **[How it works & limitations](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/how)**,
    then the limitations below.
 
@@ -95,7 +95,7 @@ Overview: the summary and map show 3 SHRINKs, one per emirate (city-walk, westya
 **city-walk** → its page: a typical lounge at its site would serve about 1.9k women, bottom 30% of
 Dubai salon sites on demand (26th percentile UAE-wide), at a rent ratio of 0.47 (98th percentile of
 rent UAE-wide); 72% of its catchment women are also reached by a sibling (the shared-women table
-names which), and the call is high confidence: it holds in all 81 assumption combinations → action:
+names which), and the call is high confidence: it holds at all 3 worker-housing share levels → action:
 put city-walk on the lease-review list with the sibling named, and ask finance for its P&L before
 anyone says "close" (a prime rent may be buying footfall the model can't see).
 
@@ -165,8 +165,9 @@ Four pages; the loop is **Overview → click a lounge or area → its page → b
 
 1. **Overview** (`/?lounge=delma` or `/?area=kalba-sharjah` preselects): the COO's question, the
    executive summary (answer, ranked arguments, *so what*, *now what*), the at-stake figures, the
-   limitations box and the **🧪 What if…?** panel (travel time, competitor coverage, worker-housing
-   share, affluence weighting, search recall, close lounges; every call recomputes). Then the map,
+   limitations box and the **🧪 What if…?** panel (worker-housing share, search recall, close lounges;
+   every call recomputes; drive time and competitor coverage stay at baseline because they don't reach
+   the scoring yet). Then the map,
    with toggles for growth areas (and SKIPs), Dubai rents, **all catchments (overlap)** and premium
    substitutes (selected lounge or every lounge); click a lounge or area for its short pyramid and
    caveats. **Compare** has a sortable **Lounges** table and a **Growth areas, ranked** table.
@@ -374,8 +375,8 @@ no longer scored.*
 7. **Lounge call** (`src/model/scorecard.py`). A composite of the demand percentile and the rent
    ratio scored on a frozen P10-P90 scale (`RENT_RATIO_P10`/`P90`), equal weights, both judging the
    site: PROTECT at `PROTECT_AT` or above, SHRINK at `SHRINK_AT` or below, HOLD between. Confidence
-   is low within 0.05 of a line, on a fallback rent, or when a ±25% weight or a third of the 81
-   assumption combinations change the call. Dropped on the way: a UAE-wide cost anchor
+   is low within 0.05 of a line, on a fallback rent, or when a ±25% weight or a third of the 3
+   worker-housing share levels change the call (the only assumption that reaches the scoring). Dropped on the way: a UAE-wide cost anchor
    (`COST_ANCHOR`: it marked down every dear Dubai site and counted served women twice) and an
    emirate-median-of-our-lounges baseline (it moved when a sibling opened or closed).
    **Cannibalisation** is a display-only what-if: close the lounge, what share of its women do
@@ -539,13 +540,14 @@ reviews, uncalibrated Huff parameters, an estimated recall correction), Google p
 coverage), the women split outside Dubai, shop rents that are asking rents or emirate medians. And we didn't trust the AI to make the calls.
 
 **What we automated.** The what-if: every call recomputes in memory, and each lounge's call is
-re-run over all 81 assumption combinations to grade confidence. The grounding check on every
+re-run at each worker-housing share level to grade confidence (drive time and coverage don't
+reach the scoring yet, affluence is off). The grounding check on every
 explanation, with a template fallback. Fetch caching: every Places and Mapbox response is cached
 in `data/raw/`, so the derived files rebuild offline without paying twice. `just labels` exports
 the calls.
 
 **What we explain.** Every call: a pyramid (answer, ranked arguments, data points), the factor
-table with unit, threshold and meaning, caveats, and how many assumption combinations flip it.
+table with unit, threshold and meaning, caveats, and at how many worker-housing share levels it flips.
 Every assumption with its source (table below), every constant with its reason (How page), and
 the limitations, ranked, first.
 
@@ -560,11 +562,12 @@ Ideas raised while building this that we haven't acted on, roughly in order of v
 
 **Features**
 
-- **Open lounges in the What-if explorer, several at once.** Today every growth area is evaluated as its own what-if (one typical lounge, net of our lounges and competitors), so the growth percentages can't be added up: neighbouring areas claim the same women (Al Dhaid and Manama). Opening several sites together in the full run would show their *combined* growth, which lounges they take customers from, and which calls move. The model already handles one new site (`what_if_open`); the work is wiring several into `run()`, the map and the tables. Measured cost: a re-run is ~2.7 s, the same as closing a lounge (confidence check ~65%, area what-ifs ~30%), or ~1 s if the explorer skips the 81-combination confidence check. About half a day; add a speed test (two openings < 4 s).
+- **Open lounges in the What-if explorer, several at once.** Today every growth area is evaluated as its own what-if (one typical lounge, net of our lounges and competitors), so the growth percentages can't be added up: neighbouring areas claim the same women (Al Dhaid and Manama). Opening several sites together in the full run would show their *combined* growth, which lounges they take customers from, and which calls move. The model already handles one new site (`what_if_open`); the work is wiring several into `run()`, the map and the tables. Measured cost: a re-run is ~2.7 s, the same as closing a lounge (confidence check ~65%, area what-ifs ~30%), or less if the explorer skips the confidence check. About half a day; add a speed test (two openings < 4 s).
 - **Choose a portfolio of sites, not a ranked list.** With the above, pick the best *set* of openings greedily (each next site judged net of the ones already chosen), instead of reading down a list whose growths overlap.
 
 **Model and data**
 
+- **Wire drive time and competitor coverage back into the served-demand model.** Today neither reaches the Huff scoring: drive time only draws the displayed catchment, and coverage changes nothing scored, so the confidence check varies worker-housing share alone (run 12 in SANITY_CHECKS). Drive time could cap the reach bands (10 min = nearest band only); coverage could scale the competitor imputation. Then restore both to the confidence check, the What-if explorer and the per-assumption tabs.
 - **Check the demand reading against real bookings.** The Huff split reads Dubai as so crowded that a typical lounge at our Dubai sites would serve about 2-5k women, against up to 23k at the best Abu Dhabi sites. Ranking within each emirate keeps that from sinking the Dubai calls, but it still sets every share of our served market and every growth figure. Even a rough ranking of lounges by bookings would confirm it or show the model is under-reading Dubai, and would calibrate the uncalibrated parameters (review exponent, distance decay, outside option).
 - **Observed rents where we only have the emirate median.** 17 of 34 GROW areas pass the rent test only because their rent is unknown (scored neutral, low confidence), mostly in Sharjah and the northern emirates. More listings or district rates there would turn those into real calls.
 - **Revenue, lease and capex data for a return test.** The brief's ROIC gate (RUBRIC OB5) can't be built from shop rent alone; with lease terms and revenue per lounge, SHRINK could mean "losing money" instead of "weak site".

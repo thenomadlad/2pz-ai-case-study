@@ -456,6 +456,14 @@ al-madam, al-batayih, ghalilah, khatt were already low (coverage or the size lin
 
 **Model issues after run 11:** F5 fixed. F6 stated, owner's call unchanged. F7 unchanged. New, explained: sharjah-sharjah's median lands on the fallback value at 15% fallback share.
 
+## Run 12 results (2026-10-11, confidence check over live axes only)
+
+- **Finding** (`src/webapp/data.at_level`): in the served-demand (Huff) model, the travel and coverage levels change no scoring input: site_served, served_women, demand_pct, composite and every lounge and area call are identical at low / medium / high (travel only changes the displayed catchment). Search recall doesn't reach the scoring either (0.4 and 0.9: no composite, site_served or call moves; it feeds capture and premium density, shown not scored). Affluence is off. Only worker share moves calls. So 78 of the 81 combinations repeated the other 3.
+- **Change (owner's option b):** `scorecard.LIVE_AXES = ("worker_share",)`, `COMBOS` 81 → 3, `FLIP_LOW` 27 → 1 (still a third). `Levels` unchanged. App: drive-time and coverage selectors and tabs removed; the "Call at 10 / 15 / 20 min" column dropped. Wiring them back is in README, Potential improvements.
+- **Confidence diff:** no call and no confidence changed (asserted against a before snapshot): 11 of 23 low before and after. khaleej-al-arabi 27/81 → 1/3 (HOLD, low); every other lounge 0.
+- **SC5:** 1 explanation regenerated offline (khaleej-al-arabi, its level_flips fact changed); `check` and `ingest` 1 / 0 failed. Note: one stray paid-API call was made by mistake (`src.explain --help` runs the API path); its cache write was reverted before the offline regeneration.
+- **SC8:** run() 4.1–4.4 s → 3.2–3.3 s (fresh processes); suite 44 s (183 passed); speed guard green.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
@@ -482,5 +490,6 @@ al-madam, al-batayih, ghalilah, khatt were already low (coverage or the size lin
 | 10 | 2026-10-11 | Labels judged within each emirate against a frozen reference of 1,123 competitor salon sites: demand percentile + rent ratio; GROW also needs rent ratio ≥ 1 and demand ≥ 50th percentile | unchanged (3/10) | BT2/BT3 partial, explained (F6: PROTECT → GROW 4/6; nad-al-sheba SKIP on the absolute 6,000 line); BT4 partial (DIP); BT1, BT5, BT6 unchanged | SC2 6/14/3/1, 32/65/464 (15 lounge calls and 17 GROW → WATCH, attributed; F7 bunching); SC4 **pass** on the frozen reference (rent ratio and reference never move; one F5 knife-edge move, 0 with the typical lounge pinned; no competitor raises a composite); SC5 pass (121 regenerated); SC8 4.1 s cold / 3.8 s warm | **none unexplained.** F5, F6, F7 explained |
 
 | 11 | 2026-10-11 | Fallback rents neutral (area half+ fallback, lounge site cell); typical lounge frozen (757, 4.6★); F6 limitation stated | unchanged (3/10) | BT2/BT3 unchanged (F6, now a stated limitation); others unchanged | SC2 6/14/3/1, 34/63/464 (manama-ajman, mudayrah-ajman WATCH → GROW; al-ain, al-falah PROTECT at low confidence); SC4 **pass** (0 moves toward SHRINK, 0 dips; F5 gone); SC5 pass (23 regenerated); SC8 4.4 s, suite 57 s | **none unexplained.** sharjah-sharjah fallback-median edge explained |
+| 12 | 2026-10-11 | Confidence check over live axes only (worker share; travel and coverage don't reach the Huff scoring) | unchanged | unchanged | Calls and confidences unchanged (11 of 23 low); khaleej-al-arabi 27/81 → 1/3; SC5 1 regenerated; run() 3.3 s | none |
 
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.

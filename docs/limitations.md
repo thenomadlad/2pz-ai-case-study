@@ -110,14 +110,16 @@ still wrong:
 The model has four assumption levels: travel time (10/15/20 min), competitor coverage (50/60/70%),
 worker-housing female share (1%/5.5%/15%) and affluence elasticity (0/0.5/1). **Affluence is off at
 baseline** (elasticity 0: every woman counts the same; why in `notebooks/features/affluence.ipynb`); it
-stays only as a what-if axis. Served demand depends on the worker-housing and affluence levels; travel
-time sets the catchments shown and which cells are growth areas.
+is not offered in the app. Served demand depends on the worker-housing and affluence levels only:
+travel time sets the catchments shown, and neither travel time nor competitor coverage reaches the
+served-demand (Huff) scoring yet (README, Potential improvements). So the confidence check and the
+app's what-if vary worker-housing share alone.
 
-- A lounge is **low confidence** when its composite is within 0.05 of a line, its call changes in a
-  third or more (27+) of the 81 level combinations, or it changes when one signal weight moves ±25%.
-  At baseline, 9 of 23 are low (2026-10-11), all within 0.05 of a line; only
-  khaleej-al-arabi flips (27 of 81), and most calls don't change in any combination.
-- The app's what-if panel switches the levels, so you can watch a lounge move.
+- A lounge is **low confidence** when its composite is within 0.05 of a line, its call changes at a
+  third or more (1+) of the 3 worker-housing share levels, or it changes when one signal weight moves
+  ±25%. At baseline, 11 of 23 are low (2026-10-11); only khaleej-al-arabi flips (1 of 3), and most
+  calls don't change at any level.
+- The app's what-if panel switches the worker-housing level, so you can watch a lounge move.
 - **Fix:** evidence on how far UAE women actually travel to a salon (a customer postcode sample
   from Bedashing's bookings would settle it).
 

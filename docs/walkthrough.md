@@ -65,8 +65,8 @@ The map draws its drive polygon, catchment cells and premium substitutes, and a 
 the legend with the short pyramid, its top drivers and the caveats. Click **Open the lounge page →**
 ([`/lounge?lounge=city-walk`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=city-walk)).
 
-**What.** City Walk, Al Wasl, Dubai. *Composite 0.15 · confidence high · the call changes in 0 of 81
-assumption combinations.* A typical lounge at its site would serve about **1,900 women** in the Huff
+**What.** City Walk, Al Wasl, Dubai. *Composite 0.15 · confidence high · the call changes at 0 of 3
+worker-housing share levels.* A typical lounge at its site would serve about **1,900 women** in the Huff
 split: **bottom 30% of Dubai salon sites on demand** (the demand score is that percentile, 0.30),
 26th percentile UAE-wide. Its shop rent, AED 4,561/m² (its DLD area's median), gives a **rent ratio
 of 0.47**: Dubai's median salon site pays under half that. That is below the rent scale's P10 (0.62),
@@ -167,7 +167,7 @@ These matter more than the calls. The full ranked list is the **How it works & l
 - **Served demand rests on lifetime Google reviews** and uncalibrated Huff parameters, so new
   lounges look weak and the split is a first cut.
 - **Calls move with assumptions.** 9 of 23 lounge calls are low confidence, all within 0.05 of a
-  line; only khaleej-al-arabi flips (27 of 81 combinations). Affluence weighting is off at baseline.
+  line; only khaleej-al-arabi flips (1 of 3 worker-housing share levels). Affluence weighting is off at baseline.
 - **Growth areas are one typical lounge at each area's centre**, judged independently, and the
   6,000 line is a first cut.
 - **Midday drive times**, and a competitor search that misses smaller salons where Google's
