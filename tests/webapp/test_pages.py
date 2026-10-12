@@ -86,7 +86,7 @@ def test_level_switch_is_fast_and_marks_explanations_as_template():
     assert at.session_state["what_if"]["levels"] == Levels(worker_share="high")
     assert any("What-if view" in w.value and "women (high)" in w.value for w in at.warning)
     assert any("numbers changed by the what-if" in c.value for c in at.caption)
-    assert any("What changed from the baseline" in m.value for m in at.markdown)
+    assert "**What changed**" in _text(at) and "Nothing yet" not in _text(at)
     at.button(key="wi-reset").click().run()
     assert not at.exception and not any("What-if view" in w.value for w in at.warning)
 
@@ -107,7 +107,7 @@ def test_closing_lounges_from_the_panel_shows_what_changed():
     at.multiselect(key="wi-closed").set_value(["al-barsha", "city-walk"]).run()
     assert not at.exception
     assert at.session_state["what_if"]["closed"] == frozenset({"al-barsha", "city-walk"})
-    assert "**city-walk**: SHRINK → closed" in _text(at)    # SHRINK under the salon-site reference (2026-10-11)
+    assert "**City Walk**: ~~SHRINK~~ → closed" in _text(at)    # SHRINK under the salon-site reference (2026-10-11)
 
 
 def test_level_selectors_show_actual_values():
@@ -301,3 +301,46 @@ def test_shop_rent_shows_as_cost_with_the_unit_assumption():
     # review I2: the area table carries the unit assumption too; I3: the mall/street caveat is shown
     assert "assumes a 150 m² unit" in _text(areas)
     assert "mixes mall and street shops" in lounge
+
+
+def test_explorer_summary_at_baseline_says_nothing_changed():
+    at = _page("predictions")
+    assert not at.exception
+    t = at.table[0].value
+    assert list(t.columns) == ["Baseline", "This scenario", "Change"]
+    assert (t["Baseline"] == t["This scenario"]).all() and (t["Change"] == "—").all()
+    assert "PROTECT lounges" in t.index and "Best GROW area: est. growth" in t.index
+    assert "Nothing yet — change an assumption, a rule or a rent below." in _text(at)
+
+
+def test_explorer_summary_with_a_quote_and_a_tighter_grow_minimum():
+    from src.models import Rules
+    at = _page("predictions", what_if={**CLOSE_TWO, "closed": frozenset(), "rules": Rules(grow_min=10_000),
+                                       "quotes": {"city-walk": 2_200.0}})
+    assert not at.exception
+    text = _text(at)
+    assert "**City Walk at AED 2,200/m² (quote)**: ~~SHRINK~~ → **HOLD** (site rent score" in text
+    assert "~~GROW~~ → **WATCH**" in text and "Nothing yet" not in text
+    t = at.table[0].value
+    assert t.loc["SHRINK lounges", "Change"] == "-1" and t.loc["GROW areas", "Change"].startswith("-")
+    assert any("GROW minimum 10,000" in w.value and "City Walk at AED 2,200/m² (quote)" in w.value for w in at.warning)
+
+
+def test_quote_and_rule_controls_flow_into_the_what_if_and_reset_clears_them():
+    from src.models import Rules
+    at = _page("predictions")
+    at.selectbox(key="wi-q-site").set_value("city-walk").run()
+    assert at.number_input(key="wi-q-rent").value == 4_600          # starts at the data's rent (4,561)
+    at.number_input(key="wi-q-rent").set_value(2_200).run()
+    at.button(key="wi-q-add").click().run()
+    assert at.session_state["what_if"]["quotes"] == {"city-walk": 2_200.0}
+    at.number_input(key="wi-growmin").set_value(10_000).run()
+    assert at.session_state["what_if"]["rules"] == Rules(grow_min=10_000)
+    at.slider(key="wi-shrink").set_value(0.7).run()                 # above the PROTECT line: refused
+    assert any("SHRINK line" in e.value for e in at.error)
+    assert at.session_state["what_if"]["rules"] == Rules(grow_min=10_000)
+    at.button(key="wi-q-rm-city-walk").click().run()
+    assert at.session_state["what_if"]["quotes"] == {}
+    at.button(key="wi-reset").click().run()
+    assert not at.exception and at.session_state["what_if"]["rules"] == Rules()
+    assert not any("What-if view" in w.value for w in at.warning)

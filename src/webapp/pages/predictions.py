@@ -18,7 +18,7 @@ from src.webapp.map import (
     view_at,
 )
 from src.webapp.pages.area import _check
-from src.webapp.scenario_editor import render_panel
+from src.webapp.scenario_editor import render_panel, render_summary
 from src.webapp.views import (
     area_caveats,
     badge,
@@ -30,8 +30,6 @@ from src.webapp.views import (
     render_pyramid,
     short,
 )
-
-WEIGHTS = {s.name: s.weight for s in scorecard.SIGNALS}
 
 
 def _selection(map_state) -> tuple[str | None, str | None]:
@@ -87,7 +85,7 @@ def _legend(r, lounge: str | None, show_overlap: bool = False,
     with st.expander(LEGEND_TITLE):
         lounges, areas = st.columns(2)
         with lounges:
-            _lounge_legend()
+            _lounge_legend(r.rules)
         with areas:
             _area_legend(r)
     if show_overlap:
@@ -104,15 +102,16 @@ def _legend(r, lounge: str | None, show_overlap: bool = False,
         st.caption("Click a lounge for its catchment, or an area for its call.")
 
 
-def _lounge_legend() -> None:
+def _lounge_legend(rules) -> None:
     st.markdown("**Lounges** (pin in the call's colour)")
-    st.markdown(f"🟢 **PROTECT**: composite ≥ {scorecard.PROTECT_AT}  \n"
-                f"🟠 **HOLD**: between {scorecard.SHRINK_AT} and {scorecard.PROTECT_AT}  \n"
-                f"🔴 **SHRINK**: composite ≤ {scorecard.SHRINK_AT}  \n"
+    st.markdown(f"🟢 **PROTECT**: composite ≥ {rules.protect_at:g}  \n"
+                f"🟠 **HOLD**: between {rules.shrink_at:g} and {rules.protect_at:g}  \n"
+                f"🔴 **SHRINK**: composite ≤ {rules.shrink_at:g}  \n"
                 "⚪ **NOT SCORED**: the airport lounge  \n"
                 "◯ **Hollow** = low confidence")
     st.caption("Composite: site demand (share of its emirate's competitor salon sites a typical lounge there would out-serve) "
-               "and site rent (its emirate's median salon-site rent ÷ its own), weight 1 each, each "
+               f"and site rent (its emirate's median salon-site rent ÷ its own), weighted {rules.demand_weight:.0%} / "
+               f"{1 - rules.demand_weight:.0%}, each "
                f"0-1 on a fixed scale against a frozen reference; review share, rating and shared catchment are shown, not scored. Low confidence: within {scorecard.LOW_MARGIN} of a line, the call changes in "
                f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations, or it changes when a "
                "signal weight moves ±25%.")
@@ -120,8 +119,8 @@ def _lounge_legend() -> None:
 
 def _area_legend(r) -> None:
     st.markdown("**Areas** (every named place; colour, not checkboxes, says what each is)")
-    st.markdown(f"🟦 **GROW**: a typical new lounge here would add ≥ {growth.NEW_SITE_MIN:,} net new women, "
-                f"worker housing under {growth.WORKER_CAP:.0%}, out-serving {growth.DEMAND_PCT_MIN:.0%}+ of its emirate's "
+    st.markdown(f"🟦 **GROW**: a typical new lounge here would add ≥ {r.rules.grow_min:,} net new women, "
+                f"worker housing under {growth.WORKER_CAP:.0%}, out-serving {r.rules.demand_pct_min:.0%}+ of its emirate's "
                 "salon sites *and* rent no dearer than their median (or unknown)  \n"
                 f"🟩 **Already captured**: our lounges serve {CAPTURED_MIN:.0%}+ of its women (model estimate); "
                 f"deeper green = more, deepest at {CAPTURED_FULL:.0%}+  \n"
@@ -145,8 +144,9 @@ def _lounge_panel(r, b: str) -> None:
     with left:
         render_pyramid(exp)
         if d.key_drivers:
+            weights = scorecard.weights(r.rules)
             st.markdown("**Top drivers:** " + " · ".join(
-                f"{n} {d.scores[n]:.2f} (weight {WEIGHTS[n]:g})" for n in d.key_drivers))
+                f"{n} {d.scores[n]:.2f} (weight {weights[n]:g})" for n in d.key_drivers))
             st.caption("The signals furthest from neutral, each scored 0-1 (1 = good for the lounge).")
         if d.action != "NOT SCORED":
             st.markdown(performance_line(f))
@@ -173,8 +173,8 @@ def _area_panel(r, area_id: str) -> None:
     with left:
         render_pyramid(exp)
         st.markdown(f"**The tests:** {_check(d.big_enough)} big enough ({a.new_site_net or 0:,.0f} net new "
-                    f"women, line {growth.NEW_SITE_MIN:,}) · "
-                    f"{_check(a.demand_pct is None or a.demand_pct >= growth.DEMAND_PCT_MIN)} "
+                    f"women, line {r.rules.grow_min:,}) · "
+                    f"{_check(a.demand_pct is None or a.demand_pct >= r.rules.demand_pct_min)} "
                     f"{growth.demand_text(a.demand_ref, a.demand_pct, a.demand_pct_uae, a.emirate)} · "
                     f"{_check(growth.rent_ok(a))} "
                     f"{growth.rent_text(a.rent_ratio, a.rent_pct_uae, a.emirate, growth.rent_fallback(a))} · {_check(a.data_coverage >= growth.MIN_COVERAGE)} searched ({a.data_coverage:.0%} of women)")
@@ -187,9 +187,10 @@ def render() -> None:
     st.title("What-if explorer")
     banner()
     r = data.current()
-    st.caption("Change the model's assumptions or close lounges and watch the calls move, then click a lounge or "
-               "an area on the map. **Only this page changes:** the Executive Summary, Lounges and Areas pages "
-               "always show the baseline. Every number is the model's estimate.")
+    st.caption("Change the model's assumptions, your decision rules or a site's rent, or close lounges, and watch "
+               "the calls move; then click a lounge or an area on the map. **Only this page changes:** the "
+               "Executive Summary, Lounges and Areas pages always show the baseline. Every number is the model's estimate.")
+    render_summary()
     render_panel()
     st.markdown("##### The map: click a lounge or an area")
     city = st.pills("Jump to", list(CITIES), default="UAE", key="map-city") or "UAE"

@@ -10,7 +10,7 @@ from src import explain
 from src.baseline import Run
 from src.config import settings
 from src.model import growth, scorecard
-from src.models import Area, AreaDecision, Decision, Explanation, Levels, LoungeFeatures
+from src.models import Area, AreaDecision, Decision, Explanation, Levels, LoungeFeatures, Rules
 from src.webapp import data
 
 BADGE_COLORS = {"PROTECT": "green", "HOLD": "orange", "SHRINK": "red", "NOT SCORED": "gray",
@@ -43,7 +43,38 @@ def what_if_summary() -> str:
         parts.append(f"search recall {w['recall']:.2f}")
     if w["closed"]:
         parts.append("closed: " + ", ".join(sorted(w["closed"])))
+    parts += rules_summary(w["rules"])
+    parts += [quote_label(sid, q) for sid, q in sorted(w["quotes"].items())]
     return "; ".join(parts)
+
+
+def rules_summary(r: Rules) -> list[str]:
+    """The decision rules that differ from the baseline's, in words."""
+    base, out = Rules(), []
+    if r.demand_weight != base.demand_weight:
+        out.append(f"demand weight {r.demand_weight:.0%} (rent {1 - r.demand_weight:.0%})")
+    if r.protect_at != base.protect_at:
+        out.append(f"PROTECT line {r.protect_at:.2f}")
+    if r.shrink_at != base.shrink_at:
+        out.append(f"SHRINK line {r.shrink_at:.2f}")
+    if r.grow_min != base.grow_min:
+        out.append(f"GROW minimum {r.grow_min:,} net new women")
+    if r.demand_pct_min != base.demand_pct_min:
+        out.append(f"GROW demand line {r.demand_pct_min:.0%}")
+    return out
+
+
+def site_name(sid: str) -> str:
+    """A lounge's short name or an area's name, for any site id a what-if can name."""
+    lo = next((lo for lo in data.v3().lounges if lo.branch_id == sid), None)
+    if lo:
+        return short(lo.title, sid)
+    a = next((a for get in (data.baseline, data.current) for a in get().areas if a.area_id == sid), None)
+    return a.name if a else sid
+
+
+def quote_label(sid: str, rent: float) -> str:
+    return f"{site_name(sid)} at AED {rent:,.0f}/m² (quote)"
 
 
 def banner() -> None:

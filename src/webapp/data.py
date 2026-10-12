@@ -15,7 +15,7 @@ from src.config import REPO_ROOT, load_baseline_assumptions
 from src.data_v3 import V3, load_v3
 from src.features.lounges import NOT_SCORED
 from src.market import women_15plus
-from src.models import BaselineAssumptions, Levels
+from src.models import BaselineAssumptions, Levels, Rules
 
 BASELINE_YAML = REPO_ROOT / "data" / "scenarios" / "baseline.yaml"
 
@@ -29,22 +29,32 @@ def v3() -> V3:
     return load_v3()
 
 
+def empty_what_if() -> dict:
+    return {"levels": Levels(), "closed": frozenset(), "recall": None, "rules": Rules(), "quotes": {}}
+
+
 def what_if() -> dict:
-    """{"levels": Levels, "closed": frozenset, "recall": float | None (None = baseline)}."""
-    w = st.session_state.setdefault("what_if", {"levels": Levels(), "closed": frozenset(), "recall": None})
-    if type(w["levels"]) is not Levels:   # a dev hot-reload re-imported src.models: rebuild from the old instance
-        w["levels"] = Levels(**dataclasses.asdict(w["levels"]))
+    """{"levels": Levels, "closed": frozenset, "recall": float | None (None = baseline), "rules": Rules,
+    "quotes": {site id: AED/m²/yr}}."""
+    w = st.session_state.setdefault("what_if", empty_what_if())
+    for k, v in empty_what_if().items():
+        w.setdefault(k, v)
+    for k, cls in (("levels", Levels), ("rules", Rules)):
+        if type(w[k]) is not cls:   # a dev hot-reload re-imported src.models: rebuild from the old instance
+            w[k] = cls(**dataclasses.asdict(w[k]))
     return w
 
 
 def active() -> bool:
     w = what_if()
-    return w["levels"] != Levels() or bool(w["closed"]) or w["recall"] is not None
+    return (w["levels"] != Levels() or bool(w["closed"]) or w["recall"] is not None
+            or w["rules"] != Rules() or bool(w["quotes"]))
 
 
 @lru_cache(maxsize=64)
-def _run(levels: Levels, closed: frozenset[str], recall: float | None) -> Run:
-    return run(levels, closed, recall)     # run() deep-copies; keep one copy per what-if
+def _run(levels: Levels, closed: frozenset[str], recall: float | None, rules: Rules = Rules(),  # noqa: B008
+         quotes: tuple = ()) -> Run:
+    return run(levels, closed, recall, rules, dict(quotes))     # run() deep-copies; keep one copy per what-if
 
 
 def baseline() -> Run:
@@ -55,7 +65,7 @@ def baseline() -> Run:
 def current() -> Run:
     """The What-if explorer's run for the current what-if: the same object for the same what-if, so treat it as read-only."""
     w = what_if()
-    return _run(w["levels"], w["closed"], w["recall"])
+    return _run(w["levels"], w["closed"], w["recall"], w["rules"], tuple(sorted(w["quotes"].items())))
 
 
 _SUBJECTS: dict[int, tuple[Run, dict]] = {}
