@@ -464,6 +464,15 @@ al-madam, al-batayih, ghalilah, khatt were already low (coverage or the size lin
 - **SC5:** 1 explanation regenerated offline (khaleej-al-arabi, its level_flips fact changed); `check` and `ingest` 1 / 0 failed. Note: one stray paid-API call was made by mistake (`src.explain --help` runs the API path); its cache write was reverted before the offline regeneration.
 - **SC8:** run() 4.1–4.4 s → 3.2–3.3 s (fresh processes); suite 44 s (183 passed); speed guard green.
 
+## Run 13 results (2026-10-11, drive time and coverage wired into the Huff split; UI changes)
+
+Lean run: SC2, SC4, SC5, SC8. Back-tests not re-run (the calls didn't change, so BT2-BT6 carry over from run 11).
+
+- **SC2:** calls unchanged: lounges 6 / 14 / 3 / 1, areas 34 / 63 / 464. Confidence over 27 combinations again (run 12: 3): **12 of 23 low** (run 12: 11). New: jumeirah-park, whose call changes in 9 of 27 (a third). Flips now: khaleej-al-arabi 16, khalifa-city-a 15, al-jada 12, nine lounges at 6-9.
+- **SC4 (close a sibling, 23 closures): PASS, 0 violations.** 0 moves toward SHRINK and 0 composite dips in any other lounge. The same four moves *up* as run 11, by design: westyas SHRINK → HOLD when al-falah, khalifa-city-a or shahama closes (0.348 → 0.351-0.358), al-jada SHRINK → HOLD when zawaya-walk closes (0.338 → 0.363). Not re-run: +50% women and rival next door (no change to those paths).
+- **SC5:** 15 explanations regenerated offline (14 lounges + the UAE summary; the others' fact sheets were unchanged); `check` and `ingest` 15 / 0 failed; the 3 stale-explanation xfails removed and passing. Note: `python -m src.explain --help` again ran the paid-API path (any unknown argument does) before it was killed; its 12 API-written cache entries were reverted and every committed entry is offline-written. The CLI should refuse unknown arguments.
+- **SC8:** run() 4.5 s cold (fresh process); 23 closures 73 s (~3.2 s each, every closure re-runs the 27-combination confidence check); suite 147 s (184 passed, 0 xfailed; run 12: 44 s, the 27-combination confidence check is back in every run).
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
@@ -491,5 +500,6 @@ al-madam, al-batayih, ghalilah, khatt were already low (coverage or the size lin
 
 | 11 | 2026-10-11 | Fallback rents neutral (area half+ fallback, lounge site cell); typical lounge frozen (757, 4.6★); F6 limitation stated | unchanged (3/10) | BT2/BT3 unchanged (F6, now a stated limitation); others unchanged | SC2 6/14/3/1, 34/63/464 (manama-ajman, mudayrah-ajman WATCH → GROW; al-ain, al-falah PROTECT at low confidence); SC4 **pass** (0 moves toward SHRINK, 0 dips; F5 gone); SC5 pass (23 regenerated); SC8 4.4 s, suite 57 s | **none unexplained.** sharjah-sharjah fallback-median edge explained |
 | 12 | 2026-10-11 | Confidence check over live axes only (worker share; travel and coverage don't reach the Huff scoring) | unchanged | unchanged | Calls and confidences unchanged (11 of 23 low); khaleej-al-arabi 27/81 → 1/3; SC5 1 regenerated; run() 3.3 s | none |
+| 13 | 2026-10-11 | Drive time and coverage wired into the Huff split (confidence over 27 combinations again); UI: Executive Summary, What-if explorer, table pickers, factor tree | unchanged | not re-run (calls unchanged) | Calls 6/14/3/1, 34/63/464 unchanged; 12 of 23 low (jumeirah-park new, 9/27); SC4 **pass** (0 moves toward SHRINK, 0 dips); SC5 15 regenerated offline; run() 4.5 s cold, suite 147 s | none |
 
 *Not yet automated:* the checks are run by hand or by agents for now. Scripting BT2–BT5 and SC2–SC4 (as `just sanity`) belongs with the OB3 model work, since BT1 and SC6 only become meaningful after it.
