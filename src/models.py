@@ -143,8 +143,11 @@ class LoungeFeatures(BaseModel):
     site_cost_k: float | None = None             # annual site cost, AED 1k: rent x unit + amortised fit-out (assumed)
     site_served: float | None = None             # women a typical lounge would serve at this site, this lounge closed (demand signal)
     performance_vs_site: float | None = None     # served_women / site_served: context, not scored
-    served_per_cost: float | None = None         # site-served women per AED 1k of annual site cost
-    cost_index: float | None = None              # served_per_cost / COST_ANCHOR (UAE-wide, frozen; 1 = typical)
+    demand_ref: str = ""                         # whose salon sites demand_pct ranks against: the emirate, or "UAE" (under 50)
+    demand_pct: float | None = None              # share of those reference salon sites this site out-serves (0..1)
+    demand_pct_uae: float | None = None          # ... of all UAE reference salon sites (context)
+    rent_ratio: float | None = None              # emirate median shop rent at its salon sites / this site's (>1 = cheaper)
+    rent_pct_uae: float | None = None            # share of UAE reference salon sites with a lower shop rent (context)
     site_rent_m2: float | None = None            # shop rent at the lounge's site, AED/m2/yr: our cost (display only)
     site_rent_source: str = "none"               # dld | adrec | listings | emirate_median | none
     catchment_shop_rent_m2: float | None = None  # women-weighted median over catchment cells with one
@@ -178,8 +181,11 @@ class Area(BaseModel):
     new_site_taken: float | None = None          # ... of which taken from our existing lounges
     new_site_net: float | None = None            # ... net new to the network (served - taken)
     site_cost_k: float | None = None             # annual site cost here, AED 1k (rent x unit + fit-out)
-    served_per_cost: float | None = None         # net new women per AED 1k of annual site cost
-    cost_index: float | None = None              # served_per_cost / COST_ANCHOR (UAE-wide, frozen; 1 = typical)
+    demand_ref: str = ""                         # whose salon sites demand_pct ranks against: the emirate, or "UAE" (under 50)
+    demand_pct: float | None = None              # share of those reference salon sites new_site_served out-serves (0..1)
+    demand_pct_uae: float | None = None          # ... of all UAE reference salon sites (context)
+    rent_ratio: float | None = None              # emirate median shop rent at its salon sites / this site's (>1 = cheaper)
+    rent_pct_uae: float | None = None            # share of UAE reference salon sites with a lower shop rent (context)
     shop_rent_m2: float | None = None            # women-weighted median shop rent over the area's cells
     shop_rent_coverage: float = 0.0
     women_per_rent_k: float | None = None        # addressable women per AED 1,000 of annual rent there

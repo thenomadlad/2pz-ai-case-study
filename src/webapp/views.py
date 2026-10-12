@@ -189,7 +189,7 @@ def limitations_box(r: Run) -> None:
             "1. **No revenue or lease data in the model.** Site cost is shop rent x an assumed 150 m² unit "
             "plus an assumed fit-out (AED 3,000/m² over 5 years); the rent is an area median, a district "
             "rate or an asking rent, not the lease. No revenue, lease terms, actual capex or footfall: it "
-            "scores served demand and cost efficiency only. SHRINK means *investigate*, not *close*; a "
+            "scores site demand and site rent only. SHRINK means *investigate*, not *close*; a "
             "SHRINK lounge can be profitable and a PROTECT one unprofitable.\n"
             "2. **Served demand leans on lifetime Google reviews.** Each salon's pull in the Huff split is "
             "its review count, so older salons look bigger. The call therefore scores the *site* (what a "
@@ -199,8 +199,10 @@ def limitations_box(r: Run) -> None:
             "Abu Dhabi: ADREC 2025 district street-retail rates, read by hand off its public map; northern "
             "emirates: Property Finder / Bayut asking rents scraped via third-party Apify actors (a grey area "
             "under those portals' terms; asking rents run above achieved ones); gaps take the "
-            "emirate median. The cost index compares every site with one frozen UAE-wide anchor (the median "
-            "lounge site at baseline), so dear Dubai sites score low on cost. "
+            "emirate median. Both signals rank a site within its emirate's frozen market of competitor salon "
+            "sites (demand: share of them it out-serves; rent: their median ÷ its own), so a dear Dubai site is "
+            "judged against Dubai salon sites, not Fujairah ones. Emirates with under 50 reference sites (Ajman, "
+            "Ras Al Khaimah, Fujairah, Umm Al Quwain) rank demand UAE-wide. "
             "Affluence weighting is off: every woman counts the same.\n"
             f"4. **The calls depend on the assumptions.** Right now **{low} of {len(scored)}** scored "
             "lounges are low confidence: near a threshold, a call "
@@ -243,6 +245,8 @@ def lounge_caveats(f: LoungeFeatures, d: Decision, flips: int | None) -> list[st
                    f"confidence from {scorecard.FLIP_LOW}).")
     if f.affluence_coverage < AFFLUENCE_KNOWN:
         out.append(affluence_caveat(f.affluence_coverage))
+    if f.demand_ref == "UAE":
+        out.append(f"{f.emirate} has under 50 reference salon sites: its demand is ranked against all UAE salon sites.")
     if f.review_count < FEW_REVIEWS:
         out.append(f"Only {f.review_count:,} lifetime Google reviews. Capture uses lifetime reviews, "
                    "so a newer lounge looks weaker than it is.")

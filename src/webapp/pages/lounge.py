@@ -5,7 +5,7 @@ import streamlit as st
 
 from src import explain
 from src.features.lounges import NOT_SCORED, substitutes
-from src.model import scorecard
+from src.model import growth, scorecard
 from src.webapp import data, nav
 from src.webapp.map import (
     build_deck,
@@ -37,12 +37,15 @@ def _signals(f, d) -> None:
     st.markdown("##### The two signals, on fixed scales")
     st.caption("Each signal scores 0 (worst) to 1 (best for the lounge); the composite is their "
                "weighted average. Capture, rating and shared catchment are shown below, not scored.")
+    words = {"demand": growth.demand_text(f.demand_ref, f.demand_pct, f.demand_pct_uae, f.emirate).capitalize(),
+             "cost": growth.rent_text(f.rent_ratio, f.rent_pct_uae, f.emirate).capitalize()}
     for s in scorecard.SIGNALS:
         score = d.scores[s.name]
         st.progress(score, text=f"**{s.label}:** {val(s.field, getattr(f, s.field))} → score "
                                 f"{score:.2f} (weight {s.weight:g})")
         note = " Missing: scored neutral." if getattr(f, s.field) is None else ""
         st.caption(f"Scale: {val(s.field, s.worst)} → 0, {val(s.field, s.best)} → 1. {s.why}{note}")
+        st.markdown(words[s.name])
     nd = explain.composite_digits(min(abs(d.composite - scorecard.PROTECT_AT), abs(d.composite - scorecard.SHRINK_AT)))
     verdict = (f"Composite **{d.composite:.{nd}f}** → **{d.action}** (PROTECT at {scorecard.PROTECT_AT} "
                f"or more, SHRINK at {scorecard.SHRINK_AT} or less). Confidence: {d.confidence}.")

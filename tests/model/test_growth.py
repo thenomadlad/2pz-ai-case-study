@@ -2,8 +2,10 @@ import pytest
 
 from src.features.lounges import build
 from src.model.growth import (
+    DEMAND_PCT_MIN,
     MIN_COVERAGE,
     NEW_SITE_MIN,
+    RENT_RATIO_MIN,
     SKIP_UNDER_WOMEN,
     UNSATURATED_PER_1K,
     WORKER_CAP,
@@ -14,25 +16,30 @@ from tests.features.test_lounges import ASSUMPTIONS, C1, C2, _cell, _lounge, _sa
 
 
 # Served-demand model 2026-10-11: an area's call comes from the open-a-lounge what-if (net new women
-# >= NEW_SITE_MIN) and its cost index, not from the size and saturation tests; those tests are gone.
-def _a(women=50_000.0, worker=0.1, per_1k=0.0, coverage=1.0, net=10_000.0, cost=None):
+# >= NEW_SITE_MIN), its demand percentile and rent ratio against the frozen salon-site reference.
+def _a(women=50_000.0, worker=0.1, per_1k=0.0, coverage=1.0, net=10_000.0, rent=None, demand=None, ref="Dubai"):
     return Area(area_id="x", name="X", emirate="Dubai", lat=25, lng=55, women=women, addressable_women=women,
                 affluence_rent=None, affluence_coverage=0.0, cells=3,
                 worker_share=worker, premium_salons=None if per_1k is None else 1,
                 premium_reviews_per_1k=per_1k, full_circle_share=None if per_1k is None else 0.5,
                 data_coverage=0.0 if per_1k is None else coverage, cell_ids=["r0c0"],
-                nearest_lounge_id="al-barsha", nearest_lounge_km=12.3, new_site_net=net, cost_index=cost)
+                nearest_lounge_id="al-barsha", nearest_lounge_km=12.3, new_site_net=net, rent_ratio=rent,
+                demand_pct=demand, demand_pct_uae=demand, rent_pct_uae=None if rent is None else 0.5, demand_ref=ref)
 
 
 def test_constants():
     assert (SKIP_UNDER_WOMEN, WORKER_CAP, MIN_COVERAGE, NEW_SITE_MIN) == (5_000, 0.5, 0.5, 6_000)
 
 
-def test_grow_watch_skip_on_net_new_women_and_cost():
+def test_grow_watch_skip_on_net_new_women_rent_and_demand():
     assert classify(_a(net=NEW_SITE_MIN)).action == "GROW"
-    assert classify(_a(net=NEW_SITE_MIN, cost=1.0)).action == "GROW"
-    d = classify(_a(net=NEW_SITE_MIN, cost=0.99))
-    assert d.action == "WATCH" and "dearer" in d.rationale
+    d = classify(_a(net=NEW_SITE_MIN, rent=RENT_RATIO_MIN, demand=DEMAND_PCT_MIN))
+    assert d.action == "GROW" and "top 50% of Dubai salon sites on demand" in d.rationale
+    d = classify(_a(net=NEW_SITE_MIN, rent=0.99, demand=0.9))
+    assert d.action == "WATCH" and "dearer" in d.rationale and "weaker" not in d.rationale
+    d = classify(_a(net=NEW_SITE_MIN, rent=1.2, demand=0.49))
+    assert d.action == "WATCH" and "weaker demand" in d.rationale and "dearer" not in d.rationale
+    assert "UAE-wide" in d.rationale                                       # the UAE context, always
     assert classify(_a(net=NEW_SITE_MIN - 1)).action == "WATCH"           # half a lounge or more
     assert classify(_a(net=NEW_SITE_MIN / 2 - 1)).action == "SKIP"
     assert classify(_a(women=SKIP_UNDER_WOMEN - 1, net=50_000)).action == "SKIP"
@@ -44,9 +51,15 @@ def test_worker_housing_caps_at_watch():
     assert classify(_a(worker=WORKER_CAP - 0.01)).action == "GROW"
 
 
-def test_unknown_cost_is_a_caveat_not_a_block():
-    d = classify(_a(cost=None))
-    assert d.action == "GROW" and any("cost efficiency unknown" in c for c in d.caveats)
+def test_unknown_rent_is_a_caveat_not_a_block():
+    d = classify(_a(rent=None, demand=0.8))
+    assert d.action == "GROW" and any("rent unknown" in c for c in d.caveats)
+
+
+def test_small_emirates_rank_demand_uae_wide_and_say_so():
+    d = classify(_a(rent=1.1, demand=0.8, ref="UAE").model_copy(update={"emirate": "Fujairah"}))
+    assert "UAE salon sites (Fujairah has under 50)" in d.rationale
+    assert any("ranked UAE-wide" in c for c in d.caveats)
 
 
 def test_low_coverage_is_low_confidence_with_a_caveat():

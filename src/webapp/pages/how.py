@@ -5,7 +5,7 @@ import re
 import streamlit as st
 
 from src.config import REPO_ROOT
-from src.features.lounges import COST_ANCHOR, COST_ANCHOR_WHY, NOT_SCORED, NOT_SCORED_WHY
+from src.features.lounges import MIN_REF_SITES, NOT_SCORED, NOT_SCORED_WHY, SITE_REFERENCE_WHY, site_reference
 from src.market import AFFLUENCE_CLIP, AFFLUENCE_CLIP_WHY
 from src.model import growth, scorecard
 from src.webapp import data
@@ -78,14 +78,17 @@ def render() -> None:
         {"Constant": "FLIP_LOW_SHARE", "Value": f"a third: {scorecard.FLIP_LOW} of {scorecard.COMBOS}",
          "Why": scorecard.FLIP_WHY},
         {"Constant": "NEUTRAL", "Value": f"{scorecard.NEUTRAL}",
-         "Why": "A missing signal value (e.g. no cost index) scores neutral, never the worst."},
+         "Why": "A missing signal value (e.g. no shop rent) scores neutral, never the worst."},
         {"Constant": "WEIGHT_STEPS", "Value": " / ".join(f"×{x:g}" for x in scorecard.WEIGHT_STEPS),
          "Why": scorecard.WEIGHT_WHY},
         {"Constant": "LOW_MARGIN / HIGH_MARGIN",
          "Value": f"low within {scorecard.LOW_MARGIN} of a line; high from {scorecard.HIGH_MARGIN}",
          "Why": f"Low also when the call flips {scorecard.FLIP_LOW}+ times or a signal weight ±25% changes it."},
-        {"Constant": "COST_ANCHOR (src/features/lounges.py)", "Value": f"{COST_ANCHOR:g} women per AED 1k",
-         "Why": COST_ANCHOR_WHY},
+        {"Constant": "Site reference (src/features/lounges.py)",
+         "Value": " · ".join(f"{e}: {n}" for e, n in site_reference().emirate.value_counts().items())
+         + f" salon sites; under {MIN_REF_SITES}: demand ranked UAE-wide", "Why": SITE_REFERENCE_WHY},
+        {"Constant": "RENT_RATIO_P10 / P90", "Value": f"{scorecard.RENT_RATIO_P10:g} / {scorecard.RENT_RATIO_P90:g}",
+         "Why": scorecard.RENT_RATIO_WHY},
         {"Constant": "performance_vs_site", "Value": "served women ÷ site served",
          "Why": "Context, not scored: 'The model estimates this lounge is performing 2.7x compared to its site' "
                 "(khalifa-city-a at baseline). The call scores the site; this says how the lounge does on it, "

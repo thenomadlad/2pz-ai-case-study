@@ -95,7 +95,7 @@ def test_closing_lounges_from_the_panel_shows_what_changed():
     at.multiselect(key="wi-closed").set_value(["al-barsha", "city-walk"]).run()
     assert not at.exception
     assert at.session_state["what_if"]["closed"] == frozenset({"al-barsha", "city-walk"})
-    assert "**al-barsha**: SHRINK → closed" in _text(at)    # SHRINK since the served-demand model (2026-10-11)
+    assert "**city-walk**: SHRINK → closed" in _text(at)    # SHRINK under the salon-site reference (2026-10-11)
 
 
 def test_level_selectors_show_actual_values():
@@ -108,8 +108,8 @@ def test_level_selectors_show_actual_values():
 
 
 def test_lounge_page_shows_caveats_beside_the_call():
-    # site-scored model 2026-10-11: mirdif-35 is a HOLD within 0.05 of the SHRINK line
-    at = _page("lounge", lounge="mirdif-35")
+    # salon-site reference 2026-10-11: al-barsha is a HOLD within 0.05 of the SHRINK line
+    at = _page("lounge", lounge="al-barsha")
     assert not at.exception
     caveats = next(w.value for w in at.warning if "Caveats for this lounge" in w.value)
     assert "Confidence: low" in caveats

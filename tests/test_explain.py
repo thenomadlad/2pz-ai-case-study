@@ -8,21 +8,22 @@ from src import explain
 from src.models import Explanation
 from src.models import Evidence, Reason
 
-# A HOLD lounge (served-demand model 2026-10-11: two scored signals, demand and cost). Weighted
+# A HOLD lounge (two scored signals against the frozen salon-site reference: demand and rent). Weighted
 # distance of each score from neutral (0.5): demand 0.22, cost 0.17 -> both are arguments, in that order.
 FACTS = {"catchment_women": 42648, "addressable_women": 56864, "affluence_rent": 75000.0,
          "affluence_coverage": 1.0, "catchment_cells": 3, "shared_share": 0.334,
          "premium_pool": 69, "substitutes_k": 12, "capture": 0.0, "thin_premium_market": False,
          "lounge_rating": 4.7, "lounge_reviews": 396, "served_women": 5686, "site_served": 5686.0, "performance_vs_site": 1.0,
-         "cost_index": 1.164, "served_per_cost": 15.9, "site_cost_k": 357.6, "site_rent_m2": 1784.0,
+         "demand_pct": 0.2843, "demand_pct_uae": 0.41, "demand_ref": "Dubai", "rent_ratio": 1.159,
+         "rent_pct_uae": 0.62, "site_cost_k": 357.6, "site_rent_m2": 1784.0,
          "composite": 0.41, "score_demand": 0.2843, "score_cost": 0.666}
 TOPICS = ["demand", "cost"]
 EVIDENCE = {
     "demand": [("addressable_women", 56864), ("catchment_women", 42648)],
-    "cost": [("cost_index", 1.164), ("site_rent_m2", 1784.0)],
+    "cost": [("rent_ratio", 1.159), ("site_rent_m2", 1784.0)],
 }
 CLAIMS = {"demand": "About 42,600 women live within a 15-min drive.",
-          "cost": "Cost efficiency is 1.16 times the typical lounge site, at a shop rent of 1,784 AED per square metre."}
+          "cost": "Rent ratio 1.16 against the median Dubai salon site, at a shop rent of 1,784 AED per square metre."}
 SO_WHAT = ("The model estimates this lounge is performing 1.0x compared to its site (context, not scored). "
            "About 42,600 women live in reach, and 33% of them are shared with a sibling.")
 NOW_WHAT = "No portfolio action this cycle; revisit at the next lease event."
@@ -63,10 +64,10 @@ def test_prioritize_always_gives_at_least_two_arguments():
 
 
 def test_prioritize_area_cases():
-    base = {"women": 60_000, "skip_under_women": 10_000, "cost_index": 1.4,
+    base = {"women": 60_000, "skip_under_women": 10_000, "rent_ratio": 1.4, "demand_pct": 0.7,
             "worker_share": 0.1, "worker_cap": 0.5, "data_coverage": 0.9, "min_coverage": 0.5}
-    assert explain.prioritize("area", base, "GROW") == ["size", "cost", "reach"]
-    assert explain.prioritize("area", {**base, "cost_index": None}, "GROW") == ["size", "reach"]
+    assert explain.prioritize("area", base, "GROW") == ["size", "demand", "cost", "reach"]
+    assert explain.prioritize("area", {**base, "rent_ratio": None}, "GROW") == ["size", "demand", "reach"]
     assert explain.prioritize("area", {**base, "worker_share": 0.6}, "WATCH")[-1] == "worker_housing"
     assert explain.prioritize("area", {**base, "data_coverage": 0.2}, "WATCH")[-1] == "data_gap"
     assert explain.prioritize("area", {**base, "women": 5_000}, "SKIP") == ["size", "reach"]
@@ -102,9 +103,9 @@ def test_verify_bounds_data_points_and_requires_own_topic():
 
 
 def test_verify_rejects_wrong_value_unknown_field_and_invented_number():
-    bad = {**EVIDENCE, "cost": [("cost_index", 1.5), ("site_rent_m2", 1784.0)]}
-    assert any("cost_index" in e for e in explain.verify(_exp(evidence=bad), FACTS, "lounge"))
-    unknown = {**EVIDENCE, "cost": [("revenue", 1), ("cost_index", 1.164)]}
+    bad = {**EVIDENCE, "cost": [("rent_ratio", 1.5), ("site_rent_m2", 1784.0)]}
+    assert any("rent_ratio" in e for e in explain.verify(_exp(evidence=bad), FACTS, "lounge"))
+    unknown = {**EVIDENCE, "cost": [("revenue", 1), ("rent_ratio", 1.159)]}
     assert any("unknown field" in e
                for e in explain.verify(_exp(evidence=unknown), FACTS, "lounge"))
     invented = {**CLAIMS, "demand": "Revenue fell 23% last year."}
@@ -316,7 +317,10 @@ def test_area_gaps_agree_with_the_tests():
             continue
         assert (f["size_gap"] >= 0 and f["worker_gap"] > 0) == f["big_enough"], sid
         if action == "GROW":
-            assert f["big_enough"] and (f["cost_gap"] is None or f["cost_gap"] >= 0), sid
+            assert f["big_enough"] and (f["rent_gap"] is None or f["rent_gap"] >= 0), sid
+            assert f["demand_gap"] is None or f["demand_gap"] >= 0, sid
+        elif action == "WATCH" and f["big_enough"]:
+            assert (f["rent_gap"] or 0) < 0 or (f["demand_gap"] or 0) < 0, sid
         if f["unsaturated"] is not None:
             assert (f["saturation_gap"] > 0) == f["unsaturated"], sid
 

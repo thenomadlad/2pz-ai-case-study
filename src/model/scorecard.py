@@ -1,5 +1,6 @@
-"""Lounge scorecard: two signals on FIXED scales (site demand, site cost efficiency), weighted,
-PROTECT / HOLD / SHRINK. Both score the SITE (a typical lounge there), as growth areas do; the
+"""Lounge scorecard: two signals on FIXED scales (site demand, site rent), weighted,
+PROTECT / HOLD / SHRINK. Both rank the site within its emirate's frozen market of competitor salon
+sites (src/features/lounges.SITE_REFERENCE_WHY), never against our own lounges. Both score the SITE (a typical lounge there), as growth areas do; the
 lounge's own served women are context (performance_vs_site), not scored.
 
 Fixed scales so a lounge's score doesn't move when a sibling opens or closes. Each `why` says how its
@@ -26,20 +27,30 @@ class Signal:
     weight: float = 1.0
 
 
+RENT_RATIO_P10 = 0.6176   # RENT_RATIO_WHY
+RENT_RATIO_P90 = 1.4290
+RENT_RATIO_WHY = (
+    "Frozen 2026-10-11 from the reference salon sites (scripts/build_site_reference.py): the 10th and "
+    "90th percentiles of rent_ratio over all 1,123, each against its own emirate's median. A site as "
+    "dear, relative to its emirate's salon sites, as the dearest tenth scores 0; as cheap as the "
+    "cheapest tenth scores 1; the emirate's median salon site (ratio 1) scores about 0.47.")
+
 SIGNALS: tuple[Signal, ...] = (
-    Signal("demand", "site_served", "Women a typical lounge would serve at this site (Huff, this lounge closed, rivals and siblings open)",
-           0, 20_000,
-           "Quick first cut (2026-10-11): scores the SITE, not the lounge's popularity. A typical lounge "
-           "(median reviews and rating) at the site serves about 1.4k-23k women over the scored lounges; "
-           "20k is about the best, so a site serving that many scores 1. The lounge's own served women are "
-           "shown as performance_vs_site (context, not scored): served by its own reviews, they partly "
-           "restate review volume (SANITY_CHECKS F2)."),
-    Signal("cost", "cost_index", "Site-served women per AED 1k of site cost, against the UAE-wide anchor", 0.5, 1.5,
-           "1 = as cost-efficient as the median lounge site at baseline (COST_ANCHOR, frozen: COST_ANCHOR_WHY "
-           "in src/features/lounges.py); half as good scores 0, 1.5x scores 1. Site cost = shop rent x 150 m2 "
-           "+ amortised fit-out (assumed). Every cell has a shop rent since 2026-10-11 (DLD, ADREC, listings "
-           "or the emirate median); a missing index scores neutral. Cannibalisation is not scored: it is a "
-           "what-if shown on the lounge page."),
+    Signal("demand", "demand_pct", "Site demand: share of its emirate's salon sites it out-serves",
+           0, 1,
+           "Scores the SITE, not the lounge's popularity: the women a typical lounge (median reviews and "
+           "rating) would serve there, this lounge closed and rivals and siblings open, ranked among the "
+           "frozen reference of competitor salon sites in the same emirate (each with a typical lounge "
+           "there and all our lounges open; UAE-wide where an emirate has under 50: SITE_REFERENCE_WHY "
+           "in src/features/lounges.py). The 0..1 percentile is the score. The lounge's own served "
+           "women are shown as performance_vs_site (context, not scored): served by its own reviews, "
+           "they partly restate review volume (SANITY_CHECKS F2)."),
+    Signal("cost", "rent_ratio", "Site rent: emirate median shop rent at salon sites ÷ this site's",
+           RENT_RATIO_P10, RENT_RATIO_P90,
+           "Above 1 = cheaper than a typical salon site in its emirate. Scale frozen (RENT_RATIO_WHY). "
+           "Rent only: served women are already the demand signal, so they are not counted twice. Site "
+           "shop rent from DLD, ADREC, listings or the emirate median; a missing rent scores neutral. "
+           "Cannibalisation is not scored: it is a what-if shown on the lounge page."),
 )
 
 PROTECT_AT = 0.65
@@ -67,7 +78,7 @@ WEIGHT_WHY = ("The weights are a design choice, not data. Each signal's weight i
               "one at a time (8 variants); a call that changes under any of them depends on the weighting, "
               "so it is low confidence. The decision lines aren't varied: within 0.05 of one is already low.")
 NO_FINANCIALS = ("No revenue, lease or footfall data: site cost is an area shop rent (150 m² assumed) plus assumed fit-out, "
-                 "so this scores location, market and cost efficiency, not return on invested capital.")
+                 "so this scores location, market and rent, not return on invested capital.")
 
 
 def score(signal: Signal, value: float | None) -> float:
@@ -126,7 +137,7 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
     return Decision(
         branch_id=f.branch_id, action=action, weight_flips=wflips,
         confidence=_confidence(composite, flippy or bool(wflips)),
-        rationale=(f"Composite {composite:.2f} across site demand and site cost efficiency "
+        rationale=(f"Composite {composite:.2f} across site demand and site rent "
                    f"(PROTECT ≥ {PROTECT_AT}, SHRINK ≤ {SHRINK_AT})."),
         key_drivers=sorted(scores, key=lambda n: abs(scores[n] - NEUTRAL), reverse=True)[:2],
         caveats=caveats, composite=round(composite, 4), scores={k: round(v, 4) for k, v in scores.items()})

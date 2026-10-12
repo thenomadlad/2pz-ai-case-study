@@ -36,7 +36,7 @@ from src.models import (
 logger = logging.getLogger(__name__)
 
 CACHE_PATH = REPO_ROOT / "data" / "explanations" / "cache.json"
-PROMPT_VERSION = "v6"
+PROMPT_VERSION = "v7"
 
 
 MIN_ITEMS, MAX_ITEMS = 2, 5  # per pyramid level: enough to support, few enough to read
@@ -150,8 +150,19 @@ GLOSSARY: dict[str, Field] = {
                                  "not scored: it reflects the lounge's own reviews and rating, not the site."),
     "absorbed_share": Field("Absorbed by siblings", "% of served", "Share of its served women other lounges take over if it closes.", pct=True),
     "site_cost_k": Field("Site cost", "AED 1k/yr", "Shop rent x 150 m² (assumed unit) + fit-out of AED 3,000/m² over 5 years (assumed)."),
-    "served_per_cost": Field("Women per AED 1k of site cost", "women", "Site-served (for an area, net new) women per AED 1,000 of annual site cost."),
-    "cost_index": Field("Cost efficiency vs typical site", "x typical site", "Women per AED 1k of site cost against one frozen UAE-wide anchor: the median lounge site at baseline (14.34 women per AED 1k). 1 = typical; it never moves when other lounges open or close."),
+    "demand_ref": Field("Demand ranked among", "", "Whose salon sites the demand percentile ranks against: the site's emirate, or UAE when the emirate has under 50 reference salon sites."),
+    "demand_pct": Field("Site demand percentile", "% of salon sites",
+                        "Share of the reference salon sites in its emirate (UAE-wide under 50) that a typical lounge "
+                        "would out-serve at this site: the women it would serve there (for an area, a new lounge) "
+                        "against what it would serve at each competitor salon site, frozen 2026-10-11.", pct=True),
+    "demand_pct_uae": Field("Demand percentile UAE-wide", "% of UAE salon sites",
+                            "The same, against all 1,123 UAE reference salon sites. Context, not scored.", pct=True),
+    "rent_ratio": Field("Rent ratio", "ratio",
+                        "Median shop rent at the reference salon sites in its emirate ÷ this site's shop rent: above 1 "
+                        "is cheaper than a typical salon site there. Rent only, no served women."),
+    "rent_pct_uae": Field("Rent percentile UAE-wide", "% of UAE salon sites",
+                          "Share of the UAE reference salon sites with a lower shop rent (higher = dearer). Context, not scored.",
+                          pct=True),
     "new_site_served": Field("New lounge would serve", "women", "What-if: women a typical new lounge here would serve (Huff)."),
     "new_site_taken": Field("Taken from our lounges", "women", "What-if: of those, women it would take from our existing lounges."),
     "new_site_net": Field("Net new women", "women", "What-if: women a new lounge here adds to the network (served − taken)."),
@@ -208,9 +219,12 @@ GLOSSARY: dict[str, Field] = {
     "saturation_gap": Field("Saturation gap", "reviews per 1k women",
                             "Saturation line minus premium saturation: positive is room under the "
                             "line, negative is how far over it. Context only. n/a when unsearched."),
-    "cost_gap": Field("Cost gap", "x typical site",
-                      "Cost efficiency minus 1 (the typical lounge site, UAE-wide): GROW needs 0 or more, "
+    "rent_gap": Field("Rent gap", "ratio",
+                      "Rent ratio minus 1 (the median salon site in its emirate): GROW needs 0 or more, "
                       "else a big-enough area is WATCH. n/a when no shop rent is known."),
+    "demand_gap": Field("Demand gap", "% of salon sites",
+                        f"Site demand percentile minus {growth.DEMAND_PCT_MIN:.0%}: GROW needs 0 or more, else a "
+                        "big-enough area is WATCH.", pct=True),
     "worker_gap": Field("Worker-housing gap", "% of adults",
                         "Worker-housing cap minus worker share: negative means over the cap.",
                         pct=True),
@@ -237,8 +251,8 @@ GLOSSARY: dict[str, Field] = {
         "that flip across assumption levels or when a signal weight moves ±25%."),
     "growth_areas_total": Field("Growth areas", "count",
                                 "Named places (one per OSM place name), each evaluated as a what-if new lounge."),
-    "grow_count": Field("GROW", "areas", "Areas passing both tests."),
-    "watch_count": Field("WATCH", "areas", "Areas passing one of the two tests."),
+    "grow_count": Field("GROW", "areas", "Areas passing every growth test (size, demand, rent, worker housing)."),
+    "watch_count": Field("WATCH", "areas", "Big-enough areas failing the demand, rent or worker-housing test, or half the size line."),
     "grow_areas": Field("GROW areas", "", "Ids of GROW areas."),
     "grow_women_total": Field("Women in GROW areas", "women", "Sum over GROW areas."),
     "grow_nearest_km_min": Field("Closest GROW area to a lounge", "km",
@@ -258,17 +272,18 @@ GLOSSARY: dict[str, Field] = {
 # which apply and orders them; every reason must cite at least one of its topic's fields.
 TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     "lounge": {
-        "demand": ("site_served", "served_women", "performance_vs_site", "score_demand", "addressable_women",
+        "demand": ("demand_pct", "demand_pct_uae", "demand_ref", "site_served", "served_women", "performance_vs_site", "score_demand", "addressable_women",
                    "catchment_women", "affluence_coverage", "affluence_rent", "catchment_cells", "contrib_demand"),
         "cannibalisation": ("absorbed_share", "shared_share"),
-        "cost": ("cost_index", "served_per_cost", "site_cost_k", "site_rent_m2", "score_cost", "contrib_cost"),
+        "cost": ("rent_ratio", "rent_pct_uae", "site_rent_m2", "site_cost_k", "score_cost", "contrib_cost"),
         "capture": ("capture", "substitutes_k", "premium_pool", "thin_premium_market"),
         "rating": ("rating_gap", "lounge_rating", "substitutes_median_rating", "lounge_reviews"),
     },
     "area": {
         "size": ("new_site_net", "new_site_served", "new_site_taken", "new_site_min", "size_gap",
                  "big_enough", "women", "skip_under_women", "unserved_women"),
-        "cost": ("cost_index", "cost_gap", "served_per_cost", "site_cost_k", "shop_rent_m2"),
+        "demand": ("demand_pct", "demand_gap", "demand_pct_uae", "demand_ref", "new_site_served"),
+        "cost": ("rent_ratio", "rent_gap", "rent_pct_uae", "shop_rent_m2", "site_cost_k"),
         "saturation": ("premium_reviews_per_1k", "premium_salons", "unsaturated",
                        "unsaturated_per_1k", "saturation_gap"),
         "reach": ("nearest_lounge_km", "nearest_lounge_id"),
@@ -285,7 +300,7 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
     },
 }
 TOPIC_LABELS = {
-    "demand": "Demand", "cannibalisation": "Cannibalisation", "cost": "Cost efficiency", "capture": "Capture",
+    "demand": "Site demand", "cannibalisation": "Cannibalisation", "cost": "Site rent", "capture": "Capture",
     "rating": "Rating vs rivals", "size": "Net new women", "saturation": "Competition",
     "reach": "Distance to a lounge", "worker_housing": "Demand reliability",
     "data_gap": "What we couldn't search", "shrink": "Where to investigate",
@@ -324,7 +339,7 @@ def fmt_unit(field: str, value) -> str:
     if (not f or value is None or isinstance(value, bool)
             or f.unit in ("", "count", "yes/no", "0-1", "%")):
         return text
-    return f"{text} of catchment" if f.pct else f"{text} {f.unit}"
+    return text + f.unit[1:] if f.pct else f"{text} {f.unit}"
 
 
 def _scale(signal) -> str:
@@ -347,13 +362,15 @@ THRESHOLDS: dict[str, str] = {
     "worker_share": f"GROW needs under {growth.WORKER_CAP:.0%}",
     "premium_reviews_per_1k": f"Unsaturated under {growth.UNSATURATED_PER_1K:g} (context, not a test)",
     "data_coverage": f"GROW needs {growth.MIN_COVERAGE:.0%}",
-    "big_enough": "GROW needs big enough and cost efficiency 1 or more (or unknown)",
+    "big_enough": (f"GROW needs big enough, rent ratio {growth.RENT_RATIO_MIN:g} or more (or unknown) and demand "
+                   f"percentile {growth.DEMAND_PCT_MIN:.0%} or more"),
     "unsaturated": "Context, not a test",
     **{f"contrib_{s.name}": f"Sums to the composite (max {s.weight / _TOTAL_WEIGHT:.2f})"
        for s in scorecard.SIGNALS},
     "size_gap": f"GROW needs 0 or more (line {growth.NEW_SITE_MIN:,})",
     "saturation_gap": f"Context, not a test (line {growth.UNSATURATED_PER_1K:g})",
-    "cost_gap": "GROW needs 0 or more (or no rent known)",
+    "rent_gap": "GROW needs 0 or more (or no rent known)",
+    "demand_gap": "GROW needs 0 or more",
     "worker_gap": f"GROW needs above 0 (cap {growth.WORKER_CAP:.0%})",
     "coverage_gap": f"Under 0: low confidence (needs {growth.MIN_COVERAGE:.0%})",
 }
@@ -395,10 +412,14 @@ def what_would_change(kind: str, facts: dict) -> list[str]:
     gap = facts["size_gap"]
     out = [f"Size: {fmt('size_gap', abs(gap))} net new women "
            + ("above the line." if gap >= 0 else "short of the line.")]
-    cost = facts["cost_gap"]
-    if cost is not None:
-        out.append(f"Cost: {fmt('cost_index', facts['cost_index'])}x the typical lounge site, "
-                   f"{fmt('cost_gap', abs(cost))} " + ("above the 1x line." if cost >= 0 else "short of the 1x line."))
+    dem = facts.get("demand_gap")
+    if dem is not None:
+        out.append(f"Demand: {fmt('demand_pct', facts['demand_pct'])} of {facts['demand_ref']} salon sites out-served, "
+                   f"{fmt('demand_gap', abs(dem))} " + ("above the line." if dem >= 0 else "short of the line."))
+    rent = facts.get("rent_gap")
+    if rent is not None:
+        out.append(f"Rent: ratio {fmt('rent_ratio', facts['rent_ratio'])} against its emirate's median salon site, "
+                   f"{fmt('rent_gap', abs(rent))} " + ("above the 1 line." if rent >= 0 else "short of the 1 line."))
     if facts["worker_gap"] <= 0:
         out.append(f"Worker housing: {fmt('worker_gap', -facts['worker_gap'])} of adults over the cap.")
     if facts["coverage_gap"] < 0:
@@ -422,18 +443,18 @@ def _rounded(facts: dict) -> dict:
 
 # --- facts ------------------------------------------------------------------------------
 
-LOUNGE_TABLE = ("site_served", "served_women", "performance_vs_site", "absorbed_share", "catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
+LOUNGE_TABLE = ("demand_pct", "demand_ref", "demand_pct_uae", "site_served", "served_women", "performance_vs_site", "absorbed_share", "catchment_women", "addressable_women", "affluence_rent", "affluence_coverage",
                 "catchment_cells", "shared_share", "premium_pool", "premium_reviews_per_1k",
-                "site_rent_m2", "women_per_rent_k",
+                "rent_ratio", "rent_pct_uae", "site_rent_m2", "women_per_rent_k",
                 "substitutes_k", "capture", "thin_premium_market",
                 "lounge_rating", "lounge_reviews", "substitutes_median_rating", "rating_gap",
-                "level_flips", "composite", "score_demand", "score_cost", "cost_index", "served_per_cost", "site_cost_k",
+                "level_flips", "composite", "score_demand", "score_cost", "site_cost_k",
                 "contrib_demand", "contrib_cost", "next_call", "line_gap", "flip_driver",
                 "flip_value")
 AREA_TABLE = ("women", "addressable_women", "affluence_rent", "affluence_coverage", "cells", "worker_share", "premium_salons", "premium_reviews_per_1k",
               "shop_rent_m2", "women_per_rent_k", "new_site_served", "new_site_taken", "new_site_net",
-              "unserved_women", "site_cost_k", "served_per_cost", "cost_index", "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
-              "unsaturated", "confidence", "size_gap", "cost_gap", "saturation_gap", "worker_gap", "coverage_gap")
+              "unserved_women", "demand_pct", "demand_ref", "demand_pct_uae", "rent_ratio", "rent_pct_uae", "site_cost_k", "data_coverage", "nearest_lounge_id", "nearest_lounge_km", "big_enough",
+              "unsaturated", "confidence", "size_gap", "demand_gap", "rent_gap", "saturation_gap", "worker_gap", "coverage_gap")
 NOT_SCORED_ACTION = "NOT SCORED"
 
 
@@ -476,7 +497,8 @@ def area_facts(a: Area, d: AreaDecision) -> dict:
                  min_coverage=growth.MIN_COVERAGE,
                  # Gap to each test's line (E3): positive passes, negative is the shortfall.
                  size_gap=round((a.new_site_net or 0.0) - growth.NEW_SITE_MIN),
-                 cost_gap=None if a.cost_index is None else a.cost_index - 1,
+                 demand_gap=None if a.demand_pct is None else a.demand_pct - growth.DEMAND_PCT_MIN,
+                 rent_gap=None if a.rent_ratio is None else a.rent_ratio - growth.RENT_RATIO_MIN,
                  saturation_gap=None if a.premium_reviews_per_1k is None
                  else growth.UNSATURATED_PER_1K - a.premium_reviews_per_1k,
                  worker_gap=growth.WORKER_CAP - a.worker_share,
@@ -537,7 +559,8 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
     if kind == "area":
         if facts["women"] < facts["skip_under_women"]:
             return ["size", "reach"]
-        topics = ["size"] + (["cost"] if facts.get("cost_index") is not None else []) + ["reach"]
+        topics = (["size"] + (["demand"] if facts.get("demand_pct") is not None else [])
+                  + (["cost"] if facts.get("rent_ratio") is not None else []) + ["reach"])
         if facts["worker_share"] >= facts["worker_cap"]:
             topics.append("worker_housing")
         if facts["data_coverage"] < facts["min_coverage"]:
@@ -551,8 +574,10 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
 GROWTH_WHY = (
     "Each area is a what-if: open a typical lounge there and count the women it would add to the "
     f"network, net of those it takes from our own lounges (Huff). GROW needs at least {growth.NEW_SITE_MIN:,} "
-    f"net new women, worker housing under {growth.WORKER_CAP:.0%} of adults, and cost efficiency at least "
-    "the typical lounge site (1x the UAE-wide anchor, or no shop rent known). WATCH: big enough but dearer, mostly "
+    f"net new women, worker housing under {growth.WORKER_CAP:.0%} of adults, a shop rent no dearer than the median "
+    "salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least "
+    f"{growth.DEMAND_PCT_MIN:.0%} of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big "
+    "enough but dearer or weaker demand, mostly "
     f"worker housing, or {growth.NEW_SITE_MIN // 2:,}+ net new women. SKIP: fewer, under "
     f"{growth.SKIP_UNDER_WOMEN:,} women, or non-residential by name. Under {growth.MIN_COVERAGE:.0%} of the "
     "women searched for competitors lowers confidence.")
@@ -586,8 +611,11 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
         return {
             "size": (f"A new lounge here would add about {fmt('new_site_net', f['new_site_net'])} net new "
                      f"women (GROW needs {fmt('new_site_min', f['new_site_min'])})."),
-            "cost": (f"Cost efficiency {fmt('cost_index', f['cost_index'])}x the typical lounge site "
-                     f"(GROW needs 1x)."),
+            "demand": (f"A new lounge here would out-serve {fmt('demand_pct', f['demand_pct'])} of "
+                       f"{f['demand_ref']} salon sites ({fmt('demand_pct_uae', f['demand_pct_uae'])} UAE-wide; "
+                       f"GROW needs {growth.DEMAND_PCT_MIN:.0%})."),
+            "cost": (f"Rent ratio {fmt('rent_ratio', f['rent_ratio'])} against the median {f['emirate']} salon "
+                     f"site (GROW needs 1 or more)."),
             "saturation": (f"{fmt('premium_reviews_per_1k', sat)} premium reviews per 1k women, "
                            f"{'under' if f['unsaturated'] else 'over'} the "
                            f"{fmt('unsaturated_per_1k', f['unsaturated_per_1k'])} line."),
@@ -619,9 +647,12 @@ def _template_headline(kind: str, action: str, f: dict) -> str:
         return (f"{action}: composite {f['composite']:.2f} (PROTECT at {scorecard.PROTECT_AT} or "
                 f"more, SHRINK at {scorecard.SHRINK_AT} or less).")
     if kind == "area":
-        cost = f.get("cost_gap")
-        return (f"{action}: {'big enough' if f['big_enough'] else 'not big enough'}, and "
-                + ("cost unknown" if cost is None else "cost-efficient" if cost >= 0 else "dearer than typical") + ".")
+        rent, dem = f.get("rent_gap"), f.get("demand_gap")
+        return (f"{action}: {'big enough' if f['big_enough'] else 'not big enough'}, "
+                + ("demand unknown" if dem is None else "strong demand" if dem >= 0 else "weaker demand")
+                + " for its emirate, and "
+                + ("rent unknown" if rent is None else "no dearer than" if rent >= 0 else "dearer than")
+                + ("" if rent is None else " its emirate's median salon site") + ".")
     return (f"{f['protect_count']} PROTECT, {f['hold_count']} HOLD and {f['shrink_count']} "
             f"SHRINK across {f['lounges_scored']} scored lounges, with {f['grow_count']} "
             "areas to GROW.")
@@ -629,16 +660,16 @@ def _template_headline(kind: str, action: str, f: dict) -> str:
 
 _TEMPLATE_CAPTIONS = {
     "lounge": ("Each signal is scored 0-1 on a fixed scale, where 1 is good for the lounge, and "
-               "the composite is their weighted average. Both score the site: demand is the women "
-               "a typical lounge would serve there (Huff); cost is those women per AED 1k of "
-               "rent-based site cost against the typical lounge site UAE-wide. The lounge's own "
+               "the composite is their weighted average. Both rank the site within its emirate's "
+               "frozen market of competitor salon sites: demand is the share of them a typical lounge "
+               "here would out-serve (Huff); rent is their median shop rent over this site's. The lounge's own "
                "served women, as performance vs its site, capture, rating and the shared catchment "
                "are shown for context, not scored."),
     "area": ("Each area is a what-if new lounge: big enough when it would add enough net new "
-             "women to the network, and GROW when it is also at least as cost-efficient as the "
-             "typical lounge site (UAE-wide)."),
-    "uae": ("Lounge calls come from a fixed-scale scorecard scoring each site (site demand and site cost); "
-            "growth-area calls from a what-if new lounge's net new women and cost efficiency."),
+             "women to the network, and GROW when it would also out-serve at least half its emirate's "
+             "salon sites and its rent is no dearer than theirs (median)."),
+    "uae": ("Lounge calls come from a fixed-scale scorecard scoring each site within its emirate's salon sites (demand and rent); "
+            "growth-area calls from a what-if new lounge's net new women, demand percentile and rent ratio."),
 }
 
 
@@ -812,7 +843,7 @@ SYSTEM_PROMPT = (
     "position, what is shared with sibling lounges. Now what: 1-2 sentences giving the action "
     "the call asks for (the action_definition you are given, in your own words but keeping its "
     "key phrase) and what would change the call, citing the distance-to-line facts "
-    "(line_gap, next_call, flip_driver, flip_value; for areas size_gap, saturation_gap, "
+    "(line_gap, next_call, flip_driver, flip_value; for areas size_gap, demand_gap, rent_gap, saturation_gap, "
     "worker_gap, coverage_gap). Our scope ends at the site: never advise on anything inside a "
     "branch (ratings, reviews to chase, staffing, service quality, operations); rating is "
     "context, not a lever. Use only the fact sheet. Every number you write must appear in the "
@@ -820,7 +851,8 @@ SYSTEM_PROMPT = (
     "claims. Never mention revenue or profit (none exist). Quote shop rent only when the fact "
     "sheet has it, as our cost (never customer affluence, never a lever to renegotiate), and say "
     "the 150 m² unit is assumed when quoting women per rent. For a lounge, the call scores its SITE "
-    "(what a typical lounge would serve there and its cost), not the lounge's own popularity: so_what "
+    "(its demand percentile and rent ratio among its emirate's competitor salon sites), not the lounge's "
+    "own popularity; quote the UAE-wide percentiles as context where you cite either signal: so_what "
     "must quote performance_vs_site word for word as 'The model estimates this lounge is performing "
     "N.Nx compared to its site' (1 decimal) and say it is context, not scored. Always answer by "
     "calling the submit_explanation tool."

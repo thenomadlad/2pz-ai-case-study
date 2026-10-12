@@ -107,8 +107,9 @@ def _lounge_legend() -> None:
                 f"🔴 **SHRINK**: composite ≤ {scorecard.SHRINK_AT}  \n"
                 "⚪ **NOT SCORED**: the airport lounge  \n"
                 "◯ **Hollow** = low confidence")
-    st.caption("Composite: site demand (what a typical lounge would serve there) and site cost efficiency (weight 1 each), each "
-               f"0-1 on a fixed scale; capture, rating and shared catchment are shown, not scored. Low confidence: within {scorecard.LOW_MARGIN} of a line, the call changes in "
+    st.caption("Composite: site demand (share of its emirate's competitor salon sites a typical lounge there would out-serve) "
+               "and site rent (its emirate's median salon-site rent ÷ its own), weight 1 each, each "
+               f"0-1 on a fixed scale against a frozen reference; capture, rating and shared catchment are shown, not scored. Low confidence: within {scorecard.LOW_MARGIN} of a line, the call changes in "
                f"{scorecard.FLIP_LOW}+ of {scorecard.COMBOS} assumption combinations, or it changes when a "
                "signal weight moves ±25%.")
 
@@ -116,9 +117,9 @@ def _lounge_legend() -> None:
 def _area_legend(r) -> None:
     st.markdown(f"**Growth areas** (cells beyond a {data.minutes(r.levels)}-min drive of every lounge)")
     st.markdown(f"🔵 **GROW**: a typical new lounge here would add ≥ {growth.NEW_SITE_MIN:,} net new women, "
-                f"worker housing under {growth.WORKER_CAP:.0%}, *and* cost efficiency at least the typical "
-                "lounge site, UAE-wide (or unknown)  \n"
-                "🟣 **WATCH**: big but dearer, big but mostly worker housing, or "
+                f"worker housing under {growth.WORKER_CAP:.0%}, out-serving {growth.DEMAND_PCT_MIN:.0%}+ of its emirate's "
+                "salon sites *and* rent no dearer than their median (or unknown)  \n"
+                "🟣 **WATCH**: big but dearer or weaker demand, big but mostly worker housing, or "
                 f"{growth.NEW_SITE_MIN // 2:,}+ net new women  \n"
                 f"⚪ **SKIP**: otherwise, under {growth.SKIP_UNDER_WOMEN:,} women, or a non-residential name")
 
@@ -159,10 +160,12 @@ def _area_panel(r, area_id: str) -> None:
     left, right = st.columns([3, 2])
     with left:
         render_pyramid(exp)
-        cost = "cost unknown" if a.cost_index is None else f"{a.cost_index:.2f}x typical cost efficiency"
         st.markdown(f"**The tests:** {_check(d.big_enough)} big enough ({a.new_site_net or 0:,.0f} net new "
-                    f"women, line {growth.NEW_SITE_MIN:,}) · {_check(a.cost_index is None or a.cost_index >= 1)} "
-                    f"{cost} · {_check(a.data_coverage >= growth.MIN_COVERAGE)} searched ({a.data_coverage:.0%} of women)")
+                    f"women, line {growth.NEW_SITE_MIN:,}) · "
+                    f"{_check(a.demand_pct is None or a.demand_pct >= growth.DEMAND_PCT_MIN)} "
+                    f"{growth.demand_text(a.demand_ref, a.demand_pct, a.demand_pct_uae, a.emirate)} · "
+                    f"{_check(a.rent_ratio is None or a.rent_ratio >= growth.RENT_RATIO_MIN)} "
+                    f"{growth.rent_text(a.rent_ratio, a.rent_pct_uae, a.emirate)} · {_check(a.data_coverage >= growth.MIN_COVERAGE)} searched ({a.data_coverage:.0%} of women)")
     with right:
         render_caveats(f"Confidence: {d.confidence}. Caveats for this area", area_caveats(a, d),
                        d.action != "SKIP")
@@ -206,6 +209,10 @@ def _lounge_table(r) -> None:
     df = pd.DataFrame([{"Lounge": f.branch_id, "Call": d.action, "Emirate": f.emirate,
                         "Composite": None if f.not_scored else d.composite,
                         **{n.capitalize(): d.scores.get(n) for n in WEIGHTS},
+                        "Demand pct (emirate)": None if f.not_scored else f.demand_pct,
+                        "Demand pct (UAE)": None if f.not_scored else f.demand_pct_uae,
+                        "Rent ratio": None if f.not_scored else f.rent_ratio,
+                        "Rent pct (UAE)": None if f.not_scored else f.rent_pct_uae,
                         "Performance vs site": None if f.not_scored else f.performance_vs_site,
                         "Shared catchment": f.shared_share, "Capture share": f.capture,
                         "Premium reviews per 1k women": f.premium_reviews_per_1k,
@@ -221,12 +228,17 @@ def _lounge_table(r) -> None:
     pct = st.column_config.NumberColumn(format="percent")
     st.dataframe(df, hide_index=True, column_config={
         "Composite": score, **{n.capitalize(): score for n in WEIGHTS}, "Shared catchment": pct,
+        "Demand pct (emirate)": pct, "Demand pct (UAE)": pct, "Rent pct (UAE)": pct,
+        "Rent ratio": st.column_config.NumberColumn(format="%.2f"),
         "Performance vs site": st.column_config.NumberColumn(format="%.1fx"),
         "Capture share": pct, "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
         "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
         "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f")})
     st.caption("Click a column header to sort. Signal scores are 0-1 on fixed scales (1 = good for the "
-               "lounge) and both score the site; performance vs site = women the lounge serves ÷ women a typical "
+               "lounge) and both score the site within its emirate's frozen market of competitor salon sites "
+               "(demand pct = share of them it out-serves, UAE-wide where the emirate has under 50; rent ratio = their "
+               "median shop rent ÷ the site's, above 1 = cheaper); the UAE columns rank the same site against all "
+               "UAE salon sites (rent pct: higher = dearer). Performance vs site = women the lounge serves ÷ women a typical "
                "lounge would serve there (2.7x reads 'The model estimates this lounge is performing 2.7x compared "
                "to its site'): context, not scored; shared catchment = share of its women another open lounge also reaches; capture "
                "share = its share of its premium substitutes' Google reviews; premium reviews per 1k women = "
@@ -241,7 +253,8 @@ def _area_table(r) -> None:
     ranked = sorted((d for d in r.area_decisions if d.action != "SKIP"),
                     key=lambda d: (ORDER[d.action], -(by_id[d.area_id].new_site_net or 0)))
     df = pd.DataFrame([{"Rank": i, "Area": a.name, "Emirate": a.emirate, "Call": d.action,
-                        "Net new women": round(a.new_site_net or 0), "Cost index": a.cost_index,
+                        "Net new women": round(a.new_site_net or 0), "Demand pct (emirate)": a.demand_pct,
+                        "Demand pct (UAE)": a.demand_pct_uae, "Rent ratio": a.rent_ratio, "Rent pct (UAE)": a.rent_pct_uae,
                         "Women 15+": round(a.women), "Worker housing": a.worker_share,
                         "Premium reviews per 1k women": a.premium_reviews_per_1k, "Searched": a.data_coverage,
                         "Shop rent (AED/m²/yr)": a.shop_rent_m2, "Women per AED 1k rent": a.women_per_rent_k,
@@ -256,14 +269,16 @@ def _area_table(r) -> None:
     df = df[df.Call.isin(calls or df.Call) & df.Emirate.isin(emirates or df.Emirate)]
     pct = st.column_config.NumberColumn(format="percent")
     st.dataframe(df, hide_index=True, column_config={
-        "Worker housing": pct, "Searched": pct,
-        "Cost index": st.column_config.NumberColumn(format="%.2f"),
+        "Worker housing": pct, "Searched": pct, "Demand pct (emirate)": pct, "Demand pct (UAE)": pct,
+        "Rent pct (UAE)": pct, "Rent ratio": st.column_config.NumberColumn(format="%.2f"),
         "Premium reviews per 1k women": st.column_config.NumberColumn(format="%.0f"),
         "Shop rent (AED/m²/yr)": st.column_config.NumberColumn(format="%.0f"),
         "Women per AED 1k rent": st.column_config.NumberColumn(format="%.0f"),
         "Why": st.column_config.TextColumn(width="large")})
     st.caption("Ranked GROW first, then WATCH, each by net new women (what a typical new lounge would add to the "
-               "network, net of what it takes from our lounges). Cost index: vs the typical lounge site, UAE-wide. Why: the tests it passed or "
+               "network, net of what it takes from our lounges). Demand pct: share of its emirate's salon sites a new lounge here would out-serve (GROW needs "
+               f"{growth.DEMAND_PCT_MIN:.0%}; UAE-wide where the emirate has under 50); rent ratio: their median shop rent ÷ the "
+               "area's (GROW needs 1+); UAE columns: the same against all UAE salon sites. Why: the tests it passed or "
                "failed. SKIP areas are left out. Shop rent is our cost; women per AED 1k assumes a 150 m² "
                "unit (and counts the whole area's women against one unit's rent).")
 

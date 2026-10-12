@@ -2,9 +2,12 @@
 (src/model/served.what_if_open) and count the women it would add to the network, net of those it takes
 from our own lounges.
 
-  GROW   net new women >= NEW_SITE_MIN, worker housing under WORKER_CAP of adults, and cost index >= 1
-         (as cost-efficient as the typical lounge site, UAE-wide: COST_ANCHOR) or unknown.
-  WATCH  big enough but dearer; or big enough but mostly worker housing; or NEW_SITE_MIN / 2 or more.
+  GROW   net new women >= NEW_SITE_MIN, worker housing under WORKER_CAP of adults, rent_ratio >= 1
+         (no dearer than the median salon site in its emirate; unknown passes) and demand_pct >=
+         DEMAND_PCT_MIN (a new lounge here would out-serve at least half its emirate's salon sites;
+         src/features/lounges.SITE_REFERENCE_WHY).
+  WATCH  big enough but dearer or weaker demand; or big enough but mostly worker housing; or
+         NEW_SITE_MIN / 2 or more.
   SKIP   fewer net new women; under SKIP_UNDER_WOMEN women (raw); or a NON_RESIDENTIAL name.
   Saturation (premium reviews per 1k women vs UNSATURATED_PER_1K) is context, not a test: competition
   already shapes the Huff split. Under MIN_COVERAGE of the women searched lowers confidence.
@@ -47,36 +50,78 @@ WHY = {
 }
 
 
+DEMAND_PCT_MIN = 0.5
+DEMAND_PCT_MIN_WHY = ("GROW needs the site to out-serve at least half of its emirate's reference salon sites "
+                      "(UAE-wide where an emirate has under 50): a typical lounge here would serve at least what "
+                      "one would at the median competitor salon site. Net new women stay the absolute size test.")
+RENT_RATIO_MIN = 1.0
+RENT_RATIO_MIN_WHY = ("GROW needs a shop rent no dearer than the median at its emirate's reference salon sites "
+                      "(rent_ratio 1 or more; unknown passes). Rent only: served women are the demand tests.")
 NEW_SITE_MIN = 6_000
 NEW_SITE_MIN_WHY = ("Quick first cut (2026-10-11): a new lounge here should add at least about what our median "
                     "lounge serves today (~6k women, Huff), net of what it takes from our own lounges.")
-WHY = {"NEW_SITE_MIN": NEW_SITE_MIN_WHY, **WHY}  # shown first on the How page
+WHY = {"NEW_SITE_MIN": NEW_SITE_MIN_WHY, "DEMAND_PCT_MIN": DEMAND_PCT_MIN_WHY,
+       "RENT_RATIO_MIN": RENT_RATIO_MIN_WHY, **WHY}  # shown first on the How page
+
+
+def _ord(p: float) -> str:
+    n = round(p * 100)
+    return f"{n}{'th' if 10 <= n % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
+
+
+def demand_text(where: str, pct: float | None, pct_uae: float | None, emirate: str) -> str:
+    """'top 20% of Dubai salon sites on demand · 45th percentile UAE-wide' (the owner's wording)."""
+    if pct is None:
+        return "demand unknown"
+    group = f"{where} salon sites" if where != "UAE" else f"UAE salon sites ({emirate} has under 50)"
+    rank = f"top {max(1, round((1 - pct) * 100))}%" if pct >= 0.5 else f"bottom {max(1, round(pct * 100))}%"
+    return f"{rank} of {group} on demand · {_ord(pct_uae)} percentile UAE-wide"
+
+
+def rent_text(ratio: float | None, pct_uae: float | None, emirate: str) -> str:
+    """'rent ratio 1.25 (cheaper than the median Dubai salon site) · 45th percentile of rent UAE-wide'."""
+    if ratio is None:
+        return "rent unknown"
+    r = f"{ratio:.2f}" if round(ratio, 2) != 1 or ratio == 1 else f"{ratio:.3f}"   # 0.998 is not "1.00"
+    side = "cheaper than" if ratio > 1 else "as dear as" if ratio == 1 else "dearer than"
+    return f"rent ratio {r} ({side} the median {emirate} salon site) · {_ord(pct_uae)} percentile of rent UAE-wide"
+
+
+def site_text(x) -> str:
+    """Both signals in words with their UAE-wide context, for a lounge (LoungeFeatures) or an area."""
+    return (f"{demand_text(x.demand_ref, x.demand_pct, x.demand_pct_uae, x.emirate)}; "
+            f"{rent_text(x.rent_ratio, x.rent_pct_uae, x.emirate)}")
 
 
 def classify(a: Area) -> AreaDecision:
     """What-if: open a typical lounge here (src/model/served.what_if_open). GROW / WATCH / SKIP on the
-    women it would add to the network, and its cost efficiency where a shop rent is known."""
+    women it would add to the network, its demand percentile and its rent ratio (salon-site reference)."""
     net = a.new_site_net or 0.0
-    cheap = a.cost_index is None or a.cost_index >= 1
+    cheap = a.rent_ratio is None or a.rent_ratio >= RENT_RATIO_MIN
+    strong = a.demand_pct is None or a.demand_pct >= DEMAND_PCT_MIN
     big = net >= NEW_SITE_MIN and a.worker_share < WORKER_CAP
     unsat = None if a.premium_reviews_per_1k is None else a.premium_reviews_per_1k < UNSATURATED_PER_1K
     caveats = []
     if a.data_coverage < MIN_COVERAGE:
         caveats.append(f"Only {a.data_coverage:.0%} of its women were searched for competitors: the rest are "
                        "imputed from comparable places in the emirate.")
-    if a.cost_index is None and a.new_site_net is not None:
-        caveats.append("No shop rent here: cost efficiency unknown.")
+    if a.rent_ratio is None and a.new_site_net is not None:
+        caveats.append("No shop rent here: rent unknown.")
+    if a.demand_ref == "UAE" and a.new_site_net is not None:
+        caveats.append(f"{a.emirate} has under 50 reference salon sites: demand is ranked UAE-wide.")
     gap = (net - NEW_SITE_MIN) / NEW_SITE_MIN
     confidence = "low" if abs(gap) < NEAR_LINE or a.data_coverage < MIN_COVERAGE else "high" if abs(gap) >= FAR_LINE else "medium"
     if NON_RESIDENTIAL.search(a.name):
         action, why, confidence = "SKIP", f"Non-residential by name ({a.name}): not where customers live.", "high"
     elif a.women < SKIP_UNDER_WOMEN:
         action, why, confidence = "SKIP", f"Only {a.women:,.0f} women 15+, under the {SKIP_UNDER_WOMEN:,} floor.", "high"
-    elif big and cheap:
-        action, why = "GROW", (f"A new lounge would add about {net:,.0f} women to the network"
-                               + ("" if a.cost_index is None else f", at {a.cost_index:.1f}x our typical cost efficiency") + ".")
+    elif big and cheap and strong:
+        action, why = "GROW", f"A new lounge would add about {net:,.0f} women to the network; {site_text(a)}."
     elif big:
-        action, why = "WATCH", f"Enough new women ({net:,.0f}), but dearer per woman than our typical lounge ({a.cost_index:.1f}x)."
+        action, why = "WATCH", (f"Enough new women ({net:,.0f}), but "
+                                + " and ".join(w for w, bad in (("dearer than its emirate's median salon site", not cheap),
+                                                               ("weaker demand than its emirate's median salon site", not strong)) if bad)
+                                + f": {site_text(a)}.")
     elif net >= NEW_SITE_MIN:
         action, why = "WATCH", f"Enough new women ({net:,.0f}), but mostly worker housing ({a.worker_share:.0%} of adults)."
     elif net >= NEW_SITE_MIN / 2:

@@ -4,8 +4,12 @@ per V3."""
 import re
 import statistics
 from collections import Counter, defaultdict
+from functools import cache
 
 import numpy as np
+import pandas as pd
+
+from src.config import REPO_ROOT
 
 from src.data_v3 import V3
 from src.market import (
@@ -219,26 +223,62 @@ def site_cost_k(rent_m2: float | None) -> float | None:
     return (rent_m2 * REF_UNIT_M2 + FITOUT_AED_M2 * REF_UNIT_M2 / FITOUT_YEARS) / 1000
 
 
-COST_ANCHOR = 14.34   # women per AED 1k of site cost; COST_ANCHOR_WHY
-COST_ANCHOR_WHY = (
-    "Cost index = women per AED 1k of annual site cost against ONE UAE-wide anchor, frozen 2026-10-11: "
-    "the median site-served women per AED 1k over the 23 scored lounges at baseline (default levels, "
-    "nothing closed) = {:.2f}. A constant, so a lounge's or area's index moves only with its own served "
-    "women and site cost, never when a sibling opens, closes or grows or the levels change (the old "
-    "emirate-median baseline did: SANITY_CHECKS F1). Lounges are measured on site-served women (a typical "
-    "lounge at the site), areas on net new women of a what-if lounge; both against the same anchor. "
-    "Re-freeze it (and say so) only when the served model or site cost changes.").format(COST_ANCHOR)
+SITE_REFERENCE = REPO_ROOT / "data/seed/v3/site_reference.csv"
+MIN_REF_SITES = 50
+SITE_REFERENCE_WHY = (
+    "Labels are judged within each emirate, against its market of salon SITES, frozen: every real "
+    "(non-imputed) premium competitor salon in the served model, Bedashing excluded (1,123 sites; "
+    "data/seed/v3/site_reference.csv, built once 2026-10-11 by scripts/build_site_reference.py). Per site: "
+    "the cell shop rent, and the women a typical lounge would serve there with all our lounges open. Never "
+    "against our own lounges (Fujairah and Ras Al Khaimah have one, Sharjah two), and nothing we open or "
+    "close moves it. Demand = the share of the emirate's reference sites a site out-serves; an emirate with "
+    f"under {MIN_REF_SITES} reference sites (Ajman 38, Ras Al Khaimah 33, Fujairah 18, Umm Al Quwain 5) uses "
+    "the UAE-wide set instead: a percentile among a few dozen sites moves several points per site. Rent "
+    "ratio = the emirate's median shop rent at its reference sites ÷ the site's shop rent (its own "
+    "emirate's median even under 50 sites: rents are an emirate-level market, and a UAE-wide median "
+    "would call every northern site cheap). Rebuild (and say so) only when the served model, demand "
+    "or salon data change.")
+
+
+@cache
+def site_reference() -> pd.DataFrame:
+    """The frozen reference set of competitor salon sites (SITE_REFERENCE_WHY)."""
+    return pd.read_csv(SITE_REFERENCE, comment="#")
+
+
+@cache
+def _ref() -> dict:
+    r = site_reference()
+    served = {e: np.sort(g.ref_served.to_numpy()) for e, g in r.groupby("emirate")}
+    return {"served": served, "uae": np.sort(r.ref_served.to_numpy()), "rents": np.sort(r.shop_rent_m2.to_numpy()),
+            "rent_median": r.groupby("emirate").shop_rent_m2.median().to_dict(),
+            "uae_rent_median": float(r.shop_rent_m2.median())}
+
+
+def _below(sorted_ref: np.ndarray, x: float) -> float:
+    """Share of the reference strictly below x (empirical percentile, 0..1)."""
+    return float(np.searchsorted(sorted_ref, x, side="left") / len(sorted_ref))
+
+
+def site_signals(emirate: str, served: float | None, rent_m2: float | None) -> dict:
+    """A site's place in the frozen reference (SITE_REFERENCE_WHY): demand_pct within its emirate's
+    salon sites (UAE-wide under MIN_REF_SITES), rent_ratio against its emirate's median rent, and
+    the UAE-wide percentiles of both for context."""
+    r = _ref()
+    own = r["served"].get(emirate)
+    use_own = own is not None and len(own) >= MIN_REF_SITES
+    rent = None if rent_m2 is None or rent_m2 != rent_m2 or rent_m2 <= 0 else rent_m2
+    return {"demand_ref": emirate if use_own else "UAE",
+            "demand_pct": None if served is None else _below(own if use_own else r["uae"], served),
+            "demand_pct_uae": None if served is None else _below(r["uae"], served),
+            "rent_ratio": None if rent is None else r["rent_median"].get(emirate, r["uae_rent_median"]) / rent,
+            "rent_pct_uae": None if rent is None else _below(r["rents"], rent)}
 
 
 def _lounge_costs(feats):
-    """Site cost, site-served women per AED 1k of it, and the cost index against COST_ANCHOR."""
-    out = []
-    for f in feats:
-        cost = site_cost_k(f.site_rent_m2)
-        spc = f.site_served / cost if f.site_served and cost else None
-        out.append(f.model_copy(update={"site_cost_k": cost, "served_per_cost": spc,
-                                        "cost_index": None if spc is None else spc / COST_ANCHOR}))
-    return out
+    """Site cost, and the site's demand and rent against the frozen salon-site reference."""
+    return [f.model_copy(update={"site_cost_k": site_cost_k(f.site_rent_m2),
+                                 **site_signals(f.emirate, f.site_served, f.site_rent_m2)}) for f in feats]
 
 
 def _typical(lounges) -> tuple[float, float | None]:
@@ -260,7 +300,7 @@ def _site_served(v3, a, aw_s, closed, lounges) -> dict[str, float]:
 
 def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
     """Open a typical lounge at each area worth a look (5k+ women, a residential name): what it serves,
-    what it takes from our lounges, and its net new women per AED 1k of site cost."""
+    what it takes from our lounges, and its demand and rent against the salon-site reference."""
     from src.model.growth import NON_RESIDENTIAL, SKIP_UNDER_WOMEN
     from src.model.served import what_if_open
     reviews, rating = _typical(feats)
@@ -278,8 +318,7 @@ def _area_what_ifs(v3, a, aw_s, areas, feats, closed):
         cost = site_cost_k(ar.shop_rent_m2)
         out.append(ar.model_copy(update={
             "new_site_served": w["served"], "new_site_taken": w["taken_from_lounges"], "new_site_net": w["net_new"],
-            "site_cost_k": cost, "served_per_cost": w["net_new"] / cost if cost else None,
-            "cost_index": w["net_new"] / cost / COST_ANCHOR if cost else None}))
+            "site_cost_k": cost, **site_signals(ar.emirate, w["served"], ar.shop_rent_m2)}))
     return out
 
 

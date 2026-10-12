@@ -265,32 +265,48 @@ def test_every_scored_lounge_has_a_site_rent_from_its_cell(real_v3):
     assert {x.site_rent_source for x in f if x.emirate == "Dubai"} == {"dld"}
 
 
-def test_cost_index_is_women_per_cost_against_the_frozen_anchor(real_v3):
-    # F1 (2026-10-11): one UAE-wide anchor for lounges (site-served women) and areas (net new women)
-    import statistics
+def test_signals_rank_the_site_in_the_frozen_salon_site_reference(real_v3):
+    # Owner's call (2026-10-11): judge each site within its emirate's market of salon SITES, never
+    # against our own lounges; under MIN_REF_SITES the demand ranks UAE-wide.
+    import numpy as np
 
-    from src.features.lounges import COST_ANCHOR, site_cost_k
+    from src.features.lounges import MIN_REF_SITES, site_reference
+    from src.model.scorecard import RENT_RATIO_P10, RENT_RATIO_P90
+    ref = site_reference()
+    n = ref.emirate.value_counts()
+    med = ref.groupby("emirate").shop_rent_m2.median()
     f, areas = build(real_v3, ASSUMPTIONS)
     for x in (x for x in f if not x.not_scored):
-        assert x.cost_index == pytest.approx(x.site_served / site_cost_k(x.site_rent_m2) / COST_ANCHOR), x.branch_id
-    for a in areas:
-        if a.served_per_cost is not None:
-            assert a.cost_index == pytest.approx(a.new_site_net / a.site_cost_k / COST_ANCHOR), a.area_id
-    # the anchor is the median scored lounge site at baseline: re-freeze it if this drifts
-    assert statistics.median(x.cost_index for x in f if not x.not_scored) == pytest.approx(1, abs=0.01)
+        own = n.get(x.emirate, 0) >= MIN_REF_SITES
+        pool = ref[ref.emirate == x.emirate] if own else ref
+        assert x.demand_ref == (x.emirate if own else "UAE")
+        assert x.demand_pct == pytest.approx((pool.ref_served < x.site_served).mean()), x.branch_id
+        assert x.demand_pct_uae == pytest.approx((ref.ref_served < x.site_served).mean())
+        assert x.rent_ratio == pytest.approx(med[x.emirate] / x.site_rent_m2)
+        assert x.rent_pct_uae == pytest.approx((ref.shop_rent_m2 < x.site_rent_m2).mean())
+    for a in (a for a in areas if a.new_site_served is not None):
+        assert a.demand_pct_uae == pytest.approx((ref.ref_served < a.new_site_served).mean()), a.area_id
+    assert {x.demand_ref for x in f if x.emirate in ("Fujairah", "Ras Al Khaimah")} == {"UAE"}
+    # the rent scale is the frozen P10 / P90 of every reference site against its own emirate's median
+    ratio = ref.emirate.map(med) / ref.shop_rent_m2
+    assert (RENT_RATIO_P10, RENT_RATIO_P90) == pytest.approx(tuple(np.percentile(ratio, [10, 90])), abs=1e-4)
 
 
-def test_closing_a_lounge_never_changes_another_lounges_cost_index_except_through_served(real_v3):
-    # SANITY_CHECKS F1: the old emirate-median baseline moved a lounge's cost index (and call) when a
-    # sibling closed. Now the index moves only with the lounge's own site-served women.
+def test_closing_a_lounge_never_moves_another_lounges_reference(real_v3):
+    # Frozen reference: closing any lounge never changes another lounge's rent ratio or the salon sites
+    # its demand is ranked against; its demand percentile moves only with its own site-served women.
+    from src.features import lounges
+    ref = lounges.site_reference().copy()
     base = {x.branch_id: x for x in build(real_v3, ASSUMPTIONS, areas=False)[0] if not x.not_scored}
     for gone in base:
         for x in build(real_v3, ASSUMPTIONS, closed=frozenset({gone}), areas=False)[0]:
             if x.not_scored:
                 continue
             b = base[x.branch_id]
-            assert x.site_cost_k == b.site_cost_k
-            assert x.cost_index / b.cost_index == pytest.approx(x.site_served / b.site_served), (gone, x.branch_id)
+            assert (x.rent_ratio, x.rent_pct_uae, x.demand_ref) == (b.rent_ratio, b.rent_pct_uae, b.demand_ref)
+            same = lounges.site_signals(x.emirate, x.site_served, x.site_rent_m2)
+            assert (x.demand_pct, x.demand_pct_uae) == (same["demand_pct"], same["demand_pct_uae"]), (gone, x.branch_id)
+    assert lounges.site_reference().equals(ref)
 
 
 def test_site_served_is_a_typical_lounge_at_the_site_with_this_one_closed(real_v3):
