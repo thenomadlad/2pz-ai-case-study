@@ -303,15 +303,14 @@ def test_shop_rent_shows_as_cost_with_the_unit_assumption():
     assert "mixes mall and street shops" in lounge
 
 
-def test_explorer_summary_at_baseline_says_nothing_changed():
+def test_explorer_summary_appears_only_once_something_changed():
     at = _page("predictions")
     assert not at.exception
-    t = at.table[0].value
-    assert list(t.columns) == ["Baseline", "This scenario", "Change"]
-    assert (t["Baseline"] == t["This scenario"]).all() and (t["Change"] == "—").all()
-    assert "PROTECT lounges" in t.index and "Best GROW area: est. growth" in t.index
-    assert "Nothing yet — change an assumption, a rule or a rent below." in _text(at)
-
+    assert not at.table and "This scenario against the baseline" not in _text(at)   # baseline: just a hint
+    assert "a comparison with the baseline and every call that changes will appear here" in _text(at)
+    at.number_input(key="wi-growmin").set_value(10_000).run()           # one rule changed: the table appears
+    assert not at.exception and "This scenario against the baseline" in _text(at)
+    assert list(at.table[0].value.columns) == ["Baseline", "This scenario", "Change"]
 
 def test_explorer_summary_with_a_quote_and_a_tighter_grow_minimum():
     from src.models import Rules

@@ -81,6 +81,11 @@ def diff_lines(base: Run, cur: Run) -> list[str]:
 
 
 def render_summary() -> None:
+    """Baseline vs scenario and what changed, once anything differs from the baseline."""
+    if not data.active():
+        st.caption("Change an assumption, a decision rule or a rent below, or close a lounge: a comparison "
+                   "with the baseline and every call that changes will appear here.")
+        return
     base, cur = data.baseline(), data.current()
     st.markdown("##### This scenario against the baseline")
     st.table(summary_table(base, cur))
