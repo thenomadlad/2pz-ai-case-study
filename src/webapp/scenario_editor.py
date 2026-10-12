@@ -59,7 +59,7 @@ def render_panel() -> None:
                       key="wi-closed", on_change=_sync, format_func=lambda b: f"{names[b]} · {calls.get(b, '')}",
                       placeholder="SHRINK lounges first")
         st.caption("Opening is evaluated for every area on the Areas page, one area at a time. Opening several "
-                   "together isn't modelled yet, which is why growth figures can't be added up (README: "
+                   "together isn't modelled yet, which is why growth figures can't be added up (How it works: "
                    "Potential improvements).")
         st.button("Reset to baseline", on_click=_reset, disabled=not data.active(), key="wi-reset")
         if data.active():
