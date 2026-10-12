@@ -358,6 +358,18 @@ Areas: **15 WATCH → GROW, nothing else moves** (34 → 49 GROW, 63 → 48 WATC
 - **F3 (explained finding, fragility):** unchanged in kind, larger in reach: one big rival 200 m away moves 6 PROTECT sites to HOLD.
 - **F5 (new, explained, minor):** the typical lounge (median reviews and rating of open lounges) drifts with closures, so a closure far away can move a knife-edge call (al-maqta). Fix if wanted: freeze it like the anchor.
 
+## Expected outcomes for run 10 (written 2026-10-11, before running SC4 and the back-tests)
+
+Scope: the owner's decision to judge labels **within each emirate, against its market of salon SITES**, frozen. Reference = the 1,123 real premium competitor salons the served model uses (no imputed, no Bedashing), each with its cell shop rent and the women a typical lounge would serve there with all our lounges open (`data/seed/v3/site_reference.csv`, built once by `scripts/build_site_reference.py` in ~9 s; Dubai 582, Abu Dhabi 304, Sharjah 143, Ajman 38, Ras Al Khaimah 33, Fujairah 18, Umm Al Quwain 5). Demand = `demand_pct`, the site's percentile among its emirate's reference sites (UAE-wide under 50). Cost = `rent_ratio` = emirate median reference rent ÷ site rent, on a frozen P10–P90 scale (0.618 → 0, 1.429 → 1). `COST_ANCHOR` and `cost_index` are gone; served women are no longer in the cost signal. GROW also needs `rent_ratio` ≥ 1 and `demand_pct` ≥ 0.5.
+
+- **SC2.** Already seen while building (so not a blind prediction): lounges **6 PROTECT / 14 HOLD / 3 SHRINK / 1 not scored**, areas **32 GROW / 65 WATCH / 464 SKIP**. Expect every swing to trace to one of two causes: Dubai sites now compete with Dubai salon sites (they were dear against a UAE-wide anchor), so Dubai rises; Abu Dhabi and Sharjah sites whose rent is above their emirate's salon-site median fall (their old cost index was high because they served many women per dirham, which the demand signal now carries alone).
+- **SC4 (must pass).** *Close a sibling:* `rent_ratio` never moves (emirate median of a frozen set); the demand reference never moves, so `demand_pct` moves only with the lounge's own site-served women (unit test `test_closing_a_lounge_never_moves_another_lounges_reference`). Closing a sibling raises site-served women (one supplier fewer) except through F5 (the typical lounge's median reviews drift with closures). Expect **no label move toward SHRINK**; khaleej-al-arabi (0.3504) sits on the line, so any move there must trace to F5. *+50% women in one catchment:* the reference is frozen, so another lounge can't fall; expect no label drop. *A big premium rival next door:* can only lower site-served women; expect no composite rise beyond float noise and label drops as in run 9 (F3).
+- **Level flips.** The reference is frozen at baseline levels while site_served moves with worker share and affluence, so expect somewhat more flips than run 9's single knife edge, concentrated in lounges near a line.
+- **BT2/BT3.** Same unit both sides; the growth rule now also needs `rent_ratio` ≥ 1 and `demand_pct` ≥ 0.5, which a PROTECT site mostly has. Expect PROTECT → GROW for most of the 6 (a Dubai PROTECT may miss the 6,000 net line: Dubai sites serve fewer women in absolute terms), SHRINK → WATCH or SKIP.
+- **BT4 / SC3 / SC1 / SC7 / BT5 / BT6.** Name rule, size floor and data unchanged: same results; GROW is a subset of run 9's, so no new non-residential GROW.
+- **SC5.** 121 explanations regenerated offline (prompt v7); all must pass `check`; read-through of six.
+- **SC8.** run() unchanged (~4.2 s warm): one cached CSV read and a sorted search per site.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
