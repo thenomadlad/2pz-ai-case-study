@@ -2,6 +2,7 @@
 
 The what-if lives in st.session_state["what_if"] (not in widget keys, which Streamlit drops on
 pages that don't render the widget), so every page sees it."""
+import dataclasses
 from functools import cache, lru_cache
 
 import pandas as pd
@@ -29,8 +30,10 @@ def v3() -> V3:
 
 def what_if() -> dict:
     """{"levels": Levels, "closed": frozenset, "recall": float | None (None = baseline)}."""
-    return st.session_state.setdefault(
-        "what_if", {"levels": Levels(), "closed": frozenset(), "recall": None})
+    w = st.session_state.setdefault("what_if", {"levels": Levels(), "closed": frozenset(), "recall": None})
+    if type(w["levels"]) is not Levels:   # a dev hot-reload re-imported src.models: rebuild from the old instance
+        w["levels"] = Levels(**dataclasses.asdict(w["levels"]))
+    return w
 
 
 def active() -> bool:

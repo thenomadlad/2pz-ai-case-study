@@ -1,6 +1,10 @@
 """Overview: the COO's question, the executive summary and what's at stake, the limitations that matter most, the what-if panel, the map
 and a short pyramid for whatever you click."""
+import re
+from collections import Counter
+
 import pandas as pd
+import pydeck as pdk
 import streamlit as st
 
 from src.features.lounges import substitutes
@@ -11,7 +15,6 @@ from src.webapp.map import (
     area_cells_layer,
     build_deck,
     catchment_cells_layer,
-    flag_layer,
     lounge_layer,
     overlap_layer,
     polygon_layer,
@@ -49,7 +52,7 @@ def map_layers(r, lounge: str | None, show_areas: bool, show_skip: bool, show_su
                show_affluence: bool = False, show_overlap: bool = False, show_all_subs: bool = False) -> list:
     """Bottom to top: affluence, every catchment (overlap), growth areas, every lounge's premium
     substitutes, the selected lounge's catchment cells, polygon and substitutes, then every lounge
-    and its flag."""
+    as a pin."""
     v3, layers = data.v3(), []
     if show_affluence:
         layers.append(affluence_layer(v3.cells))
@@ -70,7 +73,7 @@ def map_layers(r, lounge: str | None, show_areas: bool, show_skip: bool, show_su
         if show_subs:
             layers.append(substitutes_layer(substitutes(v3, data.assumptions(), r.levels,
                                                         frozenset(r.closed), lounge)))
-    return layers + [lounge_layer(r.features, r.decisions), flag_layer(r.features)]
+    return layers + [lounge_layer(r.features, r.decisions)]
 
 
 def _legend(r, lounge: str | None, show_affluence: bool, show_overlap: bool = False,
@@ -101,7 +104,7 @@ def _legend(r, lounge: str | None, show_affluence: bool, show_overlap: bool = Fa
 
 
 def _lounge_legend() -> None:
-    st.markdown("**Lounges** (flag; circle sized by women in catchment)")
+    st.markdown("**Lounges** (pin in the call's colour)")
     st.markdown(f"🟢 **PROTECT**: composite ≥ {scorecard.PROTECT_AT}  \n"
                 f"🟠 **HOLD**: between {scorecard.SHRINK_AT} and {scorecard.PROTECT_AT}  \n"
                 f"🔴 **SHRINK**: composite ≤ {scorecard.SHRINK_AT}  \n"
@@ -176,33 +179,146 @@ WEIGHTS = {s.name: s.weight for s in scorecard.SIGNALS}
 QUESTION = "Where is my network under pressure, and where should we grow?"
 
 
-def stake(r) -> dict[str, tuple[int, float]]:
-    """(count, women) per call: SHRINK lounges and the women in their catchment cells another open
-    lounge also reaches; PROTECT lounges and their catchment women; GROW areas' addressable women;
-    WATCH areas. Women are counted once per cell, however many lounges reach it."""
-    w, reached = data.women(r.levels.worker_share), data.reached(r.levels, frozenset(r.closed))
-    by = {k: {d.branch_id for d in r.decisions if d.action == k} for k in ("SHRINK", "PROTECT")}
+def short(name: str) -> str:
+    """'Bedashing Beauty Lounge - Al Dhafra' -> 'Al Dhafra'."""
+    return re.sub(r"^Bedashing Beauty Lounge\s*[-–]?\s*", "", name) or name
+
+
+def _n(k: int, one: str, many: str | None = None) -> str:
+    return f"{k} {one if k == 1 else many or one + 's'}"
+
+
+def pyramid(r) -> dict:
+    """The page's argument: one governing thought and three key lines (review, grow, protect), each
+    with the lounges or areas that are its evidence. Built from the run, so it can't drift from the calls."""
+    calls = {d.branch_id: d for d in r.decisions}
+    lounges = {k: [f for f in r.features if calls[f.branch_id].action == k] for k in ("SHRINK", "PROTECT")}
     act = {d.area_id: d.action for d in r.area_decisions}
-    return {"SHRINK": (len(by["SHRINK"]), sum(w[c] for c, bs in reached.items()
-                                              if len(bs) > 1 and by["SHRINK"] & set(bs))),
-            "PROTECT": (len(by["PROTECT"]), sum(w[c] for c, bs in reached.items() if by["PROTECT"] & set(bs))),
-            "GROW": (sum(act[a.area_id] == "GROW" for a in r.areas),
-                     sum(a.addressable_women for a in r.areas if act[a.area_id] == "GROW")),
-            "WATCH": (sum(act[a.area_id] == "WATCH" for a in r.areas), 0.0)}
+    grow = sorted((a for a in r.areas if act[a.area_id] == "GROW"), key=lambda a: -(a.new_site_net or 0))
+    lead = [e for e, _ in Counter(a.emirate for a in grow).most_common(2)]
+    shrink, protect = lounges["SHRINK"], lounges["PROTECT"]
+    thought = (f"Review {_n(len(shrink), 'weak lounge site')}, defend {_n(len(protect), 'strong one')} and test "
+               f"{_n(len(grow), 'area')} for new lounges" + (f", most of them in {' and '.join(lead)}." if lead else "."))
+    return {"thought": thought, "shrink": shrink, "protect": protect, "grow": grow,
+            "claims": {"review": f"{_n(len(shrink), 'lounge site is', 'lounge sites are')} weak for "
+                                 "their emirate on demand or rent: review them",
+                       "grow": f"{_n(len(grow), 'area')} would each add {growth.NEW_SITE_MIN:,}+ net new women",
+                       "protect": f"{_n(len(protect), 'lounge site is', 'lounge sites are')} strong for "
+                                  "their emirate: defend them"}}
 
 
-def _at_stake(r) -> None:
-    s, minutes = stake(r), data.minutes(r.levels)
-    cols = st.columns(3)
-    cols[0].metric(f"Under pressure: {s['SHRINK'][0]} SHRINK lounges", f"{s['SHRINK'][1]:,.0f} women")
-    cols[0].caption("Women 15+ in their catchment cells that a sibling lounge also reaches: the overlap a "
-                    "consolidation review would test. Investigate, don't close.")
-    cols[1].metric(f"To defend: {s['PROTECT'][0]} PROTECT lounges", f"{s['PROTECT'][1]:,.0f} women")
-    cols[1].caption(f"Women 15+ within a {minutes}-min drive of them.")
-    cols[2].metric(f"To grow: {s['GROW'][0]} GROW areas", f"{s['GROW'][1]:,.0f} women")
-    cols[2].caption(f"Addressable women beyond a {minutes}-min drive of every lounge; "
-                    f"{s['WATCH'][0]} more areas on WATCH.")
-    st.caption("At stake is counted in women, not money: the model has a rent-based site cost but no revenue, lease or capex data.")
+def _governing(r, p: dict) -> None:
+    scored = [d for d in r.decisions if d.action != "NOT SCORED"]
+    low = sum(d.confidence == "low" for d in scored)
+    with st.container(border=True):
+        st.markdown(f"### {p['thought']}")
+        st.markdown(f"⚠️ {low} of {len(scored)} lounge calls are low confidence, and the model has no revenue or "
+                    "lease data. [How sure we are ↓](#how-sure-we-are)")
+    with st.expander("Read the AI-written summary"):
+        render_pyramid(explanation_for(r, "uae", "uae")[0])
+
+
+def _cards(p: dict) -> None:
+    served = lambda fs: sum(f.served_women or 0 for f in fs)
+    top = p["grow"][0] if p["grow"] else None
+    cards = [("1 · Review", p["claims"]["review"], f"{served(p['shrink']):,.0f} women",
+              "served by them today", ", ".join(short(f.name) for f in p["shrink"]), "review"),
+             ("2 · Grow", p["claims"]["grow"],
+              f"{top.new_site_net:,.0f} women" if top else "none",
+              f"net new at the best ({top.name})" if top else "net new at the best",
+              ", ".join(a.name for a in p["grow"][:3]) + (" …" if len(p["grow"]) > 3 else ""), "grow"),
+             ("3 · Protect", p["claims"]["protect"], f"{served(p['protect']):,.0f} women",
+              "served by them today", ", ".join(short(f.name) for f in p["protect"]), "protect")]
+    for col, (label, claim, kpi, kpi_note, names, anchor) in zip(st.columns(3), cards):
+        with col.container(border=True, height="stretch"):
+            st.caption(label)
+            st.markdown(f"**{claim[0].upper() + claim[1:]}.**")
+            st.metric(kpi_note, kpi, label_visibility="visible")
+            st.caption(names)
+            st.markdown(f"[Evidence ↓](#{anchor})")
+
+
+def _fit(points: list[tuple[float, float]], max_zoom: float = 11) -> pdk.ViewState:
+    """A view that frames these (lat, lng) points, never closer than max_zoom."""
+    if not points:
+        return None
+    view = pdk.data_utils.compute_view([[lng, lat] for lat, lng in points], view_proportion=1)
+    view.zoom = min(max_zoom, view.zoom - 0.8)
+    return view
+
+
+def _lounge_evidence(r, fs: list, claim: str, anchor: str) -> None:
+    st.subheader(claim[0].upper() + claim[1:], anchor=anchor)
+    if not fs:
+        st.caption("None in this run.")
+        return
+    calls = {d.branch_id: d for d in r.decisions}
+    ids = {f.branch_id for f in fs}
+    left, right = st.columns([5, 8])
+    left.pydeck_chart(build_deck([lounge_layer(r.features, r.decisions, only=ids)],
+                                 _fit([(f.lat, f.lng) for f in fs])), height=340)
+    df = pd.DataFrame([{"Lounge": short(f.name), "Composite": calls[f.branch_id].composite,
+                        "Out-serves": _pct(f.demand_pct), "Rent ratio": _ratio(f.rent_ratio),
+                        "Vs its site": f.performance_vs_site, "Confidence": calls[f.branch_id].confidence,
+                        "Page": f"/lounge?lounge={f.branch_id}"}
+                       for f in sorted(fs, key=lambda f: calls[f.branch_id].composite)])
+    right.dataframe(df, hide_index=True, column_config=_EVIDENCE_COLUMNS)
+
+
+def _pct(x: float | None) -> int | None:
+    return None if x is None else round(100 * x)
+
+
+def _ratio(x: float | None) -> str:
+    return "median only" if x is None else f"{x:.2f}x"
+
+
+_EVIDENCE_COLUMNS = {
+    "Composite": st.column_config.ProgressColumn(min_value=0, max_value=1, format="%.2f"),
+    "Out-serves": st.column_config.NumberColumn(format="%d%%", help="Share of its emirate's competitor salon "
+                                                "sites a typical lounge here would out-serve (UAE-wide where the "
+                                                "emirate has under 50)"),
+    "Rent ratio": st.column_config.TextColumn(help="Its emirate's median salon-site rent ÷ this site's: above "
+                                              "1x = cheaper. 'median only' = only the emirate median rent is "
+                                              "known, so rent is scored neutral"),
+    "Vs its site": st.column_config.NumberColumn(format="%.1fx", help="Women the lounge serves ÷ women a typical "
+                                                 "lounge would serve at its site: context, not scored"),
+    "Net new women": st.column_config.NumberColumn(format="%d"),
+    "Page": st.column_config.LinkColumn(display_text="Open →")}
+
+
+def _grow_evidence(r, p: dict) -> None:
+    st.subheader(p["claims"]["grow"][0].upper() + p["claims"]["grow"][1:], anchor="grow")
+    act = {d.area_id: d for d in r.area_decisions}
+    cells = data.v3().cells
+    pts = [(cells.at[c, "lat"], cells.at[c, "lng"]) for a in p["grow"] for c in a.cell_ids]
+    left, right = st.columns([5, 8])
+    left.pydeck_chart(build_deck([area_cells_layer(cells, p["grow"], r.area_decisions),
+                                  lounge_layer(r.features, r.decisions)], _fit(pts, 9)), height=340)
+    df = pd.DataFrame([{"Area": f"{a.name}, {a.emirate}", "Net new women": round(a.new_site_net or 0),
+                        "Out-serves": _pct(a.demand_pct),
+                        "Rent ratio": _ratio(None if growth.rent_fallback(a) else a.rent_ratio),
+                        "Confidence": act[a.area_id].confidence, "Page": f"/area?area={a.area_id}"}
+                       for a in p["grow"]])
+    right.dataframe(df, hide_index=True, column_config=_EVIDENCE_COLUMNS, height=340)
+    st.caption("Blue cells: GROW areas; pins: our lounges. Net new women can't be added up across areas: "
+               "neighbouring areas reach the same women.")
+
+
+def _how_sure(r) -> None:
+    st.subheader("How sure we are", anchor="how-sure-we-are")
+    calls = [d for d in r.decisions if d.action != "NOT SCORED"]
+    hold = [d for d in calls if d.action == "HOLD"]
+    near = [d for d in calls if min(abs(d.composite - scorecard.PROTECT_AT),
+                                    abs(d.composite - scorecard.SHRINK_AT)) <= scorecard.LOW_MARGIN]
+    low = [d for d in calls if d.confidence == "low"]
+    names = {f.branch_id: short(f.name) for f in r.features}
+    st.markdown(f"- **{_n(len(hold), 'lounge')} sit between the lines (HOLD):** no action, but "
+                f"{_n(len(near), 'call')} overall {'is' if len(near) == 1 else 'are'} within "
+                f"{scorecard.LOW_MARGIN} of a line.\n"
+                f"- **{len(low)} of {len(calls)} calls are low confidence:** "
+                f"{', '.join(names[d.branch_id] for d in low)}.")
+    limitations_box(r)
 
 
 def _lounge_table(r) -> None:
@@ -288,14 +404,22 @@ def render() -> None:
     banner()
     r = data.current()
     st.markdown(f"#### {QUESTION}")
-    st.subheader("Executive summary")
-    render_pyramid(explanation_for(r, "uae", "uae")[0])
-    _at_stake(r)
-    limitations_box(r)
-    render_panel()
+    p = pyramid(r)
+    _governing(r, p)
+    _cards(p)
+    st.divider()
+    _lounge_evidence(r, p["shrink"], p["claims"]["review"], "review")
+    st.divider()
+    _grow_evidence(r, p)
+    st.divider()
+    _lounge_evidence(r, p["protect"], p["claims"]["protect"], "protect")
+    st.divider()
+    _how_sure(r)
 
     st.divider()
-    st.subheader("The map — click a lounge or an area")
+    st.subheader("Explore")
+    render_panel()
+    st.markdown("##### The map: click a lounge or an area")
     map_key = f"uae-map-{st.session_state.get('map_nonce', 0)}"
     lounge, area_id = _selection(st.session_state.get(map_key))
     # Controls above the map and the legend below it, so the map keeps its width on narrow screens.
@@ -324,8 +448,7 @@ def render() -> None:
     elif area_id:
         _area_panel(r, area_id)
 
-    st.divider()
-    st.subheader("Compare")
+    st.markdown("##### Compare everything")
     lounges, areas = st.tabs(["Lounges", "Growth areas, ranked"])
     with lounges:
         _lounge_table(r)

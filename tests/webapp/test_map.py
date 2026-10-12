@@ -22,9 +22,9 @@ def test_lounge_layer_colours_by_action_and_hollows_low_confidence():
 def test_selected_lounge_adds_polygon_cells_and_substitutes():
     ids = lambda layers: [x.id for x in layers]
     none = ids(map_layers(run(), None, True, False, True))
-    assert none == ["areas", "lounges", "lounge-flags"]
+    assert none == ["areas", "lounges"]
     picked = map_layers(run(), "al-barsha", True, False, True)
-    assert ids(picked) == ["areas", "catchment-cells", "catchment-polygon", "substitutes", "lounges", "lounge-flags"]
+    assert ids(picked) == ["areas", "catchment-cells", "catchment-polygon", "substitutes", "lounges"]
     subs = next(x for x in picked if x.id == "substitutes").data
     assert len(subs) == next(f for f in run().features if f.branch_id == "al-barsha").substitutes_k
     assert "substitutes" not in ids(map_layers(run(), "al-barsha", False, False, False))
@@ -53,16 +53,13 @@ def test_pixel_units_serialise_as_literals_not_accessors():
     and every marker filled the viewport."""
     import json
 
-    from src.webapp.map import build_deck, flag_layer, lounge_layer
+    from src.webapp.map import build_deck, lounge_layer
     r = run()
     sub = {"name": "a", "lat": 25, "lng": 55, "review_count": 16, "rating": 4.5, "premium_because": "x"}
-    deck = json.loads(build_deck([lounge_layer(r.features, r.decisions), substitutes_layer([sub]),
-                                  flag_layer(r.features)]).to_json())
+    deck = json.loads(build_deck([lounge_layer(r.features, r.decisions), substitutes_layer([sub])]).to_json())
     layers = {x["id"]: x for x in deck["layers"]}
-    for lid in ("lounges", "substitutes"):
-        assert layers[lid]["radiusUnits"] == "pixels", lid
-    assert layers["lounges"]["lineWidthUnits"] == "pixels"
-    assert layers["lounge-flags"]["sizeUnits"] == "pixels"
+    assert layers["substitutes"]["radiusUnits"] == "pixels"
+    assert layers["lounges"]["sizeUnits"] == "pixels"          # pins
 
 
 def test_affluence_layer_shades_only_observed_cells_and_is_a_toggle():

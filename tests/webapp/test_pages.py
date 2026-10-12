@@ -1,8 +1,6 @@
 import re
 import time
 
-import pytest
-
 from streamlit.testing.v1 import AppTest
 
 from src.models import Levels
@@ -42,13 +40,15 @@ def test_every_page_loads_at_baseline_and_with_two_lounges_closed():
 
 
 def test_overview_full_app_leads_with_summary_then_limitations():
+    from src.baseline import run as run_
     at = AppTest.from_file(APP, default_timeout=30).run()
     assert not at.exception
-    assert at.subheader[0].value == "Executive summary"
+    from src.webapp.pages.overview import pyramid
     md = [m.value for m in at.markdown]
+    assert md[1] == f"### {pyramid(run_()).get('thought')}"      # the governing thought comes first
+    subs = [h.value for h in at.subheader]
+    assert subs[:4] == [c[0].upper() + c[1:] for c in pyramid(run_())["claims"].values()][:3] + ["How sure we are"]
     box = md.index("#### ⚠️ Before you trust these calls")
-    numbered = [m for m in md[:box] if m[:2] in {f"{i}." for i in range(1, 6)}]
-    assert 2 <= len(numbered) <= 5                      # the pyramid comes first
     body = md[box + 1]
     assert "No revenue or lease data in the model" in body and "lifetime Google reviews" in body
     from src.baseline import run
@@ -240,22 +240,28 @@ def test_untrusted_url_ids_never_reach_markdown():
         assert not any("evil.example" in str(v) for v in shown), (page, key)
 
 
-def test_overview_opens_on_the_question_and_whats_at_stake():
+def test_overview_opens_on_the_question_and_its_pyramid():
+    """Governing thought, then review / grow / protect, each backed by exactly its lounges or areas."""
     from src.baseline import run
-    from src.webapp.pages.overview import QUESTION, stake
+    from src.webapp.pages.overview import QUESTION, pyramid
     at = _page("overview")
     assert at.markdown[0].value == f"#### {QUESTION}"
-    s, r = stake(run()), run()
-    shrink = [f for f in r.features if next(d for d in r.decisions if d.branch_id == f.branch_id).action == "SHRINK"]
-    assert 0 < s["SHRINK"][1] <= sum(f.shared_share * f.catchment_women for f in shrink) + 1  # each cell once
-    assert s["GROW"][0] == sum(d.action == "GROW" for d in r.area_decisions) > 0
-    labels = {m.label: m.value for m in at.metric}
-    assert labels[f"Under pressure: {s['SHRINK'][0]} SHRINK lounges"] == f"{s['SHRINK'][1]:,.0f} women"
+    r = run()
+    p, calls = pyramid(r), {d.branch_id: d.action for d in r.decisions}
+    assert {f.branch_id for f in p["shrink"]} == {b for b, a in calls.items() if a == "SHRINK"}
+    assert {f.branch_id for f in p["protect"]} == {b for b, a in calls.items() if a == "PROTECT"}
+    assert len(p["grow"]) == sum(d.action == "GROW" for d in r.area_decisions) > 0
+    assert f"Review {len(p['shrink'])} weak" in p["thought"] and f"test {len(p['grow'])} areas" in p["thought"]
+    net = [a.new_site_net for a in p["grow"]]
+    assert net == sorted(net, reverse=True)                       # best area first
+    evidence = [d.value for d in at.dataframe[:3]]               # review, grow, protect tables
+    assert len(evidence[0]) == len(p["shrink"]) and len(evidence[1]) == len(p["grow"])
+    assert len(evidence[2]) == len(p["protect"])
 
 
 def test_overview_compares_lounges_and_ranks_growth_areas_with_filters():
     at = _page("overview")
-    lounges, areas = at.dataframe[0].value, at.dataframe[1].value
+    lounges, areas = at.dataframe[-2].value, at.dataframe[-1].value
     assert len(lounges) == 24 and {"Composite", "Demand", "Shared catchment", "Confidence",
                                    "Premium reviews per 1k women"} <= set(lounges.columns)
     assert "Confidence" in areas.columns
@@ -265,7 +271,7 @@ def test_overview_compares_lounges_and_ranks_growth_areas_with_filters():
     at.multiselect(key="cmp-call").set_value(["SHRINK"]).run()
     at.multiselect(key="cmp-area-emirate").set_value(["Sharjah"]).run()
     assert not at.exception
-    assert set(at.dataframe[0].value.Call) == {"SHRINK"} and set(at.dataframe[1].value.Emirate) == {"Sharjah"}
+    assert set(at.dataframe[-2].value.Call) == {"SHRINK"} and set(at.dataframe[-1].value.Emirate) == {"Sharjah"}
 
 
 def test_overview_panels_show_top_drivers_and_area_tests():
@@ -295,7 +301,7 @@ def test_shop_rent_shows_as_cost_with_the_unit_assumption():
     lounge = " ".join(t.value.to_string() for t in _page("lounge", lounge="al-barsha").table)   # factor table
     assert "Shop rent at the site" in lounge and "AED/m²/yr" in lounge
     overview = _page("overview")
-    assert "Shop rent (AED/m²/yr)" in overview.dataframe[0].value.columns
+    assert "Shop rent (AED/m²/yr)" in overview.dataframe[-2].value.columns
     assert "Shop rent is our cost; women per AED 1k assumes a 150 m² unit." in _text(overview)
     # review I2: the area table carries the unit assumption too; I3: the mall/street caveat is shown
     assert _text(overview).count("assumes a 150 m² unit") >= 2

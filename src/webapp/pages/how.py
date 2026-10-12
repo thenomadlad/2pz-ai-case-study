@@ -5,7 +5,13 @@ import re
 import streamlit as st
 
 from src.config import REPO_ROOT
-from src.features.lounges import MIN_REF_SITES, NOT_SCORED, NOT_SCORED_WHY, SITE_REFERENCE_WHY, site_reference
+from src.features.lounges import (
+    MIN_REF_SITES,
+    NOT_SCORED,
+    NOT_SCORED_WHY,
+    SITE_REFERENCE_WHY,
+    site_reference,
+)
 from src.market import AFFLUENCE_CLIP, AFFLUENCE_CLIP_WHY
 from src.model import growth, scorecard
 from src.webapp import data

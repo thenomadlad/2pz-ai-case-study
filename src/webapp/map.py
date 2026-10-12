@@ -21,12 +21,18 @@ AREA_COLORS: dict[str, list[int]] = {"GROW": [21, 101, 192], "WATCH": [142, 36, 
 UAE_VIEW = pdk.ViewState(latitude=24.6, longitude=54.6, zoom=6.4)
 _PIXELS = "'pixels'"
 
-_FLAG_SVG = (
-    '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">'
-    '<rect x="14" y="6" width="5" height="56" rx="2" fill="#fff"/>'
-    '<path d="M19 8 L56 18 L19 30 Z" fill="#fff"/></svg>')
-FLAG_ICON = {"url": "data:image/svg+xml;base64," + base64.b64encode(_FLAG_SVG.encode()).decode(),
-             "width": 64, "height": 64, "anchorX": 16, "anchorY": 62, "mask": True}
+_PIN_PATH = "M24 2C12.4 2 3 11.2 3 22.6 3 38 24 62 24 62s21-24 21-39.4C45 11.2 35.6 2 24 2z"
+
+
+def pin_icon(rgb: list[int], hollow: bool = False) -> dict:
+    """A map-app style pin in the call's colour; hollow (white, outlined in the colour) for low confidence."""
+    c = "#{:02x}{:02x}{:02x}".format(*rgb)
+    body, dot = ("#fff", c) if hollow else (c, "#fff")
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="48" height="64" viewBox="0 0 48 64">'
+           f'<path d="{_PIN_PATH}" fill="{body}" stroke="{c if hollow else "#fff"}" stroke-width="3"/>'
+           f'<circle cx="24" cy="22.5" r="8" fill="{dot}"/></svg>')
+    return {"url": "data:image/svg+xml;base64," + base64.b64encode(svg.encode()).decode(),
+            "width": 48, "height": 64, "anchorX": 24, "anchorY": 62, "id": f"pin-{c}-{hollow}"}
 
 
 def _box(cells: pd.DataFrame, cid: str) -> list[list[float]]:
@@ -34,36 +40,28 @@ def _box(cells: pd.DataFrame, cid: str) -> list[list[float]]:
     return [[c.west, c.south], [c.east, c.south], [c.east, c.north], [c.west, c.north]]
 
 
-def lounge_layer(features: list[LoungeFeatures], decisions: list[Decision]) -> pdk.Layer:
-    """Lounges coloured by action, sized by catchment women. Low confidence: hollow (faint fill,
-    thick ring in the action colour)."""
+def lounge_layer(features: list[LoungeFeatures], decisions: list[Decision],
+                 only: set[str] | None = None) -> pdk.Layer:
+    """A pin per lounge in its call's colour; hollow pin for low confidence. `only`: just these lounges."""
     by_id = {d.branch_id: d for d in decisions}
     rows = []
     for f in features:
+        if only is not None and f.branch_id not in only:
+            continue
         d = by_id[f.branch_id]
         color = ACTION_COLORS[d.action]
         low = d.confidence == "low" and d.action != "NOT SCORED"
         comp = "" if d.action == "NOT SCORED" else f" · composite {d.composite:.2f}"
         rows.append({
             "branch_id": f.branch_id, "name": f.name, "lat": f.lat, "lng": f.lng, "action": d.action,
-            "radius": max(6.0, min(14.0, math.sqrt(f.catchment_women) / 35)),
             "color": [*color, 50 if low else 230], "line": color if low else [255, 255, 255],
-            "line_px": 3 if low else 1,
+            "icon": pin_icon(color, low),
             "detail": (f"{d.action}{comp} · confidence {'n/a' if d.action == 'NOT SCORED' else d.confidence}<br/>"
                        f"{f.catchment_women:,.0f} women in catchment · "
                        f"{f.rating or 'no'}★ · {f.review_count:,} reviews"),
         })
-    return pdk.Layer("ScatterplotLayer", data=rows, get_position=["lng", "lat"], get_radius="radius",
-                     radius_units=_PIXELS, get_fill_color="color", get_line_color="line",
-                     get_line_width="line_px", line_width_units=_PIXELS, stroked=True,
-                     pickable=True, id="lounges")
-
-
-def flag_layer(features: list[LoungeFeatures]) -> pdk.Layer:
-    """A flag on every lounge, drawn above the circles."""
-    rows = [{"lat": f.lat, "lng": f.lng, "icon": FLAG_ICON} for f in features]
-    return pdk.Layer("IconLayer", data=rows, get_position=["lng", "lat"], get_icon="icon", get_size=22,
-                     size_units=_PIXELS, get_color=[33, 33, 33], id="lounge-flags")
+    return pdk.Layer("IconLayer", data=rows, get_position=["lng", "lat"], get_icon="icon", get_size=34,
+                     size_units=_PIXELS, pickable=True, id="lounges")
 
 
 def polygon_layer(geometry: dict, minutes: int, name: str) -> pdk.Layer:

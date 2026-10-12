@@ -10,7 +10,6 @@ from src.webapp import data, nav
 from src.webapp.map import (
     build_deck,
     catchment_cells_layer,
-    flag_layer,
     lounge_layer,
     polygon_layer,
     substitutes_layer,
@@ -125,7 +124,7 @@ def render() -> None:
     subs = substitutes(v3, data.assumptions(), r.levels, frozenset(r.closed), b)
     layers = [catchment_cells_layer(v3.cells, data.catchment(r.levels, b), data.women(r.levels.worker_share)),
               polygon_layer(v3.polygons[(b, minutes)], minutes, f.name), substitutes_layer(subs),
-              lounge_layer(r.features, r.decisions), flag_layer(r.features)]
+              lounge_layer(r.features, r.decisions)]
     st.pydeck_chart(build_deck(layers, view_at(f.lat, f.lng, 10.5)), key=f"lounge-map-{b}")
     st.caption(f"Its {minutes}-min drive polygon (midday traffic), catchment cells (darker = more "
                "women), premium substitutes (grey, sized by reviews) and every lounge. Hover for data.")
