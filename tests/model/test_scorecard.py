@@ -98,7 +98,7 @@ def test_lounges_that_flip_often_are_low_confidence():
     strong = _f(served=1, cost=1)
     assert decide([strong], flips={"a": FLIP_LOW - 1})[0].confidence == "high"
     d = decide([strong], flips={"a": FLIP_LOW})[0]
-    assert d.confidence == "low" and any(f"of {COMBOS} worker-housing" in c for c in d.caveats)
+    assert d.confidence == "low" and any(f"of {COMBOS} assumption combinations" in c for c in d.caveats)
 
 
 def test_level_flips_on_real_data():
@@ -123,10 +123,10 @@ def test_a_call_that_flips_with_a_signal_weight_is_low_confidence():
     assert far.weight_flips == [] and far.confidence == "high"
 
 
-def test_flip_line_is_a_third_of_the_live_axis_levels():
-    # travel and coverage don't reach the Huff scoring and affluence is off: worker share alone (LIVE_AXES_WHY)
-    assert LIVE_AXES == ("worker_share",)
-    assert COMBOS == 3 and FLIP_LOW_SHARE == 1 / 3 and FLIP_LOW == 1
+def test_flip_line_is_a_third_of_the_live_axis_combinations():
+    # drive time, coverage and worker share reach the Huff scoring; affluence is off (LIVE_AXES_WHY)
+    assert LIVE_AXES == ("travel", "coverage", "worker_share")
+    assert COMBOS == 27 and FLIP_LOW_SHARE == 1 / 3 and FLIP_LOW == 9
 
 
 def test_level_flips_varies_only_the_live_axes_fast():
@@ -142,9 +142,17 @@ def test_level_flips_varies_only_the_live_axes_fast():
     lounges.build = lambda *args, **kw: seen.append(args[2]) or real(*args, **kw)
     try:
         start = time.perf_counter()
-        level_flips(v3, a, Levels(travel="high"))
+        level_flips(v3, a, Levels(affluence="high"))
         took = time.perf_counter() - start
     finally:
         lounges.build = real
     assert len(set(seen)) == COMBOS and took < 2     # ~0.1 s here; slack for slower machines
-    assert {lv.travel for lv in seen} == {"high"}      # the other axes stay where `levels` puts them
+    assert {lv.affluence for lv in seen} == {"high"}      # the other axes stay where `levels` puts them
+
+
+def test_drive_time_and_coverage_levels_reach_the_huff_split_and_medium_is_the_baseline():
+    from src.model import served
+    assert served.decay(15) == served.DECAY and served.competitor_scale(0.6) == 1.0   # baseline unchanged
+    assert served.decay(10) == {10: 1.0, 15: 0.0, 20: 0.0}                          # nearest band only
+    assert served.decay(20)[15] > served.DECAY[15] and served.decay(20)[20] == 0.5   # flatter
+    assert served.competitor_scale(0.5) < 1 < served.competitor_scale(0.7)

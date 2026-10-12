@@ -80,10 +80,13 @@ def _substitutes(subs: list[dict], f, coverage: float) -> None:
     st.caption(f"The most-reviewed premium salons holding {coverage:.0%} "
                "of the catchment's premium reviews: capture is this lounge's share of their reviews "
                f"(scaled ×{f.recall_multiplier:.2f} for salons the search missed).")
-    if subs:
-        wrapped_table([{"Salon": s["name"], "Reviews": f"{s['review_count']:,}",
-                        "Rating": s["rating"] if s["rating"] is not None else "—",
-                        "Premium because": s["premium_because"]} for s in subs])
+    if subs:   # ~10 rows tall, scrolls for the rest; click a header to sort
+        st.dataframe(pd.DataFrame([{"Salon": s["name"], "Reviews": s["review_count"], "Rating": s["rating"],
+                                    "Premium because": s["premium_because"]} for s in subs]),
+                     hide_index=True, height=388, column_config={
+                         "Reviews": st.column_config.NumberColumn(format="%d"),
+                         "Rating": st.column_config.NumberColumn(format="%.1f★"),
+                         "Premium because": st.column_config.TextColumn(width="large")})
 
 
 WEIGHTS = {s.name: s.weight for s in scorecard.SIGNALS}
@@ -160,8 +163,8 @@ def render() -> None:
                "reviews. Services offered and price tier per lounge aren't in the data.")
     badge(d.action)
     if d.action != "NOT SCORED":
-        st.caption(f"Composite {d.composite:.2f} · confidence {d.confidence} · the call changes at "
-                   f"{flips} of {scorecard.COMBOS} worker-housing share levels")
+        st.caption(f"Composite {d.composite:.2f} · confidence {d.confidence} · the call changes in "
+                   f"{flips} of {scorecard.COMBOS} assumption combinations")
         st.markdown(performance_line(f))
     left, right = st.columns([3, 2])
     with left:

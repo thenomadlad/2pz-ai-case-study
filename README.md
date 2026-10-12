@@ -121,9 +121,10 @@ At the baseline (2026-10-11: 15-min drive, 60% competitor coverage, 5.5% women i
 affluence off):
 
 - **Lounges:** 6 PROTECT (al-taif-mall, al-ain, mirdif-35, al-falah, al-dhafra, nad-al-sheba),
-  14 HOLD, 3 SHRINK, 1 NOT SCORED (the airport lounge serves travellers). **11 of 23** calls are low
+  14 HOLD, 3 SHRINK, 1 NOT SCORED (the airport lounge serves travellers). **12 of 23** calls are low
   confidence: 10 within 0.05 of a line (5 of them Abu Dhabi HOLDs just above the SHRINK line, and
-  al-falah just above PROTECT), plus al-ain; al-ain and al-falah have the Abu Dhabi median as
+  al-falah just above PROTECT), plus al-ain and jumeirah-park (its call changes in 9 of the 27
+  drive-time x coverage x worker-share combinations); al-ain and al-falah have the Abu Dhabi median as
   their site rent (fallback), so rent scores neutral.
   khalifa-city-a is HOLD on its site (top 27% of Abu Dhabi salon sites on demand, but rent ratio
   0.62), though the model estimates it is performing 2.7x compared to its site (context, not scored).
@@ -567,7 +568,7 @@ Ideas raised while building this that we haven't acted on, roughly in order of v
 
 **Model and data**
 
-- **Wire drive time and competitor coverage back into the served-demand model.** Today neither reaches the Huff scoring: drive time only draws the displayed catchment, and coverage changes nothing scored, so the confidence check varies worker-housing share alone (run 12 in SANITY_CHECKS). Drive time could cap the reach bands (10 min = nearest band only); coverage could scale the competitor imputation. Then restore both to the confidence check, the What-if explorer and the per-assumption tabs.
+- ~~**Wire drive time and competitor coverage back into the served-demand model.**~~ Done (2026-10-11): drive time sets the decay across the 10/15/20-min bands (10 min = nearest band only, 15 = today's decay, 20 = flatter) and coverage scales the competitors' pull by coverage / 60%, as the old capture did; both are back in the confidence check (27 combinations), the What-if explorer and the per-assumption tabs. `src/model/served.py`, LEVELS_WHY.
 - **Check the demand reading against real bookings.** The Huff split reads Dubai as so crowded that a typical lounge at our Dubai sites would serve about 2-5k women, against up to 23k at the best Abu Dhabi sites. Ranking within each emirate keeps that from sinking the Dubai calls, but it still sets every share of our served market and every growth figure. Even a rough ranking of lounges by bookings would confirm it or show the model is under-reading Dubai, and would calibrate the uncalibrated parameters (review exponent, distance decay, outside option).
 - **Observed rents where we only have the emirate median.** 17 of 34 GROW areas pass the rent test only because their rent is unknown (scored neutral, low confidence), mostly in Sharjah and the northern emirates. More listings or district rates there would turn those into real calls.
 - **Revenue, lease and capex data for a return test.** The brief's ROIC gate (RUBRIC OB5) can't be built from shop rent alone; with lease terms and revenue per lounge, SHRINK could mean "losing money" instead of "weak site".

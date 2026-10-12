@@ -104,10 +104,10 @@ GLOSSARY: dict[str, Field] = {
     "rating_gap": Field("Rating gap", "stars",
                         "Lounge rating minus the median rating of the premium salons in its catchment (20+ reviews)."),
     "level_flips": Field(
-        "Assumption sensitivity", f"of {scorecard.COMBOS} worker-housing share levels",
-        f"At how many of the {scorecard.COMBOS} worker-housing share levels (low, medium, high) this "
-        "lounge's call changes. Only worker share is varied: drive time and competitor coverage don't "
-        "reach the served-demand scoring yet, and affluence weighting is off."),
+        "Assumption sensitivity", f"of {scorecard.COMBOS} combinations",
+        f"In how many of the {scorecard.COMBOS} combinations of drive time, competitor coverage and "
+        "worker-housing share (low, medium, high each) this lounge's call changes. Affluence weighting "
+        "is off, so it isn't varied."),
     "composite": Field(
         "Composite score", "0-1",
         "Weighted average of the signal scores below (weights in the Threshold column). "

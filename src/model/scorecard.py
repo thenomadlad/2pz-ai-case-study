@@ -62,17 +62,16 @@ THRESHOLDS_WHY = (
     f"signals, not just one. SHRINK at {SHRINK_AT} or less means it is weak on most signals. "
     "Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree."
 )
-LIVE_AXES = ("worker_share",)   # LIVE_AXES_WHY
-LIVE_AXES_WHY = ("Only the assumptions that reach the scoring are varied. Drive time and competitor coverage "
-                 "don't reach the served-demand (Huff) scoring yet: drive time only draws the displayed "
-                 "catchment and coverage changes nothing scored (to be wired back: README, Potential improvements). "
-                 "Affluence weighting is off. So the check varies worker-housing share alone.")
-COMBOS = 3 ** len(LIVE_AXES)                     # 3 levels
+LIVE_AXES = ("travel", "coverage", "worker_share")   # LIVE_AXES_WHY
+LIVE_AXES_WHY = ("Only the assumptions that reach the scoring are varied: drive time (the decay across the 10/15/20-min "
+                 "bands), competitor coverage (the competitors' pull) and worker-housing share (src/model/served.LEVELS_WHY). "
+                 "Affluence weighting is off, so it stays at baseline.")
+COMBOS = 3 ** len(LIVE_AXES)                     # 27 level combinations
 FLIP_LOW_SHARE = 1 / 3   # of the combinations: a call that flips this often is low confidence
-FLIP_LOW = round(FLIP_LOW_SHARE * COMBOS)        # 1 of 3
-FLIP_WHY = (f"A lounge whose action changes at {FLIP_LOW} or more (a third) of the {COMBOS} levels of "
-            "worker-housing share depends on that assumption more than on the data, so its call is low "
-            f"confidence. {LIVE_AXES_WHY}")
+FLIP_LOW = round(FLIP_LOW_SHARE * COMBOS)        # 9 of 27
+FLIP_WHY = (f"A lounge whose action changes in {FLIP_LOW} or more (a third) of the {COMBOS} combinations of "
+            "drive time, competitor coverage and worker-housing share depends on the assumptions more than on "
+            f"the data, so its call is low confidence. {LIVE_AXES_WHY}")
 NEUTRAL = 0.5  # a missing rating gap never scores as the worst; thin-market capture is pulled toward it
 THIN_MARKET = 10
 THIN_MARKET_WHY = ("Under 10 premium salons, capture is a share of a tiny pool, so it is noisy: its score keeps "
@@ -140,7 +139,7 @@ def _decide(f: LoungeFeatures, flips: int | None) -> Decision:
                        "its cell): rent scores neutral.")
     flippy = flips is not None and flips >= FLIP_LOW
     if flippy:
-        caveats.append(f"The call changes at {flips} of {COMBOS} worker-housing share levels.")
+        caveats.append(f"The call changes in {flips} of {COMBOS} assumption combinations.")
     wflips = weight_flips(scores)
     if wflips:
         caveats.append("The call depends on the signal weights: it changes with " + "; ".join(wflips) + ".")

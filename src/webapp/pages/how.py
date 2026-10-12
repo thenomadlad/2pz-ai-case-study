@@ -12,7 +12,7 @@ from src.features.lounges import (
     SITE_REFERENCE_WHY,
     site_reference,
 )
-from src.model import growth, scorecard
+from src.model import growth, scorecard, served
 from src.webapp import data
 from src.webapp.views import wrapped_table
 
@@ -79,13 +79,18 @@ def render() -> None:
          "Why": scorecard.THRESHOLDS_WHY},
         {"Constant": "FLIP_LOW_SHARE", "Value": f"a third: {scorecard.FLIP_LOW} of {scorecard.COMBOS} ({', '.join(scorecard.LIVE_AXES)})",
          "Why": scorecard.FLIP_WHY},
+        {"Constant": "Drive time and coverage in the Huff split (src/model/served.py)",
+         "Value": " · ".join(f"{m} min: " + "/".join(f"{w:.2f}" for w in served.decay(m).values()) for m in (10, 15, 20))
+         + " (10/15/20-min band weights); competitors ×" + " / ×".join(
+             f"{served.competitor_scale(c):.2f}" for c in data.assumptions().competitor_coverage.values()),
+         "Why": served.LEVELS_WHY},
         {"Constant": "NEUTRAL", "Value": f"{scorecard.NEUTRAL}",
          "Why": "A missing signal value (e.g. no shop rent) scores neutral, never the worst."},
         {"Constant": "WEIGHT_STEPS", "Value": " / ".join(f"×{x:g}" for x in scorecard.WEIGHT_STEPS),
          "Why": scorecard.WEIGHT_WHY},
         {"Constant": "LOW_MARGIN / HIGH_MARGIN",
          "Value": f"low within {scorecard.LOW_MARGIN} of a line; high from {scorecard.HIGH_MARGIN}",
-         "Why": f"Low also when the call flips at {scorecard.FLIP_LOW}+ worker-housing level(s) or a signal weight ±25% changes it."},
+         "Why": f"Low also when the call flips in {scorecard.FLIP_LOW}+ assumption combinations or a signal weight ±25% changes it."},
         {"Constant": "Site reference (src/features/lounges.py)",
          "Value": " · ".join(f"{e}: {n}" for e, n in site_reference().emirate.value_counts().items())
          + f" salon sites; under {MIN_REF_SITES}: demand ranked UAE-wide", "Why": SITE_REFERENCE_WHY},

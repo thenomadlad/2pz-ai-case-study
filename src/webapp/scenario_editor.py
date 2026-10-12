@@ -1,4 +1,4 @@
-"""The what-if panel (What-if explorer): the worker-housing share level, search recall and closed lounges. Widgets
+"""The what-if panel (What-if explorer): drive time, competitor coverage, worker-housing share, search recall and closed lounges. Widgets
 write into data.what_if() on change; everything recomputes through baseline.run()."""
 import streamlit as st
 
@@ -8,9 +8,8 @@ from src.webapp import data
 from src.webapp.views import level_label, short
 
 LEVELS = ("low", "medium", "high")
-# Drive time and competitor coverage don't reach the scoring (scorecard.LIVE_AXES_WHY): they stay at baseline,
-# and so does affluence (off).
-_AXES = (("worker_share", "Women in worker housing"),)
+_AXES = (("travel", "Travel time to a lounge"), ("coverage", "Competitor coverage"),
+         ("worker_share", "Women in worker housing"))     # scorecard.LIVE_AXES; affluence stays off (Levels default)
 
 
 def _sync() -> None:

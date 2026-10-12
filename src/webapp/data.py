@@ -103,7 +103,8 @@ def address(branch_id: str) -> str:
     return next(lo.address for lo in v3().lounges if lo.branch_id == branch_id)
 
 
-AXES = (("worker_share", "Women in worker housing"),)   # the axes that reach the scoring: scorecard.LIVE_AXES_WHY
+AXES = (("travel", "Drive time"), ("coverage", "Competitor coverage"),
+        ("worker_share", "Women in worker housing"))   # scorecard.LIVE_AXES
 LEVELS = ("low", "medium", "high")
 
 
