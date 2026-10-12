@@ -1,7 +1,9 @@
-"""How it works & limitations: the README itself (one source of truth; Mermaid diagrams drawn in the
-browser, repo links pointed at GitHub), then live tables of every assumption in baseline.yaml and every
+"""How it works & limitations: the README, docs/model.md and docs/implementation.md themselves (one source
+of truth; Mermaid diagrams drawn in the browser, links between the three as in-page anchors, other repo
+links pointed at GitHub), then live tables of every assumption in baseline.yaml and every
 scorecard / growth constant with why it was chosen."""
 import html
+import posixpath
 import re
 
 import streamlit as st
@@ -56,27 +58,37 @@ def _const(v) -> str:
 
 
 README = REPO_ROOT / "README.md"
+# The page, in order: each file's in-app anchor is its title's heading slug, so links between them stay in the page
+DOCS = {"README.md": "#bedashing-network-right-sizing", "docs/model.md": "#the-model-in-detail",
+        "docs/implementation.md": "#implementation-notes"}
 REPO_URL = "https://github.com/thenomadlad/2pz-ai-case-study/blob/main/"
 _MERMAID = """<div class="mermaid">{code}</div>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>mermaid.initialize({{startOnLoad: true, theme: "neutral", securityLevel: "strict"}});</script>"""
 
 
-def readme_parts(text: str) -> list[tuple[str, str]]:
-    """The README as ("md", markdown) and ("mermaid", diagram) parts, with repo-relative links pointing at
-    GitHub so they work inside the app."""
-    text = re.sub(r"\]\((?!https?://|#|mailto:)([^)\s]+)\)", lambda m: f"]({REPO_URL}{m.group(1)})", text)
+def _link(path: str, base: str) -> str:
+    """A repo-relative link from a file in `base`: an in-page anchor for the docs on this page, else GitHub."""
+    target = posixpath.normpath(posixpath.join(base, path))
+    return DOCS.get(target, REPO_URL + target)
+
+
+def readme_parts(text: str, base: str = "") -> list[tuple[str, str]]:
+    """A doc as ("md", markdown) and ("mermaid", diagram) parts, its repo-relative links (relative to the
+    directory `base`) rewritten by _link so they work inside the app."""
+    text = re.sub(r"\]\((?!https?://|#|mailto:)([^)\s]+)\)", lambda m: f"]({_link(m.group(1), base)})", text)
     parts = re.split(r"^```mermaid\n(.*?)^```\n?", text, flags=re.DOTALL | re.MULTILINE)
     return [("mermaid" if i % 2 else "md", p) for i, p in enumerate(parts) if p.strip()]
 
 
 def render() -> None:
-    # The README is this page: one source of truth for the model, its limitations and its trade-offs
-    for kind, part in readme_parts(README.read_text()):
-        if kind == "md":
-            st.markdown(part)
-        else:
-            components.html(_MERMAID.format(code=html.escape(part)), height=720, scrolling=True)
+    # The README and the two docs are this page: one source of truth for the model, its limitations and trade-offs
+    for doc in DOCS:
+        for kind, part in readme_parts((REPO_ROOT / doc).read_text(), posixpath.dirname(doc)):
+            if kind == "md":
+                st.markdown(part)
+            else:
+                components.html(_MERMAID.format(code=html.escape(part)), height=720, scrolling=True)
 
     st.divider()
     st.header("Live values from the code")

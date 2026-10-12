@@ -189,16 +189,25 @@ def test_pages_default_to_the_top_row_and_ignore_unknown_links():
 
 
 def test_how_page_is_the_readme_then_live_values():
-    from src.webapp.pages.how import README, readme_parts
+    import posixpath
+    import re
+
+    from src.config import REPO_ROOT
+    from src.webapp.pages.how import DOCS, readme_parts
     at = _page("how")
     assert not at.exception
     text = _text(at)
     assert text.lstrip().startswith("# Bedashing network right-sizing")   # the README, from its own title
+    assert text.index("# The model in detail") < text.index("# Implementation notes")   # then the two docs, in order
     assert "Every factor we ignore, and why" in text and "Why commercial rent stands in for cost" in text
-    parts = readme_parts(README.read_text())
+    assert "The AI layer" in text and "Potential improvements" in text
+    parts = [p for doc in DOCS for p in readme_parts((REPO_ROOT / doc).read_text(), posixpath.dirname(doc))]
     assert sum(k == "mermaid" for k, _ in parts) == 2                     # both diagrams drawn, not shown as code
     md = " ".join(p for k, p in parts if k == "md")
-    assert "](https://github.com/thenomadlad/2pz-ai-case-study/blob/main/docs/rubric.md)" in md   # repo links work
+    assert "](https://github.com/thenomadlad/2pz-ai-case-study/blob/main/docs/limitations.md)" in md   # repo links work
+    assert "](#the-model-in-detail)" in md and "](#implementation-notes)" in md   # the three docs link in-page
+    assert not re.search(r"\]\((?:\.\./)?(?:docs/)?(?:model|implementation)\.md\)|README\.md\)", md)
+    assert not re.search(r"\bbrief\b|case study|interview|take-home", text, re.IGNORECASE)   # no trace of the original assignment
     assumptions = at.table[0].value                                       # live values from the code
     assert {"travel_time_minutes", "search_recall", "worker_housing_female_share"} <= set(assumptions.index)
     assert "low: 10 · medium: 15 · high: 20" in assumptions.loc["travel_time_minutes"].iloc[0]
