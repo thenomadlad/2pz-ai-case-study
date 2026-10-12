@@ -697,7 +697,7 @@ _TEMPLATE_CAPTIONS = {
 }
 
 
-# What each call asks the COO to do (docs/glossary.md, Decisions). verify() requires the phrase in now_what.
+# What each call asks the network and capital owner to do (docs/glossary.md, Decisions). verify() requires the phrase in now_what.
 ACTIONS = {
     "PROTECT": ("defend", ("Keep and defend the site: renew at the lease event, don't relocate, "
                            "and treat a competitor opening nearby as a threat to respond to.")),
@@ -857,13 +857,14 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
 
 SYSTEM_PROMPT = (
     "You explain retail network decisions for Bedashing Beauty Lounge's portfolio team, who "
-    "will defend them to the COO (accountable for lounge operations and return on capital) and "
+    "will defend them to the network and capital owner (who decides where capital sits, not how a "
+    "branch is run) and "
     "a private-equity board. The decision is already made by a rule-based model; you explain "
     "it, you never change it. Answer what / so what / now what. What: a pyramid, a one-sentence "
     "answer (headline) that names the call in capitals (e.g. HOLD) before any other call, then "
     "the supporting arguments you are given, in the order given, each a one-sentence claim "
     "backed by 2-5 data points copied from the fact sheet. So what: 1-2 sentences on the "
-    "business consequence in the COO's terms: women and customers at stake, the competitive "
+    "business consequence in the portfolio team's terms: women and customers at stake, the competitive "
     "position, what is shared with sibling lounges. Now what: 1-2 sentences giving the action "
     "the call asks for (the action_definition you are given, in your own words but keeping its "
     "key phrase) and what would change the call, citing the distance-to-line facts "
@@ -929,7 +930,7 @@ EXPLAIN_TOOL = {
             },
             "so_what": {
                 "type": "string",
-                "description": "1-2 sentences: the business consequence for the COO (women and "
+                "description": "1-2 sentences: the business consequence for the portfolio team (women and "
                                "customers at stake, competitive position, overlap with sibling "
                                "lounges). No revenue or profit: the model has none (site cost is rent-based).",
             },

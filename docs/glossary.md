@@ -163,7 +163,7 @@ _Avoid_: contested share, overlap (unqualified)
 
 **Lounge action**:
 PROTECT, HOLD or SHRINK from the scorecard; NOT SCORED for the airport lounge. What each one asks
-the COO to do:
+the network and capital owner to do:
 - **PROTECT**: keep and defend the site. Renew at the lease event, don't relocate, and treat a
   competitor opening nearby as a threat to respond to.
 - **HOLD**: no portfolio action this cycle. Revisit at the next lease event, or sooner if a signal
@@ -207,8 +207,8 @@ Bedashing's network, real estate and expansion team and its analysts. The primar
 _Avoid_: user, analyst (unqualified)
 
 **Decision-maker**:
-Bedashing's COO. Approves or questions the portfolio team's recommendations. Accountable for lounge operations and return on invested capital.
-_Avoid_: leadership, user
+The network and capital owner, on the portfolio team. Decides where Bedashing is present and how much capital each site ties up: open, renew, resize, relocate or exit. Doesn't run the branches: service quality, staffing and day-to-day performance belong to operations, so every call answers "is this a good place to have our capital?", never "is this branch well run?".
+_Avoid_: leadership, user, a job title
 
 **Board**:
 The PE owner's board and operating partner, who must be persuaded that a decision is defensible.

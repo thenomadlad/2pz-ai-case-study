@@ -1,6 +1,6 @@
 # Sanity Checks
 
-[`docs/rubric.md`](rubric.md) asks whether the solution has what it needs. This file asks whether the answers are **believable**: whether a COO can actually use them, whether the model rediscovers what we already know, and whether it fails in the places it should. The rubric is the go/no-go gate, and a clean run of this file is one of its conditions (MO5).
+[`docs/rubric.md`](rubric.md) asks whether the solution has what it needs. This file asks whether the answers are **believable**: whether the portfolio team can actually use them, whether the model rediscovers what we already know, and whether it fails in the places it should. The rubric is the go/no-go gate, and a clean run of this file is one of its conditions (MO5).
 
 ## When to run
 
@@ -18,9 +18,9 @@ Record each run in the log at the bottom.
 
 ---
 
-## 1. User stories (walk through the app as the COO)
+## 1. User stories (walk through the app as the network and capital owner)
 
-Open the app as the **COO**, who is accountable for lounge operations and return on capital. Try each story. Tick it only if the answer is *findable in the product without help*, *grounded in our data* and *framed in business terms* (rubric E6). A failure points at the rubric items listed, and that's where the To-improve note goes.
+Open the app as the **network and capital owner** on the portfolio team, who decides where Bedashing is present and how much capital each site ties up (not how a branch is run). Try each story. Tick it only if the answer is *findable in the product without help*, *grounded in our data* and *framed in business terms* (rubric E6). A failure points at the rubric items listed, and that's where the To-improve note goes.
 
 #### From the overview
 
@@ -128,7 +128,7 @@ The 24 operating lounges are our only revealed-preference data: Bedashing picked
   - The thin-market cliff is gone: one extra salon adds +0.014, against +0.14 before.
   - The median-based premium test is still non-monotone in 32 areas, with no label effect. Deliberately deferred.
   - **New:** adding one unpriced 4.9★ salon (259 reviews) to al-maqta flips it from **SHRINK to HOLD** (0.341 → 0.351). The rating gap is taken over the top-k substitutes, with k from `coverage_k`. The extra salon raises k from 20 to 21 and moves the median from 4.65 to 4.60. The bug was latent; A1 moved al-maqta to 0.01 under the line, which exposed it. Fix: take the median over a fixed set.
-- [x] **SC5. Explanation read-through.** Read 5 random cached explanations: 3 lounges and 2 areas. Each must pass what / so what / now what (rubric E6), and nothing in them should tell the COO to fix something inside a branch (OB4). *Pass 1:* fails. Kalba is a bare "what", and mirdif-35 says "Improving its rating is the lever to watch". *Run 1:* **PASS.** The sample was khalifa-city-a, noya-plaza, al-dhafra, madinat-hind-4 and digdaga, and across all 65 there are 0 in-branch hits and no missing so-what or now-what. One overclaim was found and fixed by hand: al-dhahir's "half the market a lounge runs on". *Run 2:* **PASS** on the regenerated cache (64 entries; sample noya-plaza, jumeirah-park, al-ain, al-dhahir, al-bihouth). Some so-whats only restate figures (rubric E6 note).
+- [x] **SC5. Explanation read-through.** Read 5 random cached explanations: 3 lounges and 2 areas. Each must pass what / so what / now what (rubric E6), and nothing in them should tell the portfolio team to fix something inside a branch (OB4). *Pass 1:* fails. Kalba is a bare "what", and mirdif-35 says "Improving its rating is the lever to watch". *Run 1:* **PASS.** The sample was khalifa-city-a, noya-plaza, al-dhafra, madinat-hind-4 and digdaga, and across all 65 there are 0 in-branch hits and no missing so-what or now-what. One overclaim was found and fixed by hand: al-dhahir's "half the market a lounge runs on". *Run 2:* **PASS** on the regenerated cache (64 entries; sample noya-plaza, jumeirah-park, al-ain, al-dhahir, al-bihouth). Some so-whats only restate figures (rubric E6 note).
 - [ ] **SC6. Orders of magnitude.** *(Needs OB2/OB5.)* Estimated services per lounge fit within plausible capacity (specialists × hours), and the contribution and ROIC figures land in a believable range for UAE salons. Nothing should claim a 300% ROIC.
 - [x] **SC8. Performance.** Record, every run, the cold and warm `src.baseline.run()` time (fresh process; cold = no `.cache/` access table) and the full-suite time (`just test` prints the 10 slowest tests). Flag any that regresses more than 2x against the last row; `tests/test_speed.py` fails a warm run over 8 s or a cold one over 10 s.
   - *2026-10-11, before the numpy allocate:* run() 44 s cold and warm; suite 414 s (172 passed, 4 xfailed).

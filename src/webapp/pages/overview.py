@@ -1,4 +1,4 @@
-"""Executive Summary: the COO's question answered as a pyramid: one governing thought, three key lines
+"""Executive Summary: the portfolio team's question answered as a pyramid: one governing thought, three key lines
 (review, grow, protect), each line's evidence, and how sure we are."""
 from collections import Counter
 

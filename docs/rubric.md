@@ -135,13 +135,13 @@ These are the layers the product must show. Most of the substance is covered in 
 
 ### A. Business framing
 
-- [x] `[core]` **A1. Decision-maker named:** who they are (e.g. COO, portfolio team, board) and what they care about.
+- [x] `[core]` **A1. Decision-maker named:** who they are (e.g. the network and capital owner, the portfolio team, the board) and what they care about.
 - [x] `[core]` **A2. Decisions enumerated:** the specific decisions, each tied to a label set, e.g. "approve lease renewal → PROTECT/HOLD/SHRINK".
 - [x] `[core]` **A3. Metrics that matter:** the north-star metric (services delivered, OB1) and the proxies standing in for it are named. Each signal is listed with *why* it matters for the decision, not just *that* we computed it.
 - [x] `[core]` **A4. How the system supports the decision:** the flow from question to screen to evidence to action is stated.
 - [x] `[ours]` **A5. Out of scope** is stated: actual P&L (we only model contribution from assumptions, see OB5), in-branch staffing, quality management and operations, and anything else we deliberately don't model, with the reason. Our job ends once capacity is allocated to sites (OB4).
 - [x] `[ours]` **A6. Framing shows up up front:** in the README and the demo opening, not only in a design doc.
-- [x] `[ours]` **A7. The first page leads with the business.** The overview opens on the COO's question and the headline answer (e.g. "N lounges to protect, M under pressure, top 3 openings, and what's at stake") before any map layer or score. Someone who reads only the first screen should know what to do next.
+- [x] `[ours]` **A7. The first page leads with the business.** The overview opens on the portfolio team's question and the headline answer (e.g. "N lounges to protect, M under pressure, top 3 openings, and what's at stake") before any map layer or score. Someone who reads only the first screen should know what to do next.
 
 *To improve:*
 
@@ -216,7 +216,7 @@ From the reviewer's seat, each question below should be answerable **for any sin
 - [x] `[ours]` **E5. Consistency:** the explanation and the label never disagree, and an automated test enforces it.
 - [ ] `[ours]` **E6. What / so what / now what.** Every recommendation, whether in the generated text, the UI or the demo, answers all three:
   - **What:** the label and the two or three facts behind it, with numbers.
-  - **So what:** the business consequence in the COO's terms, i.e. services and demand at stake, the competitive position, and whether it clears the ROIC gate (OB5).
+  - **So what:** the business consequence in the portfolio team's terms, i.e. services and demand at stake, the competitive position, and whether it clears the ROIC gate (OB5).
   - **Now what:** the action leadership should take, and what would change the call.
 
   "GROW because the demand score is 0.8" fails this item. A factor-level explanation alone is a *what* without a *so what*. The prompt for generated text has to require all three parts, and a spot check of generated outputs confirms it does.

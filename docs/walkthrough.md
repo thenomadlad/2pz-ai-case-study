@@ -10,8 +10,9 @@ Live app: https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/
 
 ## 1. Who it's for and what it decides
 
-The reader is Bedashing's **COO**, who is accountable for lounge operations and return on capital.
-The app answers the two decisions the COO already makes:
+**Who decides:** the owner of the network's footprint and capital, on the retail portfolio team. They decide where Bedashing is present and how much capital each site ties up: open, renew, resize, relocate or exit (access to market and deployment of capital). They don't run the branches: service quality, staffing and day-to-day performance belong to operations. So every call answers 'is this a good place to have our capital?', never 'is this branch well run?'
+
+The app answers the two decisions they already make:
 
 - **Lease renewal**, lounge by lounge: **PROTECT** (keep and defend), **HOLD** (no action this
   cycle), **SHRINK** (investigate downsizing or consolidating before the lease event, *not* close).
@@ -24,7 +25,7 @@ against the data.
 ## 2. The Executive Summary: the answer, then the evidence
 
 Open the [Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/). It opens on
-the COO's question, **"Where is my network under pressure, and where should we grow?"**, and answers it in
+the portfolio team's question, **"Where is my network under pressure, and where should we grow?"**, and answers it in
 one sentence: review 3 weak lounge sites, defend 6 strong ones and test 34 areas for new lounges. Of 23
 scored lounges, 6 are PROTECT, 14 HOLD and 3 SHRINK; 34 of 561 growth areas are GROW and 63 WATCH. Every
 label is judged within the site's emirate against a frozen market of 1,123 competitor salon sites, never
@@ -84,7 +85,7 @@ prime rent may be buying footfall the model can't see.
 [`/lounge?lounge=nad-al-sheba`](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/lounge?lounge=nad-al-sheba)
 is even more overlapped (75% shared) but PROTECT at 0.71: top 32% of Dubai salon sites on demand
 (48th percentile UAE-wide) at a rent ratio of 1.21, cheaper than the median Dubai salon site.
-Overlap alone doesn't make a SHRINK. So the COO's lease-review list starts with city-walk, with
+Overlap alone doesn't make a SHRINK. So the portfolio team's lease-review list starts with city-walk, with
 finance's P&L for it before anyone says "close".
 
 ## 4. One growth opportunity: Kalba (GROW)

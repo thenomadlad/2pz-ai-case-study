@@ -9,8 +9,8 @@ is checked against the data.
 
 ## The questions it answers
 
-The app is for Bedashing's **retail portfolio team** (network, real estate, expansion), working for the
-COO, to answer five questions. Each answer below is the model's current baseline
+The app is for Bedashing's **retail portfolio team** (network, real estate, expansion) and the
+network and capital owner on it, to answer five questions. Each answer below is the model's current baseline
 (all counts of women are model estimates), and where in the app to see it.
 
 1. **Which lounges should we keep, watch or review?**
@@ -48,7 +48,7 @@ COO, to answer five questions. Each answer below is the model's current baseline
 ## Look at this in 5 minutes
 
 1. **[Executive Summary](https://2pz-ai-case-study-wr7zdmdumqywtp8bvpmbxm.streamlit.app/):** the
-   COO's question answered in one line (at the 2026-10-11 baseline: *review 3 weak lounge sites,
+   portfolio team's question answered in one line (at the 2026-10-11 baseline: *review 3 weak lounge sites,
    defend 6 strong ones and test 34 areas for new lounges, most of them in Abu Dhabi and Sharjah*),
    then three cards in % of our served market, the ~164k women our lounges serve today (model
    estimate): **Review** 3 lounges, 7%; **Grow** 34 areas, the best (Al Dhaid) +35%; **Protect** 6
@@ -116,18 +116,23 @@ The full ranked list, with which calls each limitation touches and what would fi
 
 | Role | Who | Uses it to |
 |---|---|---|
-| **Primary user** | Bedashing's portfolio team (network, real estate, expansion) | form recommendations, stress-test them with what-ifs, lift the explanations into memos |
-| **Decision-maker** | COO, accountable for lounge operations and return on capital | approve or question the recommendation from the headline and the reasons |
+**Who decides:** the owner of the network's footprint and capital, on the retail portfolio team. They decide where Bedashing is present and how much capital each site ties up: open, renew, resize, relocate or exit (access to market and deployment of capital). They don't run the branches: service quality, staffing and day-to-day performance belong to operations. So every call answers 'is this a good place to have our capital?', never 'is this branch well run?'
+
+| Role | Who | Uses it to |
+|---|---|---|
+| **Primary user** | Bedashing's retail portfolio team (network, real estate, expansion) | form recommendations, stress-test them with what-ifs, lift the explanations into memos |
+| **Decision-maker** | The network and capital owner, on the portfolio team: where Bedashing is present and how much capital each site ties up | open, renew, resize, relocate or exit, from the headline and the reasons |
+| **Operations** (out of scope) | Whoever runs the branches: service quality, staffing, day-to-day performance | nothing here: the tool never judges how a branch is run |
 | **Board** | PE owner's board / operating partner | judge whether the call is defensible: evidence, thresholds, caveats |
 
-Each label maps to a decision the COO already makes (definitions: [`docs/glossary.md`](docs/glossary.md), "Decisions"):
+Each label maps to a decision the network and capital owner already makes (definitions: [`docs/glossary.md`](docs/glossary.md), "Decisions"):
 
-| COO decision | Label | What it asks |
+| Their decision | Label | What it asks |
 |---|---|---|
-| **Lease renewal** (each lounge, at its lease event) | **PROTECT** | Keep and defend: renew, don't relocate, respond to a competitor opening nearby |
+| **Lease renewal, resize or exit** (each lounge, at its lease event) | **PROTECT** | Keep and defend: renew, don't relocate, respond to a competitor opening nearby |
 | | **HOLD** | No portfolio action this cycle; revisit at the next lease event, or sooner if a signal crosses a line |
 | | **SHRINK** | Investigate, don't close: before the lease event, review downsizing or consolidating into the sibling that shares most of its catchment |
-| **Site search** (expansion plan) | **GROW** | Start a site search: a shortlist for site visits, verified on the ground before committing |
+| **Open** (site search, expansion plan) | **GROW** | Start a site search: a shortlist for site visits, verified on the ground before committing |
 | **Revisit later** | **WATCH** | Don't act now; revisit when the named failing test changes |
 | **No action** | **SKIP** | Too small or already crowded. (The airport lounge is NOT SCORED: it serves travellers.) |
 
@@ -147,9 +152,9 @@ names which), and the call is high confidence: it holds in all 27 assumption com
 put city-walk on the lease-review list with the sibling named, and ask finance for its P&L before
 anyone says "close" (a prime rent may be buying footfall the model can't see).
 
-**Why a hosted web app.** The COO opens a link: nothing to install, and every lounge and area has
+**Why a hosted web app.** The decision-maker opens a link: nothing to install, and every lounge and area has
 its own URL, so a recommendation can be sent as a link to the evidence. The portfolio team runs
-what-ifs in the same place the COO reads the answer, and the board sees the same numbers.
+what-ifs in the same place the decision-maker reads the answer, and the board sees the same numbers.
 
 ## Out of scope, and why
 
@@ -212,7 +217,7 @@ with `scorecard.ipynb`).
 
 Five pages; the loop is **Executive Summary → click a lounge or area → its page → back**.
 
-1. **Executive Summary** (`/overview`): the COO's question, one governing thought, a *How we measure*
+1. **Executive Summary** (`/overview`): the portfolio team's question, one governing thought, a *How we measure*
    note (the two proxies and why each threshold sits where it does) and the AI-written summary, then
    three cards (**Review**, **Grow**, **Protect**), each a claim with its share of our served market
    (model estimate). Below them, each card's evidence: a map and a table (composite, share of
