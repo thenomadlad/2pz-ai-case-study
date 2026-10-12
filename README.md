@@ -554,6 +554,32 @@ emirates, grounded explanations, notebooks per stage, the ranked limitations. No
 revenue or ROIC view, capacity, a free-text question box (the AI only explains precomputed calls),
 rush-hour catchments, a full competitor sweep, Bedashing's real price level.
 
+## Potential improvements
+
+Ideas raised while building this that we haven't acted on, roughly in order of value. The open items in [RUBRIC.md](RUBRIC.md) (*To improve*) and the limitations above are the detailed record; this is the short list.
+
+**Features**
+
+- **Open lounges in the What-if explorer, several at once.** Today every growth area is evaluated as its own what-if (one typical lounge, net of our lounges and competitors), so the growth percentages can't be added up: neighbouring areas claim the same women (Al Dhaid and Manama). Opening several sites together in the full run would show their *combined* growth, which lounges they take customers from, and which calls move. The model already handles one new site (`what_if_open`); the work is wiring several into `run()`, the map and the tables. Measured cost: a re-run is ~2.7 s, the same as closing a lounge (confidence check ~65%, area what-ifs ~30%), or ~1 s if the explorer skips the 81-combination confidence check. About half a day; add a speed test (two openings < 4 s).
+- **Choose a portfolio of sites, not a ranked list.** With the above, pick the best *set* of openings greedily (each next site judged net of the ones already chosen), instead of reading down a list whose growths overlap.
+
+**Model and data**
+
+- **Check the demand reading against real bookings.** The Huff split reads Dubai as so crowded that a typical lounge at our Dubai sites would serve about 2-5k women, against up to 23k at the best Abu Dhabi sites. Ranking within each emirate keeps that from sinking the Dubai calls, but it still sets every share of our served market and every growth figure. Even a rough ranking of lounges by bookings would confirm it or show the model is under-reading Dubai, and would calibrate the uncalibrated parameters (review exponent, distance decay, outside option).
+- **Observed rents where we only have the emirate median.** 17 of 34 GROW areas pass the rent test only because their rent is unknown (scored neutral, low confidence), mostly in Sharjah and the northern emirates. More listings or district rates there would turn those into real calls.
+- **Revenue, lease and capex data for a return test.** The brief's ROIC gate (RUBRIC OB5) can't be built from shop rent alone; with lease terms and revenue per lounge, SHRINK could mean "losing money" instead of "weak site".
+- **Capacity.** Lounges have no capacity in the model (OB2), so "too much capacity in a shared catchment" can't be tested and cannibalisation is shown (siblings' absorbed share), not scored.
+- **Thin-market reach.** In small towns a new lounge's 20-min reach covers the next town (Al Dhaid's +35% is mostly Al Dhaid town, also claimed by Manama); treat single large growth figures as a ceiling until reach is checked against real drive times and demand.
+- **Score lines.** Percentile scoring bunches lounges in the middle (14 HOLD, 10 within 0.05 of a line). Where PROTECT and SHRINK lines belong is an owner decision, not a tuning job.
+- **Better competitor and price data.** A full sweep of the capped search circles (free from 1 November, ~$54-210 before), Bedashing's real price level from its booking pages, and services and price tier per lounge, none of which are in the data today.
+- **Affluence beyond Dubai.** Observed household rents exist only for Dubai, so affluence weighting is off; a UAE-wide income or rent proxy would let it back in.
+
+**App polish**
+
+- Lounge and area detail pages, and the AI explanations, still talk in women rather than % of our served market (the explanations need an offline regeneration).
+- Composite bars are red even for PROTECT; the "Open →" column is clipped in the Executive Summary's evidence tables; `/overview` shows "Page not found" (the default page lives at `/`).
+- Streamlit Cloud has stopped redeploying on push: reboot the app after merging to `main`.
+
 ## Repo map
 
 ```
