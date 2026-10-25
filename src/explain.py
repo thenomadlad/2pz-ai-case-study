@@ -19,6 +19,7 @@ import hashlib
 import json
 import logging
 import re
+from collections import Counter
 from dataclasses import dataclass
 
 from src.config import REPO_ROOT, settings
@@ -244,41 +245,33 @@ GLOSSARY: dict[str, Field] = {
     "coverage_gap": Field("Coverage gap", "% of women",
                           "Competitor data coverage minus the coverage needed: negative means "
                           "too little was searched to GROW.", pct=True),
-    # --- uae (network summary) ---
+    # --- uae (network summary: the Executive Summary in one paragraph) ---
     "lounges_scored": Field("Lounges scored", "count", "UAE lounges given a call."),
-    "not_scored_count": Field("Not scored", "lounges",
-                              "Lounges that serve travellers (the airport lounge)."),
-    "protect_count": Field("PROTECT", "lounges",
-                           f"Lounges with composite ≥ {scorecard.PROTECT_AT}."),
     "hold_count": Field("HOLD", "lounges", "Lounges between the two thresholds."),
-    "shrink_count": Field("SHRINK", "lounges", f"Lounges with composite ≤ {scorecard.SHRINK_AT}."),
-    "protect_lounges": Field("PROTECT lounges", "", "Ids of PROTECT lounges."),
-    "shrink_lounges": Field("SHRINK lounges", "", "Ids of SHRINK lounges."),
-    "protect_composite_min": Field("Weakest PROTECT composite", "0-1",
-                                   "Lowest composite among PROTECT lounges."),
-    "shrink_composite_max": Field("Strongest SHRINK composite", "0-1",
-                                  "Highest composite among SHRINK lounges."),
     "low_confidence_count": Field(
         "Low-confidence calls", "lounges",
-        "Calls within 0.05 of a threshold, with a missing input or a thin premium market, or "
-        "that flip across assumption levels or when a signal weight moves ±25%."),
-    "growth_areas_total": Field("Growth areas", "count",
-                                "Named places (one per OSM place name), each evaluated as a what-if new lounge."),
-    "grow_count": Field("GROW", "areas", "Areas passing every growth test (size, demand, rent, worker housing)."),
-    "watch_count": Field("WATCH", "areas", "Big-enough areas failing the demand, rent or worker-housing test, or half the size line."),
-    "grow_areas": Field("GROW areas", "", "Ids of GROW areas."),
-    "grow_women_total": Field("Women in GROW areas", "women", "Sum over GROW areas."),
-    "grow_nearest_km_min": Field("Closest GROW area to a lounge", "km",
-                                 "Smallest nearest-lounge distance among GROW areas."),
-    "grow_nearest_km_max": Field("Furthest GROW area from a lounge", "km",
-                                 "Largest nearest-lounge distance among GROW areas."),
-    "grow_reviews_per_1k_max": Field("Most saturated GROW area", "reviews per 1k women",
-                                     "Highest premium saturation among GROW areas."),
-    "salons_total": Field("Salons searched", "count",
-                          "Women's salons found by the Google Places search (all of the UAE "
-                          "searched)."),
-    "revenue_data_available": Field("Revenue data", "yes/no", "Per-lounge revenue or footfall."),
-    "rent_data_available": Field("Lease data", "yes/no", "Per-lounge lease terms, capex or rent actually paid (shop rent shown is an area median or a published band)."),
+        "Lounge calls within 0.05 of a threshold, on the emirate-median fallback rent, or that flip "
+        "in 9+ of the 27 assumption combinations or when a signal weight moves ±25%."),
+    "near_line_count": Field("Calls near a line", "lounges",
+                             "Lounge composites within 0.05 of the PROTECT or SHRINK line."),
+    "shrink_count": Field("SHRINK", "lounges", f"Lounges with composite ≤ {scorecard.SHRINK_AT}, any confidence."),
+    "shrink_high_count": Field("SHRINK, high confidence", "lounges", "SHRINK lounges with a high-confidence call."),
+    "shrink_high_lounges": Field("SHRINK lounges, high confidence", "", "Ids of high-confidence SHRINK lounges."),
+    "protect_count": Field("PROTECT", "lounges", f"Lounges with composite ≥ {scorecard.PROTECT_AT}, any confidence."),
+    "protect_high_count": Field("PROTECT, high confidence", "lounges", "PROTECT lounges with a high-confidence call."),
+    "protect_high_lounges": Field("PROTECT lounges, high confidence", "", "Ids of high-confidence PROTECT lounges."),
+    "grow_count": Field("GROW", "areas", "Areas passing every growth test, any confidence."),
+    "grow_high_count": Field("GROW, high confidence", "areas", "GROW areas with a high-confidence call."),
+    "grow_high_lead_emirates": Field("Where most high-confidence GROW areas are", "",
+                                     "The one or two emirates holding the most high-confidence GROW areas."),
+    "grow_high_lead_count": Field("High-confidence GROW areas in those emirates", "areas",
+                                  "How many of the high-confidence GROW areas lie in the leading emirates."),
+    "new_site_min_share": Field("GROW size line, as a share of our served market", "%",
+                                "The size line over the women our lounges serve today (model estimate).",
+                                pct=True),
+    "revenue_data_available": Field("Revenue data", "yes/no", "Per-lounge revenue, margin or bookings."),
+    "lease_data_available": Field("Lease data", "yes/no", "Per-lounge lease terms or rent actually paid. "
+                                  "The model scores area shop rent per m², not the lease."),
 }
 
 # Each argument a pyramid can make, with the facts that can back it. `prioritize` picks
@@ -303,22 +296,21 @@ TOPICS: dict[str, dict[str, tuple[str, ...]]] = {
         "worker_housing": ("worker_share", "worker_cap", "worker_gap"),
         "data_gap": ("data_coverage", "min_coverage", "unsaturated", "coverage_gap"),
     },
-    "uae": {
-        "shrink": ("shrink_count", "shrink_lounges", "shrink_composite_max"),
-        "grow": ("grow_count", "grow_areas", "grow_women_total", "grow_nearest_km_min",
-                 "grow_nearest_km_max"),
-        "protect": ("protect_count", "protect_lounges", "protect_composite_min"),
-        "confidence": ("hold_count", "low_confidence_count", "lounges_scored"),
-        "data_gaps": ("revenue_data_available", "rent_data_available", "salons_total"),
+    "uae": {   # the Executive Summary's order: review, protect, grow, then how sure
+        "shrink": ("shrink_high_count", "shrink_high_lounges", "shrink_count"),
+        "protect": ("protect_high_count", "protect_high_lounges", "protect_count"),
+        "grow": ("grow_high_count", "grow_high_lead_emirates", "grow_high_lead_count", "grow_count",
+                 "new_site_min", "new_site_min_share"),
+        "confidence": ("low_confidence_count", "lounges_scored", "near_line_count", "hold_count",
+                       "revenue_data_available", "lease_data_available"),
     },
 }
 TOPIC_LABELS = {
     "demand": "Site demand", "cannibalisation": "Cannibalisation", "cost": "Site rent", "capture": "Capture",
     "rating": "Rating vs rivals", "size": "Net new women", "saturation": "Competition",
     "reach": "Distance to a lounge", "worker_housing": "Demand reliability",
-    "data_gap": "What we couldn't search", "shrink": "Where to investigate",
-    "grow": "Where to grow", "protect": "What to protect", "confidence": "How sure we are",
-    "data_gaps": "What this can't see",
+    "data_gap": "What we couldn't search", "shrink": "What to review",
+    "grow": "Where to search for sites", "protect": "What to defend", "confidence": "How sure we are",
 }
 IMPORTANT = 0.1  # a lounge signal must sit this far from neutral (0.5), weighted, to be an argument
 
@@ -527,34 +519,36 @@ def area_facts(a: Area, d: AreaDecision) -> dict:
     return _rounded(facts)
 
 
-def uae_facts(decisions: list[Decision], areas: list[Area], area_decisions: list[AreaDecision],
-              salons_total: int) -> dict:
-    scored = [d for d in decisions if d.action != NOT_SCORED_ACTION]
-    by_action = {a: [d for d in scored if d.action == a] for a in ("PROTECT", "HOLD", "SHRINK")}
-    act = {d.area_id: d.action for d in area_decisions}
-    grow = [a for a in areas if act[a.area_id] == "GROW"]
+def uae_facts(r) -> dict:
+    """The network summary's facts, counted as the Executive Summary counts them: high-confidence calls
+    first, every call second. No sum over growth areas: each is a separate what-if, so they overlap."""
+    scored = [d for d in r.decisions if d.action != NOT_SCORED_ACTION]
+    high = lambda ds, a: [d for d in ds if d.action == a and d.confidence == "high"]
+    count = lambda ds, a: sum(d.action == a for d in ds)
+    emirate = {a.area_id: a.emirate for a in r.areas}
+    grow_high = high(r.area_decisions, "GROW")
+    lead = Counter(emirate[d.area_id] for d in grow_high).most_common(2)
+    served = sum(f.served_women or 0 for f in r.features)
     return _rounded({
         "lounges_scored": len(scored),
-        "not_scored_count": len(decisions) - len(scored),
-        "protect_count": len(by_action["PROTECT"]),
-        "hold_count": len(by_action["HOLD"]),
-        "shrink_count": len(by_action["SHRINK"]),
-        "protect_lounges": ", ".join(sorted(d.branch_id for d in by_action["PROTECT"])) or "none",
-        "shrink_lounges": ", ".join(sorted(d.branch_id for d in by_action["SHRINK"])) or "none",
-        "protect_composite_min": min((d.composite for d in by_action["PROTECT"]), default=None),
-        "shrink_composite_max": max((d.composite for d in by_action["SHRINK"]), default=None),
+        "hold_count": count(scored, "HOLD"),
         "low_confidence_count": sum(d.confidence == "low" for d in scored),
-        "growth_areas_total": len(areas),
-        "grow_count": len(grow),
-        "watch_count": sum(d.action == "WATCH" for d in area_decisions),
-        "grow_areas": ", ".join(sorted(a.area_id for a in grow)) or "none",
-        "grow_women_total": round(sum(a.women for a in grow)),
-        "grow_nearest_km_min": min((a.nearest_lounge_km for a in grow), default=None),
-        "grow_nearest_km_max": max((a.nearest_lounge_km for a in grow), default=None),
-        "grow_reviews_per_1k_max": max((a.premium_reviews_per_1k for a in grow if a.premium_reviews_per_1k is not None), default=None),
-        "salons_total": salons_total,
+        "near_line_count": sum(min(abs(d.composite - scorecard.PROTECT_AT), abs(d.composite - scorecard.SHRINK_AT))
+                               < scorecard.LOW_MARGIN for d in scored),
+        "shrink_count": count(scored, "SHRINK"),
+        "shrink_high_count": len(high(scored, "SHRINK")),
+        "shrink_high_lounges": ", ".join(sorted(d.branch_id for d in high(scored, "SHRINK"))) or "none",
+        "protect_count": count(scored, "PROTECT"),
+        "protect_high_count": len(high(scored, "PROTECT")),
+        "protect_high_lounges": ", ".join(sorted(d.branch_id for d in high(scored, "PROTECT"))) or "none",
+        "grow_count": count(r.area_decisions, "GROW"),
+        "grow_high_count": len(grow_high),
+        "grow_high_lead_emirates": " and ".join(e for e, _ in lead) or "none",
+        "grow_high_lead_count": sum(n for _, n in lead),
+        "new_site_min": growth.NEW_SITE_MIN,
+        "new_site_min_share": growth.NEW_SITE_MIN / served if served else None,
         "revenue_data_available": False,
-        "rent_data_available": False,
+        "lease_data_available": False,
     })
 
 
@@ -654,14 +648,14 @@ def _template_claim(kind: str, topic: str, f: dict) -> str:
                          "of the women here, so competition is partly unknown."),
         }[topic]
     return {  # uae
-        "shrink": f"Investigate before shrinking: {f['shrink_lounges']}.",
-        "grow": (f"{f['grow_count']} areas to GROW, with "
-                 f"{fmt('grow_women_total', f['grow_women_total'])} women 15+ between them."),
-        "protect": f"Protect {f['protect_lounges']}.",
-        "confidence": (f"{f['hold_count']} lounges sit in the HOLD band and "
-                       f"{f['low_confidence_count']} calls are low confidence."),
-        "data_gaps": ("No revenue or lease data: these are location and market calls, not "
-                      "return-on-capital calls."),
+        "shrink": (f"Review {f['shrink_high_count']} weak lounge site(s) ({f['shrink_high_lounges']}), of "
+                   f"{f['shrink_count']} SHRINK calls."),
+        "protect": (f"Defend {f['protect_high_count']} strong site(s) ({f['protect_high_lounges']}), of "
+                    f"{f['protect_count']} PROTECT calls."),
+        "grow": (f"Search for sites in {f['grow_high_count']} high-confidence GROW areas, of "
+                 f"{f['grow_count']} GROW areas."),
+        "confidence": (f"{f['low_confidence_count']} of {f['lounges_scored']} lounge calls are low "
+                       "confidence, and there is no revenue or lease data."),
     }[topic]
 
 
@@ -679,9 +673,8 @@ def _template_headline(kind: str, action: str, f: dict) -> str:
                 + " for its emirate, and "
                 + ("rent unknown" if rent is None else "no dearer than" if rent >= 0 else "dearer than")
                 + ("" if rent is None else " its emirate's median salon site") + ".")
-    return (f"{f['protect_count']} PROTECT, {f['hold_count']} HOLD and {f['shrink_count']} "
-            f"SHRINK across {f['lounges_scored']} scored lounges, with {f['grow_count']} "
-            "areas to GROW.")
+    return (f"Review {f['shrink_high_count']}, defend {f['protect_high_count']} and search for sites in "
+            f"{f['grow_high_count']} areas (high-confidence calls).")
 
 
 _TEMPLATE_CAPTIONS = {
@@ -739,14 +732,12 @@ def _template_so_what(kind: str, action: str, f: dict) -> str:
     if kind == "area":
         return (f"{fmt('women', f['women'])} women 15+ live here; our nearest lounge is "
                 f"{f['nearest_lounge_id']}.")
-    return (f"{fmt('grow_women_total', f['grow_women_total'])} women live in the {f['grow_count']} "
-            f"GROW areas; {f['shrink_count']} lounges need a closer look.")
+    return ""   # uae: the summary is one paragraph, headline and arguments only
 
 
 def _template_now_what(kind: str, action: str, f: dict) -> str:
     if action not in ACTIONS:
-        return ("No portfolio call from this model." if kind == "lounge" else
-                "Investigate the SHRINK lounges and start site searches in the GROW areas.")
+        return "No portfolio call from this model." if kind == "lounge" else ""
     return " ".join([ACTIONS[action][1], *what_would_change(kind, f)])
 
 
@@ -805,7 +796,7 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
     if got != topics:
         errors.append(f"arguments must be exactly {topics}, in that order; got {got}")
     for name in ("so_what", "now_what"):
-        if not getattr(exp, name, "").strip():
+        if kind != "uae" and not getattr(exp, name, "").strip():
             errors.append(f"{name} is required")
     if exp.action in LABELS.get(kind, ()):  # E5: the text names the decision's own label
         first = re.search(r"\b(" + "|".join(LABELS[kind]) + r")\b", exp.headline)
@@ -823,6 +814,12 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
     if any(IN_BRANCH.search(t) for t in texts):
         errors.append("in-branch advice (rating, staffing, service quality) is out of scope: "
                       "explain where capacity sits, never how to run a branch")
+    if kind == "uae":
+        paragraph = [exp.headline] + [r.claim for r in exp.reasons]
+        if any(re.search(r"\bopen", t, re.IGNORECASE) for t in paragraph):
+            errors.append("GROW starts a site search: never say open")
+        if any(re.search(r"\bclos(e|ing|ure)\b(?!\s+to\b)", t, re.IGNORECASE) for t in paragraph):
+            errors.append("SHRINK means review, never close")
     allowed = _allowed_numbers(facts)
     for r in exp.reasons:
         if not MIN_ITEMS <= len(r.evidence) <= MAX_ITEMS:
@@ -837,8 +834,9 @@ def verify(exp: Explanation, facts: dict, kind: str) -> list[str]:
             elif not _match(e.value, facts[e.field]):
                 errors.append(f"{e.field}: cited {e.value!r}, actual {facts[e.field]!r}")
     # Ids like "mirdif-35" are cited verbatim; drop them so their digits aren't read as data.
-    ids = sorted({part for v in facts.values() if isinstance(v, str) for part in v.split(", ")}
-                 | {exp.subject_id}, key=len, reverse=True)
+    # Also as written in prose: "Mirdif 35" for mirdif-35.
+    ids = {part for v in facts.values() if isinstance(v, str) for part in v.split(", ")} | {exp.subject_id}
+    ids = sorted(ids | {i.replace("-", " ") for i in ids}, key=len, reverse=True)
     for text in texts:
         for ident in ids:
             text = re.sub(re.escape(ident), "", text, flags=re.IGNORECASE)
@@ -970,6 +968,8 @@ def _user_message(kind: str, subject_id: str, action: str, facts: dict, errors: 
                                "meaning": GLOSSARY[k].meaning} for k in facts},
         "thresholds": _thresholds_note(kind),
     }
+    if kind == "uae":
+        msg["format"] = NETWORK_FORMAT
     if errors:
         msg["your_previous_attempt_failed_checks"] = errors
     return json.dumps(msg)
@@ -1054,6 +1054,16 @@ def explain(kind: str, subject_id: str, action: str, facts: dict,
 
 
 NETWORK_ACTION = "SUMMARY"
+# The Executive Summary's one-paragraph summary: the page, read top-down (the pyramid principle).
+NETWORK_FORMAT = (
+    "This is the Executive Summary's one-paragraph summary, shown as plain text: the headline and then "
+    "each argument's claim, read together as 4-5 sentences. Headline: the answer, as actions (review, "
+    "defend, search for sites), counting high-confidence calls. Then one sentence per argument, each "
+    "giving its high-confidence count first and the all-confidence count second. The last sentence says "
+    "how sure to be and why (calls near a line, no revenue or lease data). GROW starts a site search: "
+    "never write open. SHRINK means review: never write close. Growth areas overlap, so never add their "
+    "figures. Plain words, no ids in brackets unless they are lounge names. Leave so_what and now_what "
+    "empty; the table_caption is one sentence.")
 V3_NETWORK_ID = "uae"
 
 
@@ -1066,11 +1076,7 @@ def v3_subjects() -> list[tuple[str, str, str, dict]]:
 def run_subjects(r) -> list[tuple[str, str, str, dict]]:
     """(kind, id, action, facts) for every explanation of one baseline.Run (the app uses this too,
     so its fact sheets hit the committed cache exactly when the numbers match the baseline)."""
-    from src.data_v3 import load_v3
-
-    salons = int((load_v3().salons.excluded_reason == "").sum())
-    subjects = [("uae", V3_NETWORK_ID, NETWORK_ACTION,
-                 uae_facts(r.decisions, r.areas, r.area_decisions, salons))]
+    subjects = [("uae", V3_NETWORK_ID, NETWORK_ACTION, uae_facts(r))]
     subjects += [("lounge", f.branch_id, d.action, lounge_facts(f, d, r.flips.get(f.branch_id)))
                  for f, d in zip(r.features, r.decisions)]
     subjects += [("area", a.area_id, d.action, area_facts(a, d))

@@ -70,10 +70,29 @@ def test_prioritize_area_cases():
     assert explain.prioritize("area", {**base, "women": 5_000}, "SKIP") == ["size", "reach"]
 
 
-def test_prioritize_uae_skips_empty_groups():
+def test_prioritize_uae_follows_the_page_and_skips_empty_groups():
     facts = {"shrink_count": 0, "grow_count": 4, "protect_count": 2}
-    assert explain.prioritize("uae", facts, "SUMMARY") == [
-        "grow", "protect", "confidence", "data_gaps"]
+    assert explain.prioritize("uae", facts, "SUMMARY") == ["protect", "grow", "confidence"]
+
+
+def test_network_summary_counts_high_confidence_first_and_never_sums_areas():
+    from src.baseline import run
+    f = explain.uae_facts(run())
+    assert (f["shrink_high_count"], f["protect_high_count"], f["grow_high_count"]) == (1, 3, 12)
+    assert not any("total" in k for k in f)          # growth areas overlap: no sums
+
+
+def test_network_summary_never_says_open_or_close():
+    from src.baseline import run
+    from src.webapp.data import subject
+    action, facts = subject(run(), "uae", "uae")
+    exp = explain.template_explanation("uae", "uae", action, facts)
+    assert explain.verify(exp, facts, "uae") == []
+    for bad, why in (("We should open 12 lounges.", "never say open"), ("Close City Walk.", "never close")):
+        broken = exp.model_copy(update={"headline": bad})
+        assert any(why in e for e in explain.verify(broken, facts, "uae"))
+    near = exp.model_copy(update={"headline": "12 calls sit close to a line."})
+    assert not any("close" in e for e in explain.verify(near, facts, "uae"))
 
 
 # --- grounding check ----------------------------------------------------------------------

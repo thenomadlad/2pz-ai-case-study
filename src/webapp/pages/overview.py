@@ -17,8 +17,8 @@ from src.webapp.map import (
 from src.webapp.views import (
     explanation_for,
     limitations_box,
-    render_pyramid,
     short,
+    source_note,
 )
 
 WEIGHTS = {s.name: s.weight for s in scorecard.SIGNALS}
@@ -73,7 +73,9 @@ def _governing(r, p: dict) -> None:
     with st.expander("How we measure: serviceable market per AED of commercial rent, within each emirate"):
         st.markdown(measures_text(r))
     with st.expander("Read the AI-written summary", expanded=True):
-        render_pyramid(explanation_for(r, "uae", "uae")[0])
+        exp = explanation_for(r, "uae", "uae")[0]    # the page in one paragraph: answer, then review, protect, grow, how sure
+        st.markdown(" ".join([exp.headline] + [reason.claim for reason in exp.reasons]))
+        st.caption(source_note(exp))
 
 
 def served_market(r) -> float:

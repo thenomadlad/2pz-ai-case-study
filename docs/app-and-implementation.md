@@ -79,7 +79,7 @@ direction and signed off the judgement calls: the scorecard scales and the salon
 ## How we checked it
 
 - **Sanity checks and back-tests** ([`docs/sanity-checks.md`](sanity-checks.md), re-run and logged after each model change): closing any sibling never pushes another lounge toward SHRINK (23 closures, 0 violations); +50% women in a catchment never lowers its call; 5 of 6 industrial, free-zone and military negative controls come out SKIP (the sixth, mixed-use Dubai Investments Park, is WATCH).
-- **Tests:** 196, about 45 s (`just test`); a full baseline run takes about 2-3 s, including: default decision rules reproduce the baseline exactly; a rent quote rescores only that site; tightening the GROW minimum never adds a GROW.
+- **Tests:** 203, about 45 s (`just test`); a full baseline run takes about 2-3 s, including: default decision rules reproduce the baseline exactly; a rent quote rescores only that site; tightening the GROW minimum never adds a GROW.
 - **Speed guards:** a full baseline run must stay under 8 s warm and 10 s cold (`tests/test_speed.py`).
 - **No paid API by accident:** the only paid path must be asked for by name, and a test proves unknown arguments never reach it.
 - **What we can't check:** there is no ground truth. Without bookings data the demand model is uncalibrated, so the calls are a ranked shortlist, not a forecast.

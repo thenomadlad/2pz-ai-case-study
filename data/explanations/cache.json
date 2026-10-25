@@ -4512,6 +4512,123 @@
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
+  "679c301a6b097d80": {
+    "action": "SUMMARY",
+    "headline": "Review 1 weak lounge site, defend 3 strong ones and search for sites in 12 areas: these are the calls the model is surest of.",
+    "kind": "uae",
+    "now_what": "",
+    "reasons": [
+      {
+        "claim": "City Walk is the one site to review, the only high-confidence call among 3 SHRINKs, and reviewing it starts with the lease and finance's numbers.",
+        "evidence": [
+          {
+            "field": "shrink_high_count",
+            "label": "SHRINK, high confidence",
+            "value": 1
+          },
+          {
+            "field": "shrink_high_lounges",
+            "label": "SHRINK lounges, high confidence",
+            "value": "city-walk"
+          },
+          {
+            "field": "shrink_count",
+            "label": "SHRINK",
+            "value": 3
+          }
+        ],
+        "topic": "shrink"
+      },
+      {
+        "claim": "Al Dhafra, Al Taif Mall and Mirdif 35 are strong sites for their emirates and worth defending at renewal; the other 3 of the 6 PROTECT calls are less certain.",
+        "evidence": [
+          {
+            "field": "protect_high_count",
+            "label": "PROTECT, high confidence",
+            "value": 3
+          },
+          {
+            "field": "protect_high_lounges",
+            "label": "PROTECT lounges, high confidence",
+            "value": "al-dhafra, al-taif-mall, mirdif-35"
+          },
+          {
+            "field": "protect_count",
+            "label": "PROTECT",
+            "value": 6
+          }
+        ],
+        "topic": "protect"
+      },
+      {
+        "claim": "12 of the 34 GROW areas are high confidence, 11 of them in Abu Dhabi and Ajman, and each would add at least 6,000 net new women (about 4% of our served market), though neighbouring areas reach the same women.",
+        "evidence": [
+          {
+            "field": "grow_high_count",
+            "label": "GROW, high confidence",
+            "value": 12
+          },
+          {
+            "field": "grow_count",
+            "label": "GROW",
+            "value": 34
+          },
+          {
+            "field": "grow_high_lead_emirates",
+            "label": "Where most high-confidence GROW areas are",
+            "value": "Abu Dhabi and Ajman"
+          },
+          {
+            "field": "grow_high_lead_count",
+            "label": "High-confidence GROW areas in those emirates",
+            "value": 11
+          },
+          {
+            "field": "new_site_min",
+            "label": "GROW size line",
+            "value": 6000
+          }
+        ],
+        "topic": "grow"
+      },
+      {
+        "claim": "Treat this as a shortlist to test, not a decision: 12 of 23 lounge calls are low confidence, 10 of them close to a decision line, and the model has no revenue or lease data.",
+        "evidence": [
+          {
+            "field": "low_confidence_count",
+            "label": "Low-confidence calls",
+            "value": 12
+          },
+          {
+            "field": "lounges_scored",
+            "label": "Lounges scored",
+            "value": 23
+          },
+          {
+            "field": "near_line_count",
+            "label": "Calls near a line",
+            "value": 10
+          },
+          {
+            "field": "revenue_data_available",
+            "label": "Revenue data",
+            "value": false
+          },
+          {
+            "field": "lease_data_available",
+            "label": "Lease data",
+            "value": false
+          }
+        ],
+        "topic": "confidence"
+      }
+    ],
+    "so_what": "",
+    "source": "ai",
+    "subject_id": "uae",
+    "table_caption": "Lounge calls weigh site demand and shop rent within each emirate; area calls test a what-if new lounge's net new women, demand and rent.",
+    "thresholds_note": "PROTECT at a composite of 0.65 or more, SHRINK at 0.35 or less: 0.15 either side of a neutral 0.5. With two equal signals, even a perfect score on one needs at least 0.3 on the other to reach PROTECT (and a zero on one needs 0.7 on the other to escape SHRINK): the two have to broadly agree. Everything between is HOLD: with no revenue or lease data, a strong call needs both signals behind it. Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
+  },
   "67c19dc6bfa8962e": {
     "action": "PROTECT",
     "headline": "PROTECT: al-taif-mall's site would out-serve 90% of UAE salon sites on demand, with a rent cheaper than the median salon site in its emirate (composite 0.95).",
@@ -4993,134 +5110,6 @@
     "subject_id": "eastern-mahadir-abu-dhabi",
     "table_caption": "Each area is a what-if: open a typical lounge here and count the women it adds to the network, net of what it takes from our own lounges. GROW also needs the site to out-serve at least half of its emirate's salon sites and a rent no dearer than their median; the UAE-wide percentiles are context.",
     "thresholds_note": "Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
-  },
-  "71a4d1b214cb4fa9": {
-    "action": "SUMMARY",
-    "headline": "SUMMARY: investigate 3 lounges for SHRINK, open in 34 GROW areas, and protect 6 lounges, across 23 lounges scored.",
-    "kind": "uae",
-    "now_what": "Investigate the 3 SHRINK lounges before their lease events, scope the 34 GROW areas, and renew the 6 PROTECT sites. Confirm the thin calls against real revenue and lease data before committing capital.",
-    "reasons": [
-      {
-        "claim": "Three lounges (al-jada, city-walk, westyas) sit at or below the SHRINK line, the highest at a composite of 0.348.",
-        "evidence": [
-          {
-            "field": "shrink_count",
-            "label": "SHRINK",
-            "value": 3
-          },
-          {
-            "field": "shrink_lounges",
-            "label": "SHRINK lounges",
-            "value": "al-jada, city-walk, westyas"
-          },
-          {
-            "field": "shrink_composite_max",
-            "label": "Strongest SHRINK composite",
-            "value": 0.348
-          }
-        ],
-        "topic": "shrink"
-      },
-      {
-        "claim": "34 areas clear the GROW bar, together adding about 796,000 net new women, 1.3 to 55 km from our nearest lounge.",
-        "evidence": [
-          {
-            "field": "grow_count",
-            "label": "GROW",
-            "value": 34
-          },
-          {
-            "field": "grow_women_total",
-            "label": "Women in GROW areas",
-            "value": 796024
-          },
-          {
-            "field": "grow_nearest_km_min",
-            "label": "Closest GROW area to a lounge",
-            "value": 1.3018
-          },
-          {
-            "field": "grow_nearest_km_max",
-            "label": "Furthest GROW area from a lounge",
-            "value": 54.9537
-          },
-          {
-            "field": "growth_areas_total",
-            "label": "Growth areas",
-            "value": 561
-          }
-        ],
-        "topic": "grow"
-      },
-      {
-        "claim": "Six lounges clear the PROTECT line, the lowest at a composite of 0.6645.",
-        "evidence": [
-          {
-            "field": "protect_count",
-            "label": "PROTECT",
-            "value": 6
-          },
-          {
-            "field": "protect_lounges",
-            "label": "PROTECT lounges",
-            "value": "al-ain, al-dhafra, al-falah, al-taif-mall, mirdif-35, nad-al-sheba"
-          },
-          {
-            "field": "protect_composite_min",
-            "label": "Weakest PROTECT composite",
-            "value": 0.6645
-          }
-        ],
-        "topic": "protect"
-      },
-      {
-        "claim": "14 of 23 lounges are HOLD, and 12 calls are low confidence because they change in 9 or more of 27 assumption combinations.",
-        "evidence": [
-          {
-            "field": "hold_count",
-            "label": "HOLD",
-            "value": 14
-          },
-          {
-            "field": "low_confidence_count",
-            "label": "Low-confidence calls",
-            "value": 12
-          },
-          {
-            "field": "lounges_scored",
-            "label": "Lounges scored",
-            "value": 23
-          }
-        ],
-        "topic": "confidence"
-      },
-      {
-        "claim": "The model has no revenue data and no lounge rent data, and sees 3,833 competitor salons, so calls rest on site signals only.",
-        "evidence": [
-          {
-            "field": "revenue_data_available",
-            "label": "Revenue data",
-            "value": false
-          },
-          {
-            "field": "rent_data_available",
-            "label": "Lease data",
-            "value": false
-          },
-          {
-            "field": "salons_total",
-            "label": "Salons searched",
-            "value": 3833
-          }
-        ],
-        "topic": "data_gaps"
-      }
-    ],
-    "so_what": "Six lounges anchor the network, while three weak sites and 34 high-potential areas show where capital could move. With 12 of 23 calls low confidence, treat the map as a shortlist to investigate.",
-    "source": "ai",
-    "subject_id": "uae",
-    "table_caption": "The table counts lounges by call and lists growth areas the model would open in. Calls come from site signals only: rent and demand percentile, scored 0 to 1. Read counts as a shortlist, since many calls are low confidence.",
-    "thresholds_note": "PROTECT at a composite of 0.65 or more means the lounge clears the bar on most signals, not just one. SHRINK at 0.35 or less means it is weak on most signals. Everything between is HOLD: with no revenue or lease data, strong calls need the signals to agree. Each area is a what-if: open a typical lounge there and count the women it would add to the network, net of those it takes from our own lounges (Huff). GROW needs at least 6,000 net new women, worker housing under 50% of adults, a shop rent no dearer than the median salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: neutral, low confidence) and a site that would out-serve at least 50% of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big enough but dearer or weaker demand, mostly worker housing, or 3,000+ net new women. SKIP: fewer, under 5,000 women, or non-residential by name. Under 50% of the women searched for competitors lowers confidence."
   },
   "7219bc0eff03c3ee": {
     "action": "WATCH",

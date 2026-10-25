@@ -485,6 +485,14 @@ Trigger: 60e6c77 (scoring takes the portfolio team's decision rules and rent quo
 - **SC8:** run() 1.8 s in a fresh process with the disk access cache, 2.1 s with an empty one (run 13: 4.5 s cold); suite 42 s, 196 passed and 1 failed. The failure (`tests/webapp/test_pages.py::test_area_page_caveats`, an area-page caveat string) came with uncommitted app-text and test edits in the working tree at the time of the run, not from the model; the suite had 196 tests before those edits added one.
 - **User stories:** 3/10, unchanged. US10 is closer (decision rules are now levers) but stays partial on margin (no money in the model).
 
+## Run 15 results (2026-10-25, the network summary rewritten; no call changed)
+
+Trigger: the Executive Summary's AI-written summary counted every call with no confidence split, so it contradicted the page's headline, and it read a "women in GROW areas" sum (796k) as net new women. Its fact sheet now counts high-confidence calls first and all calls second, carries no sum over growth areas (they overlap), and says *lease* data where it said rent; it renders as one 4-5 sentence paragraph.
+
+- **SC2: unchanged.** No model code changed: 6/14/3/1, 34/63/464, 12 of 23 low.
+- **SC5: PASS.** 1 explanation regenerated offline (the uae summary); `check` and `ingest` 1 / 0 failed; 121 cached. `verify()` now also rejects "open" and "close" in it (GROW starts a site search; SHRINK means review), and reads lounge ids written as names ("Mirdif 35") as ids, not numbers. Read-through: the five sentences match the page (review 1, defend 3, search 12; 11 of the 12 in Abu Dhabi and Ajman; 12 of 23 low, 10 near a line).
+- **SC8:** suite 203 passed.
+
 ## Run log
 
 | Run | Date | Trigger | User stories | Back-tests | Sanity checks | Unexplained failures |
@@ -514,5 +522,6 @@ Trigger: 60e6c77 (scoring takes the portfolio team's decision rules and rent quo
 | 12 | 2026-10-11 | Confidence check over live axes only (worker share; travel and coverage don't reach the Huff scoring) | unchanged | unchanged | Calls and confidences unchanged (11 of 23 low); khaleej-al-arabi 27/81 → 1/3; SC5 1 regenerated; run() 3.3 s | none |
 | 13 | 2026-10-11 | Drive time and coverage wired into the Huff split (confidence over 27 combinations again); UI: Executive Summary, What-if explorer, table pickers, factor tree | unchanged | not re-run (calls unchanged) | Calls 6/14/3/1, 34/63/464 unchanged; 12 of 23 low (jumeirah-park new, 9/27); SC4 **pass** (0 moves toward SHRINK, 0 dips); SC5 15 regenerated offline; run() 4.5 s cold, suite 147 s | none |
 | 14 | 2026-10-12 | Three `src/model` commits since run 13 (decision rules and rent quotes as parameters; WHY text), at 28df27b | 3/10 (US10 closer: decision rules are levers; margin still missing) | BT2/BT3 re-run: unchanged (PROTECT → GROW 4/6, F6); others carried over (calls and data unchanged) | Calls 6/14/3/1 (12 of 23 low), 34/63/464 (12 GROW high), unchanged; SC4 **pass** (0 moves toward SHRINK, 0 dips, reference never moves; +50% 0 drops; rival 0 rises); SC5 not re-run (needs `src.explain`), cache test green; run() 2.1 s cold, suite 42 s | none |
+| 15 | 2026-10-25 | Network summary rewritten (high-confidence counts, no growth sums, one paragraph); explanation text and checks only | unchanged | not re-run (calls unchanged) | SC5 pass (1 regenerated, 121 cached) | none |
 
 *Not yet automated:* the checks are run by hand or by agents, with throwaway scripts on in-memory copies of the data. Parts are unit tests already (SC4's frozen reference and frozen typical lounge: `test_closing_a_lounge_never_moves_another_lounges_reference`, `test_typical_lounge_is_frozen_at_the_baseline_median`, `test_a_better_rated_competitor_never_raises_a_lounge`; SC5's grounding: `test_every_committed_cache_entry_is_current_and_grounded`). The OB3 model this once waited on landed at pass 5 and BT1 first ran at run 7, so scripting SC2, SC4 and BT2/BT3 as `just sanity` is unblocked; it hasn't been done. SC6 still needs OB2/OB5.
