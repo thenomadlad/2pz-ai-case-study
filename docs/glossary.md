@@ -66,7 +66,7 @@ The emirate's median shop rent at its reference sites ÷ the site's shop rent (`
 cheaper than the median salon site in its emirate). Always against its own emirate, even under 50
 sites. The scorecard's cost signal on a frozen scale (P10 0.62 → 0, P90 1.43 → 1) and a GROW test
 (1+; unknown or the emirate-median fallback passes, low confidence). Rent only: served women are not in it. Shown with its UAE-wide rent percentile
-(`rent_pct_uae`, higher = dearer) as context.
+(`rent_pct_uae`, higher = more expensive) as context.
 _Avoid_: ROI, return, profitability, cost efficiency
 
 **Women per rent**:
@@ -206,7 +206,7 @@ GROW, WATCH or SKIP, assigned to a growth area from a what-if: open a typical lo
 - **GROW**: start a site search here. 6,000+ net new women, worker housing under 50%, a rent ratio
   of 1+ (unknown or the emirate-median fallback passes, low confidence) and a demand percentile of 0.5+ in its emirate's salon sites. It's a shortlist for a site visit and lease search, to be verified on the
   ground before committing.
-- **WATCH**: don't act now. Big but dearer than its emirate's median salon site or with weaker demand, big but mostly worker housing,
+- **WATCH**: don't act now. Big but more expensive than its emirate's median salon site or with weaker demand, big but mostly worker housing,
   or 3,000+ net new women. Revisit when the named failing test changes.
 - **SKIP**: no action. Under 3,000 net new women, under 5,000 women, or non-residential by name
   (industrial, free zone, military, airport, port).

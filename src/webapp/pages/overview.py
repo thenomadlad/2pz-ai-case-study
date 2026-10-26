@@ -101,7 +101,7 @@ def measures_text(r) -> str:
         f"{ours[0]:,.0f} to {ours[-1]:,.0f} (quartiles {ours[1]:,.0f} / {ours[2]:,.0f} / {ours[3]:,.0f}); at "
         f"the {len(ref):,} salon sites the quartiles are {theirs[0]:,.0f} / {theirs[1]:,.0f} / {theirs[2]:,.0f}. "
         "Staff, products and fit-out per appointment differ far less between branches, so rent is what makes "
-        "one site dearer than another.\n\n"
+        "one site more expensive than another.\n\n"
         "Each is scored 0-1 and the two are averaged. Emirates are compared with themselves because rents, "
         "prices and competition differ between them.\n\n"
         "**Why these thresholds.** They are judgement calls, not fitted to data (we have none to fit them to), "
@@ -115,7 +115,7 @@ def measures_text(r) -> str:
         "- **Site demand score = the percentile itself**: out-serving 66% of the emirate's salon sites scores "
         "0.66, so there is no extra cut-off to argue about.\n"
         "- **Site rent score**: the rent ratio (its emirate's median salon-site rent ÷ the site's) on a 0-1 scale. "
-        f"Rent {1 / scorecard.RENT_RATIO_P10:.1f}x the emirate median or more (the dearest 10% of the 1,123 salon "
+        f"Rent {1 / scorecard.RENT_RATIO_P10:.1f}x the emirate median or more (the most expensive 10% of the 1,123 salon "
         f"sites) scores 0; {1 / scorecard.RENT_RATIO_P90:.0%} of the median or less (the cheapest 10%) scores 1; "
         "in between it scales evenly, so a site at its emirate's median rent scores "
         f"{(1 - scorecard.RENT_RATIO_P10) / (scorecard.RENT_RATIO_P90 - scorecard.RENT_RATIO_P10):.2f}.\n"
@@ -125,7 +125,7 @@ def measures_text(r) -> str:
         "net of what it takes from our own lounges.\n"
         f"- **GROW needs demand in the top {1 - growth.DEMAND_PCT_MIN:.0%} and rent ratio 1x or more**: a "
         "typical lounge there would serve at least what one would at the median competitor salon site, at a "
-        "rent no dearer than theirs. Both lines sit at the emirate's median salon site: \"at least as good as "
+        "rent no more expensive than theirs. Both lines sit at the emirate's median salon site: \"at least as good as "
         "where our competitors already chose to be\".\n"
         "- **Low confidence** also covers calls that change in a third or more of the assumption combinations "
         "(drive time, competitor coverage, worker housing) or when a signal's weight moves ±25%.\n\n"
@@ -270,7 +270,7 @@ def _how_sure(r) -> None:
 KPI_TABLE = """| Branch health KPI | What it tells us | Today it rests on | To be more confident we need |
 |---|---|---|---|
 | **Site demand** (share of its emirate's salon sites it out-serves) | Is the location strong for its emirate? | A Huff split of women 15+ across premium salons, weighted by services sold (lifetime Google reviews, our proxy); distance decay and the outside option are uncalibrated | Bookings or visits per lounge (even a ranking) to calibrate the split; customers' home areas to check the catchments |
-| **Site rent** (rent ratio vs the emirate's salon sites) | Is the site dear for its emirate? | Area shop rents (DLD contracts, ADREC district rates, asking rents); the emirate median where none is observed | Each lounge's actual lease; observed rents where we use the median ({lounges}, {areas}) |
+| **Site rent** (rent ratio vs the emirate's salon sites) | Is the site expensive for its emirate? | Area shop rents (DLD contracts, ADREC district rates, asking rents); the emirate median where none is observed | Each lounge's actual lease; observed rents where we use the median ({lounges}, {areas}) |
 | **Share of our served market** | How much of our business sits at this lounge? | The same Huff estimate, counted in women, not customers | Customers or revenue per lounge |
 | **Performance vs its site** | Is the lounge beating or trailing its location? | Whether it sells more or less than a typical lounge would at its site, measured by lifetime Google reviews (our proxy for services sold) | Bookings, revenue and chair utilisation per lounge |
 | **The call** (PROTECT / HOLD / SHRINK) | Keep, watch or review? | Demand and rent only: no revenue, margin, capex or capacity | Revenue, margin, capex and capacity per lounge, for a return-on-capital test |

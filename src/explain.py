@@ -175,7 +175,7 @@ GLOSSARY: dict[str, Field] = {
                            "or listings rent (an area: half or more of its women), not an observation of the place. "
                            "The rent test is neutral (passes; a lounge's rent scores 0.5) and the call is low confidence."),
     "rent_pct_uae": Field("Rent percentile UAE-wide", "% of UAE salon sites",
-                          "Share of the UAE reference salon sites with a lower shop rent (higher = dearer). Context, not scored.",
+                          "Share of the UAE reference salon sites with a lower shop rent (higher = more expensive). Context, not scored.",
                           pct=True),
     "new_site_served": Field("New lounge would serve", "women", "What-if: women a typical new lounge here would serve (Huff)."),
     "new_site_taken": Field("Taken from our lounges", "women", "What-if: of those, women it would take from our existing lounges."),
@@ -589,11 +589,11 @@ def prioritize(kind: str, facts: dict, action: str) -> list[str]:
 GROWTH_WHY = (
     "Each area is a what-if: open a typical lounge there and count the women it would add to the "
     f"network, net of those it takes from our own lounges (Huff). GROW needs at least {growth.NEW_SITE_MIN:,} "
-    f"net new women, worker housing under {growth.WORKER_CAP:.0%} of adults, a shop rent no dearer than the median "
+    f"net new women, worker housing under {growth.WORKER_CAP:.0%} of adults, a shop rent no more expensive than the median "
     "salon site in its emirate (rent ratio 1 or more, or no rent known, or the emirate-median fallback: "
     "neutral, low confidence) and a site that would out-serve at least "
     f"{growth.DEMAND_PCT_MIN:.0%} of its emirate's salon sites (UAE-wide under 50; frozen reference). WATCH: big "
-    "enough but dearer or weaker demand, mostly "
+    "enough but more expensive or weaker demand, mostly "
     f"worker housing, or {growth.NEW_SITE_MIN // 2:,}+ net new women. SKIP: fewer, under "
     f"{growth.SKIP_UNDER_WOMEN:,} women, or non-residential by name. Under {growth.MIN_COVERAGE:.0%} of the "
     "women searched for competitors lowers confidence.")
@@ -671,7 +671,7 @@ def _template_headline(kind: str, action: str, f: dict) -> str:
         return (f"{action}: {'big enough' if f['big_enough'] else 'not big enough'}, "
                 + ("demand unknown" if dem is None else "strong demand" if dem >= 0 else "weaker demand")
                 + " for its emirate, and "
-                + ("rent unknown" if rent is None else "no dearer than" if rent >= 0 else "dearer than")
+                + ("rent unknown" if rent is None else "no more expensive than" if rent >= 0 else "more expensive than")
                 + ("" if rent is None else " its emirate's median salon site") + ".")
     return (f"Review {f['shrink_high_count']}, defend {f['protect_high_count']} and search for sites in "
             f"{f['grow_high_count']} areas (high-confidence calls).")
@@ -686,7 +686,7 @@ _TEMPLATE_CAPTIONS = {
                "are shown for context, not scored."),
     "area": ("Each area is a what-if new lounge: big enough when it would add enough net new "
              "women to the network, and GROW when it would also out-serve at least half its emirate's "
-             "salon sites and its rent is no dearer than theirs (median)."),
+             "salon sites and its rent is no more expensive than theirs (median)."),
     "uae": ("Lounge calls come from a fixed-scale scorecard scoring each site within its emirate's salon sites (demand and rent); "
             "growth-area calls from a what-if new lounge's net new women, demand percentile and rent ratio."),
 }

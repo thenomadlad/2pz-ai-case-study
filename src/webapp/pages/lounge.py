@@ -128,7 +128,7 @@ def _lounge_table(r) -> str | None:
                "lounge) and both score the site within its emirate's frozen market of competitor salon sites "
                "(demand pct = share of them it out-serves, UAE-wide where the emirate has under 50; rent ratio = their "
                "median shop rent ÷ the site's, above 1 = cheaper); the UAE columns rank the same site against all "
-               "UAE salon sites (rent pct: higher = dearer). Performance vs site = women the lounge serves ÷ women a typical "
+               "UAE salon sites (rent pct: higher = more expensive). Performance vs site = women the lounge serves ÷ women a typical "
                "lounge would serve there (2.7x reads 'The model estimates this lounge is performing 2.7x compared "
                "to its site'): context, not scored; shared catchment = share of its women another open lounge also reaches; review "
                "share = its share of its premium substitutes' Google reviews; premium reviews per 1k women = "

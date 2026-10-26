@@ -77,7 +77,7 @@ coverage, 5.5% women in worker housing, affluence off); every count of women is 
    - PROTECT: Al Ain, Al Dhafra, Al Falah, Al Taif Mall, Mirdif 35, Nad Al Sheba.
    - SHRINK (investigate, don't close: we can't see profit): City Walk (bottom 30% of Dubai's salon
      sites on demand, rent ratio 0.47), West Yas (bottom 45% of Abu Dhabi's, 0.82) and Al Jada (top
-     34% of Sharjah's on demand, but rent ratio 0.63: it sits on the dear Dubai edge of Sharjah).
+     34% of Sharjah's on demand, but rent ratio 0.63: it sits on the expensive Dubai edge of Sharjah).
    - 12 of the 23 calls are low confidence: close to a line, on a fallback rent, or moved by the
      assumptions (see Limitations).
    - **Where to look:** the Executive Summary's Review and Protect sections; the Lounges page for every lounge and its "What would change the call" tree.
@@ -89,7 +89,7 @@ coverage, 5.5% women in worker housing, affluence off); every count of women is 
    - These figures can't be added up: neighbouring areas reach the same women.
    - 17 of the 34 have no shop rent of their own (they take the emirate median), so their rent test is neutral and the call low confidence.
    - Most Sharjah GROWs are beyond a 15-minute drive of our two Sharjah lounges (Al Jada, Zawaya Walk, both on the Dubai side); why the footprint there is two is a business question the model can't answer.
-   - Most big WATCHes (Al Dhahir, Bani Yas, Al Helio) have the women but a rent dearer than their emirate's median salon site.
+   - Most big WATCHes (Al Dhahir, Bani Yas, Al Helio) have the women but a rent more expensive than their emirate's median salon site.
    - **Where to look:** the Executive Summary's Grow section; the Areas page; the What-if explorer's map (GROW areas in blue).
 3. **Where do our own lounges compete for the same women?**
    It shares each area's women among every salon that reaches them, our lounges included, and shows

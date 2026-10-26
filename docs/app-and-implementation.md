@@ -41,7 +41,7 @@ HOLD or SHRINK at a lounge's lease event, GROW as the start of a site search.
 
 **Key decisions, and their limitations.**
 - **Judge each site within its emirate**, against a frozen set of 1,123 competitor salon sites. Dubai
-  and Abu Dhabi markets (and rent sources) aren't comparable, and a UAE-wide yardstick sank every dear
+  and Abu Dhabi markets (and rent sources) aren't comparable, and a UAE-wide yardstick sank every expensive
   Dubai site. Limitation: a site is only as good as its emirate's yardstick; emirates with under 50 salon
   sites are ranked UAE-wide on demand.
 - **Score the site, not how much the lounge itself sells.** Site demand puts a typical lounge (757 reviews,

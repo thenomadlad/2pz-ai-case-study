@@ -35,9 +35,9 @@ def test_observed_takes_any_value_column_and_minimum():
 def test_trim_is_per_area_so_a_dear_area_keeps_its_rent():
     # Review C1: a global 1% cut fell entirely on Downtown and halved its median; nothing is cut now.
     rows = [_contract("Cheap", 100_000, 100) for _ in range(1000)]                       # AED 1,000/m2
-    rows += [_contract("Dear", 900_000 + i * 10_000, 100) for i in range(31)]            # 9,000-12,000/m2
+    rows += [_contract("Pricey", 900_000 + i * 10_000, 100) for i in range(31)]            # 9,000-12,000/m2
     got = shop_area_rents(pd.DataFrame(rows)).set_index("area")
-    assert got.loc["Dear"].median_rent_m2 == pytest.approx(10_500, rel=0.01)
+    assert got.loc["Pricey"].median_rent_m2 == pytest.approx(10_500, rel=0.01)
 
 
 def test_listing_exclusions_drop_industrial_and_cap_listings_per_building():

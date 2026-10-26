@@ -36,14 +36,14 @@ def _rule(a, d) -> None:
     cols[1].caption(f"{_check(a.demand_pct is None or a.demand_pct >= growth.DEMAND_PCT_MIN)} At least "
                     f"{growth.DEMAND_PCT_MIN:.0%}: " + growth.demand_text(a.demand_ref, a.demand_pct, a.demand_pct_uae, a.emirate))
     cols[2].metric("Rent ratio", "no data" if a.rent_ratio is None else f"{a.rent_ratio:.2f}")
-    cols[2].caption(f"{_check(growth.rent_ok(a))} Not dearer: "
+    cols[2].caption(f"{_check(growth.rent_ok(a))} Not more expensive: "
                     + growth.rent_text(a.rent_ratio, a.rent_pct_uae, a.emirate, growth.rent_fallback(a))
                     + "; unknown or emirate-median fallback passes")
     per_1k = "no data" if a.premium_reviews_per_1k is None else f"{a.premium_reviews_per_1k:,.0f}"
     cols[3].metric("Premium reviews per 1k women", per_1k)
     cols[3].caption(f"Saturation, context only (our lightest-quarter line is {growth.UNSATURATED_PER_1K:g}); "
                     f"{a.data_coverage:.0%} of the women searched for competitors")
-    st.info(f"What-if: open a typical lounge here. **GROW** needs all three checks, **WATCH** is big but dearer, weaker demand or "
+    st.info(f"What-if: open a typical lounge here. **GROW** needs all three checks, **WATCH** is big but more expensive, weaker demand or "
             f"mostly worker housing ({growth.WORKER_CAP:.0%}+ of adults), or adds "
             f"{growth.NEW_SITE_MIN // 2:,}+ net new women; **SKIP** otherwise. Under "
             f"{growth.SKIP_UNDER_WOMEN:,} women or a non-residential name is always SKIP. {d.rationale}")

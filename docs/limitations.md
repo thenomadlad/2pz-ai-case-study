@@ -82,7 +82,7 @@ has one, from the best source its emirate offers:
 - The JLL mall-class bands used before 2026-10-11 are dropped.
 
 The rent ratio compares a site only with **its own emirate's reference salon sites** (their median
-shop rent), so a Dubai contract rent is never set against a northern asking rent, and dear Dubai
+shop rent), so a Dubai contract rent is never set against a northern asking rent, and expensive Dubai
 sites are no longer marked down for being in Dubai (the UAE-wide cost anchor used before 2026-10-11
 put four of the five Dubai lounges on SHRINK; now only city-walk is, at its DLD area's AED 4,561/m²,
 rent ratio 0.47). The UAE-wide rent percentile is shown beside it as context, not scored. What is
@@ -186,10 +186,10 @@ of its women are within a 15-min drive of al-jada, zawaya-walk or mirdif-35). Ea
 open a typical lounge** (frozen at 757 reviews, 4.6★: the scored lounges' medians at the 2026-10-11
 baseline) at the area's centre and count the women it would add to the
 network, net of what it takes from our own lounges. GROW needs 6,000+ net new women, worker housing
-under 50%, a rent ratio of 1+ (no dearer than its emirate's median salon site; unknown or the
+under 50%, a rent ratio of 1+ (no more expensive than its emirate's median salon site; unknown or the
 emirate-median fallback passes) and a
 demand percentile of 0.5+ (the what-if lounge would out-serve at least half its emirate's reference
-salon sites; UAE-wide for emirates with under 50); WATCH is big but dearer or with weaker demand, big
+salon sites; UAE-wide for emirates with under 50); WATCH is big but more expensive or with weaker demand, big
 but mostly worker housing, or 3,000+ net new women; SKIP otherwise, or under 5,000 women,
 or a non-residential name. Saturation (premium reviews per 1k women) is shown as context, not tested.
 

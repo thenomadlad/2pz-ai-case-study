@@ -37,9 +37,9 @@ def test_grow_watch_skip_on_net_new_women_rent_and_demand():
     d = classify(_a(net=NEW_SITE_MIN, rent=RENT_RATIO_MIN, demand=DEMAND_PCT_MIN))
     assert d.action == "GROW" and "top 50% of Dubai salon sites on demand" in d.rationale
     d = classify(_a(net=NEW_SITE_MIN, rent=0.99, demand=0.9))
-    assert d.action == "WATCH" and "dearer" in d.rationale and "weaker" not in d.rationale
+    assert d.action == "WATCH" and "more expensive" in d.rationale and "weaker" not in d.rationale
     d = classify(_a(net=NEW_SITE_MIN, rent=1.2, demand=0.49))
-    assert d.action == "WATCH" and "weaker demand" in d.rationale and "dearer" not in d.rationale
+    assert d.action == "WATCH" and "weaker demand" in d.rationale and "more expensive" not in d.rationale
     assert "UAE-wide" in d.rationale                                       # the UAE context, always
     assert classify(_a(net=NEW_SITE_MIN - 1)).action == "WATCH"           # half a lounge or more
     assert classify(_a(net=NEW_SITE_MIN / 2 - 1)).action == "SKIP"

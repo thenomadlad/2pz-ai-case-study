@@ -35,7 +35,7 @@ capacity itself. So the ideal model allocates at the level of a **catchment regi
   branch. Over capacity: move providers to busier branches before closing one.
 - **Judge cost per region:** **total capacity of the region's branches ÷ total rent of those
   branches** (services we can sell per AED of rent), and services actually sold per AED of
-  total cost. Two lounges in one catchment are judged as one system: a dear branch can be right if it
+  total cost. Two lounges in one catchment are judged as one system: an expensive branch can be right if it
   lifts the region's services per AED, and a cheap one wrong if its providers sit idle while a sibling
   turns customers away.
 - **Branch decisions follow.** Open, resize, consolidate or exit are the moves that change a region's
@@ -109,7 +109,7 @@ We have no bookings, revenue, lease or capacity data, so every signal is a **pro
 | **Watch (HOLD)** | Mixed: strong on one signal, weak on the other, composite 0.35-0.65 | Profitable but below the network median, or utilisation slipping |
 | **Unhealthy (SHRINK)** | Weak demand for its emirate or rent well above the median: composite 0.35 or less. **Investigate, don't close**: we can't see profit | Loses money after its own rent and costs, low utilisation, appointments falling; and few of its customers would move to a sibling if it closed |
 | **Lounge vs location** | Performance vs its site: above 1x, the lounge sells more than a typical lounge would there (services sold, from reviews); below 1x, it trails its site | The same comparison on appointments and profit, which separates a good site badly run from a bad site well run |
-| **Grow** | A typical new lounge would add 6,000+ net new women, out-serve half the emirate's salon sites, at rent no dearer than their median | Predicted appointments × contribution per appointment covers rent and fit-out within an agreed payback period |
+| **Grow** | A typical new lounge would add 6,000+ net new women, out-serve half the emirate's salon sites, at rent no more expensive than their median | Predicted appointments × contribution per appointment covers rent and fit-out within an agreed payback period |
 
 ### Shared catchments aren't a reason to shrink
 
@@ -125,7 +125,7 @@ women there go unserved, and a new lounge can still be GROW, because it is judge
 what it would add after our own lounges keep theirs.
 
 - Of the 18 lounges sharing more than half their catchment with a sibling, **15 are HOLD or PROTECT**.
-  The 3 SHRINKs (City Walk, Al Jada, West Yas) are there for dear rent or weak demand for their
+  The 3 SHRINKs (City Walk, Al Jada, West Yas) are there for high rent or weak demand for their
   emirate, not for overlap.
 - Khalifa City A, Shakhbout City and Mohammed Bin Zayed City share 97-100% of their catchments and are
   all HOLD; if any one closed, its siblings would absorb only 19-20% of its customers.
@@ -189,7 +189,7 @@ flowchart LR
    site: PROTECT at `PROTECT_AT` or above, SHRINK at `SHRINK_AT` or below, HOLD between. Confidence
    is low within 0.05 of a line, on a fallback rent, or when a ±25% weight or a third of the 27
    drive-time x coverage x worker-share combinations change the call. Dropped on the way: a UAE-wide cost anchor
-   (`COST_ANCHOR`: it marked down every dear Dubai site and counted served women twice) and an
+   (`COST_ANCHOR`: it marked down every expensive Dubai site and counted served women twice) and an
    emirate-median-of-our-lounges baseline (it moved when a sibling opened or closed).
    **Cannibalisation** is a display-only what-if: close the lounge, what share of its women do
    siblings absorb ([`notebooks/scorecard.ipynb`](../notebooks/scorecard.ipynb)). **Performance vs
@@ -350,7 +350,7 @@ flowchart LR
     S7["DROPPED 200k anchor on catchment women:<br/>demand is now site served"]:::dropped
     S8["DROPPED Estimated customers:<br/>computed, never scored; superseded by served women"]:::dropped
     S10["DROPPED Emirate-median-of-lounges baseline:<br/>moved when siblings opened or closed"]:::dropped
-    S11["DROPPED UAE-wide COST_ANCHOR (cost index):<br/>marked down dear Dubai sites, counted served women twice;<br/>now rent ratio within the emirate"]:::dropped
+    S11["DROPPED UAE-wide COST_ANCHOR (cost index):<br/>marked down expensive Dubai sites, counted served women twice;<br/>now rent ratio within the emirate"]:::dropped
     S12["DROPPED 0 → 20k site-served scale:<br/>calibrated on our own lounges; now a percentile of salon sites"]:::dropped
     S13["UAE-wide demand and rent percentiles:<br/>context, not scored"]:::demoted
     S14["DROPPED Live-median typical lounge:<br/>drifted when a lounge closed; now frozen at 757 reviews, 4.6★"]:::dropped
@@ -398,7 +398,7 @@ no longer scored.*
 | **Lounge's own served women as the demand score** | How many women this lounge serves | It largely restated the lounge's review count, so PROTECT meant "busy lounge" rather than "good site" | Site served: what a *typical* lounge would serve at the site |
 | **0 → 20k site-served scale** | Site demand scored on a fixed scale | Calibrated on our own lounges, so it compared Dubai's crowded market with Abu Dhabi's | A percentile among the emirate's competitor salon sites |
 | **Emirate-median-of-lounges cost baseline** | Cost judged against the median of the emirate's own lounges | Sharjah's two lounges were graded against each other, and closing a sibling flipped other calls (Zawaya Walk went HOLD → SHRINK when Al Jada closed) | A frozen reference of competitor salon sites |
-| **UAE-wide cost anchor** | Served women per AED 1k of site cost against one UAE-wide number | Marked every dear Dubai site down without crediting Dubai's higher prices, and counted demand in both signals | Rent ratio within the emirate (rent only) |
+| **UAE-wide cost anchor** | Served women per AED 1k of site cost against one UAE-wide number | Marked every expensive Dubai site down without crediting Dubai's higher prices, and counted demand in both signals | Rent ratio within the emirate (rent only) |
 | **Live-median "typical lounge"** | The what-if lounge took the median reviews and rating of whichever lounges were open | It drifted when a lounge closed (757 → 755 reviews), enough to tip Al Maqta's call | Frozen at 757 reviews and 4.6★ |
 | **Premium saturation gate** (growth) | Reviews per 1,000 women as an "unsaturated" test | The demand split already gives competitors their share, so the gate counted competition twice | Net new women from the new-lounge what-if |
 | **Unreached cells only** (growth) | Growth areas had to be beyond every lounge's drive time | An under-served area inside our footprint can still deserve a lounge | Every named place, judged by net new women |

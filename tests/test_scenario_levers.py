@@ -56,8 +56,8 @@ def test_a_quote_clears_the_fallback_rent_flag():
 def test_area_quote_moves_the_grow_rent_test():
     r = run()
     grow = next(a for a, d in zip(r.areas, r.area_decisions) if d.action == "GROW" and a.rent_ratio)
-    dear = grow.shop_rent_m2 * grow.rent_ratio * 2     # twice its emirate's median salon-site rent
-    q = run(quotes={grow.area_id: dear})
+    expensive = grow.shop_rent_m2 * grow.rent_ratio * 2     # twice its emirate's median salon-site rent
+    q = run(quotes={grow.area_id: expensive})
     assert {d.area_id: d.action for d in q.area_decisions}[grow.area_id] == "WATCH"
 
 

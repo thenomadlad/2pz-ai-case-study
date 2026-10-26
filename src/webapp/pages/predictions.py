@@ -109,11 +109,11 @@ def _cells_help(r) -> str:
     """The cell colours in full: the hover help on CELLS_KEY."""
     return (f"🟦 **GROW**: a typical new lounge here would add ≥ {r.rules.grow_min:,} net new women, "
             f"worker housing under {growth.WORKER_CAP:.0%}, out-serving {r.rules.demand_pct_min:.0%}+ of its emirate's "
-            "salon sites *and* rent no dearer than their median (unknown, or on the emirate-median fallback, "
+            "salon sites *and* rent no more expensive than their median (unknown, or on the emirate-median fallback, "
             "passes as neutral with low confidence)  \n"
             f"🟩 **Already captured**: our lounges serve {CAPTURED_MIN:.0%}+ of its women (model estimate); "
             f"deeper green = more, deepest at {CAPTURED_FULL:.0%}+  \n"
-            "🟪 **WATCH**: big but dearer or weaker demand, or mostly worker housing  \n"
+            "🟪 **WATCH**: big but more expensive or weaker demand, or mostly worker housing  \n"
             f"⬜ **SKIP or no data**: under {growth.SKIP_UNDER_WOMEN:,} women, a non-residential name, or too small a "
             f"gain  \nUnderneath, every lounge's {data.minutes(r.levels)}-min catchment at once: faint teal = one "
             "lounge reaches the cell, 🟥 red = shared by 2+ lounges (deeper = more). Hover a cell for which lounges.")

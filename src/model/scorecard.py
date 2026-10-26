@@ -34,7 +34,7 @@ RENT_RATIO_WHY = (
     "Frozen 2026-10-11 from the reference salon sites (scripts/build_site_reference.py): the 10th and "
     "90th percentiles of rent_ratio (its emirate's median salon-site rent ÷ its own) over all 1,123. "
     f"A ratio of {RENT_RATIO_P10:.2f} or less (rent {1 / RENT_RATIO_P10:.1f}x the emirate median or more: the "
-    f"dearest 10% of salon sites) scores 0; {RENT_RATIO_P90:.2f} or more (rent {1 / RENT_RATIO_P90:.0%} of the "
+    f"most expensive 10% of salon sites) scores 0; {RENT_RATIO_P90:.2f} or more (rent {1 / RENT_RATIO_P90:.0%} of the "
     "median or less: the cheapest 10%) scores 1; in between it scales evenly, so a site at its emirate's "
     f"median rent scores {(1 - RENT_RATIO_P10) / (RENT_RATIO_P90 - RENT_RATIO_P10):.2f}.")
 
